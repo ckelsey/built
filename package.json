@@ -1,7 +1,7 @@
 {
     "name": "builtjs",
-    "version": "0.0.1",
-    "main": "dist/index.js",
+    "version": "0.0.2",
+    "main": "dist/built.js",
     "scripts": {
         "start": "gulp",
         "build": "gulp build",

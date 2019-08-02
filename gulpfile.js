@@ -153,9 +153,31 @@ const polyfill = () => {
     })
 }
 
+const built = () => new Promise((resolve) => {
+    currentPacking = spawn(`webpack`, [
+        `--config`,
+        `webpack.build.config.js`,
+        `--progress`
+    ])
+
+    currentPacking.stdout.on(`data`, data => {
+        console.log(`pack: ${data.toString()}`)
+    })
+
+    currentPacking.stderr.on(`data`, data => {
+        console.log(`pack: ${data.toString()}`)
+    })
+
+    currentPacking.on(`exit`, () => {
+        console.log(`pack done`)
+        exec(`osascript -e 'display notification "Complete" with title "WEBPACK BUILD"'`)
+        return resolve()
+    })
+})
+
 gulp.task(`polyfill`, gulp.parallel(polyfill))
 gulp.task(`watch`, gulp.parallel(watch))
 gulp.task(`pack`, gulp.parallel(pack))
 gulp.task(`server`, gulp.parallel(server))
-gulp.task(`build`, gulp.parallel(`polyfill`, `pack`))
+gulp.task(`build`, gulp.parallel(built))
 gulp.task(`default`, gulp.parallel(`server`, `polyfill`, `pack`, `watch`))
