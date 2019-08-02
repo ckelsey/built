@@ -1,0 +1,46 @@
+<style>
+    .overlay-content-container,
+    overlay-content,
+    :host,
+    :root {
+        display: block;
+        position: fixed;
+        height: 0px;
+        width: 0px;
+        top: 0px;
+        left: 0px;
+        z-index: 99999;
+        overflow: visible;
+        pointer-events: none;
+    }
+
+    .overlay-content-container-inner {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    .overlay-content-content-container {
+        max-height: 80vh;
+        max-width: 80vw;
+        overflow: auto;
+        position: relative;
+        width: 100%;
+        top: 0px;
+        left: 0px;
+        transform-origin: center center;
+        transform: scale(1, 0);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .overlay-content-container.active .overlay-content-content-container {
+        pointer-events: all;
+        opacity: 1;
+    }
+</style>

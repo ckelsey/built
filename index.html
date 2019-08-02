@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+        <style>
+            html {
+                height: 100%;
+            }
+
+            body {
+                font-family: sans-serif;
+                font-size: 14px;
+                color: #333;
+                margin: 0px 0px 0px 0px;
+                padding: 10rem 2rem;
+                box-sizing: border-box;
+                min-height: 100%;
+                /* height: 100vh;
+                width: 100vw; */
+                background: #ccc;
+            }
+
+            input-field {
+                width: 500px;
+                display: inline-block;
+                opacity: 1;
+            }
+
+            /* .input-field-container .input-field-input-container-inner {
+                background: #a10005;
+            }
+
+            .thing.input-field-container .input-field-input-container-inner {
+                background: green;
+            } */
+
+        </style>
+        <script src="/dist/webcomponentsjs/custom-elements-es5-adapter.js"></script>
+        <script src="/dist/webcomponentsjs/webcomponents-loader.js"></script>
+        <script src="/dist/effect-bounce-z.js"></script>
+        <script src="/dist/effect-underline.js"></script>
+        <script src="/dist/effect-ripple.js"></script>
+        <script src="/dist/icon-element.js"></script>
+        <script src="/dist/overlay-content.js"></script>
+        <script src="/dist/input-field.js"></script>
+        <script src="/dist/rotary-list.js"></script>
+        <script src="/dist/calendar-grid.js"></script>
+    </head>
+
+    <body>
+        <input-field
+            format='{ "method": "pipe", "fns": [ { "method": "match", "values": [ "([A-Z0-9]{1,4})", "gi" ] }, { "method": "join", "values": [ "-" ] }, { "method": "slice", "values": [ 0,19 ] } ] }'>
+        </input-field>
+    </body>
+
+</html>

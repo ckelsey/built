@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "experimentalDecorators": true,
+    "lib": [
+      "dom",
+      "es2015",
+      "webworker"
+    ],
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "es5",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowJs": false,
+    "declaration": false
+  },
+  "include": [
+    "./src/**/**/*.ts",
+    "./types.d.ts",
+    "./html.d.ts",
+    "./typings.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
