@@ -5,7 +5,7 @@ import Observable from '../../utils/observable'
 import { UnderlineObservedAttributes, UnderlineOperations } from './attributes'
 import Convert from '../../utils/convert'
 
-class EffectUnderline extends HTMLElement {
+export class EffectUnderline extends HTMLElement {
     public Template
     public state: { [key: string]: Subject } = {}
     public targets$ = []
@@ -164,6 +164,6 @@ class EffectUnderline extends HTMLElement {
     }
 }
 
-window.customElements.define(`effect-underline`, EffectUnderline)
-
-export default EffectUnderline
+if (!window.customElements.get(`effect-underline`)) {
+    window.customElements.define(`effect-underline`, EffectUnderline)
+}

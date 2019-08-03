@@ -12,7 +12,7 @@ const getDimension = target => {
     return (((max - min) / 2) + min)
 }
 
-class EffectBounceZ extends HTMLElement {
+export class EffectBounceZ extends HTMLElement {
     public state: { [key: string]: Subject } = {}
     public targets$ = []
     public downEvent
@@ -165,6 +165,6 @@ class EffectBounceZ extends HTMLElement {
     }
 }
 
-window.customElements.define(`effect-bounce-z`, EffectBounceZ)
-
-export default EffectBounceZ
+if (!window.customElements.get(`effect-bounce-z`)) {
+    window.customElements.define(`effect-bounce-z`, EffectBounceZ)
+}

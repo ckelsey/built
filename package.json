@@ -10,6 +10,14 @@
         "build:types": "tsc --emitDeclarationOnly",
         "build:babel": "babel src --out-dir dust --extensions \".ts\" --source-maps inline"
     },
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ckelsey/built.git"
+    },
     "devDependencies": {
         "@babel/cli": "^7.2.3",
         "@babel/core": "^7.4.0",

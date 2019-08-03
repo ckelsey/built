@@ -28,7 +28,7 @@ const operations = that => ({
     dates: () => that.populate(that[`value`]),
 })
 
-class CalendarGrid extends HTMLElement {
+export class CalendarGrid extends HTMLElement {
     public state: { [key: string]: Subject } = {}
     public $container
     public lastPopulate
@@ -345,6 +345,6 @@ class CalendarGrid extends HTMLElement {
     }
 }
 
-window.customElements.define(`calendar-grid`, CalendarGrid)
-
-export default CalendarGrid
+if (!window.customElements.get(`calendar-grid`)) {
+    window.customElements.define(`calendar-grid`, CalendarGrid);
+}

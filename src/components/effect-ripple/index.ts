@@ -5,7 +5,7 @@ import Observable from '../../utils/observable'
 import { RippleObservedAttributes, RippleOperations } from './attributes'
 import Convert from '../../utils/convert'
 
-class EffectRipple extends HTMLElement {
+export class EffectRipple extends HTMLElement {
     public state: { [key: string]: Subject } = {}
     public targets$ = []
     public downEvent
@@ -174,6 +174,6 @@ class EffectRipple extends HTMLElement {
     }
 }
 
-window.customElements.define(`effect-ripple`, EffectRipple)
-
-export default EffectRipple
+if (!window.customElements.get(`effect-ripple`)) {
+    window.customElements.define(`effect-ripple`, EffectRipple)
+}

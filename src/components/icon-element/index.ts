@@ -3,7 +3,7 @@ import style from './style.min.html'
 import Subject from '../../utils/subject'
 import { IconElementAttributes, IconElementAttributeOperations } from './attributes'
 
-class IconElement extends HTMLElement {
+export class IconElement extends HTMLElement {
     public subscription
     public state = {}
 
@@ -62,6 +62,6 @@ class IconElement extends HTMLElement {
     }
 }
 
-window.customElements.define(`icon-element`, IconElement)
-
-export default IconElement
+if (!window.customElements.get(`icon-element`)) {
+    window.customElements.define(`icon-element`, IconElement)
+}

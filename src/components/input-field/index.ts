@@ -7,7 +7,14 @@ import { InputFieldParseValue, InputFieldSanitizeValue, InputFieldValueNull, Inp
 import { ValidateHtml } from '../../utils/validate'
 import { InputFieldSubscriptionMethods } from './subscription-methods'
 
-class InputField extends HTMLElement {
+import '../effect-bounce-z'
+import '../effect-ripple'
+import '../effect-underline'
+import '../icon-element'
+import '../overlay-content'
+import '../rotary-list'
+
+export class InputField extends HTMLElement {
     public state: { [key: string]: Subject } = {}
 
     public $bounceZ: HTMLElement
@@ -499,12 +506,9 @@ class InputField extends HTMLElement {
     }
 }
 
-window.customElements.define(`input-field`, InputField)
-
-export default InputField
-
-
-
+if (!window.customElements.get(`input-field`)) {
+    window.customElements.define(`input-field`, InputField);
+}
 
 
 

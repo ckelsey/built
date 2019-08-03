@@ -19,7 +19,7 @@ const operations = that => ({
     readonly: () => that.populate(that[`value`]),
 })
 
-class TimeDisplay extends HTMLElement {
+export class TimeDisplay extends HTMLElement {
     public state: { [key: string]: Subject } = {}
     public $container
     public lastPopulate
@@ -157,6 +157,6 @@ class TimeDisplay extends HTMLElement {
     }
 }
 
-window.customElements.define(`time-display`, TimeDisplay)
-
-export default TimeDisplay
+if (!window.customElements.get(`time-display`)) {
+    window.customElements.define(`time-display`, TimeDisplay)
+}

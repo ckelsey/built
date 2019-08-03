@@ -4,7 +4,7 @@ import Subject from '../../utils/subject'
 import { OverlayContentObservedAttributes } from './attributes'
 import { GetCurve } from '../../utils/curve'
 
-class OverlayContent extends HTMLElement {
+export class OverlayContent extends HTMLElement {
     public state: { [key: string]: Subject } = {}
     public $container
     public $contentContainer
@@ -219,6 +219,6 @@ class OverlayContent extends HTMLElement {
     }
 }
 
-window.customElements.define(`overlay-content`, OverlayContent)
-
-export default OverlayContent
+if (!window.customElements.get(`overlay-content`)) {
+    window.customElements.define(`overlay-content`, OverlayContent)
+}

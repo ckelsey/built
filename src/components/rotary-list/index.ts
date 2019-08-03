@@ -59,7 +59,7 @@ const operations = that => ({
     }
 })
 
-class RotaryList extends HTMLElement {
+export class RotaryList extends HTMLElement {
     public state: { [key: string]: Subject } = {}
     public $list
     public $optionStyles
@@ -346,6 +346,6 @@ class RotaryList extends HTMLElement {
     }
 }
 
-window.customElements.define(`rotary-list`, RotaryList)
-
-export default RotaryList
+if (!window.customElements.get(`rotary-list`)) {
+    window.customElements.define(`rotary-list`, RotaryList)
+}
