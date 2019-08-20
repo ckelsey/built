@@ -1,8 +1,7 @@
 <style>
     .overlay-content-container,
     overlay-content,
-    :host,
-    :root {
+    :host {
         display: block;
         position: fixed;
         height: 0px;
@@ -30,8 +29,6 @@
         overflow: auto;
         position: relative;
         width: 100%;
-        top: 0px;
-        left: 0px;
         transform-origin: center center;
         transform: scale(1, 0);
         pointer-events: none;
@@ -43,4 +40,16 @@
         pointer-events: all;
         opacity: 1;
     }
+
+    .overlay-content-content-inner {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-height: 100%;
+    }
+
+    .overlay-content-content-inner.bottom {
+        justify-content: flex-start;
+    }
+
 </style>

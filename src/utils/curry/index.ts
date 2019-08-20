@@ -16,7 +16,3 @@ function Curry(func: () => any, cachedArgs: any[] = []) {
 }
 
 export default Curry
-
-// const transduce = Curry(
-//     (step, initial, xform, foldable) => foldable.reduce(xform(step), initial)
-// )

@@ -1,0 +1,47 @@
+fix effect bounce width issue
+
+
+
+
+
+
+ * BUG - Overlay placement, check with datetime
+
+ * TODO - INPUT-FIELD - MULTI INPUT
+ * TODO - INPUT-FIELD - put date-time in
+ * TODO - INPUT-FIELD - put date in
+ * TODO - INPUT-FIELD - put time in
+
+  * TODO - INPUT-FIELD - select - keyboard shortcuts
+
+ * TODO - DATE-TIME - if value is array, move to values / value gets values if array
+ * TODO - TIME - if value is array, move to values / value gets values if array
+ * TODO - CAL - if value is array, move to values / value gets values if array
+ 
+ * TODO - DATE-TIME - Delegate/accept time/date values according to element (time->time display)
+ * TODO - CAL - Only accept date values
+ * TODO - TIME - Only accept time values
+
+ * TODO - TIME - able to turn on/off hours/minutes/seconds/ampm
+ * TODO - TIME - military time
+ * TODO - TIME - handle this.Values
+
+
+ * TODO - INPUT-FIELD - ROTARY - ability to type in input
+ * TODO - INPUT-FIELD - DATERANGE = multi in input, cal in dropdown
+ * TODO - INPUT-FIELD - DATERANGE TIME = multi in input, cal and time in dropdown
+ * TODO - INPUT-FIELD - DATE TIMERANGE = multi in input, cal and time in dropdown
+ * TODO - INPUT-FIELD - DATERANGE TIMERANGE = multi in input, cal and time in dropdown
+ * TODO - INPUT-FIELD - SELECT - mobile: do native
+ * TODO - INPUT-FIELD - ROTARY - mobile: do native
+
+ * TODO - CAL CONTROLS - adjust month/year display, scale fontsize to overall cal size
+
+Cal: swipe left/right to change month
+Cal: month transition to slide
+Cal: show current date
+Select: have checboxes for multi select
+Select: touch/wheel scroll
+Cal:event element
+
+ * TODO - input settings for css/features

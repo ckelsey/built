@@ -1,0 +1,50 @@
+<style>
+    button-element,
+    :host {
+        font: inherit;
+        line-height: inherit;
+        display: inline-block;
+        position: relative;
+    }
+
+    .button-element {
+        display: block;
+        position: relative;
+        margin: 1.4em 0;
+    }
+
+    button {
+        opacity: 0;
+        background: rgba(255, 255, 255, 0.4);
+        position: relative;
+        border: none;
+        border-radius: 0px;
+        display: block;
+        margin: 0px;
+        width: auto;
+        padding: 1em;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -ms-appearance: none;
+        -moz-appearance: none;
+        box-sizing: border-box;
+        text-overflow: ellipsis;
+        hyphens: auto;
+        box-shadow: rgba(0, 0, 0, 0.13) 0px -0.09em 0px inset, rgba(0, 0, 0, 0.31) 0px 0px 0px 0.02em inset;
+        transition: color 0.4s ease, background-color 0.4s ease, opacity 0.2s ease-in-out 0.01s;
+        outline: 0px !important;
+        transform: scale(1);
+    }
+
+    button.ready {
+        opacity: 1;
+    }
+
+    slot {
+        pointer-events: none;
+    }
+
+</style>

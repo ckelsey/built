@@ -3,6 +3,10 @@ const Get = (
     path: string = ``,
     emptyVal: any = undefined
 ) => {
+    if (!el) {
+        return emptyVal
+    }
+
     let Path = [el]
 
     if (path && path.toString().split) {

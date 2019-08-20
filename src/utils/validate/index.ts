@@ -1,10 +1,42 @@
 import { ValidateResponse } from '../../../typings'
 import { svgTags, htmlTags } from '../html'
+import { ToUsZip } from '../convert/postal'
+import { ToNumber } from '../convert/number'
+import { ToString } from '../convert/string'
+import pipe from '../pipe';
+import { FromEntities } from '../convert/entities'
+import { IfInvalid } from '../convert/if'
+
+export const ValidateUsZip = (val: any): ValidateResponse => {
+    const original = val
+    const reason: string[] = []
+
+    const result = ToUsZip(val)
+
+    if (!result.valid) {
+        if (result.value.length < 5) {
+            reason.push(`minimum of 5 digits`)
+        }
+
+        if (result.value.length > 5 && result.value.length < 10) {
+            reason.push(`needs to be 5 or 9 digits`)
+        }
+    }
+
+    return {
+        original,
+        valid: result.valid,
+        sanitized: original,
+        reason
+    }
+}
 
 export const ValidateUrl = (str: string): ValidateResponse => {
     const original = str
+    const converted = pipe(ToString, FromEntities)(str)
+    const val = converted.value
 
-    if (!str || str.length === 0) {
+    if (!str || str.length === 0 || converted.type !== `string`) {
         return {
             original: str,
             valid: false,
@@ -13,13 +45,9 @@ export const ValidateUrl = (str: string): ValidateResponse => {
         }
     }
 
-    if (typeof str !== `string` && str !== undefined) {
-        str = (str as any).toString()
-    }
-
     const reasons: string[] = []
     const link = document.createElement('a')
-    link.href = str
+    link.href = val
 
     if (!link.protocol) {
         reasons.push(`Missing url protocol`)
@@ -33,24 +61,6 @@ export const ValidateUrl = (str: string): ValidateResponse => {
         original,
         valid: reasons.length === 0,
         sanitized: link.href,
-        reason: reasons
-    }
-}
-
-export const ValidateUsZipCode = (val: string): ValidateResponse => {
-    const original = val
-    const reasons: string[] = []
-    let result = val
-
-    if (!/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(val)) {
-        result = undefined
-        reasons.push(`invalid`)
-    }
-
-    return {
-        original,
-        valid: reasons.length === 0,
-        sanitized: result,
         reason: reasons
     }
 }
@@ -184,17 +194,13 @@ export const ValidatePhone = (val: string | number): ValidateResponse => {
         const numberREGEX = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
         result = val.replace(/\D/g, '')
 
-        if (result.length === 10) {
-            result = `1${result}`
-        }
-
         const length = result.length
 
         if (!numberREGEX.test(result)) {
             reasons.push(`invalid characters`)
         }
 
-        if (length < 11) {
+        if (length < 10) {
             reasons.push(`not enough digits`)
         }
     }
@@ -204,6 +210,24 @@ export const ValidatePhone = (val: string | number): ValidateResponse => {
         valid: reasons.length === 0,
         sanitized: result,
         reason: reasons
+    }
+}
+
+export const ValidateUsPhone = (val: string | number): ValidateResponse => {
+    const original = val
+    const reason = []
+    const converted = pipe(ToString, FromEntities, IfInvalid(``))(val)
+    const value = converted.value.replace(/[^\d]+/g, ``)
+
+    if (value.length !== 10) {
+        reason.push(`needs 10 digits`)
+    }
+
+    return {
+        original,
+        valid: reason.length === 0,
+        sanitized: original,
+        reason
     }
 }
 
@@ -236,39 +260,36 @@ export const ValidateBool = (val: any): ValidateResponse => {
 export const ValidateNumber = (num: any): ValidateResponse => {
     const original = num
     const reasons = []
-    let parsed = typeof num === `string` && num !== `` ? parseFloat(num as any) : num
+    const formatted = ToNumber(num)
 
-    if (isNaN(parsed)) {
-        parsed = null
+    if (!formatted.valid) {
         reasons.push(`not a number`)
     }
 
     return {
         original,
         valid: reasons.length === 0,
-        sanitized: parsed,
+        sanitized: formatted.value,
         reason: reasons
     }
 }
 
 export const ValidateEmail = (str: any): ValidateResponse => {
     const original = str
+    const converted = pipe(ToString, FromEntities)(str)
+    let val = converted.value
 
-    if (!str || !str.length) {
+    if (!val || !val.length || converted.type !== `string`) {
         return {
             original,
             valid: false,
-            sanitized: str,
+            sanitized: val,
             reason: [`no value`]
         }
     }
 
-    if (typeof str !== `string`) {
-        str = `${str}`
-    }
-
     const reasons = []
-    const split = str.split(`@`)
+    const split = val.split(`@`)
 
     if (!split[0] || !split[0].length) {
         reasons.push(`missing username`)
@@ -291,39 +312,30 @@ export const ValidateEmail = (str: any): ValidateResponse => {
         return {
             original,
             valid: false,
-            sanitized: str,
+            sanitized: val,
             reason: reasons
         }
     }
 
-    return ValidateHtml(str)
+    return ValidateHtml(val)
 }
 
 export const ValidateText = (str: any): ValidateResponse => {
     const original = str
     const reasons = []
+    const converted = pipe(ToString, FromEntities)(str)
+    let val = converted.value
 
-    if (!str || !str.length) {
+    if (!val || !val.length || converted.type !== `string`) {
         return {
             original,
             valid: false,
-            sanitized: str,
+            sanitized: val,
             reason: reasons.concat([`no value`])
         }
     }
 
-    const type = typeof str
-
-    if (type !== `string`) {
-        return {
-            original,
-            valid: false,
-            sanitized: str,
-            reason: reasons.concat([`not text`])
-        }
-    }
-
-    const htmlResults = ValidateHtml(str)
+    const htmlResults = ValidateHtml(val)
 
     htmlResults.reason = htmlResults.reason.concat(reasons)
 
@@ -332,39 +344,31 @@ export const ValidateText = (str: any): ValidateResponse => {
 
 export const ValidateHtml = (str: any, allowedHtmlTags?: string[], disallowedHtmlTags?: string[]): ValidateResponse => {
     const original = str
+    const converted = pipe(ToString, FromEntities)(str)
+    let val = converted.value
+
     const getElements = (Doc: Document, selector: string): HTMLElement[] => {
         return Array.from(Doc.body.querySelectorAll(selector))
     }
 
-    if (!str || !str.length) {
+    if (!str || !str.length || converted.type !== `string`) {
         return {
             original,
             valid: false,
-            sanitized: str,
+            sanitized: val,
             reason: [`no value`]
-        }
-    }
-
-    const type = typeof str
-
-    if (type !== `string`) {
-        return {
-            original,
-            valid: false,
-            sanitized: str,
-            reason: [`not text, is ${type}`]
         }
     }
 
     let doc
 
     try {
-        doc = new DOMParser().parseFromString(str, `text/html`)
+        doc = new DOMParser().parseFromString(val, `text/html`)
     } catch (error) {
         return {
             original,
             valid: true,
-            sanitized: str,
+            sanitized: val,
             reason: [`no html present`],
         }
     }
@@ -415,7 +419,7 @@ export const ValidateHtml = (str: any, allowedHtmlTags?: string[], disallowedHtm
     return {
         original,
         valid,
-        sanitized: valid ? str : !doc.body.innerHTML || !doc.body.innerHTML.length ? `` : doc.body.innerHTML,
+        sanitized: valid ? val : !doc.body.innerHTML || !doc.body.innerHTML.length ? `` : doc.body.innerHTML,
         reason: valid ? [] : [`${diff} element${diff > 1 ? `s were` : ` was`} removed`]
     }
 }

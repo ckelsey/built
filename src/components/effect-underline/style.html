@@ -1,5 +1,6 @@
 <style>
     :host,
+    effect-underline,
     .effect-underline-container,
     .effect-underline-container * {
         pointer-events: none;
@@ -17,6 +18,7 @@
         pointer-events: none;
         display: block;
         transform: scale(0);
+        /* will-change: transform, transform-origin, opacity; */
         transition:
             transform-origin 0.2s ease-in-out,
             transform 0.2s ease-in-out,

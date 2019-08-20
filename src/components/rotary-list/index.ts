@@ -1,39 +1,60 @@
-import template from './index.min.html'
-import style from './style.min.html'
 import Subject from '../../utils/subject'
 import { Options } from '../../utils/convert/options'
 import { ToString } from '../../utils/convert/string'
-import pipe from '../../utils/pipe';
+import pipe from '../../utils/pipe'
 import { IfInvalid } from '../../utils/convert/if'
 import { EventName } from '../../utils/html/events'
 import { ToNumber } from '../../utils/convert/number'
 import Get from '../../utils/get'
+import { ToBool } from '../../utils/convert/bool'
+import { webComponentTemplate } from '../../utils/html'
+
+const template = require('./index.html')
+const style = require('./style.html')
+const componentName = `rotary-list`
+const componentRoot = `.rotary-list-container`
+
+const validValue = (val, that) => {
+    const exact = that.values.filter(
+        o => o.toString().toLowerCase() === val.toString().toLowerCase()
+    )
+
+    if (exact[0]) {
+        return exact[0]
+    }
+
+    const startsWith = that.values.filter(
+        o => o.toString().toLowerCase()
+            .startsWith(val.toString().toLowerCase())
+    )
+
+    if (startsWith[0]) {
+        return startsWith[0]
+    }
+
+    const includes = that.values.filter(
+        o => o.toString().toLowerCase()
+            .includes(val.toString().toLowerCase())
+    )
+
+    if (includes[0]) {
+        return includes[0]
+    }
+
+    return false
+}
 
 const Properties = {
     lines: val => pipe(ToNumber, IfInvalid(5))(val).value,
-    value: (val, that) => {
-        const current = that.value === undefined
-            ? that.filteredOptions[0] === undefined
-                ? that.options
-                    ? that.options[0]
-                    : that.filteredOptions[0]
-                : that.filteredOptions[0]
-            : that.filteredOptions[0]
-
-        const currentValue = current ? current.value : undefined
-        const newVal = val === undefined
-            ? currentValue
-            : that.filteredOptions.filter(o => val.toString() === o.value.toString()).length === 0
-                ? currentValue
-                : val
-        return newVal
-    },
+    value: (val, that) => validValue(val, that) || that.Value,
     options: (val, that) => {
         const res = Options(val)
         return res.valid ? res.value : !!that.options && that.options.length ? that.options : []
     },
     filter: val => pipe(ToString, IfInvalid(``))(val).value,
-    spacing: val => pipe(ToNumber, IfInvalid(1.5))(val).value
+    spacing: val => pipe(ToNumber, IfInvalid(1.5))(val).value,
+    disablefilter: val => ToBool(val).value,
+    class: val => val
 }
 
 const operations = that => ({
@@ -56,11 +77,36 @@ const operations = that => ({
     spacing: () => {
         that.setOptions()
         that.onSpaceChange()
+    },
+    disablefilter: () => {
+        that.setOptions()
+        that.onFilterChange()
+    },
+    class: (that, val) => {
+        const newClasses = !!val && typeof val === `string` ? val.split(` `).map(c => c.trim()) : []
+        const clss = that.$container.className.split(` `).map(c => c.trim())
+        const prev = !!that.state.class.previous && typeof that.state.class.previous === `string` ? that.state.class.previous.split(` `).map(c => c.trim()) : []
+
+        prev.forEach(c => {
+            const indexInClss = clss.indexOf(c)
+            if (newClasses.indexOf(c) === -1 && indexInClss > -1) {
+                clss.splice(indexInClss, 1)
+            }
+        })
+
+        newClasses.forEach(c => {
+            if (clss.indexOf(c) === -1) {
+                clss.push(c)
+            }
+        })
+
+        that.$container.className = clss.map(c => c.trim()).filter(c => !!c).join(` `)
     }
 })
 
 export class RotaryList extends HTMLElement {
     public state: { [key: string]: Subject } = {}
+    public $container
     public $list
     public $optionStyles
     public $heightIndicator
@@ -68,6 +114,7 @@ export class RotaryList extends HTMLElement {
     public transitionTimer
     public lineHeights = []
     public filteredOptions = []
+    public optionsBuildTimer
 
     public get selectedIndex() {
         let index = 0
@@ -128,11 +175,8 @@ export class RotaryList extends HTMLElement {
         if (this.shadowRoot) { return }
 
         const Operations = operations(this)
-        const Template = document.createElement(`template`)
-        Template.innerHTML = `${style}${template}`
 
-        const clone = document.importNode(Template.content, true)
-        this.attachShadow({ mode: 'open' }).appendChild(clone)
+        webComponentTemplate(componentName, template, this, style, componentRoot)
 
         this.setElements()
         this.setOptions()
@@ -175,6 +219,8 @@ export class RotaryList extends HTMLElement {
         })
     }
 
+    public validValue(val) { return !!validValue(val, this) }
+
     public move(direction) {
         this[`value`] = this.filteredOptions[this.selectedIndex + direction] ? this.filteredOptions[this.selectedIndex + direction].value : this[`value`]
     }
@@ -188,19 +234,32 @@ export class RotaryList extends HTMLElement {
     }
 
     public setElements() {
+        this.$container = this.shadowRoot.querySelector(`.rotary-list-container`)
         this.$list = this.shadowRoot.querySelector(`.rotary-list-inner`)
         this.$optionStyles = this.shadowRoot.querySelector(`#option-styles`)
         this.$heightIndicator = this.shadowRoot.querySelector(`.rotary-list-height`)
+
+        this.$list.addEventListener(`blur`, () => {
+            const event = new CustomEvent(`rotaryblur`, {})
+            this.dispatchEvent(event)
+        })
     }
 
     public filterOptions() {
-        this.filteredOptions = !!this[`filter`]
-            ? this[`options`].filter(o => o.value.toString().startsWith(this[`filter`].toString()))
-            : this[`options`].slice()
+        if (
+            this[`disablefilter`]
+            || this[`filter`] === ``
+            || this[`filter`] === undefined
+            || this[`filter`] === null
+        ) {
+            return this.filteredOptions = this[`options`].slice()
+        }
+
+        this.filteredOptions = this[`options`].filter(o => o.value.toString().includes(this[`filter`].toString()))
     }
 
     public getOptionClassCount() {
-        return Math.round(Math.min(this[`lines`], this.filteredOptions.length) / 2)
+        return this[`lines`]
     }
 
     public setLines() {
@@ -228,39 +287,48 @@ export class RotaryList extends HTMLElement {
     }
 
     public setOptions() {
-        this.$list.classList.add(`no-transition`)
-        this.filterOptions()
-        this.setLines()
+        cancelAnimationFrame(this.optionsBuildTimer)
 
-        const ruleCount = this.getOptionClassCount()
+        this.optionsBuildTimer = requestAnimationFrame(() => {
+            if (!this.parentElement) { return }
+            this.$list.classList.add(`no-transition`)
+            this.filterOptions()
+            this.setLines()
 
-        this.$list.innerHTML = ``
-        this.filteredOptions.forEach(optionData => {
-            const optionIndex = this.$list.children.length
-            const option = document.createElement(`div`)
-            option.textContent = optionData.label
-            option.setAttribute(`value`, optionData.value)
-            option.className = `rotary-list-option`
-            this.$list.appendChild(option)
-            option.addEventListener(`click`, () => this[`value`] = this.values[optionIndex])
+            const ruleCount = this.getOptionClassCount()
+
+            this.$list.innerHTML = ``
+            this[`options`].forEach(optionData => {
+                const optionIndex = this.$list.children.length
+                const option = document.createElement(`div`)
+                option.textContent = optionData.label
+                option.setAttribute(`value`, optionData.value)
+                option.className = `rotary-list-option`
+                this.$list.appendChild(option)
+                option.addEventListener(`mousedown`, e => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this[`value`] = this.values[optionIndex]
+                })
+            })
+
+            let emptyIndex = 0
+            while (emptyIndex <= ruleCount) {
+                const emptyOption = document.createElement(`div`)
+                const emptyOption2 = document.createElement(`div`)
+                emptyOption.className = `rotary-list-option`
+                emptyOption2.className = `rotary-list-option`
+                emptyOption.innerHTML = `&nbsp;`
+                emptyOption2.innerHTML = `&nbsp;`
+                emptyOption.setAttribute(`empty-option`, `1`)
+                emptyOption2.setAttribute(`empty-option`, `1`)
+                this.$list.appendChild(emptyOption)
+                this.$list.insertBefore(emptyOption2, this.$list.children[0])
+                emptyIndex = emptyIndex + 1
+            }
+
+            this.setOptionsClasses()
         })
-
-        let emptyIndex = 0
-        while (emptyIndex <= ruleCount) {
-            const emptyOption = document.createElement(`div`)
-            const emptyOption2 = document.createElement(`div`)
-            emptyOption.className = `rotary-list-option`
-            emptyOption2.className = `rotary-list-option`
-            emptyOption.innerHTML = `&nbsp;`
-            emptyOption2.innerHTML = `&nbsp;`
-            emptyOption.setAttribute(`empty-option`, `1`)
-            emptyOption2.setAttribute(`empty-option`, `1`)
-            this.$list.appendChild(emptyOption)
-            this.$list.insertBefore(emptyOption2, this.$list.children[0])
-            emptyIndex = emptyIndex + 1
-        }
-
-        this.setOptionsClasses()
     }
 
     public setOptionsClasses() {
@@ -295,11 +363,8 @@ export class RotaryList extends HTMLElement {
                 down = down + 1
             }
 
-            // on scroll, the container jiggles in height
             const reset = () => {
                 options[selectedIndex].removeEventListener(EventName(`transitionend`), removeStyles, true)
-                // this.$list.style.removeProperty(`height`)
-                // this.$list.style.removeProperty(`overflow`)
             }
             const removeStyles = () => {
                 clearTimeout(this.transitionTimer)
@@ -346,6 +411,6 @@ export class RotaryList extends HTMLElement {
     }
 }
 
-if (!window.customElements.get(`rotary-list`)) {
-    window.customElements.define(`rotary-list`, RotaryList)
+if (!window.customElements.get(componentName)) {
+    window.customElements.define(componentName, RotaryList)
 }

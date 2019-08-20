@@ -1,45 +1,89 @@
-import { TMonad } from '.'
-import { Tmonad, finishTMonad } from './t-monad'
+import { Tmonad } from './t-monad'
 import pipe from '../pipe'
-import { ToNumber } from './number'
-import { ToString, Split } from './string'
+import { ToDigits } from './number'
+import { Split } from './string'
 import { Map, Join } from './array'
 
-export const ToPhone: (v: any) => TMonad = value => {
+export const ToPhone = value => {
     let result = Tmonad(value)
+    let pointer = 0
+    const changes = []
 
     if (result.stop) { return result }
 
     const mapper = Map((val, index) => {
-        switch (index) {
-            case 0:
-                return result.value.length > 0 ? `+${val}` : val
-            case 1:
-                return result.value.length > 1 ? ` (${val}` : val
-            case 3:
-                return result.value.length > 4 ? `${val}) ` : val
-            case 6:
-                return result.value.length > 7 ? `${val}-` : val
-            case 2:
-            case 4:
-            case 5:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-                return val
-            default:
-                return ``
+        const length = `${result.value || ``}`.length
+        let mapped = ``
+
+        if (index === 0) {
+            mapped = !!length ? `(${val}` : val
+            changes.push({
+                start: pointer,
+                end: pointer + 1,
+                input: val,
+                length: 1,
+                result: mapped,
+                added: `(`
+            })
+            pointer = pointer + 2
         }
+
+        if (index === 3) {
+            mapped = length > 4 ? `) ${val}` : val
+            changes.push({
+                start: pointer,
+                end: pointer + 2,
+                input: val,
+                length: 2,
+                result: mapped,
+                added: `) `
+            })
+            pointer = pointer + 3
+        }
+
+        if (index === 6) {
+            mapped = length > 9 ? `-${val}` : val
+            changes.push({
+                start: pointer,
+                end: pointer + 1,
+                input: val,
+                length: 1,
+                result: mapped,
+                added: `-`
+            })
+            pointer = pointer + 2
+        }
+
+        if ([9, 8, 7, 5, 4, 2, 1].indexOf(index) > -1) {
+            mapped = val
+            pointer = pointer + 1
+        }
+
+        if (index > 9) {
+            mapped = ``
+            changes.push({
+                start: pointer,
+                end: pointer + 1,
+                input: val,
+                length: 1,
+                result: mapped,
+                removed: val
+            })
+            pointer = pointer + 1
+        }
+
+        return mapped
     })
 
-    result = pipe(
-        ToNumber,
-        ToString,
+    const r = pipe(
+        ToDigits,
         Split(``),
         mapper,
-        Join(``)
+        Join(``),
     )(result)
 
-    return finishTMonad(result, `string`, `ToPhone`)
+    r.stringChanges = r.stringChanges.concat(changes)
+    r.valid = typeof r.value === `string` && r.value.length === 14
+    r.instanceof.push(`ToPhone`)
+    return r
 }

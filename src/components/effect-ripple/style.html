@@ -5,12 +5,17 @@
         box-sizing: border-box;
     }
 
+    .effect-ripple-container {
+        overflow: hidden;
+    }
+
     .effect-ripple-container .ripple {
         position: absolute;
         top: 0px;
         left: 0px;
         height: 100%;
         width: 100%;
+        max-width: 100%;
         opacity: 0;
         pointer-events: none;
         overflow: hidden;
@@ -27,6 +32,7 @@
         background: #59a2d8;
         border-radius: 50%;
         transform: scale(0);
+        /* will-change: transform; */
     }
 
     .active.effect-ripple-container .ripple {

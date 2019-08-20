@@ -109,7 +109,6 @@ const parse = (root) => {
                                 binding[`vars`] = parts
 
                                 fors[path] = binding
-                                console.log(binding)
                                 break
 
                             case `html`:

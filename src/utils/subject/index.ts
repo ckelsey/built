@@ -17,6 +17,7 @@ class Subject extends Subscription implements SubjectObject {
     constructor(state: any, noInit?: any) {
         super()
         this.state = state
+        this.previousState = state
         this.noInit = noInit
     }
 
@@ -52,7 +53,7 @@ class Subject extends Subscription implements SubjectObject {
     }
 
     public subscribe(next: ObserverNext, error?: ObserverError, complete?: ObserverComplete): () => Subscriptions {
-        if (!this.noInit) {
+        if (!this.noInit && this.value !== undefined) {
             next(this.value)
         }
 

@@ -1,23 +1,22 @@
-import { TMonad } from '.'
 import { Tmonad } from './t-monad'
 import { getType } from '../type'
 
-export const doURI: (v: any, e?: boolean, c?: boolean) => TMonad = (value, encode = false, component = false) => {
+export const doURI = (value, encode = false, component = false) => {
     const result = Tmonad(value)
 
     if (result.stop) { return result }
 
     try {
         if (encode) {
-            if(component){
+            if (component) {
                 result.value = encodeURIComponent(result.value)
-            }else{
+            } else {
                 result.value = encodeURI(result.value)
             }
         } else {
-            if(component){
+            if (component) {
                 result.value = decodeURIComponent(result.value)
-            }else{
+            } else {
                 result.value = decodeURI(result.value)
             }
         }

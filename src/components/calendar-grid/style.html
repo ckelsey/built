@@ -1,17 +1,38 @@
 <style>
+    calendar-grid,
+    :host {
+        font: inherit;
+        line-height: inherit;
+        display: block;
+    }
+
+    .calendar-inner {
+        overflow: hidden;
+    }
+
+    .calendar-days-of-week,
     .calendar-inner {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
     }
 
+    .calendar-day-of-week {
+        opacity: 0.33;
+        padding: 20% 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .calendar-inner .calendar-day-container {
         position: relative;
         border-radius: 2px;
-        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        outline: none !important;
+        transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
     }
 
     .calendar-inner .calendar-day-container.out-of-range {
-        opacity: 0.35;
+        opacity: 0.33;
     }
 
     .calendar-inner .calendar-day-container.current {
@@ -45,11 +66,10 @@
         left: 0px;
     }
 
-    .calendar-inner .clickable .calendar-day {
+    .calendar-inner.clickable .calendar-day {
         cursor: pointer;
+        outline: none !important;
     }
-
-    .calendar-inner .calendar-day-data-container {}
 
     .calendar-inner .calendar-day-data-container .calendar-day-data-item {
         width: 0.5rem;

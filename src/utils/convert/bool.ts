@@ -1,8 +1,7 @@
-import { TMonad } from '.'
 import { Tmonad } from './t-monad'
 import { getType } from '../type'
 
-export const ToBool: (v: any) => TMonad = value => {
+export const ToBool = value => {
     const result = Tmonad(value)
 
     if (result.stop) { return result }
@@ -10,6 +9,7 @@ export const ToBool: (v: any) => TMonad = value => {
     switch (result.value) {
         case `0`:
         case 0:
+        case `off`:
         case `false`:
         case false:
             result.value = false
@@ -18,6 +18,7 @@ export const ToBool: (v: any) => TMonad = value => {
 
         case `1`:
         case 1:
+        case `on`:
         case `true`:
         case true:
             result.value = true

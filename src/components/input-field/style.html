@@ -1,6 +1,6 @@
 <style>
     :host,
-    :root {
+    input-field {
         display: inline-block;
         width: 300px;
         max-width: 100%;
@@ -8,13 +8,10 @@
         position: relative;
     }
 
-    input-field {
-        position: relative;
-    }
-
     .input-field-container {
         display: inline-block;
         width: 100%;
+        max-width: 100%;
         vertical-align: top;
         opacity: 1;
         pointer-events: all;
@@ -33,7 +30,8 @@
         min-height: 1em;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.2s ease-in-out 0.15s, padding 0.2s ease-in-out;
+        max-width: 100%;
+        transition: opacity 0.2s ease-in-out 0.01s;
     }
 
     .input-field-container-inner.ready {
@@ -42,7 +40,11 @@
     }
 
     .input-field-container-inner[label-position="inside"] {
-        padding: 0em 0em 1em;
+        padding: 0 0 1.3em;
+    }
+
+    .input-field-container-inner[label-position="inside"].invalid {
+        padding: 0;
     }
 
     .input-field-bottom-content {
@@ -62,27 +64,33 @@
         justify-content: flex-start;
     }
 
-    .input-field-container-inner .input-field-message-help {
+    .input-field-container .input-field-message-help {
         opacity: 0.6;
-        font-size: 100%;
-        transition: opacity 0.2s ease-in-out, font-size 0.2s ease-in-out;
+        line-height: 1.6em;
+        font-size: 90%;
+        transform: scale(1);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
     }
 
-    .input-field-container-inner .input-field-message-error {
+    .input-field-container .input-field-message-error {
         opacity: 0;
+        line-height: 1.6em;
+        transform: scale(0);
         font-size: 0%;
-        color: var(--danger-color, #a10005);
-        transition: opacity 0.2s ease-in-out 0.1s, font-size 0.2s ease-in-out;
+        color: #a10005;
+        transition: opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out;
     }
 
     .input-field-container-inner.invalid .input-field-message-help {
         opacity: 0;
         font-size: 0%;
+        transform: scale(0);
     }
 
     .input-field-container-inner.invalid .input-field-message-error {
         opacity: 1;
-        font-size: 100%;
+        font-size: 90%;
+        transform: scale(1);
     }
 
     .input-field-character-count-inner {
@@ -95,20 +103,19 @@
 
     .input-field-container label {
         padding: 0.1em;
-        display: block;
-        font-weight: var(--label-weight, bold);
+        font-weight: bold;
         opacity: 0;
+        min-height: 1.6em;
+        display: flex;
+        align-items: center;
+        outline: none !important;
     }
 
     .input-field-container-inner.ready label {
         cursor: pointer;
         opacity: 1;
-        transition: font-weight 0.2s ease-in-out,
-            top 0.2s ease-in-out,
-            padding 0.2s ease-in-out,
-            opacity 0.2s ease-in-out 0.1s,
-            transform 0.2s ease-in-out,
-            min-width 0.2s ease-in-out;
+        transition: opacity 0.2s ease-in-out 0.1s,
+            transform 0.2s ease-in-out;
     }
 
     .input-field-container label.input-field-left-label {
@@ -119,14 +126,25 @@
         padding-left: 1em;
     }
 
+    .input-field-container .input-field-container-inner[input-kind="checkbox"] label.input-field-left-label,
+    .input-field-container .input-field-container-inner[input-kind="checkbox"] label.input-field-right-label,
+    .input-field-container .input-field-container-inner[input-kind="radio"] label.input-field-left-label,
+    .input-field-container .input-field-container-inner[input-kind="radio"] label.input-field-right-label {
+        margin-top: -0.2em;
+    }
+
     .input-field-container label.input-field-inside-label {
         position: relative;
-        top: 2.09em;
         pointer-events: none;
-        padding: 0.1em 1em;
+        padding: 0;
         font-weight: normal;
         opacity: 0.5;
         z-index: 2;
+        font-size: 85%;
+        transform: scale(1.1) translateY(2.5em) translateX(1em);
+        transform-origin: left center;
+        min-height: 1.6em;
+        max-width: calc(100% - 4em);
     }
 
     .input-field-container-inner.notempty label.input-field-inside-label,
@@ -137,12 +155,14 @@
     .input-field-container-inner.icon.focused[icon-align="right"] label.input-field-inside-label,
     .input-field-container-inner.icon.clearbutton.notempty label.input-field-inside-label,
     .input-field-container-inner.icon.clearbutton.focused label.input-field-inside-label {
-        top: 0em;
         pointer-events: all;
-        padding: 0.1em;
-        font-weight: var(--label-weight, bold);
+        padding: 0;
+        font-weight: bold;
         opacity: 1;
+        font-size: 85%;
         z-index: unset;
+        transform: scale(1) translateY(0em) translateX(0em);
+        max-width: 100%;
     }
 
     .input-field-middle-section {
@@ -155,6 +175,7 @@
 
     .input-field-input-section {
         width: 100%;
+        max-width: 100%;
         position: relative;
         flex-grow: 1;
         flex-basis: 0;
@@ -199,11 +220,10 @@
         display: none;
     }
 
-    .input-field-input-container:hover .input-field-rotary-overlay,
-    .input-field-input-container.focused .input-field-rotary-overlay {
+    .input-field-container-inner:hover .input-field-rotary-overlay,
+    .input-field-container-inner.focused .input-field-rotary-overlay {
         opacity: 1;
     }
-
 
     .input-field-input-container .input-field-rotary-overlay .input-field-up {
         transform: rotate(180deg);
@@ -233,9 +253,12 @@
     }
 
     .input-field-container-inner[input-kind="rotary"] .input-field-input-container rotary-list {
-        margin-left: 1em;
+        overflow: hidden;
         opacity: 0;
-        width: auto;
+        position: absolute;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.4);
+        box-shadow: inset 0em 0.09em 0em rgba(0, 0, 0, 0.13), inset 0em 0em 0em 0.02em rgba(0, 0, 0, 0.31);
         transition: opacity 0.2s ease-in-out;
     }
 
@@ -243,7 +266,7 @@
         opacity: 1;
     }
 
-    /* .input-field-container-inner[input-kind="rotary"] .input-field-input-container .input-field-up,
+    .input-field-container-inner[input-kind="rotary"] .input-field-input-container .input-field-up,
     .input-field-container-inner[input-kind="rotary"] .input-field-input-container .input-field-down {
         pointer-events: all;
         opacity: 0.7;
@@ -261,6 +284,7 @@
 
     .input-field-container .input-field-container-inner[input-kind="rotary"] .input-field-label-inside {
         transform: translateX(50%);
+        /* will-change: transform; */
         transition: transform 0.2s ease-in-out;
     }
 
@@ -273,10 +297,16 @@
     .input-field-container .input-field-container-inner[input-kind="rotary"].focused .input-field-label-inside,
     .input-field-container .input-field-container-inner[input-kind="rotary"].notempty .input-field-label-inside {
         transform: translateX(0%);
-    } */
+    }
+
+    .input-field-container-inner.focused[input-kind="rotary"] .input-field-input {
+        opacity: 0;
+        pointer-events: none;
+    }
 
     .input-field-container-inner .input-field-input {
         background: rgba(255, 255, 255, 0.4);
+        position: relative;
         border: none;
         border-radius: 0px;
         display: block;
@@ -296,8 +326,7 @@
         text-overflow: ellipsis;
         hyphens: auto;
         box-shadow: inset 0em 0.09em 0em rgba(0, 0, 0, 0.13), inset 0em 0em 0em 0.02em rgba(0, 0, 0, 0.31);
-        transition: color 0.4s, background-color 0.4s, box-shadow 0.4s,
-            max-height 0.4s, padding 0.4s;
+        transition: color 0.4s, background-color 0.4s, box-shadow 0.4s, opacity 0.2s;
     }
 
     .input-field-container-inner[input-kind="textarea"] .input-field-input-overlay {
@@ -318,7 +347,17 @@
     }
 
     .input-field-container-inner[input-kind="select"] .select-arrow {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .input-field-container-inner[input-kind="select"] select {
+        color: transparent;
+    }
+
+    .input-field-container-inner[input-kind="select"].notempty select {
+        color: inherit;
     }
 
     .input-field-container-inner .input-field-input-container-inner input,
@@ -336,11 +375,6 @@
         cursor: pointer;
     }
 
-    .input-field-input-container-inner rotary-list {
-        position: absolute;
-        height: 100%;
-    }
-
     .input-field-container-inner[resize="auto"] .input-field-input,
     .input-field-container-inner[resize="none"] .input-field-input {
         resize: none;
@@ -354,12 +388,47 @@
         resize: vertical;
     }
 
+    .input-field-container-inner[input-kind="checkbox"] .input-field-input-container-inner,
+    .input-field-container-inner[input-kind="radio"] .input-field-input-container-inner {
+        width: 1.7em;
+        height: 1.7em;
+        left: -.25em;
+        top: -.25em;
+        position: relative;
+        margin-right: -0.5em;
+        margin-bottom: -0.25em;
+        cursor: pointer;
+        pointer-events: all;
+    }
+
+    .input-field-container-inner[input-kind="checkbox"] .input-field-input-container-inner:after,
+    .input-field-container-inner[input-kind="radio"] .input-field-input-container-inner:after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0.25em;
+        left: 0.25em;
+        width: 1.2em;
+        height: 1.2em;
+        pointer-events: none;
+        background: rgba(255, 255, 255, .4);
+        box-shadow: inset 0 0.09em 0 rgba(0, 0, 0, .13), inset 0 0 0 0.02em rgba(0, 0, 0, .31);
+        transition: background-color .4s, box-shadow .4s;
+    }
+
+    .input-field-container-inner.checked[input-kind="checkbox"] .input-field-input-container-inner:after,
+    .input-field-container-inner.checked[input-kind="radio"] .input-field-input-container-inner:after {
+        background: currentColor;
+    }
+
     .input-field-container-inner [type="checkbox"].input-field-input,
     .input-field-container-inner [type="radio"].input-field-input {
-        width: 21px;
-        height: 21px;
-        padding: 0px;
-        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        position: relative;
+        opacity: 0;
+        pointer-events: none;
     }
 
     .input-field-container-inner[input-kind="radio"] .input-field-input-overlay {
@@ -368,11 +437,6 @@
 
     .input-field-container-inner[input-kind="radio"] .input-field-input-overlay {
         overflow: hidden;
-    }
-
-    .input-field-container-inner [type="checkbox"].input-field-input.checked,
-    .input-field-container-inner [type="checkbox"].input-field-input:checked {
-        background: rgba(89, 162, 216, 0.67);
     }
 
     .input-field-container-inner input[disabled],
@@ -404,10 +468,9 @@
         padding-left: 2.2em;
     }
 
-    /* .input-field-container-inner.icon[icon-align="left"]:not(.notempty) label.input-field-inside-label, */
     .input-field-container-inner.icon[icon-align="left"] label.input-field-inside-label,
     .input-field-container-inner.icon.clearbutton label.input-field-inside-label {
-        padding-left: 2.2em;
+        padding-left: 1.2em;
     }
 
     .input-field-container-inner.icon.clearbutton .input-field-input {
@@ -453,6 +516,14 @@
         flex-grow: 0;
     }
 
+    .input-field-container-inner[input-kind="radio"] .input-field-middle-section,
+    .input-field-container-inner[input-kind="radio"] .input-field-input-section,
+    .input-field-container-inner[input-kind="checkbox"] .input-field-middle-section,
+    .input-field-container-inner[input-kind="checkbox"] .input-field-input-section {
+        width: auto;
+        flex-grow: 0;
+    }
+
     .input-field-container-inner .input-field-character-count-container,
     .input-field-container-inner .input-field-character-count-max-divider,
     .input-field-container-inner .input-field-character-count-max {
@@ -487,10 +558,64 @@
         pointer-events: none;
     }
 
+    .input-field-container-inner.hidefilteredout .input-field-option.filtered-out:not(.selected):not(.blank) {
+        display: none;
+    }
+
     .input-field-container-inner .input-field-option.selected {
         background: #59a2d8;
         color: #fff;
         pointer-events: all;
+    }
+
+    .input-field-container .input-field-container-inner[input-kind="checkbox"] .input-field-middle-section,
+    .input-field-container .input-field-container-inner[input-kind="radio"] .input-field-middle-section {
+        align-items: flex-start;
+    }
+
+    .input-field-container-inner overlay-content {
+        z-index: 3;
+        position: absolute;
+    }
+
+    .input-field-checkbox-overlay {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        width: 1.2em;
+        height: 1.2em;
+        top: 0px;
+        left: 0px;
+        pointer-events: none;
+        color: #fff;
+        opacity: 0;
+        margin-left: 0.009em;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .input-field-container-inner.notempty.checked[input-kind="checkbox"] .input-field-checkbox-overlay {
+        opacity: 1;
+    }
+
+    .input-field-container-inner[input-kind="checkbox"] {
+        min-height: 5.25rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    date-time {
+        padding: 0.5em 1em;
+        background: #d7d8da;
+    }
+
+    @supports (-webkit-overflow-scrolling: touch) {
+
+        .input-field-container .input-field-container-inner input.input-field-input:focus,
+        .input-field-container .input-field-container-inner textarea.input-field-input:focus {
+            font-size: 16px !important;
+        }
     }
 
 </style>

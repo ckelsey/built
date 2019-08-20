@@ -242,6 +242,20 @@ export const htmlTags = [
     'wbr',
 ]
 
+export const setInputCaret = (input, position, doc) => {
+    if (!input || !doc || doc.activeElement !== input) { return }
+
+    if (input.createTextRange) {
+        var range = input.createTextRange()
+        range.move('character', position)
+        range.select()
+    } else if (input.selectionStart) {
+        input.setSelectionRange(position, position)
+    }
+
+    return input
+}
+
 export const getCSSFromSelector = selector => {
     const sheets = Array.from(document.body.ownerDocument.styleSheets) as CSSStyleSheet[]
     const rules = []
@@ -291,24 +305,58 @@ export const getCSS = el => {
     return rules
 }
 
+export const webComponentTemplate = (name, html, root, cssText, rootElementSelector) => {
+    const css = !rootElementSelector ? `` : getCSSFromSelector(rootElementSelector).join(` `)
+    const styles = `${extractStyleRules(cssText)}${css}`
+    const Template = document.createElement(`template`)
+    Template.innerHTML = html
+    appendStyleElement(extractStyleRules(styles), Template.content)
+
+    const clone = document.importNode(Template.content, true)
+    root.attachShadow({ mode: 'open' }).appendChild(clone)
+
+    if (!('registerElement' in document) && !document.head.querySelector(`style[name="${name}"]`)) {
+        appendStyleElement(extractStyleRules(styles), document.head, name)
+    }
+}
+
+export const appendStyleElement = (ruleText, parent, name = ``) => {
+    var ss1 = document.createElement(`style`) as any
+    ss1.setAttribute(`type`, `text/css`)
+    ss1.setAttribute(`name`, name)
+    ss1.style.display = `none`
+    parent.appendChild(ss1);
+    if (ss1.styleSheet) {   // IE
+        ss1.styleSheet.cssText = ruleText
+    } else {                // the world
+        var tt1 = document.createTextNode(ruleText)
+        ss1.appendChild(tt1);
+    }
+}
+
+export const extractStyleRules = string => {
+    return !string ? `` : string.replace(`<style>`, ``).replace(`</style>`, ``)
+}
+
 export function getValue(input?: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
     const type = input.type
-    let value: any = input.value
 
     if (type === `checkbox` || type === `radio`) {
-        value = input[`checked`]
+        return input[`checked`]
     }
 
     if (type === `select` && input[`selectedOptions`]) {
-        value = Array.from(input[`selectedOptions`])
+        const value = Array.from(input[`selectedOptions`])
             .map((o: HTMLOptionElement) => o.value)
 
         if (value.length < 2) {
-            value = value[0]
+            return value[0]
         }
+
+        return value
     }
 
-    return value
+    return input.value
 }
 
 export function getInvalidMessage(input?: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {

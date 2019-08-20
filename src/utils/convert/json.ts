@@ -1,9 +1,8 @@
 import { Tmonad } from './t-monad'
-import { TMonad } from '.'
 import { getType } from '../type'
 import { DecodeUriComponent } from './uri'
 
-export const FromJSON: (v: any) => TMonad = value => {
+export const FromJSON = value => {
     const result = Tmonad(value)
 
     if (result.stop) { return result }

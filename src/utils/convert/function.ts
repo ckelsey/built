@@ -1,7 +1,6 @@
 import { Tmonad } from './t-monad'
-import { TMonad } from '.'
 
-export const ToFunction: (v: any) => TMonad = value => {
+export const ToFunction = value => {
     const result = Tmonad(value)
 
     if (result.stop) { return result }

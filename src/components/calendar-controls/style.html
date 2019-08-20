@@ -1,0 +1,58 @@
+<style>
+    calendar-controls,
+    :host {
+        font: inherit;
+        line-height: inherit;
+        display: block;
+    }
+
+    .calendar-controls {
+        justify-content: space-between;
+        margin: 0 0 0 -0.5em;
+        width: calc(100% + 1em);
+        padding: 3% 0;
+        font-size: 133%;
+        line-height: 133%;
+    }
+
+    .calendar-controls,
+    .calendar-control-display {
+        display: flex;
+        align-items: center;
+    }
+
+    .calendar-control-display {
+        justify-content: center;
+        margin: 0 0 0 -0.25em;
+        width: calc(100% + 0.5em);
+        padding: 2% 0;
+    }
+
+    .calendar-controls>* {
+        margin: 0 0.5em;
+    }
+
+    .calendar-control-display>* {
+        margin: 0 0.25em;
+    }
+
+    .calendar-control {
+        font-size: 150%;
+        color: #59a2d8;
+        position: relative;
+    }
+
+    .calendar-control icon-element {
+        cursor: pointer;
+        outline: none !important;
+    }
+
+    .calendar-month {
+        font-weight: bold;
+    }
+
+    .calendar-year {
+        font-weight: 100;
+    }
+
+</style>

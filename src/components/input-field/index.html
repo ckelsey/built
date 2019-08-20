@@ -1,6 +1,5 @@
 <div class="input-field-container">
     <div class="input-field-container-inner">
-        <overlay-content align="center bottom"></overlay-content>
         <div class="input-field-top-section">
             <div class="input-field-label-top"></div>
         </div>
@@ -13,7 +12,7 @@
                     <div class="input-field-input-effects">
                         <effect-underline start="focus" end="blur" opacity="0.8" speed="300"></effect-underline>
                         <effect-ripple start="focus" opacity="0.15" speed="288"></effect-ripple>
-                        <effect-bounce-z amount="-5" speed="125"></effect-bounce-z>
+                        <effect-bounce-z amount="5" speed="125"></effect-bounce-z>
                     </div>
                     <div class="input-field-input-overlay">
                         <icon-element class="input-field-icon" size="1.25rem"></icon-element>
@@ -21,6 +20,9 @@
                         <div class="select-arrow">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path d="M7 10l5 5 5-5z" /></svg>
+                        </div>
+                        <div class="input-field-checkbox-overlay">
+                            <icon-element class="input-field-checkbox-icon" size="1rem"></icon-element>
                         </div>
                     </div>
                     <input type="hidden" class="input-field-hidden-input">
@@ -44,5 +46,6 @@
                 </div>
             </div>
         </div>
+        <overlay-content align="center bottom"></overlay-content>
     </div>
 </div>

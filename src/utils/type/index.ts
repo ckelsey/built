@@ -5,8 +5,8 @@ export const primitives = [
     `undefined`,
     `function`
 ]
-export const isDom = (s:any) => (s instanceof Element) || (s instanceof Node)
-export const isString = (s:any) => typeof s === `string`
+export const isDom = (s: any) => (s instanceof Element) || (s instanceof Node)
+export const isString = (s: any) => typeof s === `string`
 export const isPrimitive = (s: any): boolean => primitives.indexOf(typeof s) > -1
 export const isArray = (s: any): boolean => Array.isArray(s)
 export const isDate = (s: any): boolean => {
@@ -30,4 +30,4 @@ export const empty = (val: any): boolean => {
     return val === `` || type === `undefined` || type === undefined || type === null || (type === `array` && val.length === 0) || (type === `object` && Object.keys(val).length === 0)
 }
 export const anyEmpty = (val: any) => empty(val) || val === `false` || val === `undefined` || val === `null`
-export const getType = (thing: any): string => thing === null ? null : isPrimitive(thing) ? typeof thing : isArray(thing) ? `array` : isDate(thing) ? `date` : isObject(thing) ? `object` : typeof thing
+export const getType = (thing: any): string => thing === null ? null : isPrimitive(thing) ? typeof thing : isDom(thing) ? `dom` : isArray(thing) ? `array` : isDate(thing) ? `date` : isObject(thing) ? `object` : typeof thing

@@ -19,43 +19,43 @@
                 padding: 10rem 2rem;
                 box-sizing: border-box;
                 min-height: 100%;
-                /* height: 100vh;
-                width: 100vw; */
                 background: #ccc;
             }
-
-            input-field {
-                width: 500px;
-                display: inline-block;
-                opacity: 1;
-            }
-
-            /* .input-field-container .input-field-input-container-inner {
-                background: #a10005;
-            }
-
-            .thing.input-field-container .input-field-input-container-inner {
-                background: green;
-            } */
 
         </style>
         <script src="/dist/webcomponentsjs/custom-elements-es5-adapter.js"></script>
         <script src="/dist/webcomponentsjs/webcomponents-loader.js"></script>
         <script src="/dist/built.js"></script>
-        <!-- <script src="/dist/effect-bounce-z.js"></script>
-        <script src="/dist/effect-underline.js"></script>
-        <script src="/dist/effect-ripple.js"></script>
-        <script src="/dist/icon-element.js"></script>
-        <script src="/dist/overlay-content.js"></script>
-        <script src="/dist/input-field.js"></script>
-        <script src="/dist/rotary-list.js"></script>
-        <script src="/dist/calendar-grid.js"></script> -->
     </head>
 
     <body>
-        <input-field
-            format='{ "method": "pipe", "fns": [ { "method": "match", "values": [ "([A-Z0-9]{1,4})", "gi" ] }, { "method": "join", "values": [ "-" ] }, { "method": "slice", "values": [ 0,19 ] } ] }'>
+        <button-element>Hey there</button-element>
+        <icon-element type="icons/ac_unit.svg"></icon-element>
+        <!-- <input-field
+            id="claim-code"
+            mask='{ "method": "pipe", "fns": [ { "method": "split", "values": [ "/[^A-Za-z0-9]/gi" ] }, { "method": "join", "values": [ "" ] }, { "method": "match", "values": [ "/([A-Z0-9]{1,4})/gi" ] }, { "method": "join", "values": [ "-" ] }, { "method": "slice", "values": [ 0,9 ] }, { "method": "touppercase" }] }'>
+        </input-field> 
+    format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["Slice", 0, 8], ["Match", "/.{0,3}/g"],["Join", "-"]]'
+    -->
+        <input-field id="claim-code"
+            format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["BeforeEveryNth", 5, "-"],["Slice", 0, 9]]'>
         </input-field>
+        <input-field type="email" label="Email"></input-field>
+        <input-field type="uszip" label="Zip code" class="aclass" autocomplete="zipcode"></input-field>
+        <input-field type="textarea" label="Areas"></input-field>
+        <input-field type="usphone" label="US Telephone" value="1234567890"></input-field>
+        <input-field type="tel" label="Telephone" format="tel"></input-field>
+        <input-field type="checkbox" label="Click me" labelposition="right" value="true"></input-field>
+        <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready"
+            labelposition="right"></input-field>
+        <input-field type="select" label="Select" options="a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z"
+            hideonfilter="true" id="select"></input-field>
+
+        <!-- <script>
+            setTimeout(() => {
+                document.getElementById(`select`).select(``)
+            }, 1000)
+        </script> -->
     </body>
 
 </html>

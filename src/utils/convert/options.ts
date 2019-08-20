@@ -1,12 +1,11 @@
-import { TMonad } from '.'
 import { Tmonad, finishTMonad } from './t-monad'
 import pipe from '../pipe'
 import { Map } from './array'
 import { IfInvalid } from './if'
 import { CommasToArray } from './commas-to-array'
 
-export const Options: (v: any) => TMonad = (value: any) => {
-    let result: TMonad = Tmonad(value)
+export const Options = (value: any) => {
+    let result = Tmonad(value)
 
     if (result.stop) { return result }
 

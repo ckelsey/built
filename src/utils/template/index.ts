@@ -21,8 +21,6 @@ class TemplateRender {
         this.ifs = parsed.ifs
         this.fors = parsed.fors
         this.bindings = parsed.bindings
-
-        console.log(this)
     }
 
     public clone(This) {

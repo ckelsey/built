@@ -6,12 +6,12 @@ export const replaceWith = (
     // replace = ``, 
     // ignoreCase = true
 ) => {
-    const time = window.performance.now()
+    // const time = window.performance.now()
     const keys = Object.keys(searchReplace)
     let result = value.slice(0)
     let index = 0
 
-    while(index < keys.length){
+    while (index < keys.length) {
         const key = keys[index]
         const replacement = searchReplace[key]
         const reg = new RegExp(key, 'gi')
@@ -30,7 +30,6 @@ export const replaceWith = (
     //     }
     // }
 
-    console.log(window.performance.now() - time, result.length)
     return result
 
 
@@ -85,6 +84,5 @@ export const replaceWith = (
     //     currentCharacterIndex = currentCharacterIndex + 1
     // }
 
-    // console.log(window.performance.now() - time, result.length)
     // return value
 }

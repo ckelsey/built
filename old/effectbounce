@@ -1,0 +1,189 @@
+
+/*
+
+import Subject from '../../utils/subject'
+import { BounceZObservedAttributes, BounceZOperations } from './attributes'
+import { GetCurve } from '../../utils/curve'
+import ObserveEvent from '../../utils/observeEvent'
+import { webComponentTemplate } from '../../utils/html'
+
+const template = require('./index.html')
+const style = require('./style.html')
+const componentName = `effect-bounce-z`
+const componentRoot = `.effect-push-container`
+
+const getDimension = target => {
+    const max = Math.max(target.offsetWidth, target.offsetHeight)
+    const min = Math.min(target.offsetWidth, target.offsetHeight)
+
+    return (((max - min) / 2) + min)
+}
+
+export class EffectBounceZ extends HTMLElement {
+    public state: { [key: string]: Subject } = {}
+    public $container
+    public targets$ = []
+    public on = false
+
+    public static get observedAttributes(): string[] {
+        return Object.keys(BounceZObservedAttributes)
+    }
+
+    constructor() {
+        super()
+
+        this.runStart = this.runStart.bind(this)
+        this.signalEnd = this.signalEnd.bind(this)
+
+        Object.keys(BounceZObservedAttributes).forEach((attrKey) => {
+            this.state[attrKey] = new Subject(BounceZObservedAttributes[attrKey]())
+
+            Object.defineProperty(this, attrKey, {
+                get() { return this.state[attrKey].value },
+                set(attrValue) {
+                    if (!this.state[attrKey]) { return }
+
+                    const formattedValue = BounceZObservedAttributes[attrKey](attrValue)
+
+                    if (this.state[attrKey].value !== formattedValue) {
+                        this.state[attrKey].next(formattedValue)
+                    }
+                }
+            })
+        })
+    }
+
+    public attributeChangedCallback(attrName: string, oldValue: any, newValue: any) {
+        if (newValue !== oldValue) { this[attrName] = newValue }
+    }
+
+    public connectedCallback() {
+        if (!this.shadowRoot) {
+            webComponentTemplate(componentName, template, this, style, componentRoot)
+            this.$container = this.shadowRoot.querySelector(`.effect-push-container`)
+
+            Object.keys(BounceZObservedAttributes)
+                .forEach(attrKey => {
+                    if (!BounceZOperations[attrKey]) { return }
+
+                    this.state[attrKey].subscribe(
+                        val => BounceZOperations[attrKey](this, val)
+                    )
+                })
+        }
+    }
+
+    public disconnectedCallback() {
+        this.unloadTargets()
+    }
+
+    public unloadTargets() {
+        this.targets$.forEach(ob$ => ob$())
+    }
+
+    public loadTargets() {
+        if (!this[`targets`] || !this[`start`]) { return }
+
+        this[`targets`].forEach((target, index) => {
+            target[`bounceindex`] = index
+
+            const start$ = ObserveEvent(target, this[`start`], { useCapture: false })
+                .subscribe(
+                    this.runStart,
+                    () => start$(),
+                    () => start$()
+                )
+
+            this.targets$.push(start$)
+
+            if (this[`end`]) {
+                const end$ = ObserveEvent(target, this[`end`], { useCapture: false })
+                    .subscribe(
+                        this.signalEnd,
+                        () => end$(),
+                        () => end$()
+                    )
+
+                this.targets$.push(end$)
+            }
+        })
+    }
+
+    public trigger() {
+        this.runStart()
+    }
+
+    public runStart() {
+        if (this.on) { return }
+
+        this.on = true
+
+        this[`targets`].forEach((target, index) => {
+            const amount = this[`amount`]
+            const dimension = getDimension(target)
+            const scale = (dimension - amount) / dimension
+            const points = GetCurve([1, 1 - ((1 - scale) * 1.125), scale])
+            const timeout = GetCurve([0, this[`speed`] / points.length])
+
+            const loop = () => {
+                if (!this.on) { return }
+
+                const point = points.shift()
+                const time = timeout[points.length]
+
+                target.style.transform = `scale(${point})`
+
+                if (points.length) {
+                    setTimeout(() => loop(), time)
+                } else if (index === this[`targets`].length - 1) {
+                    this.runEnd()
+                }
+            }
+
+            loop()
+        })
+    }
+
+    public runEnd() {
+        this.on = false
+
+        this[`targets`].forEach(target => {
+
+            const amount = this[`amount`]
+            const dimension = getDimension(target)
+            const scale = (dimension - amount) / dimension
+            // bounce back up overshot animation points, but commented out for now
+            // until I can figure out how scaling up won't cause window scrollbars
+            // const points = GetCurve([scale, 1 + ((1 - scale) * 0.38), 1])
+
+            // linear return animation points
+            const points = GetCurve([scale, 1])
+
+            const timeout = GetCurve([0, this[`speed`] / points.length])
+
+            const loop = () => {
+                if (this.on) { return }
+
+                const point = points.shift()
+                const time = timeout[points.length]
+
+                target.style.transform = `scale(${point})`
+
+                if (points.length) {
+                    setTimeout(() => loop(), time)
+                }
+            }
+
+            loop()
+        })
+    }
+
+    public signalEnd() {
+        return this.runEnd()
+    }
+}
+
+if (!window.customElements.get(componentName)) {
+    window.customElements.define(componentName, EffectBounceZ)
+}
+*/

@@ -1,37 +1,65 @@
-import template from './index.min.html'
-import style from './style.min.html'
 import Subject from '../../utils/subject'
-import { ToDate } from '../../utils/convert/date'
+import { ToDate, DateToObject, MonthData } from '../../utils/convert/date'
 import pipe from '../../utils/pipe'
 import { IfInvalid } from '../../utils/convert/if'
 import { ToBool } from '../../utils/convert/bool'
 import { CommasToArray } from '../../utils/convert/commas-to-array'
 import { ToObject } from '../../utils/convert/object'
 
+import '../effect-bounce-z'
+import '../effect-ripple'
+import { webComponentTemplate } from '../../utils/html'
+
+const template = require('./index.html')
+const style = require('./style.html')
+const componentName = `calendar-grid`
+const componentRoot = `.calendar-container`
+
 const Properties = {
     value: val => pipe(ToDate, IfInvalid(new Date()))(val).value.getTime(),
     clickable: val => pipe(ToBool, IfInvalid(true))(val).value,
     values: val => pipe(CommasToArray, IfInvalid(null))(val).value,
-    dates: val => pipe(ToObject, IfInvalid({}))(val).value
+    dates: val => pipe(ToObject, IfInvalid({}))(val).value,
+    class: val => val
 }
 
 const operations = that => ({
     value: () => {
-        that.populate(that.lastPopulate)
+        that.populate()
         that.valuechange()
     },
     values: () => {
-        that.populate(that.lastPopulate)
+        that.populate()
         that.valuechange()
     },
-    clickable: () => that.populate(that[`value`]),
-    dates: () => that.populate(that[`value`]),
+    clickable: () => that.populate(),
+    dates: () => that.populate(),
+    class: val => {
+        const newClasses = !!val && typeof val === `string` ? val.split(` `).map(c => c.trim()) : []
+        const clss = that.$container.className.split(` `).map(c => c.trim())
+        const prev = !!that.state.class.previous && typeof that.state.class.previous === `string` ? that.state.class.previous.split(` `).map(c => c.trim()) : []
+
+        prev.forEach(c => {
+            const indexInClss = clss.indexOf(c)
+            if (newClasses.indexOf(c) === -1 && indexInClss > -1) {
+                clss.splice(indexInClss, 1)
+            }
+        })
+
+        newClasses.forEach(c => {
+            if (clss.indexOf(c) === -1) {
+                clss.push(c)
+            }
+        })
+
+        that.$container.className = clss.map(c => c.trim()).filter(c => !!c).join(` `)
+    }
 })
 
 export class CalendarGrid extends HTMLElement {
     public state: { [key: string]: Subject } = {}
     public $container
-    public lastPopulate
+    public $containerInner
 
     public get Value() {
         return new Date(this.state.value.value)
@@ -85,12 +113,8 @@ export class CalendarGrid extends HTMLElement {
         if (this.shadowRoot) { return }
 
         const Operations = operations(this)
-        // const Operations = {}
-        const Template = document.createElement(`template`)
-        Template.innerHTML = `${style}${template}`
 
-        const clone = document.importNode(Template.content, true)
-        this.attachShadow({ mode: 'open' }).appendChild(clone)
+        webComponentTemplate(componentName, template, this, style, componentRoot)
 
         Object.keys(Properties)
             .forEach(attrKey => {
@@ -102,107 +126,20 @@ export class CalendarGrid extends HTMLElement {
             })
 
         this.setElements()
-        this.populate(this.Values ? this.Values[0] : this.Value)
+        this.populate()
     }
 
     public setElements() {
-        this.$container = this.shadowRoot.querySelector(`.calendar-inner`)
-    }
+        this.$container = this.shadowRoot.querySelector(`.calendar-container`)
+        this.$containerInner = this.shadowRoot.querySelector(`.calendar-inner`)
 
-    public dateToObject(value: Date, outOfRange = false) {
-        const hour = value.getHours() > 12 ? value.getHours() - 12 : value.getHours()
-        return {
-            year: value.getFullYear(),
-            yearShort: value.getFullYear().toString().slice(-2),
-            monthIndex: value.getMonth(),
-            month: value.getMonth() + 1,
-            monthDouble: `0${value.getMonth() + 1}`.slice(-2),
-            monthName: value.toLocaleString(undefined, { month: 'long' }),
-            monthNameShort: value.toLocaleString(undefined, { month: 'short' }),
-            day: value.getDate(),
-            dayDouble: `0${value.getDate()}`.slice(-2),
-            dayOfWeek: value.toLocaleString(undefined, { weekday: 'long' }),
-            dayOfWeekShort: value.toLocaleString(undefined, { weekday: 'short' }),
-            dayIndex: value.getDay(),
-            hour24: value.getHours(),
-            hour,
-            hourDouble: `0${hour}`.slice(-2),
-            minutes: value.getMinutes(),
-            minutesDouble: `0${value.getMinutes()}`.slice(-2),
-            seconds: value.getSeconds(),
-            secondsDouble: `0${value.getSeconds()}`.slice(-2),
-            milliseconds: value.getMilliseconds(),
-            ampm: value.getHours() > 11 ? `PM` : `AM`,
-            date: value,
-            outOfRange
-        }
-    }
+        const currentDate = new Date()
+        currentDate.setDate(currentDate.getDate() + -(currentDate.getDay()))
 
-    public firstOfMonth(date) {
-        return this.dateToObject(new Date(date.getFullYear(), date.getMonth(), 1))
-    }
-
-    public lastOfMonth(date) {
-        return this.dateToObject(new Date(date.getFullYear(), date.getMonth() + 1, 0))
-    }
-
-    public monthData(date) {
-        const first = this.firstOfMonth(date)
-        const last = this.lastOfMonth(date)
-
-        let startIndex = first.dayIndex
-        const bufferStart = []
-
-        while (startIndex) {
-            bufferStart.push(
-                this.dateToObject(
-                    new Date(
-                        first.year,
-                        first.monthIndex,
-                        1 - startIndex
-                    ),
-                    true
-                )
-            )
-            startIndex = startIndex - 1
-        }
-
-        let endIndex = 6 - last.dayIndex
-        const bufferEnd = []
-
-        while (endIndex) {
-            bufferEnd.push(
-                this.dateToObject(
-                    new Date(
-                        last.year,
-                        last.monthIndex,
-                        last.day + (7 - (endIndex + last.dayIndex))
-                    ),
-                    true
-                )
-            )
-            endIndex = endIndex - 1
-        }
-
-        let daysArray = [].concat(bufferStart.slice())
-        let dayIndex = 0
-
-        while (dayIndex < last.day) {
-            daysArray.push(
-                this.dateToObject(
-                    new Date(
-                        first.year,
-                        first.monthIndex,
-                        first.day + dayIndex
-                    )
-                )
-            )
-            dayIndex = dayIndex + 1
-        }
-
-        daysArray = daysArray.concat(bufferEnd.slice())
-
-        return daysArray
+        Array.from(this.shadowRoot.querySelectorAll(`.calendar-day-of-week`))
+            .forEach((el: HTMLElement, i) => el.textContent = new Date(
+                new Date().setDate(currentDate.getDate() + i)
+            ).toLocaleString(navigator.language, { weekday: `narrow` }))
     }
 
     public getDateData(d) {
@@ -223,25 +160,24 @@ export class CalendarGrid extends HTMLElement {
         return []
     }
 
-    public populate(date) {
+    public populate() {
 
         if (!this.$container) { return }
-        if (!date) { date = new Date() }
 
-        this.lastPopulate = date
+        const date = this.Values ? this.Values[0] : this.Value ? this.Value : new Date()
 
         if (this[`clickable`]) {
-            this.$container.classList.add(`clickable`)
+            this.$containerInner.classList.add(`clickable`)
         } else {
-            this.$container.classList.remove(`clickable`)
+            this.$containerInner.classList.remove(`clickable`)
         }
 
-        this.$container.innerHTML = ``
+        this.$containerInner.innerHTML = ``
 
-        const currentFirst = this.dateToObject(this.Values ? this.Values[0] : this.Value)
-        let currentLast = this.Values && this.Values[1] ? this.dateToObject(this.Values[1]) : null
+        const currentFirst = DateToObject(this.Values ? this.Values[0] : this.Value).value
+        let currentLast = this.Values && this.Values[1] ? DateToObject(this.Values[1]).value : null
 
-        this.monthData(date).forEach(d => {
+        MonthData(date).value.forEach(d => {
             const basicMatch = compare => {
                 return !compare ? false : d.month === compare.month && d.year === compare.year
             }
@@ -263,7 +199,6 @@ export class CalendarGrid extends HTMLElement {
             const classes = [`calendar-day-container`]
 
             if (d.outOfRange) { classes.push(`out-of-range`) }
-            if (isCurrent) { classes.push(`current`) }
             if (isInRange) { classes.push(`in-range`) }
 
             dayElementContainer.className = classes.join(` `)
@@ -276,7 +211,7 @@ export class CalendarGrid extends HTMLElement {
             dayElement.className = `calendar-day`
             dayElement.textContent = d.day
 
-            this.$container.appendChild(dayElementContainer)
+            this.$containerInner.appendChild(dayElementContainer)
             dayElementContainer.appendChild(dayElement)
 
             const dateData = this.getDateData(d)
@@ -303,7 +238,42 @@ export class CalendarGrid extends HTMLElement {
 
             dayElement.appendChild(dateDataContainer)
 
-            if (!this[`clickable`]) { return }
+            if (!this[`clickable`]) {
+                this.$containerInner.style.removeProperty(`overflow`)
+                if (isCurrent) { dayElementContainer.classList.add(`current`) }
+                return
+            }
+
+            dayElementContainer.tabIndex = -1
+
+            if (isCurrent) {
+                const ripple = document.createElement(`effect-ripple`) as any
+                ripple.start = `focus`
+                ripple.end = `blur`
+                ripple.speed = 200
+                ripple.opacity = 0.5
+                ripple.targets = [dayElementContainer]
+
+                const bounce = document.createElement(`effect-bounce-z`) as any
+                bounce.start = `focus`
+                bounce.speed = 125
+                bounce.amount = -3
+                bounce.targets = [dayElementContainer]
+
+                dayElementContainer.appendChild(ripple)
+                dayElementContainer.appendChild(bounce)
+                dayElementContainer.focus()
+
+                requestAnimationFrame(() => {
+                    dayElementContainer.classList.add(`current`)
+                    dayElementContainer.blur()
+
+                    setTimeout(() => {
+                        dayElementContainer.removeChild(ripple)
+                        dayElementContainer.removeChild(bounce)
+                    }, 200)
+                })
+            }
 
             dayElementContainer.addEventListener(`click`, () => {
                 if (Array.isArray(this.Values)) {
@@ -345,6 +315,6 @@ export class CalendarGrid extends HTMLElement {
     }
 }
 
-if (!window.customElements.get(`calendar-grid`)) {
-    window.customElements.define(`calendar-grid`, CalendarGrid);
+if (!window.customElements.get(componentName)) {
+    window.customElements.define(componentName, CalendarGrid);
 }

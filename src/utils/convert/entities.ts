@@ -1,10 +1,9 @@
-import { TMonad } from '.'
 import { Tmonad } from './t-monad'
 
-export const ToEntities: (v: any) => TMonad = value => {
+export const ToEntities = value => {
     const result = Tmonad(value)
 
-    if(result.stop){ return result }
+    if (result.stop) { return result }
 
     if (result.type === `string`) {
         result.value = result.value
@@ -23,10 +22,10 @@ export const ToEntities: (v: any) => TMonad = value => {
     return result
 }
 
-export const FromEntities: (v: any) => TMonad = value => {
+export const FromEntities = value => {
     const result = Tmonad(value)
 
-    if(result.stop){ return result }
+    if (result.stop) { return result }
 
     if (result.type === `string`) {
 
