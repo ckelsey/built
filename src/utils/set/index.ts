@@ -1,11 +1,11 @@
-export const Set = (source, path, value) =>{
+export const Set = (source, path, value) => {
     if (!!path) {
         path = [source].concat(path.split(`.`))
     } else {
         path = [source]
     }
 
-     path.reduce( (accumulator, currentValue) => {
+    path.reduce((accumulator, currentValue) => {
         if (!accumulator) {
             accumulator = {}
         }
@@ -28,3 +28,5 @@ export const Set = (source, path, value) =>{
 
     return source
 }
+
+export default Set

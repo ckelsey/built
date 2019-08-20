@@ -7,7 +7,7 @@ const env = process.env.NODE_ENV || `production`
 console.log(`ENV::`, env, env === `production`)
 
 let entries = {
-    'built': path.join(__dirname, 'src/components')
+    'built': path.join(__dirname, 'src')
 }
 
 if (env === `production`) {
@@ -24,6 +24,16 @@ if (env === `production`) {
         'overlay-content': path.join(__dirname, 'src/components/overlay-content'),
         'rotary-list': path.join(__dirname, 'src/components/rotary-list'),
         'time-display': path.join(__dirname, 'src/components/time-display'),
+        'router': path.join(__dirname, 'src/services/router'),
+        'unsupported': path.join(__dirname, 'src/services/unsupported'),
+        'request': path.join(__dirname, 'src/services/request'),
+        'curve': path.join(__dirname, 'src/utils/curve'),
+        'get': path.join(__dirname, 'src/utils/get'),
+        'id': path.join(__dirname, 'src/utils/id'),
+        'observe': path.join(__dirname, 'src/utils/observe'),
+        'pipe': path.join(__dirname, 'src/utils/pipe'),
+        'observeEvent': path.join(__dirname, 'src/utils/observeEvent'),
+        'set': path.join(__dirname, 'src/utils/set'),
     })
 }
 
