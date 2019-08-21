@@ -1,8 +1,8 @@
 import { Tmonad, finishTMonad } from './t-monad'
 import pipe from '../pipe'
-import { Split, ToPlainText } from './string'
+import { Split, ToPlainText, Trim } from './string'
 import { IfInvalid } from './if'
-import { ToArray } from './array'
+import { ToArray, Map } from './array'
 
 export const CommasToArray = value => {
     let result = Tmonad(value)
@@ -13,7 +13,8 @@ export const CommasToArray = value => {
         ToArray,
         IfInvalid(pipe(
             ToPlainText,
-            Split(`,`)
+            Split(`,`),
+            Map(v => Trim(v).value)
         )(result))
     )(result), `array`, `CommasToArray`)
 }

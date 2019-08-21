@@ -7,6 +7,23 @@ import { StopIfInvalid } from './if'
 import { MatchMeta, SplitMeta, ReplaceMeta } from './meta'
 import { Join, Map } from './array'
 
+export const Trim = value => {
+    let stop = Get(value, `stop`, false)
+
+    if (stop) {
+        return Tmonad(value)
+    }
+
+    let result = Tmonad(value)
+
+    try {
+        result.value = result.value.trim()
+    } catch (error) { }
+
+    result.instanceof.push(`Trim`)
+    return result
+}
+
 export const ToPlainText = value => {
     let result = Tmonad(value)
 

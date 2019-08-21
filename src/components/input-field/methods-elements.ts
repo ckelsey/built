@@ -2,7 +2,7 @@ import { elementSelectors } from './elements'
 import { InputFieldInputAttributes } from './definitions'
 import { isMobile } from '../../utils/platform'
 import { ValidateHtml } from '../../utils/validate'
-import { setSelectInputValue } from './methods-select';
+import { setSelectInputValue } from './methods-select'
 
 const tagType = type =>
     type === `textarea`
@@ -14,13 +14,14 @@ const tagType = type =>
 const getInputType = (tag, type) => {
     if (tag === `input`) {
         switch (type) {
+            case `checkbox`:
+            case `date`:
+            case `email`:
             case `number`:
             case `password`:
-            case `checkbox`:
             case `radio`:
-            case `email`:
             case `tel`:
-            case `date`:
+            case `url`:
                 return type
         }
 
@@ -30,33 +31,82 @@ const getInputType = (tag, type) => {
     return false
 }
 
-export const createInput = (type, container) => {
-    if (!container) { return }
+const setInputValue = (input, host) => {
+    if (!isMobile && host.type === `select` && host.options) {
+        return setSelectInputValue(input, host)
+    }
 
-    const tag = tagType(type)
-    const input = document.createElement(tag)
+    setAttribute(input, `value`, host.processedValue.original)
 
-    input.className = elementSelectors.input.split(`.`).join(``)
-
-    const typeAttribute = getInputType(tag, type)
-    if (typeAttribute) { input.setAttribute(`type`, typeAttribute) }
-
-    container.innerHTML = ``
-    container.appendChild(input)
     return input
 }
 
-export const setClearButton = host => iconPath => {
-    host.elements.clearButton.type = iconPath
+const addRemoveInputAttr = (input, attr, value) => {
+    if (!input) { return }
+
+    if (attr === `value`) {
+        return setInputValue(input, value)
+    }
+
+    const arias = [`disabled`, `required`]
+
+    if (arias.indexOf(attr) > -1) {
+        setAttribute(input, `aria-${attr}`, value)
+    }
+
+    setAttribute(input, attr, value)
+
+    return input
 }
 
-export const setCount = host => count => {
-    if (!host.elements.$count) { return }
-    host.elements.count.innerHTML = ``
-    host.elements.count.textContent = count || ``
+export const createInput = type => {
+    const tag = tagType(type)
+    const input = document.createElement(tag)
+    const typeAttribute = getInputType(tag, type)
+
+    input.className = elementSelectors.input.split(`.`).join(``)
+
+    if (typeAttribute) { input.setAttribute(`type`, typeAttribute) }
+
+    return input
 }
 
-export const setEffects = host => () => {
+export const replaceElementContents = (element, contents) => {
+    const respond = () => ({ element, contents })
+
+    if (!element) { return respond() }
+    element.innerHTML = ``
+
+    if (typeof contents === `string`) {
+        element.innerHTML = contents
+        return respond()
+    }
+
+    if (!Array.isArray(contents)) { return respond() }
+    contents.forEach(content => element.appendChild(content))
+
+    return respond()
+}
+
+export const findIn = (parent, selector, all = false) => !parent
+    ? undefined
+    : parent[all ? `querySelectorAll` : `querySelector`](selector)
+
+export const setAttribute = (element, name, value) => {
+    if (!element || !name) { return element }
+
+    const set = (n, v) => !!v ? element.setAttribute(n, v) : element.removeAttribute(n)
+
+    if (Array.isArray(name)) {
+        name.forEach((n, i) => set(n, value[i]))
+    } else {
+        set(name, value)
+    }
+
+    return element
+}
+
+export const setEffects = host => {
     requestAnimationFrame(() => {
         if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
             host.elements.ripple[`targets`] = host.elements.underline[`targets`] = host.elements.options[`targets`] = []
@@ -69,86 +119,43 @@ export const setEffects = host => () => {
     })
 }
 
-export const setInputID = host => () => {
-    host.setInputAttributes()
-
-    if (!host.elements.label) { return }
-
-    host.elements.label.id = host.inputID
-    host.elements.label.setAttribute(`for`, `${host.inputID}-input`)
+export const setInputID = (host, value) => {
+    setAttribute(host.elements.label, [`id`, `for`], [value, `${value}-input`])
+    setAttribute(host.elements.help, `id`, `${value}-help`)
+    setInputAttribute(host, [`id`, `aria-labelledby`, `aria-describedby`], [`${value}-input`, value, `${value}-help`])
 }
 
-const setInputValue = (input, host) => {
-    if (!isMobile && host.type === `select` && host.options) {
-        setSelectInputValue(input, host)
-    }
-
-    input.setAttribute(`value`, host.processedValue.original)
-}
-
-const addRemoveInputAttr = (input, attr, host) => {
-    if (!input) { return }
-
-    if (attr === `value`) {
-        return setInputValue(input, host)
-    }
-
-    const arias = [`disabled`, `required`]
-
-    if (!!host[attr]) {
-        if (arias.indexOf(attr) > -1) {
-            host.elements.input.setAttribute(`aria-${attr}`, host[attr])
-        }
-
-        input.setAttribute(attr, host[attr])
-    } else {
-        if (arias.indexOf(attr) > -1) {
-            host.elements.input.removeAttribute(`aria-${attr}`)
-        }
-
-        input.removeAttribute(attr)
-    }
-}
-
-export const setIcon = host => () => {
-    if (!host.elements.icon) { return }
-    host.elements.icon.type = host.icon
-}
-
-export const setInputAttributes = host => () => {
-    if (!host.elements.input) { return }
-
-    const attrs = [`radio`, `checkbox`].indexOf(this[`inputType`]) > -1
+export const setInputAttribute = (host, name, value) => {
+    const input = host.elements.input
+    const attrs = [`radio`, `checkbox`].indexOf(host.inputType) > -1
         ? InputFieldInputAttributes.bool
         : InputFieldInputAttributes.all
 
-    attrs.forEach(attr => addRemoveInputAttr(host.elements.input, attr, host))
+    const updateAttr = (n, v) => attrs.indexOf(n) === -1 ? undefined : addRemoveInputAttr(input, n, v)
 
-    // Accessibility
-    host.elements.input.id = `${host.inputID}-input`
-    host.elements.input.setAttribute(`aria-labelledby`, host.inputID)
-    const descBy = `${host.inputID}-help`
-    host.elements.help.id = descBy
-    host.elements.input.setAttribute(`aria-describedby`, descBy)
+    if (Array.isArray(name)) {
+        name.forEach((n, i) => updateAttr(n, value[i]))
+    } else {
+        updateAttr(name, value)
+    }
 }
 
-export const setLabel = host => () => {
-    if (!host.labelContainer) { return }
+export const setLabel = (value, labelposition, host) => {
+    const labs = replaceElementContents(
+        host.labelContainer,
+        [
+            setAttribute(
+                replaceElementContents(
+                    document.createElement(`label`),
+                    ValidateHtml(value, [], [`script`]).sanitized || ``
+                ).element,
+                [`id`, `tabIndex`, `for`, `class`],
+                [host.inputID, -1, `${host.inputID}-input`, `input-field-${labelposition}-label`]
+            )
+        ]
+    ).contents[0]
 
-    const label = document.createElement(`label`)
-    label.id = host.inputID
-    label.tabIndex = -1
-    label.setAttribute(`for`, `${host.inputID}-input`)
-    label.className = `input-field-${host.labelposition}-label`
-    label.innerHTML = ValidateHtml(host.label, [], [`script`]).sanitized || ``
-    host.labelContainer.appendChild(label)
-    host.elements.label = label
-}
-
-export const setMax = host => value => {
-    if (!host.elements.max) { return }
-    host.elements.max.innerHTML = ``
-    host.elements.max.textContent = value || ``
+    host.elements.label = labs
 }
 
 export const textareaHeight = (resize, input) => {

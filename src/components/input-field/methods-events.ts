@@ -1,40 +1,42 @@
 import { getValue } from '../../utils/html'
 import { isMobile } from '../../utils/platform'
-import { setSelectSelected } from './methods-select'
+import { setSelectSelected, filterSelect } from './methods-select'
 import { typesWithOverlay } from './definitions'
 import Get from '../../utils/get'
+import { processValue } from './methods-value'
 
-export const dispatch = host => (type, data) => host.dispatchEvent(
-    new CustomEvent(type, { detail: data || host.state })
-)
+export const dispatch = (host, type, data) =>
+    host.dispatchEvent(
+        new CustomEvent(type, { detail: data || host.state })
+    )
 
-export const onInput = host => () => {
+export const onInput = host => {
     const value = getValue(host.elements.input)
 
     if (host.type === `select` && !isMobile) {
-        return host.filterSelect(value)
+        return filterSelect(value, host)
     }
 
     host.value = value
-    host.dispatch(`input`, host.value)
+    dispatch(host, `input`, host.value)
 }
 
-export const onFocus = host => () => {
+export const onFocus = host => {
     if (host.focused) { return }
 
     host.focused = true
 
     if (host.type === `select` && !isMobile) {
         host.elements.input.value = ``
-        host.filterSelect(``)
+        filterSelect(``, host)
         setSelectSelected(host.optionElements, host.processedValue.sanitized)
     }
     if (typesWithOverlay.indexOf(host.type) !== -1) { host.elements.options.show() }
 
-    host.dispatch(`focus`)
+    dispatch(host, `focus`, host)
 }
 
-export const onBlur = host => () => {
+export const onBlur = host => {
     if (!host.focused) { return }
 
     if (host.type === `select` && !isMobile) {
@@ -60,12 +62,12 @@ export const onBlur = host => () => {
 
     host.focused = false
     host.elements.options.hide()
-    host.dispatch(`blur`)
+    dispatch(host, `blur`, host)
     host.elements.input.blur()
-    host.processValue()
+    processValue(host)
 }
 
-export const onKeyDown = host => e => {
+export const onKeyDown = (e, host) => {
     if (!e) { return }
 
     const key = Get(e, `key`, ``).toLowerCase()
@@ -120,15 +122,15 @@ export const onKeyDown = host => e => {
 
             return requestAnimationFrame(() => host.elements.input.blur())
         }
-        return host.onDone()
+        return onDone(host)
     }
 }
 
-export const onLabelClick = host => e => {
+export const onLabelClick = (e, host) => {
     const input = host.elements.input
     if (!input) { return }
 
-    host.dispatch(`labelClick`)
+    dispatch(host, `labelClick`, host)
 
     if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
         const bounceZ = host.elements.bounceZ
@@ -140,14 +142,14 @@ export const onLabelClick = host => e => {
     }
 }
 
-export const onDone = host => () => {
+export const onDone = host => {
     const input = host.elements.input
 
     if (!input) { return }
 
     input.blur()
 
-    host.dispatch(`done`, {
+    dispatch(host, `done`, {
         processedValue: host.processedValue,
         value: host.value,
         valid: !host.invalid,
@@ -155,12 +157,8 @@ export const onDone = host => () => {
     })
 }
 
-export const onInvalid = host => () => {
-    if (!host.elements.input) { return }
-
-    host.dispatch(`invalid`, {
-        processedValue: host.processedValue,
-        value: host.value,
-        errortext: host.errortext
-    })
-}
+export const onInvalid = host => dispatch(host, `invalid`, {
+    processedValue: host.processedValue,
+    value: host.value,
+    errortext: host.errortext
+})

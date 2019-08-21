@@ -1,6 +1,11 @@
 import ObserveEvent from '../../utils/observeEvent'
+import { isMobile } from '../../utils/platform'
+import Set from '../../utils/set'
+import { setInputID, setEffects } from './methods-elements'
+import { clearInput } from './methods-value'
+import { dispatch, onInput, onFocus, onBlur, onKeyDown, onLabelClick } from './methods-events';
 
-export const elementSelectors = {
+export const elementSelectors = Object.freeze({
     bounceZ: `.input-field-input-container effect-bounce-z`,
     checkIcon: `.input-field-checkbox-icon`,
     clearButton: `.input-field-clear`,
@@ -19,7 +24,7 @@ export const elementSelectors = {
     rotary: `rotary-list`,
     underline: `.input-field-input-container effect-underline`,
     valueInput: `.input-field-value-input`,
-}
+})
 
 const setInputEvents = (input, host) => {
     if (host.inputContainerClick$) {
@@ -27,60 +32,69 @@ const setInputEvents = (input, host) => {
     }
 
     input.eventSubscriptions = {
-        onFocus: ObserveEvent(input, `focus`).subscribe(e => host.onFocus(e)),
-        onBlur: ObserveEvent(input, `blur`).subscribe(e => host.onBlur(e)),
-        onKeyDown: ObserveEvent(input, `keydown`).subscribe(e => host.onKeyDown(e)),
+        onFocus: ObserveEvent(input, `focus`).subscribe(() => onFocus(host)),
+        onBlur: ObserveEvent(input, `blur`).subscribe(() => onBlur(host)),
+        onKeyDown: ObserveEvent(input, `keydown`).subscribe(e => onKeyDown(host, e)),
         // onPaste: ObserveEvent(input, `paste`).subscribe(e => {
         //     host.pasted = (e.clipboardData || (window as any).clipboardData).getData('text')
         // })
     }
 
     if ([`checkbox`, `radio`].indexOf(host.type) === -1) {
-        input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(e => host.onInput(e))
+
+        input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => onInput(host))
+
+    } else if (host.type === `select` && isMobile) {
+
+        input.eventSubscriptions.onSelect = ObserveEvent(input, `input`).subscribe(() => dispatch(host, `input`, host.value))
+
     } else {
-        host.inputContainerClick$ = ObserveEvent(host.elements.inputContainer, `click`, { useCapture: false, stopPropagation: true, preventDefault: true }).subscribe(() => {
+
+        host.inputContainerClick$ = ObserveEvent(host.elements.inputContainer, `click`, { stopPropagation: true, preventDefault: true }).subscribe(() => {
             host.value = !host.value
-            host.dispatch(`input`, host.value)
+            dispatch(host, `input`, host.value)
         })
     }
 }
 
+const setElementColor = (element, property, color) =>
+    !!element
+        ? Set(element, property, color)
+        : undefined
+
 export const setColors = host => {
-    if (host.elements.ripple) {
-        host.elements.ripple.color = host.invalid ? host.warningcolor : host.accentcolor
-    }
+    const invalid = host.invalid
+    const color = invalid ? host.warningcolor : host.accentcolor
+    setElementColor(host.elements.ripple, `color`, color)
+    setElementColor(host.elements.underline, `color`, color)
 
-    if (host.elements.underline) {
-        host.elements.underline.setAttribute(`color`, host.invalid ? host.warningcolor : host.accentcolor)
-    }
-
-    if (host.elements.inputContainer && [`checkbox`, `radio`].indexOf(host.type) > -1) {
-        host.elements.inputContainer.style.color = host.invalid ? host.warningcolor : host.accentcolor
+    if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
+        setElementColor(host.elements.inputContainer, `style.color`, color)
     }
 }
 
 const elementMethods = {
     input: (input, host) => {
         setInputEvents(input, host)
-        host.setInputAttributes()
-        host.setEffects()
+        setInputID(host, host.inputID)
+        setEffects(host)
     },
 
     clearButton: (el, host) => {
         el.eventSubscriptions = {
-            click: ObserveEvent(el, `click`).subscribe(() => host.clearInput())
+            click: ObserveEvent(el, `click`).subscribe(() => clearInput(host))
         }
     },
 
     label: (el, host) => {
         el.eventSubscriptions = {
-            click: ObserveEvent(el, `click`).subscribe(() => host.onLabelClick())
+            click: ObserveEvent(el, `click`).subscribe(e => onLabelClick(host, e))
         }
     },
 
     options: (el, host) => {
         el.eventSubscriptions = {
-            hidden: ObserveEvent(el, `hidden`).subscribe(() => host.onBlur())
+            hidden: ObserveEvent(el, `hidden`).subscribe(() => onBlur(host))
         }
     },
 

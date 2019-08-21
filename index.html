@@ -4,8 +4,8 @@
     <head>
         <meta charset="utf-8" />
         <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+              name="viewport"
+              content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
         <style>
             html {
                 height: 100%;
@@ -37,19 +37,17 @@
         </input-field> 
     format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["Slice", 0, 8], ["Match", "/.{0,3}/g"],["Join", "-"]]'
     -->
-        <input-field id="claim-code"
-            format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["BeforeEveryNth", 5, "-"],["Slice", 0, 9]]'>
-        </input-field>
+        <input-field id="claim-code" format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["BeforeEveryNth", 5, "-"],["Slice", 0, 9]]'> </input-field>
+        <input-field type="url" label="URL"></input-field>
         <input-field type="email" label="Email"></input-field>
         <input-field type="uszip" label="Zip code" class="aclass" autocomplete="zipcode"></input-field>
         <input-field type="textarea" label="Areas"></input-field>
         <input-field type="usphone" label="US Telephone" value="1234567890"></input-field>
         <input-field type="tel" label="Telephone" format="tel"></input-field>
+        <input-field type="radio" label="Radio" labelposition="right" value="true"></input-field>
         <input-field type="checkbox" label="Click me" labelposition="right" value="true"></input-field>
-        <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready"
-            labelposition="right"></input-field>
-        <input-field type="select" label="Select" options="a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z"
-            hideonfilter="true" id="select"></input-field>
+        <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready" labelposition="right"></input-field>
+        <input-field type="select" label="Select" options="a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z" hideonfilter="true" id="select"></input-field>
 
         <!-- <script>
             setTimeout(() => {

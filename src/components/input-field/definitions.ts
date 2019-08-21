@@ -12,10 +12,6 @@ export const stringOrNull = val => pipe(ToString, IfInvalid(null))(val).value
 export const string = val => pipe(ToString, IfInvalid(``))(val).value
 export const labelPositions = [`top`, `bottom`, `left`, `right`, `inside`]
 export const resizeOptions = [`true`, `false`, `horizontal`, `vertical`, `auto`]
-export const inputFieldInputTypes = [`input`, `select`, `textarea`, `checkbox`, `radio`, `password`]
-
-export const boolInputTypes = [`checkbox`, `radio`]
-export const numberInputTypes = [`number`]
 export const typesWithOptions = [`select`, `rotary`]
 export const typesWithOverlay = [`select`, `datetime`]
 
@@ -35,11 +31,11 @@ export const containerClasses = [
 
 export const InputFieldInputAttributes = {
     all: [
-        `autocomplete`, `autofocus`, `disabled`, `maxlength`, `name`,
+        `aria-describedby`, `aria-labelledby`, `autocomplete`, `autofocus`, `disabled`, `id`, `maxlength`, `name`,
         `pattern`, `placeholder`, `readonly`, `required`, `tabindex`,
         `value`
     ],
-    bool: [`disabled`, `name`, `readonly`, `required`, `tabindex`, `value`]
+    bool: [`aria-describedby`, `aria-labelledby`, `disabled`, `id`, `name`, `readonly`, `required`, `tabindex`, `value`]
 }
 
 export const supportedInputTypes = [
@@ -49,15 +45,16 @@ export const supportedInputTypes = [
     `url`,
     `email`,
     `password`,
-    `tel`,
     `radio`,
     `checkbox`,
     `select`,
-    `rotary`,
-    `datetime`,
-    `date`,
-    `time`,
+    // `rotary`,
+    // `datetime`,
+    // `date`,
+    // `time`,
+    `tel`,
     `usphone`,
+    `intlphone`,
     `uszip`,
 ]
 

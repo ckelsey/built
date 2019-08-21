@@ -9,7 +9,7 @@ import { ToString, Split } from '../../utils/convert/string'
 import onChange from './onChange'
 import { trueOrNull, stringOrNull, string, numberOrNull, supportedInputTypes, commasOrArrayOrNull, labelPositions, resizeOptions } from './definitions'
 
-export const inputStates = {
+const inputStates = {
     focused: trueOrNull,
     notempty: trueOrNull,
     invalid: trueOrNull,
@@ -19,7 +19,7 @@ export const inputStates = {
     hidefilteredout: trueOrNull,
 }
 
-export const inputAttributes = {
+const inputAttributes = {
     autocomplete: stringOrNull,
     autofocus: trueOrNull,
     disabled: trueOrNull,
@@ -39,7 +39,7 @@ export const inputAttributes = {
     value: val => val
 }
 
-export const inputFieldProperties = {
+const inputFieldProperties = {
     accentcolor: val => pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
     allowhtml: commasOrArrayOrNull,
     class: val => pipe(ToString, IfInvalid(``), Split(` `), Map(v => v.trim()), Filter(v => !!v))(val).value,
@@ -52,8 +52,10 @@ export const inputFieldProperties = {
     hideonfilter: val => ToBool(val).value,
     icon: stringOrNull,
     iconalign: (val: any) => typeof val === `string` && (val === `left` || val === `right`) ? val : `left`,
-    label: string,
+    inputID: val => !!val ? val : ``,
+    // Needs to be before the label property otherwise won't be able to find labelContainer in computed
     labelposition: val => pipe(IndexOf(labelPositions), IfInvalid(`inside`))(val).value,
+    label: string,
     options: val => pipe(Options, IfInvalid([]))(val).value,
     processedErrorText: val => pipe(ToString, IfInvalid(``))(val).value,
     resize: val => pipe(IndexOf(resizeOptions), IfInvalid(`auto`))(val).value,

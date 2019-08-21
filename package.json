@@ -51,6 +51,8 @@
         "web components"
     ],
     "dependencies": {
-        "@webcomponents/webcomponentsjs": "^2.2.7"
+        "@webcomponents/webcomponentsjs": "^2.2.7",
+        "eslint": "^6.2.1",
+        "g": "^2.0.1"
     }
 }

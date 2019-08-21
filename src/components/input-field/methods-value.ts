@@ -1,7 +1,6 @@
 import { isMobile } from '../../utils/platform'
-import { ValidateNumber, ValidateBool, ValidateEmail, ValidateHtml, ValidateText, ValidateUsZip, ValidateUsPhone } from '../../utils/validate'
-import { processedNullValue } from './definitions'
-import { isAutoFilled, setInputCaret } from '../../utils/html'
+import { ValidateNumber, ValidateBool, ValidateEmail, ValidateHtml, ValidateText, ValidateUsZip, ValidateUsPhone, ValidateUrl } from '../../utils/validate'
+import { isAutoFilled, setInputCaret, getInvalidMessage } from '../../utils/html'
 import { Split, UpperCase, LowerCase, Capitalize, Replace, Match, MatchAll, AfterEveryNth, BeforeEveryNth } from '../../utils/convert/string'
 import { ToPhone } from '../../utils/convert/phone'
 import { ToUsZip } from '../../utils/convert/postal'
@@ -10,7 +9,7 @@ import { Tmonad } from '../../utils/convert/t-monad'
 import { Join, Slice } from '../../utils/convert/array'
 import pipe from '../../utils/pipe'
 
-export const clearInput = host => () => host.value = ``
+export const clearInput = host => host.value = ``
 
 export const isEmpty = val => (val === `` || val === null || val === undefined)
 
@@ -29,15 +28,15 @@ export const sanitizeValue = (val: any, type, allowhtml, disallowhtml) => {
             return ValidateUsPhone(val)
         case `uszip`:
             return ValidateUsZip(val)
+        case `url`:
+            return ValidateUrl(val)
         default:
             if (allowhtml || disallowhtml) {
                 return ValidateHtml(val, allowhtml, disallowhtml)
             }
-
-            return ValidateText(val)
     }
 
-    // return { valid: true, sanitized: val, original: val, reason: [] }
+    return ValidateText(val)
 }
 
 const getFunction = (functionString, args = []) => {
@@ -122,18 +121,14 @@ export const InputFieldFormatValue = (value, format) => {
     return pipe.apply(null, functions)(value)
 }
 
-export const processThis = host => value => {
-    if (isEmpty(value)) { return processedNullValue() }
-    return sanitizeValue(value, host.type, host.allowhtml, host.disallowhtml)
-}
-
-export const processValue = host => () => {
+export const processValue = host => {
     const type = host.type
     const input = host.elements.input
+    const validationMessage = [getInvalidMessage(input)].filter(v => !!v)
     const processed = host.processedValue
     const sanitized = processed.sanitized
-    const errors = processed.reason
-    const valid = processed.valid
+    const errors = validationMessage.concat(processed.reason)
+    const valid = errors.length ? false : processed.valid
     const autofilled = isAutoFilled(input)
     const stringEmpty = (isNaN(sanitized) || typeof sanitized === `string`) && !sanitized.length
     const empty = stringEmpty && !autofilled

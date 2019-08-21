@@ -2,8 +2,10 @@ import ObserveEvent from '../../utils/observeEvent'
 import { typesWithOptions } from './definitions'
 import { isMobile } from '../../utils/platform'
 import { ValidateHtml } from '../../utils/validate'
+import { setAttribute } from './methods-elements'
+import { dispatch } from './methods-events';
 
-export const filterSelect = host => value => {
+export const filterSelect = (value, host) => {
     const filter = value.toLowerCase()
     const options = host.optionElements
     const emptyFilter = filter === ``
@@ -39,7 +41,7 @@ export const setSelectSelected = (options, value) => {
     })
 }
 
-export const setNativeOptions = host => options => {
+export const setNativeOptions = (options, host) => {
     const input = host.elements.input
 
     if (!input || !options || !options.length) { return }
@@ -63,7 +65,7 @@ export const setNativeOptions = host => options => {
     options.forEach(option => createOption(option))
 }
 
-export const setOptions = host => options => {
+export const setOptions = (options, host) => {
     if (typesWithOptions.indexOf(host.type) === -1) { return }
 
     host.elements.options.innerHTML = ``
@@ -89,6 +91,7 @@ export const setOptions = host => options => {
             host.optionElements.forEach(o => o.classList.remove(`selected`))
             optionElement.classList.add(`selected`)
             host.value = option.value
+            dispatch(host, `input`, host.value)
         })
 
         if (host.value === option.value) {
@@ -113,7 +116,10 @@ export const setSelectInputValue = (input, host) => {
 
     while (i--) {
         if (host.options[i].value === val && !host.options[i].classList.contains(`.blank`)) {
-            return input.setAttribute(`value`, host.options[i].label)
+            setAttribute(input, `value`, host.options[i].label)
+            i = 0
         }
     }
+
+    return input
 }

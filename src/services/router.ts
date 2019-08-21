@@ -37,8 +37,6 @@ const Router = routes => {
         return {}
     }
 
-    const initial = getRouteByPath(location.pathname) || {}
-
     const methods = {
         get current() { return current || {} },
 
@@ -65,9 +63,7 @@ const Router = routes => {
         route$: Observe(undefined)
     }
 
-    if (initial) {
-        document.title = initial.title
-    }
+    methods.route(location.pathname)
 
     window.document.body.addEventListener(`click`, e => {
         let link
@@ -91,7 +87,7 @@ const Router = routes => {
         if (url.host !== location.host) { return }
         if (methods.route(url)) { e.preventDefault() }
 
-    }, true);
+    }, true)
 
     window.addEventListener('popstate', navigated, false)
 

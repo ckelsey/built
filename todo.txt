@@ -1,9 +1,10 @@
-fix effect bounce width issue
-
-
-
-
-
+ * TODO - INPUT-FIELD - file upload
+ * TODO - SERVICE - uploader
+ * TODO - Server - uploader
+ * TODO - Accordian
+ * TODO - Popup
+ * TODO - Grid layout (checkout conduco)
+ * TODO - Link styles
 
  * BUG - Overlay placement, check with datetime
 

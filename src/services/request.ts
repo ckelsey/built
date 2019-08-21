@@ -14,11 +14,11 @@ const Request = apiBase => reqData => {
     }
 
     return new Promise((resolve, reject) => {
-        const headers = REQ.headers ? Object.keys(REQ.headers).map(key => `xhr.setRequestHeader(${key}, ${REQ.headers[key]});`) : ``
+        const headers = REQ.headers ? Object.keys(REQ.headers).map(key => `xhr.setRequestHeader('${key}', '${REQ.headers[key]}');`) : ``
         const fnString = `
-        self.onmessage = function(){
+        self.onmessage = function(e){
             var xhr = new XMLHttpRequest();
-            xhr.open('${REQ.method}', ${REQ.path}, false);
+            xhr.open('${REQ.method}', '${REQ.path}', false);
             ${ headers}
             xhr.onload = () => postMessage({ status: xhr.status, response: xhr.responseText });
             xhr.onerror = () => postMessage({ status: xhr.status, response: xhr.responseText });
@@ -37,6 +37,8 @@ const Request = apiBase => reqData => {
                 return reject(res)
             }
         }
+
+        worker.onerror = (e) => reject(e.message)
 
         worker.postMessage(REQ.data)
     })

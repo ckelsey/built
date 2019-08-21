@@ -60,7 +60,7 @@ export const ValidateUrl = (str: string): ValidateResponse => {
     return {
         original,
         valid: reasons.length === 0,
-        sanitized: link.href,
+        sanitized: val,
         reason: reasons
     }
 }
@@ -219,8 +219,8 @@ export const ValidateUsPhone = (val: string | number): ValidateResponse => {
     const converted = pipe(ToString, FromEntities, IfInvalid(``))(val)
     const value = converted.value.replace(/[^\d]+/g, ``)
 
-    if (value.length !== 10) {
-        reason.push(`needs 10 digits`)
+    if (value.length < 10) {
+        reason.push(`needs at least 10 digits`)
     }
 
     return {

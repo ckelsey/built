@@ -67,9 +67,7 @@ export const unloadTargets = host => {
 export const loadTargets = host => {
     if (!host.targets || !host.start || !host.targets$) { return }
 
-    host.targets.forEach((target, index) => {
-        target[`bounceindex`] = index
-
+    host.targets.forEach(target => {
         const start$ = ObserveEvent(target, host.start, { useCapture: false })
             .subscribe(
                 runStart(host),

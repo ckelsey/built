@@ -1,6 +1,8 @@
-import { createInput } from './methods-elements'
+import { createInput, replaceElementContents, setAttribute, findIn, setInputID, setInputAttribute, setLabel } from './methods-elements'
 import { ValidateHtml } from '../../utils/validate'
-import { setColors } from './elements';
+import { setColors, elementSelectors } from './elements'
+import { processValue } from './methods-value'
+import { setOptions } from './methods-select'
 
 const addRemoveContainerClass = (val, host, clss) => {
     host.elements.container.classList[!!val ? `add` : `remove`](clss)
@@ -9,7 +11,7 @@ const addRemoveContainerClass = (val, host, clss) => {
 export default {
     accentcolor: (_val, host) => setColors(host),
 
-    autocomplete: (_val, host) => host.setInputAttributes(),
+    autocomplete: (val, host) => setInputAttribute(host, `autocomplete`, val),
 
     class: (val, host) => {
         if (!!host.state.class.previous && host.state.class.previous.length) {
@@ -22,18 +24,16 @@ export default {
     },
 
     clearbutton: (val, host) => {
-        host.setClearButton()
+        setAttribute(host.elements.clearButton, `type`, val)
         addRemoveContainerClass(!!val, host, `clearbutton`)
     },
 
-    count: (val, host) => host.setCount(val),
+    count: (val, host) => replaceElementContents(host.elements.count, val),
 
     warningcolor: (_val, host) => setColors(host),
 
     disabled: (val, host) => {
-        if (!host.elements.input) { return }
-
-        host.setInputAttributes()
+        setInputAttribute(host, `disabled`, val)
         addRemoveContainerClass(val, host, `disabled`)
     },
 
@@ -42,98 +42,82 @@ export default {
         : undefined,
 
     errortext: (val, host) => {
-        if (!host.elements.error) { return }
-        host.elements.error.innerHTML = ValidateHtml(val, [], [`script`]).sanitized || ``
+        replaceElementContents(host.elements.error, ValidateHtml(val, [], [`script`]).sanitized || ``)
     },
 
     focused: (val, host) => addRemoveContainerClass(val, host, `focused`),
 
     helptext: (val, host) => {
-        if (!host.elements.help) { return }
-        host.elements.help.innerHTML = ValidateHtml(val, [], [`script`]).sanitized || ``
+        replaceElementContents(host.elements.help, ValidateHtml(val, [], [`script`]).sanitized || ``)
     },
 
     hideonfilter: (val, host) => addRemoveContainerClass(val, host, `hidefilteredout`),
 
     icon: (val, host) => {
-        host.setIcon()
+        setAttribute(host.elements.icon, `type`, val)
         addRemoveContainerClass(val, host, `icon`)
     },
 
-    iconalign: (val, host) => host.elements.container.setAttribute(`icon-align`, val),
+    iconalign: (val, host) => setAttribute(host.elements.container, `icon-align`, val),
+
+    inputID: (val, host) => setInputID(host, val),
 
     invalid: (val, host) => {
         setColors(host)
-
-        if (!val) {
-            host.setAttribute(`valid`, `true`)
-            return addRemoveContainerClass(val, host, `invalid`)
-        }
-
-        if (!!host.processedErrorText) {
-            host.elements.error.innerHTML = host.processedErrorText
-        }
-
-        host.removeAttribute(`valid`)
-
+        setAttribute(host.elements.container, `valid`, val)
         addRemoveContainerClass(val, host, `invalid`)
     },
 
-    label: (_val, host) => host.setLabel(),
+    label: (val, host) => setLabel(val, host.labelposition, host),
 
     labelposition: (val, host) => {
-        if (!host.elements.container) { return }
-
-        host.setLabel()
-        host.elements.container.setAttribute(`label-position`, val)
+        setAttribute(host.elements.container, `label-position`, val)
+        setLabel(host.label, val, host)
     },
 
     max: (val, host) => {
-        host.setMax(val)
+        replaceElementContents(host.elements.max, val || ``)
         addRemoveContainerClass(val, host, `max`)
     },
 
     maxlength: (val, host) => {
-        host.setMax(val)
+        replaceElementContents(host.elements.max, val || ``)
         addRemoveContainerClass(val, host, `maxlength`)
     },
 
-    name: (_val, host) => host.setInputAttributes(),
+    min: (val, host) => addRemoveContainerClass(val, host, `min`),
 
-    notempty: (val, host) => {
-        host.setAttribute(`has-value`, `${val}`)
-        addRemoveContainerClass(val, host, `notempty`)
-    },
+    name: (val, host) => setInputAttribute(host, `name`, val),
 
-    options: (val, host) => host.setOptions(val),
+    notempty: (val, host) => addRemoveContainerClass(val, setAttribute(host, `has-value`, `${val}`), `notempty`),
+
+    options: (val, host) => setOptions(val, host),
+
+    processedErrorText: (val, host) => !!val ? replaceElementContents(host.elements.error, val) : undefined,
 
     ready: (val, host) => addRemoveContainerClass(val, host, `ready`),
 
-    resize: (val, host) => {
-        if (!host.elements.container) { return }
-        host.elements.container.setAttribute(`resize`, val)
-    },
+    resize: (val, host) => setAttribute(host.elements.container, `resize`, val),
 
-    required: (_val, host) => {
-        if (!host.elements.input) { return }
-        host.setInputAttributes()
-    },
+    required: (val, host) => setInputAttribute(host, `required`, val),
 
     showcount: (val, host) => addRemoveContainerClass(val, host, `showcount`),
 
-    tabindex: (val, host) => {
-        if (!host.elements.input) { return }
-        host.elements.input.setAttribute(`tabIndex`, val)
-    },
+    tabindex: (val, host) => setAttribute(host.elements.input, `tabIndex`, val),
 
-    type: (val, host) => {
-        host.elements.input = createInput(
-            val,
-            host.elements.inputContainer
-        )
+    type: (val, host) => !host.elements.inputContainer
+        ? undefined
+        : host.elements.input = replaceElementContents(
+            findIn(
+                setAttribute(
+                    host.elements.container,
+                    `input-kind`,
+                    val
+                ),
+                elementSelectors.inputContainer
+            ),
+            [createInput(val)]
+        ).contents[0],
 
-        host.elements.container.setAttribute(`input-kind`, host.type)
-    },
-
-    value: (_val, host) => host.processValue()
+    value: (_val, host) => processValue(host)
 }
