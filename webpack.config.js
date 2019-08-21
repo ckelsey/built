@@ -22,13 +22,18 @@ const getFiles = source => {
             const dir = path.basename(itemPath, ext)
             const componentIndex = itemPath.indexOf(`src/components`) === 0 && dir === `index`
             const nonComponent = itemPath.indexOf(`src/components`) === -1
-
+            const isIndex = dir === `index`
+            const isMain = isIndex && itemPath === `src/index.ts`
 
             if (!stat.isDirectory()) {
                 if (ext === `.ts`) {
                     if (nonComponent || componentIndex) {
-                        pre.push(dir)
-                        result[`${pre.join(`_`)}`] = itemPath
+                        if (isMain) {
+                            pre.push(`builtjs`)
+                        } else if (!isIndex) {
+                            pre.push(dir)
+                        }
+                        result[`${pre.join(`_`)}`] = path.join(__dirname, itemPath)
                     }
                 }
             } else {
@@ -48,34 +53,6 @@ let entries = {
 
 if (env === `production`) {
     entries = getFiles(`./src/`)
-    console.log(entries)
-
-
-    // entries = glob.sync(`./src/{components/**/index.ts,services/*.ts,utils/**/*.ts}`)
-    // entries = Object.assign(entries, {
-    //     'button-element': path.join(__dirname, 'src/components/button-element'),
-    //     'calendar-controls': path.join(__dirname, 'src/components/calendar-controls'),
-    //     'calendar-grid': path.join(__dirname, 'src/components/calendar-grid'),
-    //     'date-time': path.join(__dirname, 'src/components/date-time'),
-    //     'effect-bounce-z': path.join(__dirname, 'src/components/effect-bounce-z'),
-    //     'effect-ripple': path.join(__dirname, 'src/components/effect-ripple'),
-    //     'effect-underline': path.join(__dirname, 'src/components/effect-underline'),
-    //     'icon-element': path.join(__dirname, 'src/components/icon-element'),
-    //     'input-field': path.join(__dirname, 'src/components/input-field'),
-    //     'overlay-content': path.join(__dirname, 'src/components/overlay-content'),
-    //     'rotary-list': path.join(__dirname, 'src/components/rotary-list'),
-    //     'time-display': path.join(__dirname, 'src/components/time-display'),
-    //     'router': path.join(__dirname, 'src/services/router'),
-    //     'unsupported': path.join(__dirname, 'src/services/unsupported'),
-    //     'request': path.join(__dirname, 'src/services/request'),
-    //     'curve': path.join(__dirname, 'src/utils/curve'),
-    //     'get': path.join(__dirname, 'src/utils/get'),
-    //     'id': path.join(__dirname, 'src/utils/id'),
-    //     'observe': path.join(__dirname, 'src/utils/observe'),
-    //     'pipe': path.join(__dirname, 'src/utils/pipe'),
-    //     'observeEvent': path.join(__dirname, 'src/utils/observeEvent'),
-    //     'set': path.join(__dirname, 'src/utils/set'),
-    // })
 }
 
 let optimization = {
