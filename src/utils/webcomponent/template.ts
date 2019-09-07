@@ -1,16 +1,20 @@
-import { CSSRulesFromSelector, StyleRules, AppendStyle } from './css'
+import { AppendStyle } from './css'
 
-export const Template = (tagname, element, templateString, cssString, rootElementSelector) => {
-    const css = !rootElementSelector ? `` : CSSRulesFromSelector(rootElementSelector).join(` `)
-    const styles = `${StyleRules(cssString)}${css}`
+export const Template = (tagname, element, templateString, styleString, notWebComponent = false) => {
+
+    if (notWebComponent) {
+        element.shadowRoot = element
+        return element.innerHTML = `${templateString}<style type="text/css">${styleString}</style>`
+    }
+
     const Template = document.createElement(`template`)
     Template.innerHTML = templateString
-    AppendStyle(styles, Template.content)
+    AppendStyle(styleString, Template.content)
 
     const clone = document.importNode(Template.content, true)
     element.attachShadow({ mode: 'open' }).appendChild(clone)
 
     if (!('registerElement' in document) && !document.head.querySelector(`style[name="${tagname}"]`)) {
-        AppendStyle(styles, document.head, tagname)
+        AppendStyle(styleString, document.head, tagname)
     }
 }

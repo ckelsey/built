@@ -1,14 +1,22 @@
- * TODO - INPUT-FIELD - file upload
- * TODO - SERVICE - uploader
+ * TODO - INPUT-FIELD - MULTI INPUT
+
+ * intlphone if no value in text, treat as if it has no value
+ * TODO - INPUT-FIELD - error/help should not take up more space when present except when over 1 line
+ * TODO - INPUT-FIELD - tab on current, re-focuses on input instead of going to next until you tab again
  * TODO - Server - uploader
- * TODO - Accordian
+ * TODO - new Effect fade content - switches one content for another, like on cai
  * TODO - Popup
  * TODO - Grid layout (checkout conduco)
  * TODO - Link styles
+ * TODO - icon element - prevent load jump(transformer fx) or at least smooth it out
 
- * BUG - Overlay placement, check with datetime
+ * TODO - passable properties for components in components(preferably with mutation observer?)
+ * TODO - all components should have injectable styles property
+ * TODO - clean up old utils
 
- * TODO - INPUT-FIELD - MULTI INPUT
+
+create a ready state and dispatch event for every component (done for effects, needs else where)
+
  * TODO - INPUT-FIELD - put date-time in
  * TODO - INPUT-FIELD - put date in
  * TODO - INPUT-FIELD - put time in
@@ -46,3 +54,5 @@ Select: touch/wheel scroll
 Cal:event element
 
  * TODO - input settings for css/features
+
+ * TODO - uploader - parallel to be bool and number for max requests

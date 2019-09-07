@@ -1,110 +1,137 @@
-import Subject from '../../utils/subject'
-
+import { Define, Constructor } from '../../utils/webcomponent/constructor'
+import pipe from '../../utils/pipe'
+import { IfInvalid, IfEmpty } from '../../utils/convert/if'
+import { ToBool } from '../../utils/convert/bool'
+import { wcClassObject } from '../../utils/html/attr'
+import { ToString } from '../../utils/convert/string'
+import { setStyleRules } from '../../utils/html/markup'
+import { BUTTONELEMENT } from './theme'
+import './style.scss'
 import '../effect-bounce-z'
 import '../effect-ripple'
-import { webComponentTemplate } from '../../utils/html'
+
+const style = require('./style.scss').toString()
+
+const setStyles = (el, host, styles) => {
+    if (!el) { return }
+    setStyleRules(el, styles || host.styles)
+}
+
+const properties = {
+    accentcolor: {
+        format: val => pipe(ToString, IfEmpty(BUTTONELEMENT.accentcolor))(val).value,
+        onChange: (val, host) => {
+            if (host.hasRipple) {
+                host.elements.ripple.color = val
+            }
+            if (host.hasBounce) {
+                host.elements.bounce.color = val
+            }
+        }
+    },
+    class: wcClassObject,
+    ready: {
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
+        onChange: (val, host) => {
+            if (!val) { return }
+            setBounce(host)
+            setRipple(host)
+        }
+    },
+    ripple: {
+        format: val => pipe(ToBool, IfInvalid(BUTTONELEMENT.ripple))(val).value,
+        onChange: (_val, host) => setRipple(host)
+    },
+    bounce: {
+        format: val => pipe(ToBool, IfInvalid(BUTTONELEMENT.bounce))(val).value,
+        onChange: (_val, host) => setBounce(host)
+    },
+    styles: {
+        format: val => typeof val === `string` ? val : BUTTONELEMENT.styles,
+        onChange: (val, host) => setStyles(host.elements.injectedStyles, host, val)
+    }
+}
+
+const observedAttributes = Object.keys(properties)
+
+const elements = {
+    root: {
+        selector: `.button-element`,
+        onChange: () => { }
+    },
+    button: {
+        selector: `button`,
+        onChange: () => { }
+    },
+    ripple: {
+        selector: `effect-ripple`,
+        onChange: (_el, host) => setRipple(host)
+    },
+    bounce: {
+        selector: `effect-bounce-z`,
+        onChange: (_el, host) => setBounce(host)
+    },
+    injectedStyles: {
+        selector: `style.injectedStyles`,
+        onChange: setStyles
+    }
+}
+
+const setRipple = host => {
+    if (!host.canRipple) { return }
+    const ripple = host.elements.ripple
+    ripple.color = host.accentcolor
+    ripple.targets = [host.elements.button]
+}
+
+const setBounce = host => {
+    if (!host.canBounce) { return }
+    const bounce = host.elements.bounce
+    bounce.targets = [host.elements.button]
+}
 
 const template = require('./index.html')
-const style = require('./style.html')
 const componentName = `button-element`
 const componentRoot = `.button-element`
-
-const Properties = {
-    class: val => val
-}
-const operations = that => ({
-    class: val => {
-        const newClasses = !!val && typeof val === `string` ? val.split(` `).map(c => c.trim()) : []
-        const clss = that.$container.className.split(` `).map(c => c.trim())
-        const prev = !!that.state.class.previous && typeof that.state.class.previous === `string` ? that.state.class.previous.split(` `).map(c => c.trim()) : []
-
-        prev.forEach(c => {
-            const indexInClss = clss.indexOf(c)
-            if (newClasses.indexOf(c) === -1 && indexInClss > -1) {
-                clss.splice(indexInClss, 1)
+const ButtonElement = Constructor({
+    componentName,
+    componentRoot,
+    template,
+    style,
+    observedAttributes,
+    properties,
+    elements,
+    computed: {
+        hasRipple: host => ({
+            get() {
+                const el = host.elements.ripple
+                return !!el && el.ready === true
+            }
+        }),
+        hasBounce: host => ({
+            get() {
+                const el = host.elements.bounce
+                return !!el && el.ready === true
+            }
+        }),
+        canRipple: host => ({
+            get() {
+                const can = !!host.ripple
+                return host.hasRipple && can && !!host.elements.button && host.ready === true
+            }
+        }),
+        canBounce: host => ({
+            get() {
+                const can = !!host.bounce
+                return host.hasBounce && can && !!host.elements.button && host.ready === true
             }
         })
-
-        newClasses.forEach(c => {
-            if (clss.indexOf(c) === -1) {
-                clss.push(c)
-            }
-        })
-
-        that.$container.className = clss.map(c => c.trim()).filter(c => !!c).join(` `)
-    }
+    },
+    onConnected: host => {
+        host.elements.button.classList.add(`ready`)
+    },
 })
 
-export class ButtonElement extends HTMLElement {
-    public state: { [key: string]: Subject } = {}
-    public $container
-    public $button
-    public $bounce
-    public $ripple
+Define(componentName, ButtonElement)
 
-    static get observedAttributes(): string[] { return Object.keys(Properties) }
-
-    constructor() {
-        super()
-
-        Object.keys(Properties).forEach((attrKey) => {
-            this.state[attrKey] = new Subject(Properties[attrKey](this[attrKey], this))
-
-            Object.defineProperty(this, attrKey, {
-                get() {
-                    return this.state[attrKey].value
-                },
-                set(attrValue) {
-                    if (!this.state[attrKey]) { return }
-
-                    const formattedValue = Properties[attrKey](attrValue, this)
-
-                    if (this.state[attrKey].value !== formattedValue) {
-                        return this.state[attrKey].next(formattedValue)
-                    }
-                }
-            })
-        })
-    }
-
-    public attributeChangedCallback(attrName: string, oldValue: any, newValue: any) {
-        if (newValue !== oldValue) {
-            this[attrName] = newValue
-        }
-    }
-
-    public connectedCallback() {
-        if (this.shadowRoot) { return }
-
-        const Operations = operations(this)
-
-        webComponentTemplate(componentName, template, this, style, componentRoot)
-
-        this.$container = this.shadowRoot.querySelector(`.button-element`)
-        this.$button = this.shadowRoot.querySelector(`button`)
-        this.$bounce = this.shadowRoot.querySelector(`effect-bounce-z`)
-        this.$ripple = this.shadowRoot.querySelector(`effect-ripple`)
-
-        this.$bounce.targets = [this.$button]
-        this.$ripple.targets = [this.$button]
-
-        Object.keys(Properties)
-            .forEach(attrKey => {
-                if (!Operations[attrKey]) { return }
-
-                this.state[attrKey].subscribe(
-                    val => Operations[attrKey](val)
-                )
-            })
-
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                this.$button.classList.add(`ready`)
-            })
-        })
-    }
-}
-
-if (!window.customElements.get(componentName)) {
-    window.customElements.define(componentName, ButtonElement);
-}
+export default ButtonElement

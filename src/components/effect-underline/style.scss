@@ -1,0 +1,24 @@
+:host,
+effect-underline,
+.effect-underline-container,
+.effect-underline-container * {
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.effect-underline-container {
+    .underline {
+        position: absolute;
+        top: calc(100% - 2px);
+        left: 0px;
+        height: 2px;
+        width: 100%;
+        background: $effectunderline_background;
+        opacity: 0;
+        pointer-events: none;
+        display: block;
+        transform: perspective(1px) translateZ(0) scaleX(0);
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+    }
+}

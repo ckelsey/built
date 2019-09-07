@@ -24,7 +24,7 @@ export const Elements = (host, elements) => {
         return els[0]
     }
 
-    Object.keys(elements).forEach(key => {
+    Object.keys(elements).sort().forEach(key => {
         elStates[key] = Observe(getEl(key))
 
         Object.defineProperty(state, key, {
@@ -39,7 +39,23 @@ export const Elements = (host, elements) => {
         elStates[key].subscribe(newElement => {
             unsubscribeEvents(elStates[key].previous)
             removeOld(elStates[key].previous)
-            elements[key].onChange(newElement, host)
+
+            // const loop = () => {
+            //     if (Object.getOwnPropertyNames(newElement).length) {
+            //         if (typeof elements[key].onChange === `function`) {
+            //             elements[key].onChange(newElement, host)
+            //         }
+            //         return
+            //     }
+
+            //     requestAnimationFrame(() => loop())
+            // }
+
+            // loop()
+
+            if (typeof elements[key].onChange === `function`) {
+                elements[key].onChange(newElement, host)
+            }
         })
     })
 

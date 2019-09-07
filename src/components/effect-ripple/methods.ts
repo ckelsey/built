@@ -1,104 +1,83 @@
 import ObserveEvent from '../../utils/observeEvent'
+import { GetCurve } from '../../utils/curve'
+import Timer from '../../services/timer'
 
-const signalEnd = host => runEnd(host)
+const maxScale = 1.3
 
-const runEnd = host => () => {
-    host.elements.root.classList.remove(`hide`)
-    host.elements.root.classList.add(`fade`)
-    host.elements.root.classList.remove(`active`)
-    host.on = false
+const runStart = host => {
+    if (!host.ready) { return }
 
-    const startTime = new Date().getTime()
-    let loop = () => {
-        const now = new Date().getTime()
+    const rippleInner = document.createElement(`span`)
+    const style = rippleInner.style
+    rippleInner.className = `ripple-inner`
+    rippleInner.style.backgroundColor = host.color
+    host.elements.ripple.appendChild(rippleInner)
 
-        if (now - startTime >= host.speed) {
-            host.elements.root.classList.remove(`fade`)
-        } else {
-            requestAnimationFrame(loop)
+    setOrigin(host, rippleInner)
+
+    Timer(
+        host.speed,
+        scale => {
+            const scaleAmount = Math.max(Math.min(maxScale, scale), 0)
+            style.transform = `perspective(1px) translateZ(0) scaleX(${scaleAmount}) scaley(${scaleAmount})`
+
+        },
+        GetCurve(
+            [0, maxScale],
+            0,
+            false,
+            host.speed
+        )
+    )
+
+    Timer(
+        host.speed,
+        opacity => style.opacity = `${Math.max(Math.min(1, opacity), 0)}`,
+        GetCurve(
+            [host.opacity * 0.5, host.opacity, host.opacity * 0.5, host.opacity * 0.125, host.opacity * 0.03, 0],
+            0,
+            false,
+            host.speed
+        ),
+        () => {
+            host.elements.ripple.removeChild(rippleInner)
         }
-    }
-
-    loop()
+    )
 }
 
-const runStart = host => e => {
-    if (host.on) { return }
-    if (!host.targets || host.targets.length === 0) { return }
+const setOrigin = (host, rippleInner) => {
+    if (!host.ready) { return }
 
-    const el = e ? e.target as HTMLElement : host.targets[0]
+    const nonAutoOrigin = host.nonAutoOrigin
+    const rippleInnerStyle = rippleInner.style
 
-    host.on = true
-    host.elements.root.classList.remove(`hide`)
-    host.elements.root.classList.add(`active`)
+    if (nonAutoOrigin) { return rippleInnerStyle.transformOrigin = nonAutoOrigin }
 
-    const startTime = new Date().getTime()
-    let loop = () => {
-        const now = new Date().getTime()
-
-        setPositions(host)(el, e ? e.type === `focus` ? host.downEvent : e : host.downEvent)
-
-        if (now - startTime < host.speed) {
-            return requestAnimationFrame(loop)
-        }
-
-        runEnd(host)()
+    if (!host.downEvent || !host.downEvent.target) {
+        return rippleInnerStyle.transformOrigin = `50% 50%`
     }
-    loop()
+
+    const eventX = host.downEvent.x
+    const eventY = host.downEvent.y
+    const targetBox = host.downEvent.target.getBoundingClientRect()
+    const left = Math.round(((eventX - targetBox.left) / targetBox.width) * 100)
+    const top = Math.round(((eventY - targetBox.top) / targetBox.height) * 100)
+
+    rippleInnerStyle.transformOrigin = `${left}% ${top}%`
 }
 
-const setPositions = host => (element, e) => {
-    const el = !!element ? element : !!e && e.target ? e.target : host.targets[0]
-
-    if (!el) { return }
-
-    host.elements.ripple.style.width = `${el.offsetWidth}px`
-    host.elements.ripple.style.height = `${el.offsetHeight}px`
-
-    if (e) {
-        const x = ((e.x - el.offsetLeft) / el.offsetWidth) * 100
-        const left = Math.min(Math.max(x, 5), 95)
-        host.elements.rippleInner.style.transformOrigin = `${100 - left}% 50%`
-    }
-}
-
-export const trigger = host => runStart(host)
+export const trigger = host => () => runStart(host)
 
 export const unloadTargets = host => {
-    if (!host.targets$) { return }
+    if (!host.hasTargets$) { return }
     host.targets$.forEach(ob$ => ob$())
+    host.targets$ = []
 }
 
 export const loadTargets = host => {
-    if (!host.targets || !host.start || !host.targets$) { return }
-
+    if (!host.canLoadTargets) { return }
     host.targets.forEach(target => {
-        const start$ = ObserveEvent(target, host.start, { useCapture: false })
-            .subscribe(
-                runStart(host),
-                () => start$(),
-                () => start$()
-            )
-
-        host.targets$.push(start$)
-
-        const down$ = ObserveEvent(target, `mousedown`, { useCapture: false })
-            .subscribe(
-                e => host.downEvent = e,
-                () => down$(),
-                () => down$()
-            )
-        host.targets$.push(down$)
-
-        if (host.end) {
-            const end$ = ObserveEvent(target, host.end, { useCapture: false })
-                .subscribe(
-                    signalEnd(host),
-                    () => end$(),
-                    () => end$()
-                )
-
-            host.targets$.push(end$)
-        }
+        host.targets$.push(ObserveEvent(target, `mousedown`).subscribe(e => host.downEvent = e))
+        host.targets$.push(ObserveEvent(target, host.start).subscribe(() => runStart(host)))
     })
 }

@@ -4,7 +4,9 @@ import { getType } from '../type'
 export const ToBool = value => {
     const result = Tmonad(value)
 
-    if (result.stop) { return result }
+    if (result.stop) {
+        return result
+    }
 
     switch (result.value) {
         case `0`:
@@ -33,6 +35,5 @@ export const ToBool = value => {
 
     result.type = getType(result.value)
     result.instanceof.push(`ToBool`)
-
     return result
 }

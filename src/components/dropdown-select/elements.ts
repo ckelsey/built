@@ -1,0 +1,168 @@
+import ObserveEvent from '../../utils/observeEvent'
+import { filter, toggleOptions, setUnselectedOption, setSelectedOption } from './methods'
+import { findIn } from '../../utils/html/query'
+import Get from '../../utils/get'
+import { ValidateHtml } from '../../utils/validate'
+import { setStyleRules, replaceElementContents } from '../../utils/html/markup'
+
+export const elementSelectors = {
+    root: `.dropdown-select-container`,
+    input: `select.dropdown-select-input`,
+    filter: `input.dropdown-select-filter`,
+    overlay: `overlay-content`,
+    label: `.dropdown-select-label`,
+    arrow: `.dropdown-select-arrow`,
+    injectedStyles: `style.injectedStyles`
+}
+
+export const setInput = host => {
+    const filter = host.elements.filter
+    const overlay = host.elements.overlay
+
+    if (filter && overlay) {
+        overlay.target = host.elements.root
+    }
+}
+
+export const setLabel = host => {
+    const option = host.options[host.selectedIndex]
+    const label = option ? host.formatvaluelabel(option) : ``
+    replaceElementContents(host.elements.label, ValidateHtml(label, [], [`script`]).sanitized || ``)
+}
+
+export const setStyles = (el, styles) => {
+    if (!el) { return }
+    setStyleRules(el, styles)
+}
+
+const elements = {}
+
+const methods = {
+    filter: (el, host) => {
+        el.eventSubscriptions = {
+            focus: ObserveEvent(el, `focus`).subscribe(() => {
+                if (host.native) { return }
+                el.value = ``
+                toggleOptions(host, true)
+            }),
+            blur: ObserveEvent(el, `blur`).subscribe(() => {
+                if (host.native) { return }
+                const overlay = host.elements.overlay
+                const selectedOption = findIn(overlay, `.select-option.selected`)
+                host.value = selectedOption ? selectedOption.value : ``
+                setLabel(host)
+                overlay.hide()
+            }),
+            keydown: ObserveEvent(el, `keydown`).subscribe(e => {
+                if (host.native) { return }
+
+                const overlay = host.elements.overlay
+                const key = Get(e, `key`, ``).toLowerCase()
+
+                const newSelection = option => {
+                    setSelectedOption(host, option)
+                }
+
+                if ([`arrowup`, `arrowdown`].indexOf(key) > -1) {
+                    e.preventDefault()
+                    const $options = findIn(overlay, `.select-option:not(.filtered-out)`, true)
+                    let $previous
+                    let $next
+                    let $newSelected
+
+                    for (let i = 0; i < $options.length; i++) {
+                        const $option = $options[i] as any
+                        const isSelected = $option.classList.contains(`selected`)
+
+                        setUnselectedOption($option)
+
+                        if (isSelected) {
+                            $previous = $options[i - 1] ? $options[i - 1] : $options[i]
+                            $next = $options[i + 1] ? $options[i + 1] : $options[i]
+                            break
+                        }
+                    }
+
+                    if (!$previous && !$next) { $previous = $next = $options[0] }
+
+                    if (key === `arrowup`) {
+                        $newSelected = $previous
+                    } else if (key === `arrowdown`) {
+                        $newSelected = $next
+                    }
+
+                    if ($newSelected && !$newSelected.classList.contains(`selected`)) {
+                        newSelection($newSelected)
+                    }
+                }
+
+                if (key === `enter`) {
+                    const visibleOptions = findIn(overlay, `.select-option:not(.filtered-out)`, true)
+
+                    if (visibleOptions.length === 1) { newSelection(visibleOptions[0]) }
+
+                    el.blur()
+                }
+
+                if (key === `escape`) {
+
+                    Array.from(findIn(overlay, `.select-option.selected`, true)).forEach((o: any) => o.classList.remove(`selected`))
+
+                    const selected = host.selectedOptionElement
+
+                    if (selected) {
+                        selected.classList.add(`selected`)
+                    }
+
+                    el.blur()
+                }
+            }),
+
+            input: ObserveEvent(el, `input`).subscribe(() => { host.native ? undefined : filter(host, el.value) })
+        }
+    },
+    overlay: (el, host) => {
+        const filter = host.elements.filter
+
+        if (filter) {
+            el.target = host.elements.filter
+        }
+
+        const loop = () => {
+            if (!el || !el.parentNode) { return }
+
+            if (el.state && el.state.showing) {
+                return el.state.showing.subscribe(e => {
+                    toggleOptions(host, e)
+                })
+            }
+
+            requestAnimationFrame(loop)
+        }
+
+        loop()
+    },
+
+    root: (el, host) => {
+        el.eventSubscriptions = {
+            blur: ObserveEvent(el, `blur`).subscribe(() => {
+                host.elements.overlay.hide()
+            })
+        }
+    },
+    arrow: (el, host) => {
+        el.eventSubscriptions = {
+            click: ObserveEvent(el, `click`).subscribe(() => toggleOptions(host, true))
+        }
+    },
+    injectedStyles: (el, host) => setStyles(el, host.styles),
+}
+
+Object.keys(elementSelectors).forEach(key => {
+    elements[key] = {
+        selector: elementSelectors[key],
+        onChange: methods[key] ? methods[key] : () => { }
+    }
+})
+
+export default elements

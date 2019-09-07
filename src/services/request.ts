@@ -1,3 +1,5 @@
+import ObserveWorker from '../utils/observeWorker'
+
 const Request = apiBase => reqData => {
     const base = apiBase
     const path = `${base}/${reqData.path || ''}`
@@ -14,33 +16,39 @@ const Request = apiBase => reqData => {
     }
 
     return new Promise((resolve, reject) => {
-        const headers = REQ.headers ? Object.keys(REQ.headers).map(key => `xhr.setRequestHeader('${key}', '${REQ.headers[key]}');`) : ``
-        const fnString = `
-        self.onmessage = function(e){
-            var xhr = new XMLHttpRequest();
-            xhr.open('${REQ.method}', '${REQ.path}', false);
-            ${ headers}
-            xhr.onload = () => postMessage({ status: xhr.status, response: xhr.responseText });
-            xhr.onerror = () => postMessage({ status: xhr.status, response: xhr.responseText });
-            xhr.send(e.data);
-        }`
-        const blobURL = window.URL.createObjectURL(new Blob([fnString]))
-        const worker = new Worker(blobURL)
-
-        worker.onmessage = (e) => {
-            let res = e.data.response
-            try { res = JSON.parse(res) } catch (error) { }
-
-            if (e.data.status === 200) {
-                return resolve(res)
-            } else {
-                return reject(res)
+        const worker$ = ObserveWorker(
+            function () {
+                self.onmessage = function (e) {
+                    var xhr = new XMLHttpRequest();
+                    var data = JSON.parse(e.data)
+                    xhr.open(data.method, data.path, false);
+                    Object.keys(data.headers).forEach(key => xhr.setRequestHeader(key, data.headers[key]))
+                    xhr.onload = () => postMessage({ status: xhr.status, response: xhr.responseText || xhr.statusText });
+                    xhr.onerror = () => postMessage({ status: xhr.status, response: xhr.statusText });
+                    xhr.send(data.data);
+                }
             }
-        }
+        )
 
-        worker.onerror = (e) => reject(e.message)
+        const workerSubscription = worker$.subscribe(
+            e => {
+                workerSubscription()
+                let res = e.response
+                try { res = JSON.parse(res) } catch (error) { }
 
-        worker.postMessage(REQ.data)
+                if (e.status === 200) {
+                    return resolve(res)
+                } else {
+                    return reject(e)
+                }
+            },
+            (e: any) => {
+                workerSubscription()
+                reject(e)
+            }
+        )
+
+        worker$.post(REQ)
     })
 }
 

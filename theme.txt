@@ -1,0 +1,1 @@
+NODE_ENV=production OUTDIR=/Users/chriskelsey/Sites/testbuilt/lib THEME=/Users/chriskelsey/Sites/testbuilt/theme.js  npm run build --prefix /Users/chriskelsey/Sites/ck/built

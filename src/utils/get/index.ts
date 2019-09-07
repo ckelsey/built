@@ -29,7 +29,7 @@ const Get = (
             }
         }
 
-        if (currentValue) {
+        if ((accumulator !== null && accumulator !== undefined) && currentValue) {
             return accumulator[currentValue]
         } else {
             return accumulator

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+        <style>
+            html {
+                height: 100%;
+            }
+
+            body {
+                font-family: sans-serif;
+                font-size: 14px;
+                color: #333;
+                margin: 0px 0px 0px 0px;
+                padding: 10rem 2rem;
+                box-sizing: border-box;
+                min-height: 100%;
+                background: #ccc;
+            }
+
+        </style>
+        <script src="/dist/webcomponentsjs/custom-elements-es5-adapter.js"></script>
+        <script src="/dist/webcomponentsjs/webcomponents-loader.js"></script>
+        <script src="/dist/builtjs.js"></script>
+    </head>
+
+    <body>
+        <dropdown-select options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);" accentcolor="deeppink" selectedcolor="yellow" dropdowncolor="blue" hovercolor="darkblue"></dropdown-select>
+        <country-dropdown></country-dropdown>
+        <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
+            <span slot="header">Heading</span>
+            <div slot="content">Some content .content-drawer-header,
+                .content-drawer-content,
+                .content-drawer-content-inner,
+                .content-drawer-content-inner-inner {
+                position: relative;
+                width: 100%;
+                padding: 1em;
+                box-sizing: border-box;
+                }
+
+                .content-drawer-header {
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                flex-wrap: nowrap;
+                }</div>
+        </content-drawer>
+
+        <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
+            <span slot="header">Another Heading</span>
+            <div slot="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+        </content-drawer>
+        <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="b">
+            <span slot="header">Group B</span>
+            <div slot="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+        </content-drawer>
+        <button-element id="scale-hey">
+            <icon-element type="icons/pets.svg"></icon-element>&nbsp;Scale it
+            <effect-scale triggers='["#scale-hey"]' targets='[".scale-target"]' x="false" y="true" start="click" scaled="true" startfrom="left top" amount="-1"></effect-scale>
+        </button-element>
+        <button-element class="scale-target">
+            <icon-element type="icons/ac_unit.svg"></icon-element>&nbsp;Hey there
+        </button-element>
+        <input-field id="claim-code" format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["BeforeEveryNth", 5, "-"],["Slice", 0, 9]]'></input-field>
+        <input-field type="url" label="URLee"></input-field>
+        <input-field label="Pattern" pattern="[^a-z0-9]"></input-field>
+        <input-field type="intlphone" label="International phone" value="+254 (415) 734-7616"></input-field>
+        <input-field type="file" label="Drag a file here or&nbsp;<span class='browse-color'>browse</span>"></input-field>
+        <input-field type="file" label="Browse for file" multiple="true" droppable="true" accept="image/jpeg, image/png, video/mp4" id="imageup"></input-field>
+        <input-field type="email" label="Email"></input-field>
+        <p class="scale-target">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+        <input-field type="uszip" label="Zip code" class="aclass" autocomplete="zipcode"></input-field>
+        <input-field type="textarea" label="Areas"></input-field>
+        <input-field type="usphone" label="US Telephone" value="1234567890"></input-field>
+        <input-field type="tel" label="Telephone" format="tel"></input-field>
+        <input-field type="radio" label="Radio" labelposition="right" value="true"></input-field>
+        <input-field type="checkbox" label="Click me" labelposition="right" value="true"></input-field>
+        <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready" labelposition="right"></input-field>
+        <input-field type="select" label="Select" options="ab,abb,cb,db,eb,fb,gb,hb,ib,jb,kb,lb,mb,nb,ob,pb,qb,rb,sb,tb,ub,vb,wb,xb,yb,zb" hideonfilter="true" id="select"></input-field>
+    </body>
+
+</html>

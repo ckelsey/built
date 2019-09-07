@@ -1,0 +1,7 @@
+:host,
+effect-scale,
+.effect-scale-container,
+.effect-scale-container * {
+    pointer-events: none;
+    box-sizing: border-box;
+}

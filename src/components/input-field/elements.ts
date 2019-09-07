@@ -1,9 +1,15 @@
 import ObserveEvent from '../../utils/observeEvent'
-import { isMobile } from '../../utils/platform'
 import Set from '../../utils/set'
-import { setInputID, setEffects } from './methods-elements'
+import { setInputID, setEffects, inputAttributeList, setInputValue } from './methods-elements'
 import { clearInput } from './methods-value'
-import { dispatch, onInput, onFocus, onBlur, onKeyDown, onLabelClick } from './methods-events';
+import { dispatch, onInput, onFocus, onBlur, onKeyDown, onLabelClick, setDroppable } from './methods-events'
+import { addRemoveAttr } from '../../utils/html/attr'
+import { setStyleRules } from '../../utils/html/markup'
+
+export const setStyles = (el, styles) => {
+    if (!el) { return }
+    setStyleRules(el, styles)
+}
 
 export const elementSelectors = Object.freeze({
     bounceZ: `.input-field-input-container effect-bounce-z`,
@@ -15,15 +21,16 @@ export const elementSelectors = Object.freeze({
     help: `.input-field-message-help`,
     icon: `.input-field-icon`,
     inputContainer: `.input-field-input-container-inner`,
+    inputContainerOuter: `.input-field-input-container`,
     input: `.input-field-input`,
     label: `.input-field-container-inner label`,
     max: `.input-field-character-count-max`,
-    options: `overlay-content`,
     ripple: `.input-field-input-container effect-ripple`,
     root: `.input-field-container`,
     rotary: `rotary-list`,
     underline: `.input-field-input-container effect-underline`,
     valueInput: `.input-field-value-input`,
+    injectedStyles: `style.injectedStyles`
 })
 
 const setInputEvents = (input, host) => {
@@ -34,25 +41,22 @@ const setInputEvents = (input, host) => {
     input.eventSubscriptions = {
         onFocus: ObserveEvent(input, `focus`).subscribe(() => onFocus(host)),
         onBlur: ObserveEvent(input, `blur`).subscribe(() => onBlur(host)),
-        onKeyDown: ObserveEvent(input, `keydown`).subscribe(e => onKeyDown(host, e)),
-        // onPaste: ObserveEvent(input, `paste`).subscribe(e => {
-        //     host.pasted = (e.clipboardData || (window as any).clipboardData).getData('text')
-        // })
+        onKeyDown: ObserveEvent(input, `keydown`).subscribe(e => onKeyDown(host, e))
     }
 
-    if ([`checkbox`, `radio`].indexOf(host.type) === -1) {
-
-        input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => onInput(host))
-
-    } else if (host.type === `select` && isMobile) {
-
-        input.eventSubscriptions.onSelect = ObserveEvent(input, `input`).subscribe(() => dispatch(host, `input`, host.value))
-
-    } else {
-
+    if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
         host.inputContainerClick$ = ObserveEvent(host.elements.inputContainer, `click`, { stopPropagation: true, preventDefault: true }).subscribe(() => {
             host.value = !host.value
             dispatch(host, `input`, host.value)
+        })
+
+    } else if (host.type === `intlphone`) {
+        input.eventSubscriptions.onInput = ObserveEvent(input, `inputchange`).subscribe((e) => {
+            host.value = e.detail
+        })
+    } else {
+        input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => {
+            onInput(host)
         })
     }
 }
@@ -73,11 +77,21 @@ export const setColors = host => {
     }
 }
 
+export const setOptions = (input, options) => {
+    if (!input) { return }
+
+    input.options = options
+}
+
 const elementMethods = {
     input: (input, host) => {
+        inputAttributeList(host)
+            .forEach(attr => attr === `value` ? setInputValue(input, host) : addRemoveAttr(input, attr, host[attr]))
         setInputEvents(input, host)
         setInputID(host, host.inputID)
         setEffects(host)
+        setDroppable(host)
+        setOptions(input, host.options)
     },
 
     clearButton: (el, host) => {
@@ -88,19 +102,15 @@ const elementMethods = {
 
     label: (el, host) => {
         el.eventSubscriptions = {
-            click: ObserveEvent(el, `click`).subscribe(e => onLabelClick(host, e))
-        }
-    },
-
-    options: (el, host) => {
-        el.eventSubscriptions = {
-            hidden: ObserveEvent(el, `hidden`).subscribe(() => onBlur(host))
+            click: ObserveEvent(el, `click`).subscribe(e => onLabelClick(e, host))
         }
     },
 
     ripple: (_el, host) => setColors(host),
 
-    underline: (_el, host) => setColors(host)
+    underline: (_el, host) => setColors(host),
+
+    injectedStyles: (el, host) => setStyles(el, host.styles)
 }
 
 const elements = {}

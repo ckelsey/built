@@ -1,11 +1,21 @@
 import { Constructor, Define } from '../../utils/webcomponent/constructor'
-import ID from '../../utils/id'
-import { observedAttributes, properties } from './properties'
+import {
+    observedAttributes,
+    properties,
+    hasTargets,
+    hasTargets$,
+    hasStart,
+    canLoadTargets,
+    canStart,
+    nonAutoOrigin
+} from './properties'
 import { trigger, unloadTargets } from './methods'
 import elements from './elements'
 
+import './style.scss'
+const style = require('./style.scss').toString()
+
 const template = require('./index.html')
-const style = require('./style.html')
 const componentName = `effect-ripple`
 const componentRoot = `.effect-ripple-container`
 const EffectRipple = Constructor({
@@ -17,7 +27,14 @@ const EffectRipple = Constructor({
     properties,
     elements,
     methods: { trigger },
-    onConnected: host => host.inputID = ID(componentName),
+    computed: {
+        hasTargets,
+        hasTargets$,
+        hasStart,
+        canLoadTargets,
+        canStart,
+        nonAutoOrigin,
+    },
     onDisconnected: host => unloadTargets(host)
 })
 

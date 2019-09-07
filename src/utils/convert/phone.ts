@@ -87,3 +87,19 @@ export const ToPhone = value => {
     r.instanceof.push(`ToPhone`)
     return r
 }
+
+export const ToIntlPhone = value => {
+    let result = Tmonad(value)
+
+    if (result.stop) { return result }
+
+    const parts = result.value.split(` `)
+    const countryCode = parts[0].indexOf(`+`) > -1 ? `${parts.shift()} ` : ``
+    const countryCodeMonad = ToDigits(countryCode)
+    const r = ToPhone(parts.join(` `))
+
+    result.value = `+${countryCodeMonad.value} ${r.value}`.trim()
+    result.stringChanges = r.stringChanges
+    result.instanceof.push(`ToIntlPhone`)
+    return result
+}

@@ -1,97 +1,75 @@
 import ObserveEvent from '../../utils/observeEvent'
+import { GetCurve } from '../../utils/curve'
+import Timer from '../../services/timer'
 
 const signalEnd = host => runEnd(host)
 
+const runAnimation = (host, isOn) => {
+    const underlineStyle = host.elements.underline.style
+
+    if (isOn) {
+        underlineStyle.opacity = host.opacity
+        setOrigin(host)
+    }
+
+    Timer(
+        host.speed,
+        scale => underlineStyle.transform = `perspective(1px) translateZ(0) scaleX(${scale})`,
+        GetCurve(isOn ? [0, 1] : [1, 0], isOn ? host.spring : 0.5, false, host.speed),
+        () => underlineStyle.transform = `perspective(1px) translateZ(0) scaleX(${isOn ? 1 : 0})`
+    )
+}
+
 const runEnd = host => () => {
-    host.elements.root.classList.remove(`active`)
+    if (!host.canRunEnd) { return }
     host.on = false
-
-    const startTime = new Date().getTime()
-    let loop = () => {
-        const now = new Date().getTime()
-        const timesNotUp = now - startTime < host.speed
-
-        return timesNotUp ? requestAnimationFrame(loop) : undefined
-    }
-
-    loop()
+    runAnimation(host, false)
 }
 
-const runStart = host => e => {
-    if (host.on) { return }
-    if (!host.targets || host.targets.length === 0) { return }
-
-    const el = e ? e.target as HTMLElement : host.targets[0]
-    const isBlur = e.type === `focus` && host.end === `blur`
-
+const runStart = host => () => {
+    if (!host.canRunStart) { return }
     host.on = true
-    host.elements.root.classList.remove(`hide`)
-    host.elements.root.classList.add(`active`)
-
-    const startTime = new Date().getTime()
-    let loop = () => {
-        const now = new Date().getTime()
-        const animateAgain = now - startTime < host.speed || (host.on && isBlur)
-        setPositions(host)(el, e ? e.type === `focus` ? host.downEvent : e : host.downEvent)
-        return animateAgain ? requestAnimationFrame(loop) : runEnd(host)()
-    }
-    loop()
+    runAnimation(host, true)
+    host.downEvent = undefined
 }
 
-const setPositions = host => (element, e) => {
-    const el = !!element ? element : !!e && e.target ? e.target : host.targets[0]
+const setOrigin = host => {
+    if (!host.ready) { return }
 
-    if (!el) { return }
+    const nonAutoOrigin = host.nonAutoOrigin
+    const underlineStyle = host.elements.underline.style
 
-    if (e && host.direction === `auto`) {
-        const x = ((e.x - el.offsetLeft) / el.offsetWidth) * 100
-        const left = Math.min(Math.max(x, 5), 95)
-        host.elements.underline.style.transformOrigin = `${left}% 50%`
-    } else {
-        host.elements.underline.style.transformOrigin =
-            host.direction === `to left`
-                ? `100% center`
-                : host.direction === `from center`
-                    ? `center center`
-                    : `to right`
-    }
+    if (nonAutoOrigin) { return underlineStyle.transformOrigin = nonAutoOrigin }
+
+    const eventX = host.downEvent.x
+    const targetBox = host.downEvent.target.getBoundingClientRect()
+    const left = Math.round(((eventX - targetBox.left) / targetBox.width) * 100)
+    underlineStyle.transformOrigin = `${left}% center`
 }
 
-export const trigger = host => runStart(host)
+export const toggle = host => host.on ? runEnd(host) : runStart(host)
+export const open = host => runStart(host)
+export const close = host => runEnd(host)
 
 export const unloadTargets = host => {
-    if (!host.targets$) { return }
+    if (!host.hasTargets$) { return }
     host.targets$.forEach(ob$ => ob$())
+    host.targets$ = []
 }
 
 export const loadTargets = host => {
-    if (!host.targets || !host.start || !host.targets$) { return }
+    if (!host.canLoadTargets) { return }
+
+    unloadTargets(host)
 
     host.targets.forEach(target => {
-        const start$ = ObserveEvent(target, host.start, { useCapture: false })
-            .subscribe(
-                runStart(host),
-                () => start$(),
-                () => start$()
-            )
+        if (host.canStart) {
+            host.targets$.push(ObserveEvent(target, `mousedown`).subscribe(e => host.downEvent = e))
+            host.targets$.push(ObserveEvent(target, host.start).subscribe(runStart(host)))
+        }
 
-        host.targets$.push(start$)
-
-        const down$ = ObserveEvent(target, `mousedown`, { useCapture: false })
-            .subscribe(
-                e => host.downEvent = e,
-                () => down$(),
-                () => down$()
-            )
-        host.targets$.push(down$)
-
-        const end$ = ObserveEvent(target, host.end, { useCapture: false })
-            .subscribe(
-                signalEnd(host),
-                () => end$(),
-                () => end$()
-            )
-
-        host.targets$.push(end$)
+        if (host.canEnd) {
+            host.targets$.push(ObserveEvent(target, host.end).subscribe(signalEnd(host)))
+        }
     })
 }

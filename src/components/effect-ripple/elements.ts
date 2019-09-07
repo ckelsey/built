@@ -1,7 +1,14 @@
+import { setStyleRules } from '../../utils/html/markup'
+
 export const elementSelectors = {
     root: `.effect-ripple-container`,
     ripple: `.ripple`,
-    rippleInner: `.ripple-inner`
+    injectedStyles: `style.injectedStyles`
+}
+
+export const setStyles = (el, styles) => {
+    if (!el) { return }
+    setStyleRules(el, styles)
 }
 
 const elements = {}
@@ -9,7 +16,9 @@ const elements = {}
 Object.keys(elementSelectors).forEach(key => {
     elements[key] = {
         selector: elementSelectors[key],
-        onChange: () => { }
+        onChange: key === `injectedStyles`
+            ? (el, host) => setStyles(el, host.styles)
+            : () => { }
     }
 })
 

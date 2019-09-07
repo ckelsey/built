@@ -1,11 +1,24 @@
 import { Constructor, Define } from '../../utils/webcomponent/constructor'
-import ID from '../../utils/id'
-import { observedAttributes, properties } from './properties'
-import { trigger, unloadTargets } from './methods'
+import {
+    observedAttributes,
+    properties,
+    hasTargets,
+    hasTargets$,
+    hasStart,
+    canLoadTargets,
+    canStart,
+    canEnd,
+    canRunStart,
+    canRunEnd,
+    nonAutoOrigin
+} from './properties'
+import { toggle, unloadTargets, open, close } from './methods'
 import elements from './elements'
 
+import './style.scss'
+const style = require('./style.scss').toString()
+
 const template = require('./index.html')
-const style = require('./style.html')
 const componentName = `effect-underline`
 const componentRoot = `.effect-underline-container`
 const EffectUnderline = Constructor({
@@ -16,8 +29,18 @@ const EffectUnderline = Constructor({
     observedAttributes,
     properties,
     elements,
-    methods: { trigger },
-    onConnected: host => host.inputID = ID(componentName),
+    methods: { toggle, open, close },
+    computed: {
+        hasTargets,
+        hasTargets$,
+        hasStart,
+        canLoadTargets,
+        canStart,
+        canEnd,
+        canRunStart,
+        canRunEnd,
+        nonAutoOrigin,
+    },
     onDisconnected: host => unloadTargets(host)
 })
 

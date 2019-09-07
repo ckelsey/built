@@ -1,9 +1,8 @@
 import { getValue } from '../../utils/html'
-import { isMobile } from '../../utils/platform'
-import { setSelectSelected, filterSelect } from './methods-select'
-import { typesWithOverlay } from './definitions'
-import Get from '../../utils/get'
-import { processValue } from './methods-value'
+import { processValue, getFileValue } from './methods-value'
+import DragDropService from '../../services/dragDrop'
+import ObserveEvent from '../../utils/observeEvent'
+import { UseIf } from '../../utils/convert/if'
 
 export const dispatch = (host, type, data) =>
     host.dispatchEvent(
@@ -11,10 +10,15 @@ export const dispatch = (host, type, data) =>
     )
 
 export const onInput = host => {
-    const value = getValue(host.elements.input)
+    const input = host.elements.input
+    let value = getValue(input)
 
-    if (host.type === `select` && !isMobile) {
-        return filterSelect(value, host)
+    if (host.type === `select`) {
+        value = input.value
+    }
+
+    if (host.type === `file`) {
+        value = UseIf(v => v.length, () => ``, getFileValue(input)).value
     }
 
     host.value = value
@@ -25,43 +29,17 @@ export const onFocus = host => {
     if (host.focused) { return }
 
     host.focused = true
-
-    if (host.type === `select` && !isMobile) {
-        host.elements.input.value = ``
-        filterSelect(``, host)
-        setSelectSelected(host.optionElements, host.processedValue.sanitized)
-    }
-    if (typesWithOverlay.indexOf(host.type) !== -1) { host.elements.options.show() }
-
+    host.setAttribute(`focused`, `true`)
+    processValue(host)
     dispatch(host, `focus`, host)
 }
 
 export const onBlur = host => {
     if (!host.focused) { return }
 
-    if (host.type === `select` && !isMobile) {
-        const selected = host.selected
-
-        if (selected.element) {
-            if (selected.element.classList.contains(`blank`)) {
-                host.elements.input.value = ``
-            } else {
-                host.elements.input.value = selected.label || ``
-            }
-
-            selected.element.dispatchEvent(new Event(`mousedown`))
-            selected.element.click()
-        } else {
-            host.elements.input.value = selected.label || ``
-        }
-    }
-
-    if (host.type === `rotary` && host.elements.rotary) {
-        host.elements.input.value = host.elements.rotary.value
-    }
-
     host.focused = false
-    host.elements.options.hide()
+    host.setAttribute(`focused`, `false`)
+
     dispatch(host, `blur`, host)
     host.elements.input.blur()
     processValue(host)
@@ -70,58 +48,7 @@ export const onBlur = host => {
 export const onKeyDown = (e, host) => {
     if (!e) { return }
 
-    const key = Get(e, `key`, ``).toLowerCase()
-
-    if (host.type === `select` && [`arrowup`, `arrowdown`].indexOf(key) > -1) {
-        e.preventDefault()
-        const $options = host.optionElements.filter(o => !o.classList.contains(`filtered-out`))
-        let $previous
-        let $next
-        let $newSelected
-
-        for (let i = 0; i < $options.length; i++) {
-            const $option = $options[i] as any
-            const isSelected = $option.classList.contains(`selected`)
-            $option.classList.remove(`selected`)
-
-            if (isSelected) {
-                $previous = $options[i - 1] ? $options[i - 1] : $options[i]
-                $next = $options[i + 1] ? $options[i + 1] : $options[i]
-                break
-            }
-        }
-
-        if (!$previous && !$next) { $previous = $next = $options[0] }
-
-        if (key.toLowerCase() === `arrowup`) {
-            $newSelected = $previous
-        } else if (key.toLowerCase() === `arrowdown`) {
-            $newSelected = $next
-        }
-
-        if ($newSelected && !$newSelected.classList.contains(`selected`)) {
-            $newSelected.classList.add(`selected`)
-            const optionBox = $newSelected.getBoundingClientRect()
-            const containerPosition = host.elements.options.position
-            const optionTop = optionBox.top - containerPosition.top
-            const optionBottom = optionBox.height + optionTop
-
-            if (optionBottom > containerPosition.height) {
-                host.elements.options.scrollContent(0, containerPosition.scrollTop + (optionBottom - containerPosition.height))
-            }
-
-            if (optionTop < 0) {
-                host.elements.options.scrollContent(0, containerPosition.scrollTop + optionTop)
-            }
-        }
-    }
-
     if (e.key && e.key.toLowerCase() === `enter` && host.type !== `textarea`) {
-        if (host.type === `select` && !isMobile) {
-            host.elements.input.value = host.selected.label || ``
-
-            return requestAnimationFrame(() => host.elements.input.blur())
-        }
         return onDone(host)
     }
 }
@@ -132,11 +59,14 @@ export const onLabelClick = (e, host) => {
 
     dispatch(host, `labelClick`, host)
 
-    if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
+    if ([`checkbox`, `radio`].indexOf(host.type) === -1) {
         const bounceZ = host.elements.bounceZ
         const ripple = host.elements.ripple
+
         if (bounceZ) { bounceZ.trigger() }
+
         if (ripple) { ripple.trigger(e) }
+
     } else {
         input.focus()
     }
@@ -162,3 +92,37 @@ export const onInvalid = host => dispatch(host, `invalid`, {
     value: host.value,
     errortext: host.errortext
 })
+
+export const setDroppable = host => {
+    const input = host.elements.input
+    const container = host.elements.container
+
+    function drop(e) {
+        host.value = UseIf(
+            v => v.length > 0,
+            () => ``,
+            !host.accept
+                ? Array.from(e.detail.files)
+                : Array.from(e.detail.files)
+                    .filter((file: any) =>
+                        host.accept.indexOf(file.type) > -1
+                    )
+
+        ).value
+        processValue(host)
+        dispatch(host, `input`, host.value)
+    }
+
+    if (!input || !container) { return }
+    if (container.dragDrop && typeof container.dragDrop.destroy === `function`) { container.dragDrop.destroy() }
+    if (container.drop$ && typeof container.drop$ === `function`) { container.drop$() }
+    if (container.dragended$ && typeof container.dragended$ === `function`) { container.dragended$() }
+    if (container.dragstarted$ && typeof container.dragstarted$ === `function`) { container.dragstarted$() }
+    if (!host.droppable) { return }
+
+
+    container.dragDrop = DragDropService(container)
+    container.drop$ = ObserveEvent(container, `dropped`).subscribe(drop)
+    container.dragended$ = ObserveEvent(container, `dragended`).subscribe(() => document.body.classList.remove(`dragging-elements`))
+    container.dragstarted$ = ObserveEvent(container, `dragstarted`).subscribe(() => document.body.classList.add(`dragging-elements`))
+}

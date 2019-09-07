@@ -5,37 +5,23 @@ export const Observe = (initialValue, noInit = false) => {
     let values = Object.assign({}, {
         value: initialValue,
         previousValue: undefined,
-        updated: new Date().getTime()
+        updated: new Date().getTime(),
+        subscriptions: {}
     })
 
-    const subscriptions = {}
-    const taps = {}
+    const loop = (key, val, valuesObj = {}) => {
+        Object.keys(values.subscriptions).forEach(subscriptionId => {
+            const subscriptionFn = values.subscriptions[subscriptionId][key]
 
-    const loop = (key, val, obj = {}) => {
-        Object.keys(subscriptions).forEach(subscriptionId => {
-            const subscriptionFn = subscriptions[subscriptionId][key]
+            if (!subscriptionFn || typeof subscriptionFn !== `function`) { return }
 
-            if (!subscriptionFn || typeof subscriptionFn !== `function`) {
-                return
-            }
-
-            subscriptionFn(val, obj)
-        })
-
-        Object.keys(taps).forEach(tapId => {
-            if (typeof taps[tapId] !== `function`) { return }
-            taps[tapId](key, val, subscriptions, obj)
+            subscriptionFn(val, valuesObj, subscriptionId)
         })
     }
 
     const unsubscribe = subscription => () => {
-        subscriptions[subscription.id] = null
-        delete subscriptions[subscription.id]
-
-        Object.keys(taps).forEach(tapId => {
-            if (typeof taps[tapId] !== `function`) { return }
-            taps[tapId](`unsubscribe`, subscription, subscriptions, values)
-        })
+        values.subscriptions[subscription.id] = null
+        delete values.subscriptions[subscription.id]
     }
 
     return {
@@ -46,7 +32,8 @@ export const Observe = (initialValue, noInit = false) => {
             values = Object.assign({}, {
                 value: v,
                 previousValue: values.value,
-                updated: new Date().getTime()
+                updated: new Date().getTime(),
+                subscriptions: values.subscriptions
             })
 
             loop(`next`, values.value, values)
@@ -54,17 +41,25 @@ export const Observe = (initialValue, noInit = false) => {
 
         error(err) { loop(`error`, err, values) },
         complete() { loop(`complete`, values) },
-        tap(fn) { taps[ID()] = fn },
 
-        subscribe(next, error, complete) {
-            const subscription = Object.assign({}, { next, error, complete, id: ID() })
-            subscriptions[subscription.id] = subscription
+        subscribe(next, error = (_e) => { }, complete = () => { }) {
+            const subscription: any = Object.assign({}, { next, error, complete, id: ID() })
+            subscription.unsubscribe = unsubscribe(subscription)
+            values.subscriptions[subscription.id] = subscription
 
             if (!noInit && values.value !== undefined && typeof subscription.next === `function`) {
-                subscription.next(values.value, values)
+                subscription.next(values.value, values, subscription.id)
             }
+
+            return unsubscribe(subscription)
+        },
+
+        unsubscribe(subscription) {
+            if (!subscription || !subscription.id || !values.subscriptions[subscription.id]) { return }
 
             return unsubscribe(subscription)
         }
     }
 }
+
+export default Observe

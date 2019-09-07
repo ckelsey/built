@@ -4,8 +4,18 @@ import { IfInvalid } from '../../utils/convert/if'
 import { IndexOf } from '../../utils/convert/array'
 import { ToNumber } from '../../utils/convert/number'
 import { Constructor, Define } from '../../utils/webcomponent/constructor'
-import ID from '../../utils/id'
 import { GetCurve } from '../../utils/curve'
+import { wcClassObject } from '../../utils/html/attr'
+import { setStyleRules } from '../../utils/html/markup'
+import { OVERLAYCONTENT } from './theme'
+import './style.scss'
+
+const style = require('./style.scss').toString()
+
+export const setStyles = (el, styles) => {
+    if (!el) { return }
+    setStyleRules(el, styles)
+}
 
 const alignments = [
     `center`,
@@ -25,7 +35,6 @@ const alignments = [
 ]
 
 const template = require('./index.html')
-const style = require('./style.html')
 const componentName = `overlay-content`
 const componentRoot = `.overlay-content-container`
 const positionPadding = 40
@@ -36,34 +45,49 @@ const elementSelectors = {
     root: componentRoot,
     contentContainer: `.overlay-content-content-container`,
     contentInner: `.overlay-content-content-inner`,
-    inner: `.overlay-content-container-inner`
+    inner: `.overlay-content-container-inner`,
+    injectedStyles: `style.injectedStyles`
 }
 
 Object.keys(elementSelectors).forEach(key => {
     elements[key] = {
         selector: elementSelectors[key],
-        onChange: () => { }
+        onChange: key === `injectedStyles`
+            ? (el, host) => setStyles(el, host.styles)
+            : () => { }
     }
 })
 
+const widths = [`content`, `target`]
+
 const attributes = {
-    scrim: {
-        format: val => pipe(ToBool, IfInvalid(false))(val).value
-    },
     target: {
         format: val => val instanceof HTMLElement ? val : null
     },
     align: {
-        format: val => pipe(IndexOf(alignments), IfInvalid(`center`))(val).value
+        format: val => pipe(IndexOf(alignments), IfInvalid(OVERLAYCONTENT.align))(val).value
     },
     from: {
-        format: val => pipe(IndexOf(alignments), IfInvalid(`center`))(val).value
+        format: val => pipe(IndexOf(alignments), IfInvalid(OVERLAYCONTENT.from))(val).value
     },
     speed: {
-        format: val => pipe(ToNumber, IfInvalid(333))(val).value
+        format: val => pipe(ToNumber, IfInvalid(OVERLAYCONTENT.speed))(val).value
     },
-    class: {
-        format: val => val
+    class: wcClassObject,
+    widthbasis: {
+        format: val => pipe(IndexOf(widths), IfInvalid(OVERLAYCONTENT.widthbasis))(val).value
+    },
+    styles: {
+        format: val => typeof val === `string` ? val : OVERLAYCONTENT.styles,
+        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
+    },
+}
+
+const getWidth = host => {
+    const targetWidth = !!host.target ? `${host.target.getBoundingClientRect().width}px` : `auto`
+    return {
+        width: !host.widthbasis || host.widthbasis === `content` ? `auto` : targetWidth,
+        minWidth: targetWidth
     }
 }
 
@@ -74,27 +98,52 @@ const setPositions = host => () => {
 
     if (!host.showing || !target) { return }
 
+    const container = host.elements.contentContainer
+    const inner = host.elements.inner
+    const rootBox = host.elements.root.getBoundingClientRect()
+
+    if (rootBox.y !== 0) {
+        inner.style.top = `-${rootBox.y}px`
+    }
+
+    if (rootBox.x !== 0) {
+        inner.style.left = `-${rootBox.x}px`
+    }
+
+    if (rootBox.width !== document.documentElement.clientWidth) {
+        inner.style.width = `${document.documentElement.clientWidth}px`
+    }
+
+    if (rootBox.height !== document.documentElement.clientHeight) {
+        inner.style.height = `${document.documentElement.clientHeight}px`
+    }
+
     const targetBox = target.getBoundingClientRect()
     const isOnTop = host.isOnTop
 
-    if (targetBox.top - 10 > window.innerHeight || targetBox.bottom + 10 < 0) {
+    if (targetBox.top - 10 > document.documentElement.clientHeight || targetBox.bottom + 10 < 0) {
         return host.hide()
     }
 
-    host.elements.contentContainer.style.width = `${targetBox.width}px`
-    host.elements.contentContainer.style.height = `${host.height}px`
-    host.elements.contentContainer.style.left = `${targetBox.left}px`
-    host.elements.contentContainer.style.top = `${isOnTop ? targetBox.top - host.elements.contentContainer.offsetHeight : host.spaceAbove + targetBox.height}px`
+    const widths = getWidth(host)
+    container.style.width = widths.width
+    container.style.minWidth = widths.minWidth
+    container.style.height = `auto`
+    container.style.maxHeight = `${host.height}px`
+    container.style.left = `${targetBox.left}px`
+    container.style.top = `${isOnTop ? targetBox.top - container.offsetHeight : host.spaceAbove + targetBox.height}px`
     let origin = `center ${isOnTop ? `bottom` : `top`}`
 
-    host.elements.contentContainer.style.transformOrigin = `${origin}`
+    host.width = container.offsetWidth
 
-    if (host.elements.contentInner.classList.contains(`bottom`) && isOnTop) {
-        host.elements.contentInner.classList.remove(`bottom`)
+    container.style.transformOrigin = `${origin}`
+
+    if (inner.classList.contains(`bottom`) && isOnTop) {
+        inner.classList.remove(`bottom`)
     }
 
-    if (!host.elements.contentInner.classList.contains(`bottom`) && !isOnTop) {
-        host.elements.contentInner.classList.add(`bottom`)
+    if (!inner.classList.contains(`bottom`) && !isOnTop) {
+        inner.classList.add(`bottom`)
     }
 
     host.positionTimer = requestAnimationFrame(() => {
@@ -116,20 +165,28 @@ const OverlayContent = Constructor({
         showing: {
             format: val => ToBool(val).value,
             onChange
+        },
+        width: {
+            format: val => val,
+            onChange: (_val, host) => {
+                host.dispatchEvent(new CustomEvent(`widthchange`, { detail: host }))
+            }
         }
     }, attributes),
     computed: {
         height: host => ({ get() { return (host.isOnTop ? host.spaceAbove : host.spaceBelow) - positionPadding } }),
         isOnTop: host => ({ get() { return host.spaceAbove > host.spaceBelow } }),
         spaceAbove: host => ({ get() { return host.target ? host.target.getBoundingClientRect().top : 0 } }),
-        spaceBelow: host => ({ get() { return window.innerHeight - (host.spaceAbove + (host.target ? host.target.getBoundingClientRect().height : 0)) } }),
+        spaceBelow: host => ({ get() { return document.documentElement.clientHeight - (host.spaceAbove + (host.target ? host.target.getBoundingClientRect().height : 0)) } }),
         position: host => ({
             get() {
-                if (!host.elements.contentContainer) {
+                const container = host.elements.contentContainer
+
+                if (!container) {
                     return { top: 0, y: 0, bottom: 0, left: 0, x: 0, right: 0, width: 0, height: 0, scrollTop: 0, scrollLeft: 0 }
                 }
 
-                const box = host.elements.contentContainer.getBoundingClientRect()
+                const box = container.getBoundingClientRect()
 
                 return {
                     top: box.top,
@@ -140,284 +197,86 @@ const OverlayContent = Constructor({
                     right: box.right,
                     width: box.width,
                     height: box.height,
-                    scrollTop: host.elements.contentContainer.scrollTop,
-                    scrollLeft: host.elements.contentContainer.scrollLeft
+                    scrollTop: container.scrollTop,
+                    scrollLeft: container.scrollLeft,
                 }
             }
         }),
     },
     methods: {
         scrollContent: host => (x, y) => {
-            host.elements.contentContainer.scrollTop = y
-            host.elements.contentContainer.scrollLeft = x
+            const container = host.elements.contentContainer
+            container.scrollTop = y
+            container.scrollLeft = x
         },
         show: host => () => {
-            if (host.showing) { return }
+            if (host.showing) { return Promise.resolve() }
 
-            host.showing = true
-            setPositions(host)()
+            return new Promise(resolve => {
+                host.showing = true
+                setPositions(host)()
 
-            const scalePoints = GetCurve([0, 1.02, 0.99, 1])
-            const timeout = GetCurve([0, host.speed / scalePoints.length])
+                const scalePoints = GetCurve([0, 1.02, 0.99, 1])
+                const timeout = GetCurve([0, host.speed / scalePoints.length])
+                const widths = getWidth(host)
+                const container = host.elements.contentContainer
 
-            if (host.target) {
-                host.elements.contentContainer.style.width = `${host.target.offsetWidth}px`
-            }
+                container.style.width = widths.width
+                container.style.minWidth = widths.minWidth
 
-            const loop = () => {
-                if (!host.showing) { return }
+                const loop = () => {
+                    if (!host.showing) { return Promise.resolve() }
 
-                const scalePoint = scalePoints.shift()
-                const time = timeout[scalePoints.length]
-                host.elements.contentContainer.style.transform = `scale(1, ${scalePoint})`
+                    const scalePoint = scalePoints.shift()
+                    const time = timeout[scalePoints.length]
+                    container.style.transform = `scale(1, ${scalePoint})`
 
-                if (scalePoints.length) {
-                    setTimeout(() => loop(), time)
-                } else {
-                    host.elements.root.classList.add(`active`)
+                    if (scalePoints.length) {
+                        setTimeout(() => loop(), time)
+                    } else {
+                        host.elements.root.classList.add(`active`)
+                        resolve()
+                        host.dispatchEvent(new CustomEvent(`shown`))
+                    }
                 }
-            }
 
-            loop()
+                loop()
+            })
         },
 
         hide: host => () => {
-            if (!host.showing) { return }
+            if (!host.showing) { return Promise.resolve() }
 
-            host.showing = false
-            const scalePoints = GetCurve([1, 0])
-            const timeout = GetCurve([0, host.speed / scalePoints.length])
+            return new Promise(resolve => {
+                host.showing = false
+                const scalePoints = GetCurve([1, 0])
+                const timeout = GetCurve([0, host.speed / scalePoints.length])
+                const container = host.elements.contentContainer
 
-            const loop = () => {
-                if (host.showing) { return }
+                const loop = () => {
+                    if (host.showing) { return resolve() }
 
-                const scalePoint = scalePoints.shift()
-                const time = timeout[scalePoint.length]
+                    const scalePoint = scalePoints.shift()
+                    const time = timeout[scalePoint.length]
 
-                host.elements.contentContainer.style.transform = `scale(1, ${scalePoint})`
+                    container.style.transform = `scale(1, ${scalePoint})`
 
-                if (scalePoints.length) {
-                    setTimeout(() => loop(), time)
-                } else {
-                    host.elements.root.classList.remove(`active`)
+                    if (scalePoints.length) {
+                        setTimeout(() => loop(), time)
+                    } else {
+                        host.elements.root.classList.remove(`active`)
+                        resolve()
+                        host.dispatchEvent(new CustomEvent(`hidden`))
+                    }
                 }
-            }
 
-            loop()
-
-            host.dispatchEvent(new CustomEvent(`hidden`))
+                loop()
+            })
         }
     },
     elements,
-    onConnected: host => host.inputID = ID(componentName)
 })
 
 Define(componentName, OverlayContent)
 
 export default OverlayContent
-
-/*
-import Subject from '../../utils/subject'
-import { OverlayContentObservedAttributes } from './attributes'
-import { GetCurve } from '../../utils/curve'
-import { webComponentTemplate } from '../../utils/html'
-
-
-
-export class OverlayContent extends HTMLElement {
-    public state: { [key: string]: Subject } = {}
-    public $container
-    public $contentContainer
-    public $contentInner
-    public $inner
-    public positionTimer
-    public showing = false
-
-    public get height() {
-        return (this.isOnTop ? this.spaceAbove : this.spaceBelow) - positionPadding
-    }
-
-    public get isOnTop() {
-        return this.spaceAbove > this.spaceBelow
-    }
-
-    public get spaceAbove() {
-        const target: HTMLElement = this[`target`]
-
-        if (!target) { return 0 }
-
-        return target.getBoundingClientRect().top
-    }
-
-    public get spaceBelow() {
-        const target: HTMLElement = this[`target`]
-
-        if (!target) { return 0 }
-
-        return window.innerHeight - (this.spaceAbove + target.getBoundingClientRect().height)
-    }
-
-    public get position() {
-        const box = this.$contentContainer.getBoundingClientRect()
-
-        return {
-            top: box.top,
-            y: box.y,
-            bottom: box.bottom,
-            left: box.left,
-            x: box.x,
-            right: box.right,
-            width: box.width,
-            height: box.height,
-            scrollTop: this.$contentContainer.scrollTop,
-            scrollLeft: this.$contentContainer.scrollLeft
-        }
-    }
-
-    static get observedAttributes(): string[] { return Object.keys(OverlayContentObservedAttributes) }
-
-    constructor() {
-        super()
-
-        Object.keys(OverlayContentObservedAttributes).forEach((attrKey) => {
-            this.state[attrKey] = new Subject(OverlayContentObservedAttributes[attrKey]())
-
-            Object.defineProperty(this, attrKey, {
-                get() { return this.state[attrKey].value },
-                set(attrValue) {
-                    if (!this.state[attrKey]) { return }
-
-                    const formattedValue = OverlayContentObservedAttributes[attrKey](attrValue)
-
-                    if (this.state[attrKey].value !== formattedValue) {
-                        this.state[attrKey].next(formattedValue)
-                    }
-                }
-            })
-        })
-    }
-
-    public attributeChangedCallback(attrName: string, oldValue: any, newValue: any) {
-        if (newValue !== oldValue) { this[attrName] = newValue }
-    }
-
-    public connectedCallback() {
-        this.show = this.show.bind(this)
-        this.hide = this.hide.bind(this)
-
-        if (!this.shadowRoot) {
-            webComponentTemplate(componentName, template, this, style, componentRoot)
-            this.setElements()
-        }
-    }
-
-    public setElements() {
-        this.$container = this.shadowRoot.querySelector(`.overlay-content-container`)
-        this.$contentContainer = this.shadowRoot.querySelector(`.overlay-content-content-container`)
-        this.$contentInner = this.shadowRoot.querySelector(`.overlay-content-content-inner`)
-        this.$inner = this.shadowRoot.querySelector(`.overlay-content-container-inner`)
-    }
-
-    public show() {
-        if (this.showing) { return }
-
-        this.showing = true
-        this.setPositions()
-
-        const scalePoints = GetCurve([0, 1.02, 0.99, 1])
-        const timeout = GetCurve([0, this[`speed`] / scalePoints.length])
-
-        if (this[`target`]) {
-            this.$contentContainer.style.width = `${this[`target`].offsetWidth}px`
-        }
-
-        const loop = () => {
-            if (!this.showing) { return }
-
-            const scalePoint = scalePoints.shift()
-            const time = timeout[scalePoints.length]
-
-            this.$contentContainer.style.transform = `scale(1, ${scalePoint})`
-
-            if (scalePoints.length) {
-                setTimeout(() => loop(), time)
-            } else {
-                this.$container.classList.add(`active`)
-            }
-        }
-
-        loop()
-    }
-
-    public hide() {
-        if (!this.showing) { return }
-        this.showing = false
-
-        const scalePoints = GetCurve([1, 0])
-        const timeout = GetCurve([0, this[`speed`] / scalePoints.length])
-
-        const loop = () => {
-            if (this.showing) { return }
-
-            const scalePoint = scalePoints.shift()
-            const time = timeout[scalePoint.length]
-
-            this.$contentContainer.style.transform = `scale(1, ${scalePoint})`
-
-            if (scalePoints.length) {
-                setTimeout(() => loop(), time)
-            } else {
-                this.$container.classList.remove(`active`)
-            }
-        }
-
-        loop()
-
-        this.dispatchEvent(new CustomEvent(`hidden`))
-    }
-
-    public setPositions() {
-        cancelAnimationFrame(this.positionTimer)
-
-        const target: HTMLElement = this[`target`]
-
-        if (!this.showing || !target) { return }
-
-        const targetBox = target.getBoundingClientRect()
-        const isOnTop = this.isOnTop
-
-        if (targetBox.top - 10 > window.innerHeight || targetBox.bottom + 10 < 0) {
-            return this.hide()
-        }
-
-        this.$contentContainer.style.width = `${targetBox.width}px`
-        this.$contentContainer.style.height = `${this.height}px`
-        this.$contentContainer.style.left = `${targetBox.left}px`
-        this.$contentContainer.style.top = `${isOnTop ? targetBox.top - this.$contentContainer.offsetHeight : this.spaceAbove + targetBox.height}px`
-        let origin = `center ${isOnTop ? `bottom` : `top`}`
-
-        this.$contentContainer.style.transformOrigin = `${origin}`
-
-        if (this.$contentInner.classList.contains(`bottom`) && isOnTop) {
-            this.$contentInner.classList.remove(`bottom`)
-        }
-
-        if (!this.$contentInner.classList.contains(`bottom`) && !isOnTop) {
-            this.$contentInner.classList.add(`bottom`)
-        }
-
-        this.positionTimer = requestAnimationFrame(() => {
-            this.setPositions()
-        })
-    }
-
-    public scrollContent(x, y) {
-        this.$contentContainer.scrollTop = y
-        this.$contentContainer.scrollLeft = x
-    }
-}
-
-if (!window.customElements.get(componentName)) {
-    window.customElements.define(componentName, OverlayContent)
-}
-*/

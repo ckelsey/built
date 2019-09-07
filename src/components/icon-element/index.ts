@@ -1,14 +1,21 @@
 import { Constructor, Define } from '../../utils/webcomponent/constructor'
-import ID from '../../utils/id'
-import pipe from '../../utils/pipe'
-import { ToString, Split } from '../../utils/convert/string'
-import { IfInvalid } from '../../utils/convert/if'
-import { Map, Filter } from '../../utils/convert/array'
 import { Observe } from '../../utils/observe'
+import { wcClassObject } from '../../utils/html/attr'
+import { setStyleRules } from '../../utils/html/markup'
+import { ICONELEMENT } from './theme'
+import './style.scss'
+
+const style = require('./style.scss').toString()
 
 const elementSelectors = {
     root: `.icon-element-container`,
-    svgContainer: `.svg-container`
+    svgContainer: `.svg-container`,
+    injectedStyles: `style.injectedStyles`
+}
+
+const setStyles = (el, styles) => {
+    if (!el) { return }
+    setStyleRules(el, styles)
 }
 
 const elements = {}
@@ -16,7 +23,9 @@ const elements = {}
 Object.keys(elementSelectors).forEach(key => {
     elements[key] = {
         selector: elementSelectors[key],
-        onChange: () => { }
+        onChange: key === `injectedStyles`
+            ? (el, host) => setStyles(el, host.styles)
+            : () => { }
     }
 })
 
@@ -70,11 +79,9 @@ const getIcon = (path) => {
     })
 }
 
-const stringOrNull = (val: any) => typeof val === `string` ? val : null
-
 const attributes = {
     type: {
-        format: stringOrNull,
+        format: (val: any) => typeof val === `string` ? val : ICONELEMENT.type,
         onChange: (value, host) => {
             if (!value) { return }
             if (host.subscription) { host.subscription() }
@@ -87,7 +94,7 @@ const attributes = {
         }
     },
     svg: {
-        format: stringOrNull,
+        format: (val: any) => typeof val === `string` ? val : ICONELEMENT.svg,
         onChange: (value, host) => {
             if (!value) { return }
             if (host.subscription) { host.subscription() }
@@ -95,27 +102,18 @@ const attributes = {
         }
     },
     color: {
-        format: stringOrNull,
+        format: (val: any) => typeof val === `string` ? val : ICONELEMENT.color,
         onChange: (value, host) => host.elements.svgContainer.style.color = value
     },
     size: {
-        format: stringOrNull,
+        format: (val: any) => typeof val === `string` ? val : ICONELEMENT.size,
         onChange: (value, host) => host.elements.svgContainer.style.height = host.elements.svgContainer.style.width = value
     },
-    class: {
-        format: val => pipe(ToString, IfInvalid(``), Split(` `), Map(v => v.trim()), Filter(v => !!v))(val).value,
-        onChange: (val, host) => {
-            if (!host.elements.root) { return }
-
-            if (!!host.state.class.previous && host.state.class.previous.length) {
-                host.elements.root.classList.remove(host.state.class.previous)
-            }
-
-            if (!!val && val.length) {
-                host.elements.root.classList.add(val)
-            }
-        }
-    }
+    class: wcClassObject,
+    styles: {
+        format: val => typeof val === `string` ? val : ICONELEMENT.styles,
+        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
+    },
 }
 
 const properties = Object.assign({
@@ -125,7 +123,6 @@ const properties = Object.assign({
 }, attributes)
 
 const template = require('./index.html')
-const style = require('./style.html')
 const componentName = `icon-element`
 const componentRoot = `.icon-element-container`
 const IconElement = Constructor({
@@ -136,7 +133,6 @@ const IconElement = Constructor({
     observedAttributes: Object.keys(attributes),
     properties,
     elements,
-    onConnected: host => host.inputID = ID(componentName)
 })
 
 Define(componentName, IconElement)

@@ -1,6 +1,7 @@
 /** BORROWED HEAVILY FROM: https://stackoverflow.com/a/15528789 */
 
-export const GetCurve = (points, tension = 0.5, closedPath = false, numOfSegments = 16) => {
+export const GetCurve = (points, tension = 0.5, closedPath = false, frames = 16) => {
+    const numOfSegments = Math.round(frames * .3295)
     const isPairs = Array.isArray(points[0])
     const res = []
     let pts = points.slice(0)
@@ -70,3 +71,5 @@ export const GetCurve = (points, tension = 0.5, closedPath = false, numOfSegment
 
     return isPairs ? res : res.map(p => p[0])
 }
+
+export default GetCurve

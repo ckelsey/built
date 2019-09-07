@@ -13,3 +13,10 @@ export const ToFunction = value => {
 
     return result
 }
+
+export const PartialFunction = (...args) =>
+    ![...args][0]
+        ? undefined
+        : [...args][0].length === [...args].length - 1
+            ? [...args][0].apply(null, [...args].slice(1))
+            : (...newArgs) => PartialFunction(...args, ...newArgs)

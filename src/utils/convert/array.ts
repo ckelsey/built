@@ -2,26 +2,39 @@ import { Tmonad, finishTMonad } from './t-monad'
 import pipe from '../pipe'
 import { FromJSON } from './json'
 import { ToPlainText } from './string'
-import { StopIfInvalid } from './if'
+import { StopIfInvalid, UseIf } from './if'
 import { getType } from '../type'
 import { JoinMeta } from './meta'
 
 export const ToArray = value => {
-    let res = Tmonad(value)
-    let result = {}
+    const temp = Tmonad(value)
+    if (temp.stop) { return value }
+
+    const result = Array.isArray(temp.value)
+        ? temp
+        : UseIf(
+            V => V.type === `array`,
+            V => V,
+            pipe(ToPlainText, FromJSON)(value)
+        )
+
+    result.type = getType(result.value)
+    result.valid = result.type === `array`
+    result.instanceof.push(`ToArray`)
+    return result
+}
+
+export const ForceToArray = value => {
+    let res = ToArray(value)
 
     if (res.stop) { return res }
 
-    if (res.type === `string`) {
-        result = pipe(
-            ToPlainText,
-            FromJSON
-        )(res)
-    } else {
-        result = res
-    }
+    const newValue = UseIf(v => !(Array.isArray(v) && v.length), v => v === undefined ? undefined : [v], res.value).value
 
-    return finishTMonad(result, `array`, `ToArray`)
+    res.value = newValue
+    res.instanceof.push(`ForceToArray`)
+    res.valid = Array.isArray(res.value)
+    return res
 }
 
 export const Join = delimeter => value => {

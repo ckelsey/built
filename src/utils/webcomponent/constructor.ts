@@ -1,6 +1,11 @@
 import { Template } from './template'
 import { Elements } from './elements'
-import { Observe } from '../observe';
+import { Observe } from '../observe'
+import { ToBool } from '../convert/bool'
+import ID from '../id';
+import { IfInvalid } from '../convert/if'
+import pipe from '../pipe'
+import { ObjectAssignPolyfill, MutationObserverPolyfill, WebComponentPolyFill } from '../polyfills'
 
 export interface ConstructorOptions {
     componentName: string
@@ -35,92 +40,123 @@ export interface ConstructorOptions {
     onConnected?: (host) => {}
 }
 
-export const Constructor = options => {
+const setProperty = (host, key, formatter, getter, setter) => {
 
+    Object.defineProperty(host, key, {
+        get() {
+            if (typeof getter === `function`) { return getter(host) }
+            return host.state[key].value
+        },
+        set(value) {
+            if (!host.state[key]) { return }
+
+            if (typeof setter === `function`) { return setter(host)(value) }
+
+            const formattedValue = formatter(value, host)
+            const previous = host.state[key].value
+
+            if (typeof previous === `function` && typeof formattedValue === `function` && formattedValue.toString() !== previous.toString()) {
+                return host.state[key].next(formattedValue)
+            }
+
+            if (host.state[key].value !== formattedValue) {
+                host.state[key].next(formattedValue)
+            }
+        }
+    })
+}
+
+const setStateProperty = (host, key, formatter, onChange, getter, setter) => {
+    if (typeof formatter !== `function`) { return }
+
+    host.state[key] = Observe(formatter(host[key], host))
+
+    setProperty(host, key, formatter, getter, setter)
+
+    if (typeof onChange !== `function`) { return }
+
+    host.state[key].subscribe(val => onChange(val, host))
+}
+
+export const Constructor = options => {
     const componentName = options.componentName
     const observedAttributes = options.observedAttributes || []
     const template = options.template || `<slot></slot>`
     const style = options.style || ``
-    const componentRoot = options.componentRoot
     const properties = options.properties
     const elements = options.elements
     const methods = options.methods
     const computed = options.computed
-    const getters = options.getters
-    const setters = options.setters
+    const getters = options.getters || {}
+    const setters = options.setters || {}
     const onConnected = options.onConnected
     const onDisconnected = options.onDisconnected
+    const onReady = options.onReady
 
     if (!componentName) { return }
 
-    class Class extends HTMLElement {
+    const ConnectedFn = element => {
+        element.wcID = ID(`wc`)
+
+        if (computed) {
+            Object.keys(computed).forEach(key => {
+                Object.defineProperty(element, key, computed[key](element))
+            })
+        }
+
+        if (methods) {
+            Object.keys(methods).forEach(key => element[key] = methods[key](element))
+        }
+
+        if (elements) {
+            const ElementData = Elements(element, elements)
+            element.elements = ElementData.state
+            element.disconnectElements = ElementData.disconnect
+        }
+
+        if (!properties.ready) {
+            setStateProperty(
+                element,
+                `ready`,
+                val => pipe(ToBool, IfInvalid(false))(val).value,
+                () => { },
+                getters.ready,
+                setters.ready
+            )
+        }
+
+        if (properties) {
+            Object.keys(properties).forEach(key => setStateProperty(element, key, properties[key].format, properties[key].onChange, getters[key], setters[key]))
+        }
+
+        if (onConnected) {
+            onConnected(element)
+        }
+
+        element.state[`ready`].subscribe(() => element.dispatchEvent(new CustomEvent(`ready`, { detail: element })))
+        element[`ready`] = true
+
+        if (onReady) {
+            onReady(element)
+        }
+    }
+
+    class componentClass extends HTMLElement {
+        public wcID
         public state = {}
         public elements = {}
         public disconnectElements = () => { }
 
         static get observedAttributes(): string[] { return observedAttributes }
 
-        constructor() { super() }
+        constructor() {
+            super()
+            Template(componentName, this, template, style)
+        }
 
         public attributeChangedCallback(attrName, oldValue, newValue) { if (newValue !== oldValue) { this[attrName] = newValue } }
 
-        public connectedCallback() {
-            if (!this.shadowRoot) { Template(componentName, this, template, style, componentRoot) }
-
-            if (computed) {
-                Object.keys(computed).forEach(key => {
-                    Object.defineProperty(this, key, computed[key](this))
-                })
-            }
-
-            if (methods) {
-                Object.keys(methods).forEach(key => this[key] = methods[key](this))
-            }
-
-            if (elements) {
-                const ElementData = Elements(this, elements)
-                this.elements = ElementData.state
-                this.disconnectElements = ElementData.disconnect
-            }
-
-            if (properties) {
-                Object.keys(properties).forEach(key => {
-                    if (typeof properties[key].format !== `function`) { return }
-
-                    this.state[key] = Observe(properties[key].format(this[key], this))
-
-                    try {
-                        Object.defineProperty(this, key, {
-                            get() {
-                                if (getters && getters[key]) { return getters[key](this) }
-                                return this.state[key].value
-                            },
-                            set(value) {
-                                if (!this.state[key]) { return }
-
-                                if (setters && setters[key]) { return setters[key](this)(value) }
-
-                                const formattedValue = properties[key].format(value, this)
-
-                                if (this.state[key].value !== formattedValue) {
-                                    this.state[key].next(formattedValue)
-                                }
-                            }
-                        })
-                    } catch (error) { }
-
-                    if (typeof properties[key].onChange !== `function`) { return }
-
-                    this.state[key].subscribe(val => {
-                        properties[key].onChange(val, this)
-                    })
-                })
-            }
-
-            if (onConnected) {
-                onConnected(this)
-            }
-        }
+        public connectedCallback() { ConnectedFn(this) }
 
         public disconnectedCallback() {
             if (this.state) {
@@ -137,21 +173,63 @@ export const Constructor = options => {
         }
     }
 
-    return Class
+    function newComponentObject() {
+        return function (element) {
+            element.observedAttributes = observedAttributes.slice()
+            element.state = {}
+            element.elements = {}
+            element.disconnectElements = () => { }
+
+            element.attributeChangedCallback = () => {
+
+            }
+
+            element.disconnectedCallback = () => {
+
+            }
+
+            Template(componentName, element, template, style, true)
+
+            ConnectedFn(element)
+
+            return element
+            // return {
+            //     observedAttributes: observedAttributes.slice(),
+            //     wcID: ID(`wc`),
+            //     state: {},
+            //     elements: {},
+            //     disconnectElements: () => { },
+            // }
+        }
+    }
+
+    return {
+        object: newComponentObject(),
+        component: componentClass
+    }
 }
 
-export const Define = (componentName, Class) => {
+export const Define = (componentName, componentClass) => {
     const wc = (window as any).WebComponents
+    const ce = (window as any).customElements
+
+    const defineComponent = () => {
+        if (!ce) {
+            ObjectAssignPolyfill()
+            MutationObserverPolyfill(window)
+            return WebComponentPolyFill(window, componentName, componentClass.object)
+        }
+
+        if (!ce.get(componentName)) {
+            ce.define(componentName, componentClass.component)
+        }
+    }
 
     if (wc && wc.ready) {
-        if (!window.customElements.get(componentName)) {
-            window.customElements.define(componentName, Class)
-        }
+        defineComponent()
     } else {
         window.addEventListener('WebComponentsReady', function () {
-            if (!window.customElements.get(componentName)) {
-                window.customElements.define(componentName, Class)
-            }
+            defineComponent()
         })
     }
 }

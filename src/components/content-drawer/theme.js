@@ -1,0 +1,23 @@
+module.exports = {
+    arrowIcon: process.env.CONTENTDRAWER_ARROW_ICON || `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>`,
+    accentcolor: process.env.CONTENTDRAWER_ACCENT_COLOR || process.env.ACCENT_COLOR || `#59a2d8`,
+    bounce: process.env.CONTENTDRAWER_BOUNCE !== undefined ? process.env.CONTENTDRAWER_BOUNCE : `all`,
+    bounceamount: process.env.CONTENTDRAWER_BOUNCE_AMOUNT || null,
+    bouncespeed: process.env.CONTENTDRAWER_BOUNCE_SPEED || null,
+    fade: process.env.CONTENTDRAWER_FADE !== undefined ? process.env.CONTENTDRAWER_FADE : true,
+    fadeamount: process.env.CONTENTDRAWER_FADE_AMOUNT || [0, 1],
+    fadespeed: process.env.CONTENTDRAWER_FADE_SPEED || null,
+    underline: process.env.CONTENTDRAWER_UNDERLINE !== undefined ? process.env.CONTENTDRAWER_UNDERLINE : `auto`,
+    underlineamount: process.env.CONTENTDRAWER_UNDERLINE_AMOUNT || null,
+    underlinespeed: process.env.CONTENTDRAWER_UNDERLINE_SPEED || null,
+    underlinecolor: process.env.CONTENTDRAWER_UNDERLINE_COLOR || null,
+    ripple: process.env.CONTENTDRAWER_RIPPLE !== undefined ? process.env.CONTENTDRAWER_RIPPLE : `auto`,
+    rippleamount: process.env.CONTENTDRAWER_RIPPLE_AMOUNT || null,
+    ripplespeed: process.env.CONTENTDRAWER_RIPPLE_SPEED || null,
+    ripplecolor: process.env.CONTENTDRAWER_RIPPLE_COLOR || null,
+    styles: process.env.CONTENTDRAWER_STYLES || ``,
+    headericon: process.env.CONTENTDRAWER_HEADERICON || null,
+    openfrom: process.env.CONTENTDRAWER_OPENFROM || `top`,
+    speed: process.env.CONTENTDRAWER_SPEED !== undefined ? process.env.CONTENTDRAWER_SPEED : 333,
+    sass: {}
+}

@@ -1,3 +1,6 @@
+import './dragDrop'
+import './request'
 import './router'
 import './unsupported'
-import './request'
+import './uploader'
+import './timer'

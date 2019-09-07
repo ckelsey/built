@@ -109,3 +109,21 @@ export const IfNot = (compare, replace) => value => {
 
     return result
 }
+
+export const IfIs = (compare, replace) => value => {
+    let result = Tmonad(value)
+    compare = Tmonad(compare)
+
+    result.valid = result.value === compare.value
+
+    if (result.value === compare.value) {
+        result.value = Tmonad(replace).value
+        result = Tmonad(result.value)
+    }
+
+    result.instanceof.push(`IfIs`)
+
+    return result
+}
+
+export const UseIf = (condition, ifNot, value) => Tmonad(condition(value) ? value : ifNot(value))

@@ -1,0 +1,2 @@
+/** DO NOT EDIT, AUTO-GENERATED */
+export const EFFECTUNDERLINE = {color:'#59a2d8',direction:'auto',opacity:0.2,speed:700,spring:4,end:null,start:'mousedown',styles:'',sass:{effectunderline_background:'#59a2d8'}}

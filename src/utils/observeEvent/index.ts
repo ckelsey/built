@@ -74,7 +74,7 @@ const ObserveEvent = (element, eventName, options: Opts = {}): ObserveEventObjec
 
         },
 
-        subscribe(next, error = () => { }, complete = () => { }) {
+        subscribe(next, error?, complete?) {
             if (typeof next !== `function` && typeof error !== `function` && typeof complete !== `function`) { return }
 
             const subscriber = Object.assign({}, {
@@ -87,6 +87,14 @@ const ObserveEvent = (element, eventName, options: Opts = {}): ObserveEventObjec
 
             subscriptions[subscriber.id] = subscriber
 
+            if (typeof subscriptions[subscriber.id].error !== `function`) {
+                subscriptions[subscriber.id].error = unSubscribe(subscriber.id)
+            }
+
+            if (typeof subscriptions[subscriber.id].complete !== `function`) {
+                subscriptions[subscriber.id].complete = unSubscribe(subscriber.id)
+            }
+
             startUp()
 
             return unSubscribe(subscriber.id)
@@ -94,6 +102,7 @@ const ObserveEvent = (element, eventName, options: Opts = {}): ObserveEventObjec
     }
 
     const mObserver = new MutationObserver(e => {
+        if (!e || typeof e.forEach !== `function`) { return }
         e.forEach(_e => {
             Array.from(_e.removedNodes).forEach(r => {
                 if (r !== element) { return }
@@ -103,7 +112,20 @@ const ObserveEvent = (element, eventName, options: Opts = {}): ObserveEventObjec
         })
     })
 
-    mObserver.observe(element.parentNode, { childList: true })
+    let waiting = 1000
+    const waitForParent = () => {
+        if (element.parentNode) {
+            return mObserver.observe(element.parentNode, { childList: true })
+        }
+
+        waiting = waiting - 1
+
+        if (!waiting) { return }
+
+        requestAnimationFrame(waitForParent)
+    }
+
+    waitForParent()
 
     return methods
 }

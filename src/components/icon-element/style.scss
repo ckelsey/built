@@ -1,0 +1,22 @@
+:host,
+icon-element,
+.icon-element-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.icon-element-container {
+    .svg-container {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+
+    }
+
+    svg {
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+    }
+}

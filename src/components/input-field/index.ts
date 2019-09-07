@@ -3,17 +3,20 @@ import { observedAttributes, properties } from './properties'
 import { setEffects } from './methods-elements'
 import { processedValue, labelContainer, selected, optionElements, formattedValue } from './computed'
 import elements from './elements'
-import { checkIcon } from './definitions'
 import ID from '../../utils/id'
+import { INPUTFIELD } from './theme'
 
 import '../effect-bounce-z'
 import '../effect-ripple'
 import '../effect-underline'
 import '../icon-element'
 import '../overlay-content'
+import '../country-dropdown'
+import '../dropdown-select'
+import './style.scss'
 
+const style = require('./style.scss').toString()
 const template = require('./index.html')
-const style = require('./style.html')
 const componentName = `input-field`
 const componentRoot = `.input-field-container`
 
@@ -34,7 +37,7 @@ const InputField = Constructor({
     },
     getters: {
         value: host => host.formattedValue,
-        invalid: host => !host.processedValue.valid
+        invalid: host => Array.isArray(host.processedValue) ? host.processedValue.map(v => !v.valid).filter(v => !!v).length > 1 : !host.processedValue.valid
     },
     setters: {
         value: host => value => host.state.value.next(value)
@@ -44,8 +47,7 @@ const InputField = Constructor({
         setEffects(host)
 
         requestAnimationFrame(() => {
-            host.elements.checkIcon.svg = checkIcon
-            host.ready = true
+            host.elements.checkIcon.svg = INPUTFIELD.checkIcon
         })
     }
 })

@@ -1,11 +1,13 @@
 import { ToBool } from '../../utils/convert/bool'
 import pipe from '../../utils/pipe'
-import { IndexOf, ToArray, Map, Filter } from '../../utils/convert/array'
-import { IfInvalid, IfEmpty } from '../../utils/convert/if'
-import { eventNames } from '../../utils/html'
+import { IfInvalid } from '../../utils/convert/if'
 import { ToNumber } from '../../utils/convert/number'
 import { unloadTargets, loadTargets } from './methods'
-import { ToString, Split } from '../../utils/convert/string'
+import { ToString } from '../../utils/convert/string'
+import { SelectorArrayToElements } from '../../utils/convert/dom'
+import { wcClassObject } from '../../utils/html/attr'
+import { EFFECTUNDERLINE } from './theme'
+import { setStyles } from './elements'
 
 const resetTargets = host => {
     unloadTargets(host)
@@ -13,57 +15,46 @@ const resetTargets = host => {
 }
 
 const onChange = () => { }
+const selectorsToDom = val => SelectorArrayToElements(null, val).value
 
 const attributes = {
     color: {
-        format: val => pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
-        onChange: (val, host) => !host.elements.underline ? undefined : host.elements.underline.style.backgroundColor = `${val}`
+        format: val => pipe(ToString, IfInvalid(EFFECTUNDERLINE.color))(val).value,
+        onChange: (val, host) => !val || !host.elements.underline ? undefined : host.elements.underline.style.backgroundColor = `${val}`
     },
     direction: {
-        format: val => pipe(ToString, IfInvalid(`auto`))(val).value,
+        format: val => pipe(ToString, IfInvalid(EFFECTUNDERLINE.direction))(val).value,
         onChange
     },
     end: {
-        format: val => pipe(IndexOf(eventNames), IfInvalid(null))(val).value,
+        format: val => pipe(ToString, IfInvalid(EFFECTUNDERLINE.end))(val).value,
         onChange: (_val, host) => resetTargets(host)
     },
     opacity: {
-        format: val => Math.min(1, Math.max(0, pipe(ToNumber, IfInvalid(0.2))(val).value)),
-        onChange: (val, host) => !host.elements.underline ? undefined : host.elements.underline.style.opacity = `${val}`
+        format: val => Math.min(1, Math.max(0, pipe(ToNumber, IfInvalid(EFFECTUNDERLINE.opacity))(val).value)),
+        onChange
     },
     speed: {
-        format: val => pipe(ToNumber, IfInvalid(333))(val).value,
-        onChange: (val, host) => {
-            if (!host.elements.underline) { return }
-            host.elements.underline.style.transition = `opacity ${val}ms ease-in-out`
-            host.elements.underline.style.transition = `transform ${val * 1.3}ms ease-in-out, transform-origin ${val * 1.3}ms ease-in-out, opacity ${val * 0.7}ms ease-in-out`
-        }
+        format: val => pipe(ToNumber, IfInvalid(EFFECTUNDERLINE.speed))(val).value,
+        onChange
     },
     start: {
-        format: val => pipe(IndexOf(eventNames), IfInvalid(`mousedown`))(val).value,
+        format: val => pipe(ToString, IfInvalid(EFFECTUNDERLINE.start))(val).value,
         onChange: (_val, host) => resetTargets(host)
+    },
+    styles: {
+        format: val => typeof val === `string` ? val : EFFECTUNDERLINE.styles,
+        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
+    },
+    spring: {
+        format: val => pipe(ToNumber, IfInvalid(EFFECTUNDERLINE.spring))(val).value,
+        onChange
     },
     targets: {
-        format: val => pipe(
-            ToArray,
-            IfInvalid(pipe(IfEmpty([]))([val]))
-        )(val).value,
+        format: selectorsToDom,
         onChange: (_val, host) => resetTargets(host)
     },
-    class: {
-        format: val => pipe(ToString, IfInvalid(``), Split(` `), Map(v => v.trim()), Filter(v => !!v))(val).value,
-        onChange: (val, host) => {
-            if (!host.elements.root) { return }
-
-            if (!!host.state.class.previous && host.state.class.previous.length) {
-                host.elements.root.classList.remove(host.state.class.previous)
-            }
-
-            if (!!val && val.length) {
-                host.elements.root.classList.add(val)
-            }
-        }
-    }
+    class: wcClassObject
 }
 
 export const properties = Object.assign({
@@ -71,15 +62,80 @@ export const properties = Object.assign({
         format: val => val,
         onChange
     },
+
     on: {
         format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange
     },
 
     targets$: {
-        format: val => pipe(ToArray, IfInvalid([]))(val).value,
+        format: _val => [],
         onChange
     }
 }, attributes)
 
 export const observedAttributes = Object.keys(attributes)
+
+export const hasTargets = host => ({
+    get() {
+        return host.ready && !!host.targets && Array.isArray(host.targets) && !!host.targets.length
+    }
+})
+
+export const hasTargets$ = host => ({
+    get() {
+        return host.hasTargets && host.targets$ && Array.isArray(host.targets$)
+    }
+})
+
+export const hasStart = host => ({
+    get() {
+        return host.hasTargets && host.hasTargets$ && host.start
+    }
+})
+
+export const canStart = host => ({
+    get() {
+        return host.hasTargets && host.hasTargets$ && host.start && host.start !== `none`
+    }
+})
+
+export const canEnd = host => ({
+    get() {
+        return host.hasTargets && host.hasTargets$ && host.end && host.end !== `none`
+    }
+})
+
+export const canRunStart = host => ({
+    get() {
+        return host.hasTargets && !host.on
+    }
+})
+
+export const canRunEnd = host => ({
+    get() {
+        return host.hasTargets && host.on
+    }
+})
+
+export const nonAutoOrigin = host => ({
+    get() {
+        return (
+            host.downEvent === undefined
+            || (host.downEvent && !host.downEvent.target)
+            || (host.direction !== undefined && host.direction !== `auto`)
+        )
+            ? host.direction === `to left`
+                ? `100% center`
+                : [`center`, `auto`].indexOf(host.direction) > -1
+                    ? `center center`
+                    : `0% center`
+            : false
+    }
+})
+
+export const canLoadTargets = host => ({
+    get() {
+        return host.hasTargets && host.hasTargets$ && host.hasStart
+    }
+})

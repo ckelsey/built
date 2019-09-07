@@ -1,3 +1,5 @@
+import { setStyleRules } from "../html/markup";
+
 export const CSSRulesFromSelector = selector => {
     const sheets = Array.from(document.body.ownerDocument.styleSheets) as CSSStyleSheet[]
     const rules = []
@@ -20,13 +22,7 @@ export const AppendStyle = (rulesString, parent, name = ``) => {
     style.setAttribute(`name`, name)
     style.style.display = `none`
     parent.appendChild(style)
-
-    if (style.styleSheet) {   // IE
-        style.styleSheet.cssText = rulesString
-    } else {                // the world
-        var tt1 = document.createTextNode(rulesString)
-        style.appendChild(tt1)
-    }
+    setStyleRules(style, rulesString)
 }
 
 // TODO - needs to be better than just removing style tags(may have attributes)

@@ -3,9 +3,7 @@
 
     <head>
         <meta charset="utf-8" />
-        <meta
-              name="viewport"
-              content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
         <style>
             html {
                 height: 100%;
@@ -22,24 +20,63 @@
                 background: #ccc;
             }
 
+            .input-field-container .browse-color {
+                color: cadetblue;
+            }
+
         </style>
         <script src="/dist/webcomponentsjs/custom-elements-es5-adapter.js"></script>
         <script src="/dist/webcomponentsjs/webcomponents-loader.js"></script>
-        <script src="/dist/built.js"></script>
     </head>
 
     <body>
-        <button-element>Hey there</button-element>
-        <icon-element type="icons/ac_unit.svg"></icon-element>
-        <!-- <input-field
-            id="claim-code"
-            mask='{ "method": "pipe", "fns": [ { "method": "split", "values": [ "/[^A-Za-z0-9]/gi" ] }, { "method": "join", "values": [ "" ] }, { "method": "match", "values": [ "/([A-Z0-9]{1,4})/gi" ] }, { "method": "join", "values": [ "-" ] }, { "method": "slice", "values": [ 0,9 ] }, { "method": "touppercase" }] }'>
-        </input-field> 
-    format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["Slice", 0, 8], ["Match", "/.{0,3}/g"],["Join", "-"]]'
-    -->
-        <input-field id="claim-code" format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["BeforeEveryNth", 5, "-"],["Slice", 0, 9]]'> </input-field>
-        <input-field type="url" label="URL"></input-field>
+        <dropdown-select id="country"></dropdown-select>
+        <dropdown-select options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);"></dropdown-select>
+        <!-- <country-dropdown></country-dropdown> -->
+        <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
+            <span slot="header">Heading</span>
+            <div slot="content">Some content .content-drawer-header,
+                .content-drawer-content,
+                .content-drawer-content-inner,
+                .content-drawer-content-inner-inner {
+                position: relative;
+                width: 100%;
+                padding: 1em;
+                box-sizing: border-box;
+                }
+
+                .content-drawer-header {
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                flex-wrap: nowrap;
+                }</div>
+        </content-drawer>
+
+        <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
+            <span slot="header">Another Heading</span>
+            <div slot="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+        </content-drawer>
+        <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="b">
+            <span slot="header">Group B</span>
+            <div slot="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+        </content-drawer>
+        <button-element id="scale-hey">
+            <icon-element type="icons/pets.svg"></icon-element>&nbsp;Scale it
+            <effect-scale triggers='["#scale-hey"]' targets='[".scale-target"]' x="false" y="true" start="click" scaled="true" startfrom="left top" amount="-1"></effect-scale>
+        </button-element>
+        <button-element class="scale-target">
+            <icon-element type="icons/ac_unit.svg"></icon-element>&nbsp;Hey there
+        </button-element>
+        <input-field label="replacements" replace='[["/[\\D]/g", ""], ["/(\\d{3})+./", "($1) $2-$3"]]'></input-field>
+        <input-field id="claim-code" format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["BeforeEveryNth", 5, "-"],["Slice", 0, 9]]'></input-field>
+        <input-field type="url" label="URLee"></input-field>
+        <input-field label="Pattern" pattern="[^a-z0-9]"></input-field>
+        <input-field id="intlphone" label="International phone"></input-field>
+        <input-field type="file" label="Drag a file here or&nbsp;<span class='browse-color'>browse</span>"></input-field>
+        <input-field type="file" label="Browse for file" multiple="true" droppable="true" accept="image/jpeg, image/png, video/mp4" id="imageup"></input-field>
         <input-field type="email" label="Email"></input-field>
+        <p class="scale-target">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
         <input-field type="uszip" label="Zip code" class="aclass" autocomplete="zipcode"></input-field>
         <input-field type="textarea" label="Areas"></input-field>
         <input-field type="usphone" label="US Telephone" value="1234567890"></input-field>
@@ -47,13 +84,57 @@
         <input-field type="radio" label="Radio" labelposition="right" value="true"></input-field>
         <input-field type="checkbox" label="Click me" labelposition="right" value="true"></input-field>
         <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready" labelposition="right"></input-field>
-        <input-field type="select" label="Select" options="a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z" hideonfilter="true" id="select"></input-field>
+        <input-field type="select" label="function(host, label){console.log(label, host)}" options="ab,abb,cb,db,eb,fb,gb,hb,ib,jb,kb,lb,mb,nb,ob,pb,qb,rb,sb,tb,ub,vb,wb,xb,yb,zb" hideonfilter="true" id="select"></input-field>
 
-        <!-- <script>
-            setTimeout(() => {
-                document.getElementById(`select`).select(``)
-            }, 1000)
-        </script> -->
+        <script>
+            var countries = [{
+                "name": "Afghanistan",
+                "phone": "93",
+                "code": "af",
+                "languages": ["fa-AF", "ps", "uz-AF", "tk"],
+                "native": "افغانستان",
+                "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#d80027\" d=\"M0 85.331h512v341.326H0z\"/><path fill=\"#496e2d\" d=\"M330.207 85.331H512v341.337H330.207z\"/><path d=\"M0 85.331h181.793v341.337H0z\"/><g fill=\"#ffda44\"><path d=\"M256 196.632c-32.785 0-59.362 26.577-59.362 59.362s26.577 59.362 59.362 59.362 59.362-26.577 59.362-59.362-26.577-59.362-59.362-59.362zm0 96.463c-20.491 0-37.101-16.611-37.101-37.101s16.61-37.101 37.101-37.101 37.101 16.61 37.101 37.101-16.61 37.101-37.101 37.101z\"/><path d=\"M256 233.734c-8.196 0-14.84 6.644-14.84 14.84v22.261h29.682v-22.261c-.002-8.197-6.646-14.84-14.842-14.84z\"/></g></svg>"
+            }, {
+                "name": "Albania",
+                "phone": "355",
+                "code": "al",
+                "languages": ["sq", "el"],
+                "native": "Shqipëria",
+                "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#d80027\" d=\"M0 85.331h512v341.337H0z\"/><path d=\"M352.464 212h-61.817a22.174 22.174 0 006.165-15.368c0-12.295-9.966-22.261-22.261-22.261-7.745 0-14.563 3.957-18.551 9.958-3.988-6-10.805-9.958-18.551-9.958-12.295 0-22.261 9.966-22.261 22.261A22.178 22.178 0 00221.353 212h-61.817c0 16.393 14.278 29.68 30.67 29.68h-.988c0 16.393 13.289 29.682 29.682 29.682a29.49 29.49 0 003.842 14.595l-24.619 24.621 18.888 18.888 26.794-26.794c1.05.385 2.136.692 3.257.903l-16.191 36.557L256 367.299l25.13-27.167-16.191-36.557a20.303 20.303 0 003.257-.903l26.794 26.794 18.888-18.888-24.621-24.621a29.494 29.494 0 003.842-14.595c16.393 0 29.682-13.289 29.682-29.682h-.988c16.393.001 30.671-13.287 30.671-29.68z\"/></svg>"
+            }, {
+                "name": "Algeria",
+                "phone": "213",
+                "code": "dz",
+                "languages": ["ar-DZ"],
+                "native": "الجزائر",
+                "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#496e2d\" d=\"M0 85.331h512v341.326H0z\"/><path fill=\"#f0f0f0\" d=\"M256 85.331h256v341.337H256z\"/><g fill=\"#d80027\"><path d=\"M292.669 223.259l-14.003 19.295-22.677-7.353 14.024 19.28-14.002 19.296 22.671-7.381 14.025 19.28-.014-23.841 22.669-7.381-22.678-7.354z\"/><path d=\"M270.158 304.226c-26.637 0-48.232-21.594-48.232-48.232s21.594-48.232 48.232-48.232c8.306 0 16.12 2.1 22.943 5.797-10.704-10.467-25.342-16.927-41.494-16.927-32.785 0-59.362 26.577-59.362 59.362s26.577 59.362 59.362 59.362c16.152 0 30.79-6.461 41.494-16.927a48.003 48.003 0 01-22.943 5.797z\"/></g></svg>"
+            }]
+
+            var country = document.getElementById('country')
+            country.emptyoption = false
+            country.styles = `.select-option .country-option{ display:flex; align-items:center;} .select-option .country-option-flag{height:2em;width:auto;display:block;} .select-option .country-option-flag svg{height:100%;display:block;}`
+            country.options = countries
+            country.formatvalue = option => `+${option.value.phone}`
+            country.formatlabel = option => `<span class="country-option"><span class="country-option-flag">${option.value.svg}</span><span class="country-option-phone">&nbsp;+${option.value.phone}</span></span>`
+            country.formatvaluelabel = option => `+${option.value.phone}`
+
+            //["/(\\d{3})(\\d{3})(\\d{4})/", "($1) $2-$3"]
+            var intlphone = document.getElementById(`intlphone`)
+            // intlphone.value = []
+            intlphone.styles = `dropdown-select.input-field-input-input{width: auto;}`
+            intlphone.type = [{
+                type: `select`,
+                options: countries,
+                arrow: `left`,
+                emptyoption: false,
+                styles: `.select-option .country-option{ display:flex; align-items:center;} .select-option .country-option-flag{height:2em;width:auto;display:block;} .select-option .country-option-flag svg{height:100%;display:block;}`,
+                formatvalue: option => `+${option.value.phone}`,
+                formatvaluelabel: option => `+${option.value.phone}`,
+                formatlabel: option => `<span class="country-option"><span class="country-option-flag">${option.value.svg}</span><span class="country-option-phone">&nbsp;+${option.value.phone}</span></span>`
+            }, {
+                type: `text`
+            }]
+        </script>
     </body>
 
 </html>

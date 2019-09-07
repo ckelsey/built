@@ -1,0 +1,7 @@
+:host,
+effect-fade,
+.effect-fade-container,
+.effect-fade-container * {
+    pointer-events: none;
+    box-sizing: border-box;
+}

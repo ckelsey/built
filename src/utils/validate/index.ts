@@ -231,6 +231,24 @@ export const ValidateUsPhone = (val: string | number): ValidateResponse => {
     }
 }
 
+export const ValidateIntlPhone = (val: string | number): ValidateResponse => {
+    const original = val
+    const reason = []
+    const converted = pipe(ToString, FromEntities, IfInvalid(``))(val)
+    const value = converted.value.replace(/[^\d]+/g, ``)
+
+    if (value.length < 11) {
+        reason.push(`needs at least 11 digits`)
+    }
+
+    return {
+        original,
+        valid: reason.length === 0,
+        sanitized: original,
+        reason
+    }
+}
+
 export const ValidateBool = (val: any): ValidateResponse => {
     const original = val
     const reasons: string[] = []
