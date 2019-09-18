@@ -1,4 +1,15 @@
-:host,
+:host {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+    position: relative;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
+    height: 100%;
+    width: 100%;
+}
+
 dropdown-select {
     display: inline-block;
     max-width: 100%;
@@ -132,6 +143,10 @@ dropdown-select {
         align-items: center;
         justify-content: center;
         margin: 0 0.25em 0 -0.5em;
+
+        svg {
+            fill: currentColor;
+        }
     }
 
     .select-option {

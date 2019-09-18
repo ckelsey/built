@@ -1,5 +1,11 @@
-button-element,
 :host {
+    font: inherit;
+    line-height: inherit;
+    display: inline-block;
+    position: relative;
+}
+
+button-element {
     font: inherit;
     line-height: inherit;
     display: inline-block;

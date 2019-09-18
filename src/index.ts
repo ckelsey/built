@@ -1,11 +1,15 @@
 import ButtonElement from './components/button-element'
 import ContentDrawer from './components/content-drawer'
+import ContentTransition from './components/content-transition'
+import CookieMessage from './components/cookie-message'
 import DropdownSelect from './components/dropdown-select'
 import EffectBounceZ from './components/effect-bounce-z'
 import EffectFade from './components/effect-fade'
 import EffectRipple from './components/effect-ripple'
 import EffectScale from './components/effect-scale'
 import EffectUnderline from './components/effect-underline'
+import GridLayout from './components/grid-layout'
+import HorizontalSlider from './components/horizontal-slider'
 import IconElement from './components/icon-element'
 import InputField from './components/input-field'
 import OverlayContent from './components/overlay-content'
@@ -24,16 +28,21 @@ import Pipe from './utils/pipe'
 import ObserveEvent from './utils/observeEvent'
 import ObserveWorker from './utils/observeWorker'
 import Set from './utils/set'
+import { Constructor, Define } from './utils/webcomponent/constructor'
 
 export const Components = {
     ButtonElement,
     ContentDrawer,
+    ContentTransition,
+    CookieMessage,
     DropdownSelect,
     EffectBounceZ,
     EffectFade,
     EffectRipple,
     EffectScale,
     EffectUnderline,
+    GridLayout,
+    HorizontalSlider,
     IconElement,
     InputField,
     OverlayContent
@@ -56,5 +65,68 @@ export const Utils = {
     ObserveEvent,
     ObserveWorker,
     Pipe,
-    Set
+    Set,
+    Convert: {
+        array: {
+
+        },
+        bool: {
+
+        },
+        date: {
+
+        },
+        dom: {
+
+        },
+        entities: {
+
+        },
+        function: {
+
+        },
+        if: {
+
+        },
+        json: {
+
+        },
+        meta: {
+
+        },
+        number: {
+
+        },
+        object: {
+
+        },
+        options: {
+
+        },
+        phone: {
+
+        },
+        postal: {
+
+        },
+        regex: {
+
+        },
+        string: {
+
+        },
+        tmonad: {
+
+        },
+        tap: {
+
+        },
+        uri: {
+
+        }
+    },
+    WebComponent: {
+        Constructor,
+        Define
+    }
 }

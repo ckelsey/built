@@ -1,4 +1,8 @@
-:host,
+:host {
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
 effect-underline,
 .effect-underline-container,
 .effect-underline-container * {

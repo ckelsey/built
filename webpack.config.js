@@ -145,6 +145,7 @@ const getThemes = () => {
 const themes = getThemes()
 let devServer = {}
 let plugins = []
+let postPluginHasRan = false
 
 const optimization = {
     minimize: false
@@ -160,23 +161,14 @@ const postPlugin = {
                 })
             }
 
-            const webComponentsDistPath = path.resolve(`${__dirname}/dist/webcomponents/`)
-            const webComponentsPath = path.resolve(`${__dirname}/node_modules/@webcomponents`)
-            let hasWebComponents = false
-
-            try
+            if (!postPluginHasRan)
             {
-                hasWebComponents = fs.accessSync(webComponentsDistPath)
-            } catch (error) { }
-
-            if (!hasWebComponents)
-            {
-                exec(`cp -r ${webComponentsPath}/. dist`, alert)
+                postPluginHasRan = true
+                exec(`cp -r ${path.resolve(`${__dirname}/node_modules/@webcomponents`)}/. dist`, alert)
             } else
             {
                 alert()
             }
-
         })
     )
 }

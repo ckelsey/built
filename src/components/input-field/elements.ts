@@ -41,7 +41,7 @@ const setInputEvents = (input, host) => {
     input.eventSubscriptions = {
         onFocus: ObserveEvent(input, `focus`).subscribe(() => onFocus(host)),
         onBlur: ObserveEvent(input, `blur`).subscribe(() => onBlur(host)),
-        onKeyDown: ObserveEvent(input, `keydown`).subscribe(e => onKeyDown(host, e))
+        onKeyDown: ObserveEvent(input, `keydown`).subscribe(e => onKeyDown(e, host))
     }
 
     if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
@@ -83,6 +83,16 @@ export const setOptions = (input, options) => {
     input.options = options
 }
 
+export const setSelectProperties = host => {
+    const input = host.elements.input
+
+    if (!input) { return }
+
+    input.styles = host.styles
+    input.emptyoption = host.emptyoption
+    input.class = host.class
+}
+
 const elementMethods = {
     input: (input, host) => {
         inputAttributeList(host)
@@ -92,6 +102,7 @@ const elementMethods = {
         setEffects(host)
         setDroppable(host)
         setOptions(input, host.options)
+        setSelectProperties(host)
     },
 
     clearButton: (el, host) => {
@@ -110,7 +121,20 @@ const elementMethods = {
 
     underline: (_el, host) => setColors(host),
 
-    injectedStyles: (el, host) => setStyles(el, host.styles)
+    injectedStyles: (el, host) => setStyles(el, host.styles),
+
+    icon: (el, host) => {
+        el.eventSubscriptions = {
+            click: ObserveEvent(el, `click`).subscribe(() => {
+                const input = host.elements.input
+                if (input) {
+                    input.focus()
+                }
+
+                host.dispatchEvent(new CustomEvent(`iconclick`, { detail: host }))
+            })
+        }
+    }
 }
 
 const elements = {}

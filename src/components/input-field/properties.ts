@@ -9,7 +9,7 @@ import { IndexOf, ToArray } from '../../utils/convert/array'
 import { ToString } from '../../utils/convert/string'
 import { setInput, setInputID, setInputAttribute, setLabel } from './methods-elements'
 import { ValidateHtml } from '../../utils/validate'
-import { setColors, setOptions, setStyles } from './elements'
+import { setColors, setOptions, setStyles, setSelectProperties } from './elements'
 import { processValue } from './methods-value'
 import { setDroppable } from './methods-events'
 import { setAttribute, wcClassObject } from '../../utils/html/attr'
@@ -70,7 +70,9 @@ const inputAttributes = {
     },
     emptyoption: {
         format: val => val !== undefined ? val : INPUTFIELD.emptyoption,
-        onChange
+        onChange: (_val, host) => {
+            setSelectProperties(host)
+        }
     },
     maxlength: {
         format: val => pipe(ToNumber, IfInvalid(INPUTFIELD.maxlength))(val).value,
@@ -133,7 +135,14 @@ const inputAttributes = {
     },
     value: {
         format: val => val,
-        onChange: (_val, host) => processValue(host),
+        onChange: (val, host) => {
+
+            if (host.type === `select`) {
+                host.elements.input.value = val
+            }
+
+            processValue(host)
+        },
     },
 }
 
@@ -230,7 +239,10 @@ const inputFieldProperties = {
     },
     styles: {
         format: val => typeof val === `string` ? val : INPUTFIELD.styles,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
+        onChange: (val, host) => {
+            setStyles(host.elements.injectedStyles, val)
+            setSelectProperties(host)
+        }
     },
     warningcolor: {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.warningcolor))(val).value,

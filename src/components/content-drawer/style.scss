@@ -1,5 +1,21 @@
-:host,
-content-drawer,
+:host {
+    display: block;
+    width: 100%;
+    position: relative;
+    height: auto;
+    left: 0%;
+    top: 0px;
+}
+
+content-drawer {
+    display: block;
+    width: 100%;
+    position: relative;
+    height: auto;
+    left: 0%;
+    top: 0px;
+}
+
 .content-drawer-container {
     display: block;
     width: 100%;

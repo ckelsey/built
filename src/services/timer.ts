@@ -16,7 +16,7 @@ const loop = () => {
         const subscription = subscriptions[key]
         const currentFrame = new Date().getTime() - subscription.started
 
-        if (!!subscription.duration && !subscription.frames[currentFrame]) {
+        if (!!subscription.duration && typeof subscription.frames[currentFrame] === 'undefined') {
             return subscriptions[key].cancel()
         }
 

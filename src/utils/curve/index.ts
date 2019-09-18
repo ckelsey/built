@@ -72,4 +72,58 @@ export const GetCurve = (points, tension = 0.5, closedPath = false, frames = 16)
     return isPairs ? res : res.map(p => p[0])
 }
 
+const distance = v => v[1] - v[0]
+
+export const EasePower = (stepDecimal, pow = 4) => 1 - Math.pow(1 - stepDecimal, pow)
+
+export const GetEase = (values, duration, pow, powerFn) => {
+    const results = []
+    let index = 0
+
+    while (index < duration - 1) {
+        const current = Math.round((distance(values) * powerFn(index, duration, pow)) * 1000) / 1000
+        results.push(values[0] + current)
+        index = index + 1
+    }
+
+    results.push(values[1])
+
+    return results
+}
+
+export const EaseIn = (values, duration, pow = 4) =>
+    GetEase(
+        values,
+        duration,
+        pow,
+        (index, frames) => {
+            const t = index / frames
+            return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+        }
+    )
+
+export const EaseOut = (values, duration, pow = 4) =>
+    GetEase(
+        values,
+        duration,
+        pow,
+        (index, frames, pow) => EasePower(index / frames, pow)
+    )
+
+export const EaseInOut = (values, duration, pow = 4) =>
+    GetEase(
+        values,
+        duration,
+        pow,
+        (index, frames, pow) => EasePower((index / frames) * (index / frames), pow)
+    )
+
+export const EaseBounce = (values, duration, pow = 4) =>
+    GetEase(
+        values,
+        duration,
+        pow,
+        (index, frames, pow) => EasePower(1 - (index / frames), pow)
+    )
+
 export default GetCurve

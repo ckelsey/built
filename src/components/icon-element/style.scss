@@ -1,5 +1,15 @@
-:host,
-icon-element,
+:host {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+icon-element {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
 .icon-element-container {
     display: inline-flex;
     align-items: center;

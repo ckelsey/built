@@ -82,8 +82,8 @@ const ObserveEvent = (element, eventName, options: Opts = {}): ObserveEventObjec
                 error,
                 complete
             }, {
-                    id: `${new Date().getTime()}_${Object.keys(subscriptions).length}_${Math.round(Math.random() * 10000)}`
-                })
+                id: `${new Date().getTime()}_${Object.keys(subscriptions).length}_${Math.round(Math.random() * 10000)}`
+            })
 
             subscriptions[subscriber.id] = subscriber
 
@@ -114,8 +114,13 @@ const ObserveEvent = (element, eventName, options: Opts = {}): ObserveEventObjec
 
     let waiting = 1000
     const waitForParent = () => {
-        if (element.parentNode) {
-            return mObserver.observe(element.parentNode, { childList: true })
+        if (element === window) { return }
+
+        if (!!element.parentNode) {
+            try {
+                mObserver.observe(element.parentNode, { childList: true })
+                return
+            } catch (error) { }
         }
 
         waiting = waiting - 1

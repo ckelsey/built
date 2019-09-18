@@ -14,6 +14,7 @@ import '../overlay-content'
 import '../country-dropdown'
 import '../dropdown-select'
 import './style.scss'
+import { setError } from './methods-value'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')
@@ -28,6 +29,9 @@ const InputField = Constructor({
     observedAttributes,
     properties,
     elements,
+    methods: {
+        setError
+    },
     computed: {
         processedValue,
         formattedValue,

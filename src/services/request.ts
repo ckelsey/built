@@ -20,9 +20,9 @@ const Request = apiBase => reqData => {
             function () {
                 self.onmessage = function (e) {
                     var xhr = new XMLHttpRequest();
-                    var data = JSON.parse(e.data)
+                    var data = JSON.parse(e.data);
                     xhr.open(data.method, data.path, false);
-                    Object.keys(data.headers).forEach(key => xhr.setRequestHeader(key, data.headers[key]))
+                    Object.keys(data.headers).forEach(key => xhr.setRequestHeader(key, data.headers[key]));
                     xhr.onload = () => postMessage({ status: xhr.status, response: xhr.responseText || xhr.statusText });
                     xhr.onerror = () => postMessage({ status: xhr.status, response: xhr.statusText });
                     xhr.send(data.data);

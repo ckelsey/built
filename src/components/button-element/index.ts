@@ -1,6 +1,6 @@
 import { Define, Constructor } from '../../utils/webcomponent/constructor'
 import pipe from '../../utils/pipe'
-import { IfInvalid, IfEmpty } from '../../utils/convert/if'
+import { IfInvalid } from '../../utils/convert/if'
 import { ToBool } from '../../utils/convert/bool'
 import { wcClassObject } from '../../utils/html/attr'
 import { ToString } from '../../utils/convert/string'
@@ -19,7 +19,7 @@ const setStyles = (el, host, styles) => {
 
 const properties = {
     accentcolor: {
-        format: val => pipe(ToString, IfEmpty(BUTTONELEMENT.accentcolor))(val).value,
+        format: val => pipe(ToString, IfInvalid(BUTTONELEMENT.accentcolor))(val).value,
         onChange: (val, host) => {
             if (host.hasRipple) {
                 host.elements.ripple.color = val
@@ -61,7 +61,10 @@ const elements = {
     },
     button: {
         selector: `button`,
-        onChange: () => { }
+        onChange: (_el, host) => {
+            setBounce(host)
+            setRipple(host)
+        }
     },
     ripple: {
         selector: `effect-ripple`,
@@ -78,16 +81,21 @@ const elements = {
 }
 
 const setRipple = host => {
-    if (!host.canRipple) { return }
     const ripple = host.elements.ripple
+
+    if (!ripple) { return }
+
     ripple.color = host.accentcolor
-    ripple.targets = [host.elements.button]
+    ripple.targets = host.ripple ? [host.elements.button] : []
 }
 
 const setBounce = host => {
-    if (!host.canBounce) { return }
     const bounce = host.elements.bounce
-    bounce.targets = [host.elements.button]
+    const button = host.elements.button
+
+    if (!bounce || !button) { return }
+
+    bounce.targets = host.bounce ? [button] : []
 }
 
 const template = require('./index.html')

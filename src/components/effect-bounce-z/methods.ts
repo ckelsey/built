@@ -26,7 +26,7 @@ const runStart = host => () => {
         },
         GetCurve([1, -host.amount, (-host.amount * 1.125), 1], 0.5, false, host.speed),
         () => {
-            const set = el => el.style.transform = `perspective(1px) translateZ(0) scaleX(1) scaleY(1)`
+            const set = el => el.style.removeProperty(`transform`)
             host.targets.forEach(target => Array.isArray(target) ? target.forEach(set) : set(target))
             host.on = false
         }
@@ -42,7 +42,7 @@ export const unloadTargets = host => {
 }
 
 export const loadTargets = host => {
-    if (!host.targets || !host.start || !host.ready) { return }
+    if (!host.targets || !host.start) { return }
 
     const set = el => {
         el.style.transformStyle = 'preserve-3d'

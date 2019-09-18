@@ -1,5 +1,6 @@
 export { default as ButtonElement } from './button-element'
 export { default as ContentDrawer } from './content-drawer'
+export { default as ContentTranstion } from './content-transition'
 export { default as DropdownSelect } from './dropdown-select'
 export { default as EffectBounceZ } from './effect-bounce-z'
 export { default as EffectFade } from './effect-fade'

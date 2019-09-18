@@ -4,6 +4,7 @@ import { wcClassObject } from '../../utils/html/attr'
 import { setStyleRules } from '../../utils/html/markup'
 import { ICONELEMENT } from './theme'
 import './style.scss'
+import ObserveWorker from '../../utils/observeWorker'
 
 const style = require('./style.scss').toString()
 
@@ -57,25 +58,53 @@ const getIcon = (path) => {
         AvailableIcons[path] = Observe(``)
         resolve(AvailableIcons[path])
 
-        const fnString = `
-        self.onmessage = function(e){
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', e.data, false);
-            xhr.onload = () => postMessage({ status: xhr.status, svg: xhr.responseText });
-            xhr.send();
-        }`
-        const blobURL = window.URL.createObjectURL(new Blob([fnString]))
-        const worker = new Worker(blobURL)
-
-        worker.onmessage = (e) => {
-            if (e.data.status === 200) {
-                AvailableIcons[path].next(e.data.svg)
-            } else {
-                AvailableIcons[path].error(e.data.status)
+        const worker$ = ObserveWorker(
+            function () {
+                self.onmessage = function (e) {
+                    var xhr = new XMLHttpRequest();
+                    var data = JSON.parse(e.data);
+                    xhr.open(data.method, data.path, false);
+                    xhr.onload = () => postMessage({ status: xhr.status, svg: xhr.responseText });
+                    xhr.send();
+                }
             }
-        }
+        )
 
-        worker.postMessage(path)
+        const workerSubscription = worker$.subscribe(
+            e => {
+                workerSubscription()
+                AvailableIcons[path].next(e.svg)
+            },
+            (e: any) => {
+                workerSubscription()
+                AvailableIcons[path].error(e.status)
+            }
+        )
+
+        worker$.post({
+            path,
+            method: `GET`
+        })
+
+        // const fnString = `
+        // self.onmessage = function(e){
+        //     var xhr = new XMLHttpRequest();
+        //     xhr.open('GET', e.data, false);
+        //     xhr.onload = () => postMessage({ status: xhr.status, svg: xhr.responseText });
+        //     xhr.send();
+        // }`
+        // const blobURL = window.URL.createObjectURL(new Blob([fnString]))
+        // const worker = new Worker(blobURL)
+
+        // worker.onmessage = (e) => {
+        //     if (e.data.status === 200) {
+        //         AvailableIcons[path].next(e.data.svg)
+        //     } else {
+        //         AvailableIcons[path].error(e.data.status)
+        //     }
+        // }
+
+        // worker.postMessage(path)
     })
 }
 

@@ -1,6 +1,6 @@
 import { Observe } from '../utils/observe'
 
-const Router = routes => {
+const Router = (routes, storeLocally = false) => {
     let current
     const _routes = Object.assign({}, routes)
     const navigated = () => {
@@ -11,16 +11,39 @@ const Router = routes => {
         methods.route(history.state)
     }
 
-    const joinUrl = pathname => `${location.protocol}//${location.host}${pathname}${location.search}`
+    const getQuery = search => {
+        const result = {}
+
+        if (!search) { return result }
+
+        const q = search.split(`?`)[1]
+
+        if (!q) { return result }
+
+        q
+            .split(`&`)
+            .forEach(v => {
+                result[v.split(`=`)[0]] = v.split(`=`)[1]
+            })
+
+        return result
+    }
+
+    const joinUrl = (pathname, query) => `${location.protocol}//${location.host}${!pathname ? `` : pathname[0] === `/` ? pathname : `/${pathname}`}${Object.keys(query).length ? `?${Object.keys(query).map(q => `${q}=${query[q]}`).join(`&`)}` : ``}`
 
     const updateState = (route) => {
-        if (history.pushState) {
+        if (history.pushState && route) {
+            const full = joinUrl(route.pathname, route.query)
             const state = {
                 title: route.title,
                 pathname: route.pathname,
-                full: joinUrl(route.pathname)
+                full
             }
-            history.pushState(state, document.title, joinUrl(route.pathname))
+            history.pushState(state, document.title, full)
+
+            if (storeLocally) {
+                localStorage.setItem(`route`, JSON.stringify(state))
+            }
         }
     }
 
@@ -42,8 +65,37 @@ const Router = routes => {
 
         getRouteByPath,
 
+        updateQuery(query) {
+            if (!current) { return }
+
+            current = Object.assign({}, current)
+            current.query = query
+
+            updateState(current)
+        },
+
+        getQuery(str) {
+            const result = {}
+
+            if (!str || str === ``) {
+                str = location.search
+
+                if (!str || str === ``) {
+                    return result
+                }
+            }
+
+            const str2 = str.split(`?`)[1]
+
+            if (!str2 || str2 === ``) { return result }
+
+            str2.split(`&`).forEach(element => result[element.split(`=`)[0]] = element.split(`=`)[1])
+
+            return result
+        },
+
         route(url) {
-            const route = methods.getRouteByPath(typeof url === `string` ? url : !!url.pathname ? url.pathname : ``)
+            const route = methods.getRouteByPath(typeof url === `string` ? url.split(`?`)[0] : !!url.pathname ? url.pathname : ``)
 
             if (!route) { return methods.route(`/`) }
 
@@ -52,10 +104,11 @@ const Router = routes => {
             if (current && route.pathname === current.pathname) { return true }
 
             current = Object.assign({}, route)
+            current.query = getQuery(url)
 
-            updateState(route)
+            updateState(current)
 
-            methods.route$.next(route)
+            methods.route$.next(current)
 
             return true
         },
@@ -63,7 +116,7 @@ const Router = routes => {
         route$: Observe(undefined)
     }
 
-    methods.route(location.pathname)
+    methods.route(`${location.pathname}${location.search}`)
 
     window.document.body.addEventListener(`click`, e => {
         let link

@@ -151,7 +151,7 @@ export const Constructor = options => {
 
         constructor() {
             super()
-            Template(componentName, this, template, style)
+            Template(componentName, this, template, style, false, options.appendStylesToHead)
         }
 
         public attributeChangedCallback(attrName, oldValue, newValue) { if (newValue !== oldValue) { this[attrName] = newValue } }
@@ -188,7 +188,7 @@ export const Constructor = options => {
 
             }
 
-            Template(componentName, element, template, style, true)
+            Template(componentName, element, template, style, true, options.appendStylesToHead)
 
             ConnectedFn(element)
 

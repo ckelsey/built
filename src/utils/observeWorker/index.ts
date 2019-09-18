@@ -30,7 +30,19 @@ const ObserveWorker = func => {
     const startUp = () => {
         if (worker) { return }
 
-        worker = new Worker(window.URL.createObjectURL(new Blob([functionString])))
+        let blob
+
+        console.log(`starting`)
+        try {
+            blob = window.URL.createObjectURL(new Blob([functionString], { type: 'application/javascript' }))
+        } catch (error) {
+            console.log(error)
+        }
+
+        if (!blob) { return }
+
+        worker = new Worker(blob)
+
         worker.onmessage = e => {
             previous = value
             value = e.data

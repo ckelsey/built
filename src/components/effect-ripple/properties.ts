@@ -44,6 +44,11 @@ const attributes = {
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
 
+    direction: {
+        format: val => typeof val === `string` ? val : `auto`,
+        onChange: () => { }
+    },
+
     targets: {
         format: selectorsToDom,
         onChange: (_val, host) => resetTargets(host)

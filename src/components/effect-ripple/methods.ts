@@ -5,7 +5,9 @@ import Timer from '../../services/timer'
 const maxScale = 1.3
 
 const runStart = host => {
-    if (!host.ready) { return }
+    if (!host.ready || host.isRunning) { return }
+
+    host.isRunning = true
 
     const rippleInner = document.createElement(`span`)
     const style = rippleInner.style
@@ -40,7 +42,10 @@ const runStart = host => {
             host.speed
         ),
         () => {
-            host.elements.ripple.removeChild(rippleInner)
+            requestAnimationFrame(() => {
+                host.elements.ripple.removeChild(rippleInner)
+                host.isRunning = false
+            })
         }
     )
 }
@@ -75,7 +80,8 @@ export const unloadTargets = host => {
 }
 
 export const loadTargets = host => {
-    if (!host.canLoadTargets) { return }
+    if (!host.targets || !host.start) { return }
+
     host.targets.forEach(target => {
         host.targets$.push(ObserveEvent(target, `mousedown`).subscribe(e => host.downEvent = e))
         host.targets$.push(ObserveEvent(target, host.start).subscribe(() => runStart(host)))

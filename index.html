@@ -24,6 +24,18 @@
                 color: cadetblue;
             }
 
+            .horizontal-slider-item img {
+                max-height: 100%;
+                height: 100%;
+                width: auto;
+                display: block;
+            }
+
+            .grid-item img {
+                height: 100%;
+                width: auto
+            }
+
         </style>
         <script src="/dist/webcomponentsjs/custom-elements-es5-adapter.js"></script>
         <script src="/dist/webcomponentsjs/webcomponents-loader.js"></script>
@@ -32,7 +44,48 @@
     <body>
         <dropdown-select id="country"></dropdown-select>
         <dropdown-select options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);"></dropdown-select>
-        <!-- <country-dropdown></country-dropdown> -->
+
+        <input-field label="Filter grid" id="gridfilter"></input-field>
+
+        <grid-layout>
+            <div class="grid-item" keywords="Dickinson, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
+            <div class="grid-item" keywords="Art of racing in the rain, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
+            <div class="grid-item" keywords="Men in black 4, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
+            <div class="grid-item" keywords="For All Mankind, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/fam_poster.jpg"></div>
+            <div class="grid-item" keywords="Angry Birds 2, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ab2_poster.jpg"></div>
+            <div class="grid-item" keywords="The Morning Show, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/tms_poster.jpg"></div>
+            <div class="grid-item" keywords="text">
+                <p>Hi, some text</p>
+            </div>
+            <div class="grid-item" keywords="See, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/see_poster.jpg"></div>
+            <div class="grid-item" keywords="47 degrees, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/47_poster.jpg"></div>
+            <div class="grid-item" keywords="Stuber, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/s_poster.jpg"></div>
+            <div class="grid-item" keywords="Downton Abbey, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/dta_poster.jpg"></div>
+            <div class="grid-item" keywords="Once upon a time in Hollywood, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ouatih_poster.jpg"></div>
+        </grid-layout>
+
+        <div style="height: 300px;color: #fff;">
+            <horizontal-slider currentindex="2">
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/fam_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/tms_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/see_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/47_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ab2_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/s_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/dta_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ouatih_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
+            </horizontal-slider>
+        </div>
+
+        <content-transition>
+            <div id="content-transition">
+                <div>The slotchange event is fired on an HTMLSlotElement instance (slot element) when the node(s) contained in that slot change.</div>
+            </div>
+        </content-transition>
+
         <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
             <span slot="header">Heading</span>
             <div slot="content">Some content .content-drawer-header,
@@ -53,6 +106,7 @@
                 }</div>
         </content-drawer>
 
+
         <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
             <span slot="header">Another Heading</span>
             <div slot="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
@@ -70,7 +124,7 @@
         </button-element>
         <input-field label="replacements" replace='[["/[\\D]/g", ""], ["/(\\d{3})+./", "($1) $2-$3"]]'></input-field>
         <input-field id="claim-code" format='[["Replace", "/[^a-z0-9]/gi", ""], "UpperCase", ["BeforeEveryNth", 5, "-"],["Slice", 0, 9]]'></input-field>
-        <input-field type="url" label="URLee"></input-field>
+        <input-field type="url" label="URLee" icon="icons/ac_unit.svg"></input-field>
         <input-field label="Pattern" pattern="[^a-z0-9]"></input-field>
         <input-field id="intlphone" label="International phone"></input-field>
         <input-field type="file" label="Drag a file here or&nbsp;<span class='browse-color'>browse</span>"></input-field>
@@ -85,55 +139,95 @@
         <input-field type="checkbox" label="Click me" labelposition="right" value="true"></input-field>
         <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready" labelposition="right"></input-field>
         <input-field type="select" label="function(host, label){console.log(label, host)}" options="ab,abb,cb,db,eb,fb,gb,hb,ib,jb,kb,lb,mb,nb,ob,pb,qb,rb,sb,tb,ub,vb,wb,xb,yb,zb" hideonfilter="true" id="select"></input-field>
+        <cookie-message></cookie-message>
 
         <script>
-            var countries = [{
-                "name": "Afghanistan",
-                "phone": "93",
-                "code": "af",
-                "languages": ["fa-AF", "ps", "uz-AF", "tk"],
-                "native": "افغانستان",
-                "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#d80027\" d=\"M0 85.331h512v341.326H0z\"/><path fill=\"#496e2d\" d=\"M330.207 85.331H512v341.337H330.207z\"/><path d=\"M0 85.331h181.793v341.337H0z\"/><g fill=\"#ffda44\"><path d=\"M256 196.632c-32.785 0-59.362 26.577-59.362 59.362s26.577 59.362 59.362 59.362 59.362-26.577 59.362-59.362-26.577-59.362-59.362-59.362zm0 96.463c-20.491 0-37.101-16.611-37.101-37.101s16.61-37.101 37.101-37.101 37.101 16.61 37.101 37.101-16.61 37.101-37.101 37.101z\"/><path d=\"M256 233.734c-8.196 0-14.84 6.644-14.84 14.84v22.261h29.682v-22.261c-.002-8.197-6.646-14.84-14.842-14.84z\"/></g></svg>"
-            }, {
-                "name": "Albania",
-                "phone": "355",
-                "code": "al",
-                "languages": ["sq", "el"],
-                "native": "Shqipëria",
-                "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#d80027\" d=\"M0 85.331h512v341.337H0z\"/><path d=\"M352.464 212h-61.817a22.174 22.174 0 006.165-15.368c0-12.295-9.966-22.261-22.261-22.261-7.745 0-14.563 3.957-18.551 9.958-3.988-6-10.805-9.958-18.551-9.958-12.295 0-22.261 9.966-22.261 22.261A22.178 22.178 0 00221.353 212h-61.817c0 16.393 14.278 29.68 30.67 29.68h-.988c0 16.393 13.289 29.682 29.682 29.682a29.49 29.49 0 003.842 14.595l-24.619 24.621 18.888 18.888 26.794-26.794c1.05.385 2.136.692 3.257.903l-16.191 36.557L256 367.299l25.13-27.167-16.191-36.557a20.303 20.303 0 003.257-.903l26.794 26.794 18.888-18.888-24.621-24.621a29.494 29.494 0 003.842-14.595c16.393 0 29.682-13.289 29.682-29.682h-.988c16.393.001 30.671-13.287 30.671-29.68z\"/></svg>"
-            }, {
-                "name": "Algeria",
-                "phone": "213",
-                "code": "dz",
-                "languages": ["ar-DZ"],
-                "native": "الجزائر",
-                "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#496e2d\" d=\"M0 85.331h512v341.326H0z\"/><path fill=\"#f0f0f0\" d=\"M256 85.331h256v341.337H256z\"/><g fill=\"#d80027\"><path d=\"M292.669 223.259l-14.003 19.295-22.677-7.353 14.024 19.28-14.002 19.296 22.671-7.381 14.025 19.28-.014-23.841 22.669-7.381-22.678-7.354z\"/><path d=\"M270.158 304.226c-26.637 0-48.232-21.594-48.232-48.232s21.594-48.232 48.232-48.232c8.306 0 16.12 2.1 22.943 5.797-10.704-10.467-25.342-16.927-41.494-16.927-32.785 0-59.362 26.577-59.362 59.362s26.577 59.362 59.362 59.362c16.152 0 30.79-6.461 41.494-16.927a48.003 48.003 0 01-22.943 5.797z\"/></g></svg>"
-            }]
+            // var countries = [{
+            //     "name": "Afghanistan",
+            //     "phone": "93",
+            //     "code": "af",
+            //     "languages": ["fa-AF", "ps", "uz-AF", "tk"],
+            //     "native": "افغانستان",
+            //     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#d80027\" d=\"M0 85.331h512v341.326H0z\"/><path fill=\"#496e2d\" d=\"M330.207 85.331H512v341.337H330.207z\"/><path d=\"M0 85.331h181.793v341.337H0z\"/><g fill=\"#ffda44\"><path d=\"M256 196.632c-32.785 0-59.362 26.577-59.362 59.362s26.577 59.362 59.362 59.362 59.362-26.577 59.362-59.362-26.577-59.362-59.362-59.362zm0 96.463c-20.491 0-37.101-16.611-37.101-37.101s16.61-37.101 37.101-37.101 37.101 16.61 37.101 37.101-16.61 37.101-37.101 37.101z\"/><path d=\"M256 233.734c-8.196 0-14.84 6.644-14.84 14.84v22.261h29.682v-22.261c-.002-8.197-6.646-14.84-14.842-14.84z\"/></g></svg>"
+            // }, {
+            //     "name": "Albania",
+            //     "phone": "355",
+            //     "code": "al",
+            //     "languages": ["sq", "el"],
+            //     "native": "Shqipëria",
+            //     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#d80027\" d=\"M0 85.331h512v341.337H0z\"/><path d=\"M352.464 212h-61.817a22.174 22.174 0 006.165-15.368c0-12.295-9.966-22.261-22.261-22.261-7.745 0-14.563 3.957-18.551 9.958-3.988-6-10.805-9.958-18.551-9.958-12.295 0-22.261 9.966-22.261 22.261A22.178 22.178 0 00221.353 212h-61.817c0 16.393 14.278 29.68 30.67 29.68h-.988c0 16.393 13.289 29.682 29.682 29.682a29.49 29.49 0 003.842 14.595l-24.619 24.621 18.888 18.888 26.794-26.794c1.05.385 2.136.692 3.257.903l-16.191 36.557L256 367.299l25.13-27.167-16.191-36.557a20.303 20.303 0 003.257-.903l26.794 26.794 18.888-18.888-24.621-24.621a29.494 29.494 0 003.842-14.595c16.393 0 29.682-13.289 29.682-29.682h-.988c16.393.001 30.671-13.287 30.671-29.68z\"/></svg>"
+            // }, {
+            //     "name": "Algeria",
+            //     "phone": "213",
+            //     "code": "dz",
+            //     "languages": ["ar-DZ"],
+            //     "native": "الجزائر",
+            //     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"#496e2d\" d=\"M0 85.331h512v341.326H0z\"/><path fill=\"#f0f0f0\" d=\"M256 85.331h256v341.337H256z\"/><g fill=\"#d80027\"><path d=\"M292.669 223.259l-14.003 19.295-22.677-7.353 14.024 19.28-14.002 19.296 22.671-7.381 14.025 19.28-.014-23.841 22.669-7.381-22.678-7.354z\"/><path d=\"M270.158 304.226c-26.637 0-48.232-21.594-48.232-48.232s21.594-48.232 48.232-48.232c8.306 0 16.12 2.1 22.943 5.797-10.704-10.467-25.342-16.927-41.494-16.927-32.785 0-59.362 26.577-59.362 59.362s26.577 59.362 59.362 59.362c16.152 0 30.79-6.461 41.494-16.927a48.003 48.003 0 01-22.943 5.797z\"/></g></svg>"
+            // }]
 
-            var country = document.getElementById('country')
-            country.emptyoption = false
-            country.styles = `.select-option .country-option{ display:flex; align-items:center;} .select-option .country-option-flag{height:2em;width:auto;display:block;} .select-option .country-option-flag svg{height:100%;display:block;}`
-            country.options = countries
-            country.formatvalue = option => `+${option.value.phone}`
-            country.formatlabel = option => `<span class="country-option"><span class="country-option-flag">${option.value.svg}</span><span class="country-option-phone">&nbsp;+${option.value.phone}</span></span>`
-            country.formatvaluelabel = option => `+${option.value.phone}`
+            // var country = document.getElementById('country')
+            // country.emptyoption = false
+            // country.styles = '.select-option .country-option{ display:flex; align-items:center;} .select-option .country-option-flag{height:2em;width:auto;display:block;} .select-option .country-option-flag svg{height:100%;display:block;}'
+            // country.options = countries
+            // country.formatvalue = function (option) { return '+' + option.value.phone }
+            // country.formatlabel = function (option) { return '<span class="country-option"><span class="country-option-flag">' + option.value.svg + '</span><span class="country-option-phone">&nbsp;+' + option.value.phone + '</span></span>' }
+            // country.formatvaluelabel = function (option) { return '+' + option.value.phone }
 
-            //["/(\\d{3})(\\d{3})(\\d{4})/", "($1) $2-$3"]
-            var intlphone = document.getElementById(`intlphone`)
-            // intlphone.value = []
-            intlphone.styles = `dropdown-select.input-field-input-input{width: auto;}`
-            intlphone.type = [{
-                type: `select`,
-                options: countries,
-                arrow: `left`,
-                emptyoption: false,
-                styles: `.select-option .country-option{ display:flex; align-items:center;} .select-option .country-option-flag{height:2em;width:auto;display:block;} .select-option .country-option-flag svg{height:100%;display:block;}`,
-                formatvalue: option => `+${option.value.phone}`,
-                formatvaluelabel: option => `+${option.value.phone}`,
-                formatlabel: option => `<span class="country-option"><span class="country-option-flag">${option.value.svg}</span><span class="country-option-phone">&nbsp;+${option.value.phone}</span></span>`
-            }, {
-                type: `text`
-            }]
+            // //["/(\\d{3})(\\d{3})(\\d{4})/", "($1) $2-$3"]
+            // var intlphone = document.getElementById('intlphone')
+            // // intlphone.value = []
+            // intlphone.styles = 'dropdown-select.input-field-input-input{width: auto;}'
+            // intlphone.type = [{
+            //     type: 'select',
+            //     options: countries,
+            //     arrow: 'left',
+            //     emptyoption: false,
+            //     styles: '.select-option .country-option{ display:flex; align-items:center;} .select-option .country-option-flag{height:2em;width:auto;display:block;} .select-option .country-option-flag svg{height:100%;display:block;}',
+            //     formatvalue: function (option) { return '+' + option.value.phone },
+            //     formatvaluelabel: function (option) { return '+' + option.value.phone },
+            //     formatlabel: function (option) { return '<span class="country-option"><span class="country-option-flag">' + option.value.svg + '</span><span class="country-option-phone">&nbsp;+' + option.value.phone + '</span></span>' }
+            // }, {
+            //     type: 'text'
+            // }]
+
+            // const contentTransition = document.body.querySelector('content-transition')
+
+            // setTimeout(function ()
+            // {
+            //     const newNode = document.createElement('div')
+            //     newNode.textContent = 'This causes the animations to run that were created in the previous step. Because the baked animations are already eased, the timing function needs to be set to linear otherwise you’ll ease between each keyframe which will look very weird! When it comes to collapsing the element back down there are two options: update the CSS animation to run in reverse rather than forwards. This will work just fine, but the "feel" of the animation will be reversed, so if you used an ease-out curve the reverse will feel eased in, which will make it feel sluggish. A more appropriate solution is to create a second pair of animations for collapsing the element. These can be created in exactly the same way as the expand keyframe animations, but with swapped start and end values.'
+            //     contentTransition.transitionChild(newNode)
+
+            // }, 2000)
+
+            // setTimeout(function ()
+            // {
+            //     const newNode = document.createElement('div')
+            //     newNode.textContent = 'A more advanced version: circular reveals'
+            //     contentTransition.transitionChild(newNode)
+
+            // }, 5000)
+
+            const grid = document.querySelector('grid-layout')
+            const gridfilter = document.getElementById('gridfilter')
+
+            if (grid) {
+                grid.addEventListener('contentdraweropen', function (e)
+                {
+                    const drawerContent = document.createElement('div')
+                    drawerContent.className = 'content-drawer-stuff'
+                    drawerContent.innerHTML = e.detail.element.innerHTML
+                    drawerContent.setAttribute('slot', 'content-drawer')
+                    grid.appendChild(drawerContent)
+                })
+
+                if (gridfilter) {
+                    gridfilter.addEventListener('input', function (e)
+                    {
+                        grid.filter = gridfilter.value
+                    })
+                }
+            }
         </script>
     </body>
 

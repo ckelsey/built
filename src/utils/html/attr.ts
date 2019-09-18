@@ -1,8 +1,8 @@
-import pipe from "../pipe";
-import { IfInvalid } from "../convert/if";
-import { ToString, Split } from "../convert/string";
-import { Map, Filter } from "../convert/array";
-import { CommasToArray } from "../convert/commas-to-array";
+import pipe from '../pipe'
+import { IfInvalid } from '../convert/if'
+import { ToString, Split } from '../convert/string'
+import { Map, Filter } from '../convert/array'
+import { CommasToArray } from '../convert/commas-to-array'
 
 export const setAttribute = (element, name, value, asProperty = false) => {
     if (!element || !name) { return element }
@@ -42,18 +42,48 @@ export const addRemoveAttr = (el, attr, value) => {
     return el
 }
 
+const addRemoveClassOld = (el, classArr, remove = false) => {
+    const newClasses = (el.className || ``).split(` `).map(clss => clss.trim())
+
+    classArr.forEach(clss => {
+        const index = newClasses.indexOf(clss)
+
+        if (remove && index > -1) {
+            newClasses.splice(index, 1)
+        } else if (!remove && index === -1) {
+            newClasses.push(clss)
+        }
+    })
+
+    el.className = newClasses.join(` `)
+}
+
 export const wcClass = (el, newClasses, previousClasses) => {
     if (!el) { return }
+
+    let oldClassList = false
+
+    if (!(window as any).DOMTokenList.prototype.replace) {
+        oldClassList = true
+    }
 
     let newClass = pipe(CommasToArray, IfInvalid([]))(newClasses).value
     let previousClass = pipe(CommasToArray, IfInvalid([]))(previousClasses).value
 
     if (!!previousClass && previousClass.length) {
-        el.classList.remove(...previousClass)
+        if (oldClassList) {
+            addRemoveClassOld(el, previousClass, true)
+        } else {
+            el.classList.remove(...previousClass)
+        }
     }
 
     if (!!newClass && newClass.length) {
-        el.classList.add(...newClass)
+        if (oldClassList) {
+            addRemoveClassOld(el, newClass)
+        } else {
+            el.classList.add(...newClass)
+        }
     }
 }
 

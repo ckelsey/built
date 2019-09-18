@@ -126,7 +126,7 @@ export const SelectorToElements = (parent, value) => {
     }
 
     if (!parent) {
-        parent = document.firstElementChild
+        parent = document.firstElementChild || document.documentElement
     }
 
     const isEl = IsElement(result)

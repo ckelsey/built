@@ -176,6 +176,11 @@ export const inputCaretPositions = input => {
 
 export const clearInput = host => host.value = ``
 
+export const setError = host => error => {
+    host.errortext = error
+    host.invalid = true
+}
+
 export const isEmpty = val => (val === `` || val === null || val === undefined)
 
 export const sanitizeValue = (val: any, type, allowhtml, disallowhtml) => {
@@ -398,7 +403,10 @@ export const processValue = host => {
         const files = getDroppedFiles(sanitized) || getFileValue(input)
         const filenames = !files ? [] : files.map(f => f.name)
         setAttribute(host.elements.inputContainer, `title`, filenames.join(`, `))
-        input.files = (new ClipboardEvent("").clipboardData || new DataTransfer).files
+
+        try {
+            input.files = (new ClipboardEvent("").clipboardData || new DataTransfer).files
+        } catch (error) { }
 
     } else if (host.type !== `select`) {
         try {
