@@ -9,9 +9,9 @@ import ObserveEvent from '../../utils/observeEvent'
 const tagType = type =>
     type === `textarea`
         ? `textarea`
-        : type === `select`
-            ? `dropdown-select`
-            : `input`
+        // : type === `select`
+        //     ? `dropdown-select`
+        : `input`
 
 const getInputType = (tag, type) => {
     if (tag === `input`) {

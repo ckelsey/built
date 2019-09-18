@@ -13,7 +13,7 @@ import { setLabel, setStyles } from './elements'
 import { findIn } from '../../utils/html/query'
 import { IndexOf } from '../../utils/convert/array'
 import { DROPDOWNSELECT } from './theme'
-import { ToFunction } from '../../utils/convert/function';
+import { ToFunction } from '../../utils/convert/function'
 
 const attributes = {
     arrow: {
@@ -34,6 +34,11 @@ const attributes = {
     disablefilter: {
         format: val => pipe(ToBool, IfInvalid(DROPDOWNSELECT.disablefilter))(val).value,
         onChange: (val, host) => host.elements.root.classList[val ? `add` : `remove`](`disablefilter`)
+    },
+
+    showempty: {
+        format: val => pipe(ToBool, IfInvalid(true))(val).value,
+        onChange: (_val, host) => setLabel(host)
     },
 
     emptyoption: {
@@ -108,7 +113,8 @@ const attributes = {
 
     styles: {
         format: val => typeof val === `string` ? val : DROPDOWNSELECT.styles,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
+        // onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
+        onChange: (_val, host) => setStyles(host)
     },
 
     tabindex: {
@@ -126,7 +132,33 @@ const attributes = {
             setLabel(host)
             dispatch(host, `input`)
         }
-    }
+    },
+
+    optioncolor: {
+        format: val => pipe(ToString, IfInvalid(`inherit`))(val).value,
+        onChange: (_val, host) => setStyles(host)
+    },
+    optionbackground: {
+        format: val => pipe(ToString, IfInvalid(`#fafafa`))(val).value,
+        onChange: (_val, host) => setStyles(host)
+    },
+    optionselectedcolor: {
+        format: val => pipe(ToString, IfInvalid(`#fff`))(val).value,
+        onChange: (_val, host) => setStyles(host)
+    },
+    optionselectedbackground: {
+        format: val => pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
+        onChange: (_val, host) => setStyles(host)
+    },
+
+    labelsize: {
+        format: val => pipe(ToString, IfInvalid(`inherit`))(val).value,
+        onChange: (_val, host) => setStyles(host)
+    },
+    optionsize: {
+        format: val => pipe(ToString, IfInvalid(`inherit`))(val).value,
+        onChange: (_val, host) => setStyles(host)
+    },
 }
 
 export const properties = Object.assign({}, attributes)

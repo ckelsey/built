@@ -1,11 +1,21 @@
 import { Observe } from '../observe'
+import Get from '../get'
+import pipe from '../pipe'
+import { ToFunction } from '../convert/function'
+import { IfInvalid } from '../convert/if'
 
-export const unsubscribeEvents = el => {
-    if (!el || !el.eventSubscriptions) { return }
+const unsub = (el, elementProperty, eventKey) => pipe(ToFunction, IfInvalid(() => { }))(Get(el, `${elementProperty}.${eventKey}`)).value()
 
-    Object.keys(el.eventSubscriptions).forEach(eventKey => {
-        el.eventSubscriptions[eventKey]()
-    })
+export const unsubscribeEvents = (el, elementProperty = `eventSubscriptions`) => {
+    if (!el || !el[elementProperty]) { return }
+
+    Object.keys(el[elementProperty]).forEach(eventKey => unsub(el, elementProperty, eventKey))
+}
+
+export const unsubscribeEvent = (el, eventKey, elementProperty = `eventSubscriptions`) => {
+    if (!el || !el[elementProperty]) { return }
+
+    unsub(el, elementProperty, eventKey)
 }
 
 const removeOld = el => {

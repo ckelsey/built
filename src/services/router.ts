@@ -29,7 +29,21 @@ const Router = (routes, storeLocally = false) => {
         return result
     }
 
-    const joinUrl = (pathname, query) => `${location.protocol}//${location.host}${!pathname ? `` : pathname[0] === `/` ? pathname : `/${pathname}`}${Object.keys(query).length ? `?${Object.keys(query).map(q => `${q}=${query[q]}`).join(`&`)}` : ``}`
+    const formatQuery = query => {
+        if (!Object.keys(query).length) { return `` }
+
+        const queries = Object
+            .keys(query)
+            .map(q => !!query[q] ? `${q}=${query[q]}` : false)
+            .filter(v => !!v)
+            .join(`&`)
+
+        if (!!queries) { return `?${queries}` }
+
+        return ``
+    }
+    const addLeadingSlash = pathname => !pathname ? `` : pathname[0] === `/` ? pathname : `/${pathname}`
+    const joinUrl = (pathname, query) => `${location.protocol}//${location.host}${addLeadingSlash(pathname)}${formatQuery(query)}`
 
     const updateState = (route) => {
         if (history.pushState && route) {

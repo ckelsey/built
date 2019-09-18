@@ -32,12 +32,9 @@ const ObserveWorker = func => {
 
         let blob
 
-        console.log(`starting`)
         try {
             blob = window.URL.createObjectURL(new Blob([functionString], { type: 'application/javascript' }))
-        } catch (error) {
-            console.log(error)
-        }
+        } catch (error) { }
 
         if (!blob) { return }
 

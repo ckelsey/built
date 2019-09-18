@@ -83,15 +83,15 @@ export const setOptions = (input, options) => {
     input.options = options
 }
 
-export const setSelectProperties = host => {
-    const input = host.elements.input
+// export const setSelectProperties = host => {
+//     const input = host.elements.input
 
-    if (!input) { return }
+//     if (!input) { return }
 
-    input.styles = host.styles
-    input.emptyoption = host.emptyoption
-    input.class = host.class
-}
+//     input.styles = host.styles
+//     input.emptyoption = host.emptyoption
+//     input.class = host.class
+// }
 
 const elementMethods = {
     input: (input, host) => {
@@ -102,7 +102,7 @@ const elementMethods = {
         setEffects(host)
         setDroppable(host)
         setOptions(input, host.options)
-        setSelectProperties(host)
+        // setSelectProperties(host)
     },
 
     clearButton: (el, host) => {

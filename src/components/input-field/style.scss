@@ -250,35 +250,8 @@ input-field {
             }
         }
 
-        .select-arrow {
-            display: none;
-        }
 
-        &[input-kind="select"] {
-            .select-arrow {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100%;
-                position: relative;
-                left: 0.5em;
-                color: inherit;
 
-                svg {
-                    fill: currentColor;
-                }
-            }
-
-            select {
-                color: transparent;
-            }
-
-            &.notempty select {
-                color: inherit;
-            }
-        }
-
-        &[input-kind="select"],
         &[input-kind="checkbox"],
         &[input-kind="radio"] {
             input {
@@ -370,12 +343,6 @@ input-field {
                 font-weight: normal;
                 padding: 0.929em 1em;
                 cursor: pointer;
-            }
-        }
-
-        &.hidefilteredout {
-            .input-field-option.filtered-out:not(.selected):not(.blank) {
-                display: none;
             }
         }
 
@@ -480,31 +447,6 @@ input-field {
         position: absolute;
     }
 
-    .input-field-option {
-        padding: 0.5em;
-        background: $inputfield_optionBackgroundColor;
-        color: $inputfield_optionHoverColor;
-        cursor: pointer;
-
-        &.selected {
-            background: $inputfield_optionActiveBackgroundColor;
-            color: $inputfield_optionActiveColor;
-            pointer-events: all;
-        }
-
-        &.filtered-out:not(.selected):not(.blank) {
-            cursor: none;
-            pointer-events: none;
-            opacity: 0.125;
-        }
-
-        &:hover {
-            padding: 0.5em;
-            background: $inputfield_optionHoverBackgroundColor;
-            color: $inputfield_optionHoverColor;
-        }
-    }
-
     .input-field-character-count-container,
     .input-field-character-count-max-divider,
     .input-field-character-count-max {
@@ -580,13 +522,6 @@ input-field {
             flex-wrap: nowrap;
             align-items: center;
 
-            country-dropdown {
-                flex-shrink: 1;
-                width: auto;
-                display: inline-flex;
-                flex-basis: auto;
-            }
-
             input {
                 flex-grow: 1;
                 width: 100%;
@@ -615,10 +550,6 @@ input-field {
     input,
     textarea {
         cursor: text;
-    }
-
-    dropdown-select.input-field-input {
-        padding: 0em;
     }
 
     input::-ms-clear {

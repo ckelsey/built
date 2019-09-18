@@ -18,7 +18,7 @@ export const supportedInputTypes = [
     `number`,
     `radio`,
     `checkbox`,
-    `select`,
+    // `select`,
     `tel`,
     `usphone`,
     `intlphone`,

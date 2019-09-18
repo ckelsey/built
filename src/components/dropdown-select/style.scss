@@ -29,6 +29,7 @@ dropdown-select {
     width: 100%;
     height: 100%;
     position: relative;
+    cursor: pointer;
 
     &[arrow="left"] {
         flex-direction: row-reverse;
@@ -56,7 +57,23 @@ dropdown-select {
         display: none;
     }
 
+    &.disablefilter,
+    &.hidden-label.disablefilter {
+        input.dropdown-select-filter {
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .dropdown-select-label {
+            opacity: 1;
+        }
+    }
+
     &.native-select {
+        .dropdown-select-label-container {
+            display: none;
+        }
+
         input.dropdown-select-filter {
             pointer-events: none;
             opacity: 0;
@@ -152,7 +169,7 @@ dropdown-select {
     .select-option {
         color: $dropdownselect_option_color;
         background-color: $dropdownselect_option_background_color;
-        padding: 0.5em;
+        padding: 0.5em 1em;
         cursor: pointer;
         transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 
@@ -173,7 +190,7 @@ dropdown-select {
         height: 100%;
         top: 0;
         left: 0;
-        padding: 1em 0em 1em 1em;
+        padding: 1em 0.25em 1em 1em;
         box-sizing: border-box;
     }
 

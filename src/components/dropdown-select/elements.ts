@@ -25,13 +25,37 @@ export const setInput = host => {
 }
 
 export const setLabel = host => {
-    const option = host.options[host.selectedIndex]
-    const label = option ? host.formatvaluelabel(option) : ``
+    const formatFunction = host.formatvaluelabel && typeof host.formatvaluelabel === `function`
+        ? host.formatvaluelabel
+        : o => o.label
+
+    const emptyOption = host.emptyoption
+        ? host.emptyoption
+        : ``
+
+    const option = !host.options
+        ? { value: ``, label: emptyOption }
+        : host.options[host.selectedIndex]
+
+    const label = option
+        ? formatFunction(option)
+        : host.showempty
+            ? emptyOption
+            : ``
+
     replaceElementContents(host.elements.label, ValidateHtml(label, [], [`script`]).sanitized || ``)
 }
 
-export const setStyles = (el, styles) => {
+export const setStyles = host => {
+    const el = host.elements.injectedStyles
+
     if (!el) { return }
+
+    const labelSize = `.dropdown-select-container .dropdown-select-label{font-size:${host.labelsize};}`
+    const optionColors = `.dropdown-select-container overlay-content .select-option{font-size:${host.optionsize};color:${host.optioncolor};background-color:${host.optionbackground};}`
+    const optionSelectedColors = `.dropdown-select-container overlay-content .select-option.selected,.dropdown-select-container overlay-content .select-option:hover{color:${host.optionselectedcolor};background-color:${host.optionselectedbackground};}`
+    const styles = `${host.styles}${optionColors}${optionSelectedColors}${labelSize}`
+
     setStyleRules(el, styles)
 }
 
@@ -155,7 +179,12 @@ const methods = {
             click: ObserveEvent(el, `click`).subscribe(() => toggleOptions(host, true))
         }
     },
-    injectedStyles: (el, host) => setStyles(el, host.styles),
+    injectedStyles: (_el, host) => setStyles(host),
+
+    label: (el, host) => {
+        el.eventSubscriptions = el.eventSubscriptions ? el.eventSubscriptions : {}
+        el.eventSubscriptions.click = ObserveEvent(el, `click`).subscribe(() => toggleOptions(host, true))
+    }
 }
 
 Object.keys(elementSelectors).forEach(key => {

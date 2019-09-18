@@ -24,11 +24,16 @@
                 color: cadetblue;
             }
 
-            .horizontal-slider-item img {
-                max-height: 100%;
+            .slider-item img {
                 height: 100%;
                 width: auto;
-                display: block;
+                display: inline-block;
+            }
+
+            .slider-item {
+                display: inline-block;
+                height: 100%;
+                width: auto;
             }
 
             .grid-item img {
@@ -42,7 +47,12 @@
     </head>
 
     <body>
+        <image-loader src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg" id="image-loader"></image-loader>
+
         <dropdown-select id="country"></dropdown-select>
+
+        <dropdown-select style="margin: 1em 0;width:auto" options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);" disablefilter="true"></dropdown-select>
+
         <dropdown-select options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);"></dropdown-select>
 
         <input-field label="Filter grid" id="gridfilter"></input-field>
@@ -65,18 +75,18 @@
         </grid-layout>
 
         <div style="height: 300px;color: #fff;">
-            <horizontal-slider currentindex="2">
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/fam_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/tms_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/see_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/47_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ab2_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/s_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/dta_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ouatih_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
+            <horizontal-slider>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/fam_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/tms_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/see_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/47_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ab2_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/s_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/dta_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ouatih_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
+                <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
             </horizontal-slider>
         </div>
 
@@ -212,8 +222,7 @@
             const gridfilter = document.getElementById('gridfilter')
 
             if (grid) {
-                grid.addEventListener('contentdraweropen', function (e)
-                {
+                grid.addEventListener('contentdraweropen', function (e) {
                     const drawerContent = document.createElement('div')
                     drawerContent.className = 'content-drawer-stuff'
                     drawerContent.innerHTML = e.detail.element.innerHTML
@@ -222,12 +231,30 @@
                 })
 
                 if (gridfilter) {
-                    gridfilter.addEventListener('input', function (e)
-                    {
+                    gridfilter.addEventListener('input', function (e) {
                         grid.filter = gridfilter.value
                     })
                 }
             }
+
+            // const imageLoader = document.getElementById('image-loader')
+
+            // if (imageLoader) {
+            //     console.dir(imageLoader)
+
+            //     function tryImageLoader()
+            //     {
+            //         console.log(typeof imageLoader.toDataUrl !== `function`)
+
+            //         if (typeof imageLoader.toDataUrl !== `function`) { return requestAnimationFrame(tryImageLoader) }
+
+            //         imageLoader.toData()
+            //             .then(v => console.log('toData', v))
+            //             .catch(console.log)
+            //     }
+
+            //     tryImageLoader()
+            // }
         </script>
     </body>
 

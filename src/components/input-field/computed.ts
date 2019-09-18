@@ -82,35 +82,35 @@ export const labelContainer = host => ({
     }
 })
 
-export const selected = host => ({
-    get() {
-        const selected = {
-            value: ``,
-            label: ``
-        }
+// export const selected = host => ({
+//     get() {
+//         const selected = {
+//             value: ``,
+//             label: ``
+//         }
 
-        if (host.optionElements) {
-            let i = host.optionElements.length
-            while (i--) {
-                if (host.optionElements[i].classList.contains(`selected`)) {
-                    return {
-                        value: host.optionElements[i].value,
-                        label: host.optionElements[i].textContent,
-                        element: host.optionElements[i]
-                    }
-                }
-            }
-        }
+//         if (host.optionElements) {
+//             let i = host.optionElements.length
+//             while (i--) {
+//                 if (host.optionElements[i].classList.contains(`selected`)) {
+//                     return {
+//                         value: host.optionElements[i].value,
+//                         label: host.optionElements[i].textContent,
+//                         element: host.optionElements[i]
+//                     }
+//                 }
+//             }
+//         }
 
-        return selected
-    }
-})
+//         return selected
+//     }
+// })
 
-export const optionElements = host => ({
-    get() {
-        const dropdown = host.elements.input
+// export const optionElements = host => ({
+//     get() {
+//         const dropdown = host.elements.input
 
-        if (!dropdown) { return [] }
-        return dropdown.optionElements || []
-    }
-})
+//         if (!dropdown) { return [] }
+//         return dropdown.optionElements || []
+//     }
+// })

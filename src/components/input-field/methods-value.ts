@@ -311,7 +311,7 @@ export const InputFieldFormatValue = (value, format) => {
 }
 
 export const maxMin = (host, value) => {
-    const nonStringTypes = [`select`, `number`, `checkbox`, `radio`, `file`]
+    const nonStringTypes = [`number`, `checkbox`, `radio`, `file`]
 
     if (value === undefined || value === null) {
         return value
@@ -408,7 +408,7 @@ export const processValue = host => {
             input.files = (new ClipboardEvent("").clipboardData || new DataTransfer).files
         } catch (error) { }
 
-    } else if (host.type !== `select`) {
+    } else {
         try {
             const selectionEnd = input.selectionEnd
             let cursorPosition = selectionEnd

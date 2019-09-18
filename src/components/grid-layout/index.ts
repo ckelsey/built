@@ -29,7 +29,6 @@ const GridLayout = Constructor({
     methods: { refresh },
     computed: { itemElements, itemsData },
     onConnected: host => setHostEvents(host),
-    onReady: host => host.setAttribute(`ready`, `true`),
     appendStylesToHead: true
 })
 

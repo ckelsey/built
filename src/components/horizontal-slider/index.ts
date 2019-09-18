@@ -1,7 +1,5 @@
 /**
- * repeat
-
- * user-select on all the things except slot item contents
+ * prevent initial trnsform in
  * cover flow
  * single item
  * onslidestart
@@ -29,13 +27,12 @@ const HorizontalSlider = Constructor({
     elements,
     methods: { scrollToIndex },
     onConnected: host => {
-        if (document.head.querySelector(`style[name="horizontal-slider-styles"]`)) { return }
-
-        AppendStyle(style, document.head, `horizontal-slider-styles`)
-
         window.addEventListener(`resize`, () => host.scrollToIndex(host.currentindex))
+
+        if (!document.head.querySelector(`style[name="horizontal-slider-styles"]`)) {
+            AppendStyle(style, document.head, `horizontal-slider-styles`)
+        }
     },
-    // onReady: host => setTimeout(() => host.scrollToIndex(host.currentindex), 500)
 })
 
 Define(componentName, HorizontalSlider)

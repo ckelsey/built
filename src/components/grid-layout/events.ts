@@ -4,6 +4,8 @@ import { contentDrawerContainer, contentDrawerItems, itemRowSelector } from './e
 import Timer from '../../services/timer'
 import { EaseInOut } from '../../utils/curve'
 import { setItemDefaultTransform, setItemHoverTransform } from './methods'
+import { unsubscribeEvents } from '../../utils/webcomponent/elements'
+import { imageLoader } from '../image-loader'
 
 
 const duration = 400
@@ -19,7 +21,7 @@ export const hardCloseContentDrawer = host => {
     })
 }
 
-export const removeContentDrawerItems = (host, container, contents, removeAll = false) => new Promise(resolve => {
+export const removeContentDrawerItems = (host, container, contents, removeAll = false, dispatchEvent = false) => new Promise(resolve => {
     if (!container) { return resolve() }
 
     container.classList.remove(`open`)
@@ -49,6 +51,10 @@ export const removeContentDrawerItems = (host, container, contents, removeAll = 
             }
         )
     }
+
+    if (!dispatchEvent) { return }
+
+    host.dispatchEvent(new CustomEvent(`contentdrawerclose`, { detail: host }))
 })
 
 const onContentDrawerChange = (host, container, contents) => {
@@ -100,18 +106,8 @@ const onContentDrawerChange = (host, container, contents) => {
 
     if (contentImages.length === 0) { return afterImagesAreLoaded() }
 
-    Promise.all(
-        contentImages.map(
-            (img: HTMLImageElement) => new Promise(resolve => {
-                if (img.width) { return resolve() }
-
-                const finish = () => requestAnimationFrame(resolve)
-
-                img.addEventListener(`load`, finish)
-                img.addEventListener(`error`, finish)
-            })
-        )
-    )
+    Promise
+        .all(contentImages.map(image => imageLoader(image)))
         .then(afterImagesAreLoaded)
 }
 
@@ -176,14 +172,7 @@ export const eventObervers = host => ({
 })
 
 export const itemEvents = (host, item) => {
-    if (item.element.eventSubscriptions) {
-        Object.keys(item.element.eventSubscriptions)
-            .forEach(key => {
-                if (typeof item.element.eventSubscriptions[key] === `function`) {
-                    item.element.eventSubscriptions[key]()
-                }
-            })
-    }
+    unsubscribeEvents(item.element)
 
     item.element.eventSubscriptions = {
         click: ObserveEvent(item.element, `click`)
@@ -237,6 +226,7 @@ export const closeDrawerEvents = (el, host) => el.eventSubscriptions = {
                 host,
                 contentDrawerContainer(host),
                 contentDrawerItems(host),
+                true,
                 true
             )
         )

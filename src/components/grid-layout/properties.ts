@@ -6,6 +6,7 @@ import { IsElement } from '../../utils/convert/dom'
 import { IfInvalid } from '../../utils/convert/if'
 import { triggerContentDrawer, removeContentDrawerItems } from './events'
 import { ToNumber } from '../../utils/convert/number'
+import { ToBool } from '../../utils/convert/bool'
 
 const attributes = {
     class: wcClassObject,
@@ -29,6 +30,11 @@ const attributes = {
         format: val => pipe(ToNumber, IfInvalid(0))(val).value,
     },
 
+    fillrow: {
+        format: val => pipe(ToBool, IfInvalid(true))(val).value,
+        onChange: (_val, host) => host.refresh()
+    },
+
     filter: {
         format: val => typeof val === `string` ? val : ``,
         onChange: (_val, host) => {
@@ -36,6 +42,7 @@ const attributes = {
                 host,
                 contentDrawerContainer(host),
                 contentDrawerItems(host),
+                true,
                 true
             )
             host.refresh()

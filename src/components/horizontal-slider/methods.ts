@@ -1,7 +1,80 @@
 import { setActiveChicklet, setActiveItem } from './elements'
 
-export const setLoop = _host => {
+function whichTransitionEvent() {
+    var t;
+    var el = document.createElement('fakeelement');
+    var transitions = {
+        'transition': 'transitionend',
+        'OTransition': 'oTransitionEnd',
+        'MozTransition': 'transitionend',
+        'WebkitTransition': 'webkitTransitionEnd'
+    }
 
+    for (t in transitions) {
+        if (el.style[t] !== undefined) {
+            return transitions[t];
+        }
+    }
+}
+
+export const setLoop = host => {
+    const itemContainer = host.elements.itemContainer
+    const inner = host.elements.inner
+
+    if (!host.items || !itemContainer || !inner) { return }
+
+    const transitionEvent = whichTransitionEvent()
+
+    if (!transitionEvent) {
+        setTimeout(() => { finish() }, 300)
+    } else {
+        itemContainer.addEventListener(transitionEvent, function endHandler() {
+            finish()
+            window.removeEventListener(transitionEvent, endHandler, false)
+        }, false)
+    }
+
+    const items = host.items
+    const currentItem = items[host.currentindex]
+
+    const getLeft = () => (currentItem.offsetLeft + (currentItem.offsetWidth / 2)) - (inner.offsetWidth / 2)
+    itemContainer.style.transform = `translateZ(0) translateX(${-getLeft()}px)`
+
+    const finish = () => {
+        itemContainer.style.transition = `none`
+
+        const indexShift = Math.ceil(host.items.length / 2) - host.currentindex
+        let beforeCurrent = host.currentindex - 1
+        let afterCurrent = host.currentindex + 1
+
+        currentItem.style.order = Math.ceil(host.items.length / 2)
+
+        const getShift = index => {
+            if (index + indexShift > items.length) {
+                return -(items.length) + index + indexShift
+            }
+
+            if (index + indexShift < 1) {
+                return (index + indexShift) + (items.length)
+            }
+
+            return index + indexShift
+        }
+
+        while (items[beforeCurrent]) {
+            items[beforeCurrent].style.order = getShift(beforeCurrent)
+            itemContainer.style.transform = `translateZ(0) translateX(${-getLeft()}px)`
+            beforeCurrent = beforeCurrent - 1
+        }
+
+        while (items[afterCurrent]) {
+            items[afterCurrent].style.order = getShift(afterCurrent)
+            itemContainer.style.transform = `translateZ(0) translateX(${-getLeft()}px)`
+            afterCurrent = afterCurrent + 1
+        }
+
+        itemContainer.style.removeProperty(`transition`)
+    }
 }
 
 export const autoplay = host => {
@@ -38,6 +111,16 @@ export const scrollToIndex = host => index => {
 
     if (!host.items || !itemContainer) { return }
 
+    const finish = () => {
+        setActiveItem(host)
+        setActiveChicklet(host, index)
+    }
+
+    if (host.loop) {
+        setLoop(host)
+        return finish()
+    }
+
     const item = host.items[index]
     host.currentindex = index
 
@@ -46,8 +129,7 @@ export const scrollToIndex = host => index => {
     const left = -(item.offsetLeft - (host.center ? (host.elements.inner.offsetWidth / 2) - (item.offsetWidth / 2) : 0))
     itemContainer.style.transform = `translateZ(0) translateX(${left}px)`
 
-    setActiveItem(host)
-    setActiveChicklet(host, index)
+    finish()
 }
 
 export const goToNextPage = (host, currentIndex) => {

@@ -65,8 +65,8 @@ grid-layout {
         position: absolute;
         top: 0.5rem;
         right: 0.5rem;
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 2rem;
+        height: 2rem;
         color: #fff;
         border-radius: 50%;
         background-color: rgba(0, 0, 0, 0.25);
@@ -75,6 +75,12 @@ grid-layout {
         display: flex;
         align-items: center;
         justify-content: center;
+        opacity: 0.85;
+        transition: opacity 0.2s;
+
+        &:hover {
+            opacity: 1;
+        }
 
         svg {
             width: 100%;

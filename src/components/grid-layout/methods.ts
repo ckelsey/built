@@ -1,46 +1,6 @@
 import ID from '../../utils/id'
-import ObserveEvent from '../../utils/observeEvent'
 import { itemEvents, hardCloseContentDrawer } from './events'
 import { itemRowSelector, itemRowClass } from './elements'
-
-const loadItemImage = image => new Promise(resolve => {
-    if (!image || image.tagName !== `IMG`) { return resolve() }
-
-    const isLoaded = () => image.width > 0 && image.height > 0
-
-    const resolveIfLoaded = () => {
-        if (!isLoaded() && !image.error) { return false }
-
-        errorObserver()
-        loadObserver()
-
-        if (image.error) {
-            resolve()
-        } else {
-            resolve(image)
-        }
-
-        return true
-    }
-
-    const loadObserver = ObserveEvent(image, `load`).subscribe(() => {
-        requestAnimationFrame(() => {
-            if (resolveIfLoaded()) { return loadObserver() }
-        })
-    })
-
-    const errorObserver = ObserveEvent(image, `error`).subscribe(e => {
-        image.error = e
-        resolveIfLoaded()
-    })
-
-    resolveIfLoaded()
-})
-
-const loadItemImages = images => !images || !Array.isArray(images)
-    ? Promise.reject()
-    : Promise
-        .all(images.map(loadItemImage))
 
 const createSlot = (index, container) => {
     const slot = document.createElement(`slot`) as any
@@ -72,10 +32,17 @@ const setSlotElementsSize = (host, slot, containerWidth) => {
     const initialScale = containerWidth / slot.width
     const scale = initialScale > 1.38 ? 1 : initialScale
     const elements: any[] = Array.from(host.querySelectorAll(`[slot="${slot.getAttribute(`name`)}"]`))
+    const fill = host.fillrow
 
     elements.forEach(element => {
-        element.style.height = `calc(${height} * ${scale})`
-        element.style.width = `${((element.width / containerWidth) * 100) * scale}%`
+        if (!fill) {
+            element.style.height = height
+            element.style.removeProperty(`width`)
+        } else {
+            element.style.height = `calc(${height} * ${scale})`
+            element.style.width = `${((element.width / containerWidth) * 100) * scale}%`
+        }
+
         element.classList.add(`visible-grid-item`)
         setItemDefaultTransform(host, element)
     })
@@ -139,7 +106,7 @@ export const setItemDefaultTransform = (host, element) => setElementTransform(el
 
 export const setItemHoverTransform = (host, element) => setElementTransform(element, host.hoverspacing)
 
-export const refresh = host => () => new Promise((resolve) => {
+export const refresh = host => () => new Promise(resolve => {
     let maxTries = 5000
 
     const run = container => {
@@ -154,11 +121,10 @@ export const refresh = host => () => new Promise((resolve) => {
 
         const containerWidth = container.getBoundingClientRect().width
         const assignItem = AssignItem(container, containerWidth)
-
-        let assignedIndex = 0
-        let currentSlot = undefined
         const loaded = []
         const assigned = []
+        let assignedIndex = 0
+        let currentSlot = undefined
 
         const finishRender = () => {
             if (host.rendering !== renderID) { return resolve(`invalid render`) }
@@ -175,6 +141,7 @@ export const refresh = host => () => new Promise((resolve) => {
             requestAnimationFrame(() => {
                 host.rendering = undefined
                 host.dispatchEvent(new CustomEvent(`itemsrendered`, { detail: host }))
+                host.setAttribute(`ready`, `true`)
                 resolve()
             })
         }
@@ -197,17 +164,34 @@ export const refresh = host => () => new Promise((resolve) => {
             assignNext()
         }
 
-        items
-            .forEach(item => {
-                loadItemImages(item.images)
-                    .then(() => {
-                        if (host.rendering !== renderID) { return resolve(`invalid render`) }
+        items.forEach(item => {
+            const imagesDone = () => {
+                if (host.rendering !== renderID) { return }
+                loaded.push(item.index)
+                assignNext()
+            }
 
-                        loaded.push(item.index)
+            if (!Array.isArray(item.images)) { return imagesDone() }
 
-                        assignNext()
+            return Promise.all(item.images
+                .map(image => {
+                    if (!image || !image.src || (image.width && image.height)) { return Promise.resolve() }
+
+                    return new Promise(resolve => {
+                        image.addEventListener(`load`, function loaded() {
+                            image.removeEventListener(`load`, loaded, false)
+                            return resolve()
+                        }, false)
+
+                        image.addEventListener(`error`, function errored() {
+                            image.removeEventListener(`error`, errored, false)
+                            return resolve()
+                        }, false)
                     })
-            })
+                })
+            )
+                .then(imagesDone)
+        })
     }
 
     const tryRun = () => {
@@ -216,14 +200,6 @@ export const refresh = host => () => new Promise((resolve) => {
         const container = host.elements.itemsContainer
 
         if (!container) { return requestAnimationFrame(tryRun) }
-
-        // clearTimeout(host.refreshTimer)
-
-        // host.refreshTimer = setTimeout(() => {
-        //     requestAnimationFrame(() => {
-        //         run(container)
-        //     })
-        // }, 33)
 
         run(container)
     }

@@ -11,6 +11,7 @@ import EffectUnderline from './components/effect-underline'
 import GridLayout from './components/grid-layout'
 import HorizontalSlider from './components/horizontal-slider'
 import IconElement from './components/icon-element'
+import ImageLoader from './components/image-loader'
 import InputField from './components/input-field'
 import OverlayContent from './components/overlay-content'
 import DragDropService from './services/dragDrop'
@@ -44,6 +45,7 @@ export const Components = {
     GridLayout,
     HorizontalSlider,
     IconElement,
+    ImageLoader,
     InputField,
     OverlayContent
 }

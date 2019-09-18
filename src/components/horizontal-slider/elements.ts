@@ -2,19 +2,11 @@ import { setStyleRules } from '../../utils/html/markup'
 import ObserveEvent from '../../utils/observeEvent'
 import Get from '../../utils/get'
 import { goToNextPage, goToPreviousPage, autoplay } from './methods'
+import { unsubscribeEvents } from '../../utils/webcomponent/elements'
+import { imageLoader } from '../image-loader'
 
 const sliderItemSelectedClass = `active-horizontal-slider-item`
 const sliderItemClass = `horizontal-slider-item`
-
-const clearEvents = el => !el.eventSubscriptions
-    ? undefined
-    : Object
-        .keys(el.eventSubscriptions)
-        .forEach(
-            key => typeof el.eventSubscriptions[key] !== `function`
-                ? undefined
-                : el.eventSubscriptions[key]()
-        )
 
 const handleItemEnter = item => item.hovering = true
 const handleItemLeave = item => item.hovering = false
@@ -70,46 +62,14 @@ export const setSlot = (el, host) => {
                 .from(host.children)
                 .map((item: any, index) => {
                     item.itemIndex = index
+                    item.style.order = index + 1
                     images = images.concat(Array.from(item.querySelectorAll(`img`)))
                     return item
                 })
 
-            Promise.all(
-                images.map(image => new Promise(resolve => {
-                    const isLoaded = () => image.width > 0 && image.height > 0
-
-                    const resolveIfLoaded = () => {
-                        if (!isLoaded() && !image.error) { return false }
-
-                        errorObserver()
-                        loadObserver()
-
-                        if (image.error) {
-                            resolve()
-                        } else {
-                            resolve(image)
-                        }
-
-                        return true
-                    }
-
-                    const loadObserver = ObserveEvent(image, `load`).subscribe(() => {
-                        requestAnimationFrame(() => {
-                            if (resolveIfLoaded()) { return loadObserver() }
-                        })
-                    })
-
-                    const errorObserver = ObserveEvent(image, `error`).subscribe(e => {
-                        image.error = e
-                        resolveIfLoaded()
-                    })
-
-                    resolveIfLoaded()
-                }))
-            )
-                .then(() => {
-                    host.items = items
-                })
+            Promise
+                .all(images.map(image => imageLoader(image)))
+                .then(() => host.items = items)
         })
     }
 }
@@ -141,7 +101,7 @@ export const setChicklets = host => {
 
     if (!host.chicklets) {
         const currentChicklets: any[] = Array.from(chicklets.querySelectorAll(`.${chickletSelector}`))
-        currentChicklets.forEach(clearEvents)
+        currentChicklets.forEach(chicklet => unsubscribeEvents(chicklet))
         chicklets.innerHTML = ``
     }
 
@@ -169,7 +129,7 @@ export const setPrevious = (el, host) => {
 
     el.classList[host.arrows ? `add` : `remove`](arrowClass)
 
-    clearEvents(el)
+    unsubscribeEvents(el)
 
     el.eventSubscriptions = {
         click: ObserveEvent(el, `click`).subscribe(() => goToPreviousPage(host, host.currentindex))
@@ -181,7 +141,7 @@ export const setNext = (el, host) => {
 
     el.classList[host.arrows ? `add` : `remove`](arrowClass)
 
-    clearEvents(el)
+    unsubscribeEvents(el)
 
     el.eventSubscriptions = {
         click: ObserveEvent(el, `click`).subscribe(() => goToNextPage(host, host.currentindex))

@@ -1,7 +1,7 @@
 import { Constructor, Define } from '../../utils/webcomponent/constructor'
 import { observedAttributes, properties } from './properties'
 import { setEffects } from './methods-elements'
-import { processedValue, labelContainer, selected, optionElements, formattedValue } from './computed'
+import { processedValue, labelContainer, formattedValue } from './computed'
 import elements from './elements'
 import ID from '../../utils/id'
 import { INPUTFIELD } from './theme'
@@ -36,8 +36,8 @@ const InputField = Constructor({
         processedValue,
         formattedValue,
         labelContainer,
-        selected,
-        optionElements
+        // selected,
+        // optionElements
     },
     getters: {
         value: host => host.formattedValue,

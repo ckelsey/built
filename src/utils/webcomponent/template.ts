@@ -14,7 +14,7 @@ export const Template = (tagname, element, templateString, styleString, notWebCo
     const clone = document.importNode(Template.content, true)
     element.attachShadow({ mode: 'open' }).appendChild(clone)
 
-    if ((!('registerElement' in document) && !document.head.querySelector(`style[name="${tagname}"]`)) || appendStylesToHead) {
+    if ((!('registerElement' in document) || appendStylesToHead) && !document.head.querySelector(`style[name="${tagname}"]`)) {
         AppendStyle(styleString, document.head, tagname)
     }
 }

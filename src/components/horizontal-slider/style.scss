@@ -1,5 +1,5 @@
 :host {
-    display: block;
+    display: flex;
     width: 100%;
     height: 100%;
     pointer-events: none;
@@ -10,7 +10,7 @@
 }
 
 horizontal-slider {
-    display: block;
+    display: flex;
     width: 100%;
     height: 100%;
     pointer-events: none;
@@ -36,7 +36,7 @@ horizontal-slider {
         opacity: 1;
 
         .horizontal-slider-items {
-            transition: transform 0.3s;
+            transition: transform 0.4s;
         }
     }
 
@@ -53,7 +53,6 @@ horizontal-slider {
     flex-grow: 1;
     position: relative;
     overflow: visible;
-    transition: height 0.2s;
     background: rgba(0, 0, 0, 0.62);
 }
 
@@ -82,7 +81,7 @@ horizontal-slider {
     position: relative;
     z-index: 1;
     pointer-events: all;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
 
     &:before {
         content: "";
@@ -98,6 +97,8 @@ horizontal-slider {
 
     &:hover,
     &.active-horizontal-slider-item {
+        z-index: 2;
+
         &:before {
             opacity: 1;
             transition: opacity 0.5s;
@@ -138,6 +139,7 @@ horizontal-slider {
     cursor: pointer;
     color: inherit;
     opacity: 0.7;
+    user-select: none;
     transition: opacity 0.2s;
 
     &:hover {
@@ -174,6 +176,7 @@ horizontal-slider {
     justify-content: center;
     margin: 0 -0.25em;
     flex-wrap: nowrap;
+    user-select: none;
 
     .horizontal-slider-chicklet {
         width: 0.8em;
