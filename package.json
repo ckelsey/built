@@ -9,7 +9,9 @@
         "type-check": "tsc --noEmit",
         "build:types": "tsc --emitDeclarationOnly",
         "build:babel": "babel src --out-dir dust --extensions \".ts\" --source-maps inline",
-        "demo": "browser-sync start --serveStatic './' --port '5555' --https 'true'"
+        "demo": "browser-sync . --port '5555' --index ./demo.html",
+        "test": "npx codeceptjs run --steps",
+        "jest": "jest"
     },
     "files": [
         "dist",
@@ -44,6 +46,7 @@
         "html-loader": "^0.5.5",
         "html-minifier": "^4.0.0",
         "html-webpack-plugin": "^3.2.0",
+        "jest": "^24.9.0",
         "mini-css-extract-plugin": "^0.8.0",
         "node-sass": "^4.12.0",
         "postcss-loader": "^3.0.0",
