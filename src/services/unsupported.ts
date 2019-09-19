@@ -1,4 +1,4 @@
-const WCSupportClass = () => {
+const WCSupportClass = /*#__PURE__*/ () => {
     const setUnsupportedClass = () => document.body.className = 'wc-unsupported'
     const wc = (window as any).WebComponents
     const safariVersions = [`Version/9`, `Version/8`, `Version/7`]

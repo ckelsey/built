@@ -1,4 +1,4 @@
-const ValidateYear = val => {
+const ValidateYear = /*#__PURE__*/ val => {
     const original = val
     const reasons: string[] = []
     const parsedVal = new Date(val).getUTCFullYear()

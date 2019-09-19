@@ -58,7 +58,7 @@ const setStateProperty = (host, key, formatter, onChange, getter, setter) => {
     host.state[key].subscribe(val => onChange(val, host))
 }
 
-const Constructor = options => {
+const Constructor = /*#__PURE__*/ options => {
     const componentName = options.componentName
     const observedAttributes = options.observedAttributes || []
     const template = options.template || `<slot></slot>`

@@ -4,7 +4,7 @@ import { ToString, Split } from '../convert/string'
 import { Map, Filter } from '../convert/array'
 import { CommasToArray } from '../convert/commas-to-array'
 
-export const setAttribute = (element, name, value, asProperty = false) => {
+export const setAttribute = /*#__PURE__*/ (element, name, value, asProperty = false) => {
     if (!element || !name) { return element }
 
     const set = (n, v) => {
@@ -24,7 +24,7 @@ export const setAttribute = (element, name, value, asProperty = false) => {
     return element
 }
 
-export const addRemoveAttr = (el, attr, value) => {
+export const addRemoveAttr = /*#__PURE__*/ (el, attr, value) => {
     if (!el) { return }
 
     if (attr === `accept`) {
@@ -58,7 +58,7 @@ const addRemoveClassOld = (el, classArr, remove = false) => {
     el.className = newClasses.join(` `)
 }
 
-export const wcClass = (el, newClasses, previousClasses) => {
+export const wcClass = /*#__PURE__*/ (el, newClasses, previousClasses) => {
     if (!el) { return }
 
     let oldClassList = false
@@ -87,7 +87,7 @@ export const wcClass = (el, newClasses, previousClasses) => {
     }
 }
 
-export const wcClassObject = {
+export const wcClassObject = /*#__PURE__*/ {
     format: val => pipe(ToString, IfInvalid(``), Split(` `), Map(v => v.trim()), Filter(v => !!v))(val).value,
     onChange: (val, host) => wcClass(host.elements.root, val, host.state.class.previous)
 }

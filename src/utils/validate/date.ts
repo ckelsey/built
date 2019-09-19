@@ -1,4 +1,4 @@
-const ValidateDate = val => {
+const ValidateDate = /*#__PURE__*/ val => {
     const original = val
     const reasons: string[] = []
     let result = val

@@ -102,7 +102,7 @@ const setBounce = host => {
 const template = require('./index.html')
 const componentName = `button-element`
 const componentRoot = `.button-element`
-const ButtonElement = Constructor({
+const ButtonElement = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

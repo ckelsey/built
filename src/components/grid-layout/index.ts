@@ -18,7 +18,7 @@ const template = require('./index.html')
 const componentName = `grid-layout`
 const componentRoot = `.${componentName}-container`
 
-const GridLayout = Constructor({
+const GridLayout = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

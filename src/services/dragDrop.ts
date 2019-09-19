@@ -1,4 +1,4 @@
-const DragDropService = element => {
+const DragDropService = /*#__PURE__*/ element => {
     let draggables = []
     const htmlElement = document.firstElementChild as any
     const filterElements = elements => elements.filter(el => el.parentNode)

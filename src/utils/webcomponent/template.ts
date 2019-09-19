@@ -1,6 +1,6 @@
 import AppendStyle from './append-style'
 
-const Template = (tagname, element, templateString, styleString, notWebComponent = false, appendStylesToHead = false) => {
+const Template = /*#__PURE__*/ (tagname, element, templateString, styleString, notWebComponent = false, appendStylesToHead = false) => {
 
     if (notWebComponent) {
         element.shadowRoot = element

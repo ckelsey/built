@@ -1,4 +1,4 @@
-const ValidateDateBefore = (before: Date, val: Date) => {
+const ValidateDateBefore = /*#__PURE__*/ (before: Date, val: Date) => {
     const original = val
     const reasons: string[] = []
     const parsedBefore = Date.parse(!!before ? before.toString() : ``)

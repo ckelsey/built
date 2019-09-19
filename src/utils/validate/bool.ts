@@ -1,4 +1,4 @@
-const ValidateBool = val => {
+const ValidateBool = /*#__PURE__*/ val => {
     const original = val
     const reasons: string[] = []
     let result

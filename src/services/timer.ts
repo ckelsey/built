@@ -26,7 +26,7 @@ const loop = () => {
     requestAnimationFrame(loop)
 }
 
-const Timer = (duration, stepFn, frameValues = undefined, completeFn = () => { }) => {
+const Timer = /*#__PURE__*/ (duration, stepFn, frameValues = undefined, completeFn = () => { }) => {
     if (!duration && duration !== 0) { return }
 
     const id = ID(`timer`)

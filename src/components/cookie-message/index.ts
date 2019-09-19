@@ -119,7 +119,7 @@ const elements = {
     }
 }
 
-const CookieMessage = Constructor({
+const CookieMessage = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

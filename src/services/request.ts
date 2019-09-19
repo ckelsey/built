@@ -1,6 +1,6 @@
 import ObserveWorker from '../utils/observeWorker'
 
-const Request = apiBase => reqData => {
+const Request = /*#__PURE__*/ apiBase => reqData => {
     const base = apiBase
     const path = `${base}/${reqData.path || ''}`
     const REQ = Object.assign({}, {

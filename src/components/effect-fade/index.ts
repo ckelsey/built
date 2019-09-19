@@ -10,7 +10,7 @@ const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = `effect-fade`
 const componentRoot = `.effect-fade-container`
-const EffectFade = Constructor({
+const EffectFade = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

@@ -1,6 +1,6 @@
 import { setStyleRules } from '../html/markup'
 
-const AppendStyle = (rulesString, parent, name = ``) => {
+const AppendStyle = /*#__PURE__*/ (rulesString, parent, name = ``) => {
     var style = document.createElement(`style`) as any
     style.setAttribute(`type`, `text/css`)
     style.setAttribute(`name`, name)

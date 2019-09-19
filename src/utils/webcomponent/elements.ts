@@ -6,7 +6,7 @@ const removeOld = el => {
     el.parentNode.removeChild(el)
 }
 
-const Elements = (host, elements) => {
+const Elements = /*#__PURE__*/ (host, elements) => {
     const elStates = {}
     const state = {}
 

@@ -1,6 +1,6 @@
 import { ObjectAssignPolyfill, MutationObserverPolyfill, WebComponentPolyFill } from '../polyfills'
 
-const Define = (componentName, componentClass) => {
+const Define = /*#__PURE__*/ (componentName, componentClass) => {
     const wc = (window as any).WebComponents
     const ce = (window as any).customElements
 

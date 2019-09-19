@@ -1,6 +1,6 @@
 import Observe from '../utils/observe'
 
-const Router = (routes, storeLocally = false) => {
+const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
     let current
     const _routes = Object.assign({}, routes)
     const navigated = () => {

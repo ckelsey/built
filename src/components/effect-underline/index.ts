@@ -22,7 +22,7 @@ const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = `effect-underline`
 const componentRoot = `.effect-underline-container`
-const EffectUnderline = Constructor({
+const EffectUnderline = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

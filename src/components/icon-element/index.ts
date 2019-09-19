@@ -155,7 +155,7 @@ const properties = Object.assign({
 const template = require('./index.html')
 const componentName = `icon-element`
 const componentRoot = `.icon-element-container`
-const IconElement = Constructor({
+const IconElement = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

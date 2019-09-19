@@ -1,6 +1,6 @@
 import { ToNumber } from '../convert/number'
 
-const ValidateNumber = num => {
+const ValidateNumber = /*#__PURE__*/ num => {
     const original = num
     const reasons = []
     const formatted = ToNumber(num)

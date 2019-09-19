@@ -10,7 +10,7 @@ const template = require('./index.html')
 const componentName = `content-transition`
 const componentRoot = `.content-transition-container`
 
-const ContentTransition = Constructor({
+const ContentTransition = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

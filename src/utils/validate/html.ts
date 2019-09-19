@@ -3,7 +3,7 @@ import { ToString } from '../convert/string'
 import pipe from '../pipe'
 import { svgTags, htmlTags } from '../html'
 
-const ValidateHtml = (str: any, allowedHtmlTags?: string[], disallowedHtmlTags?: string[]) => {
+const ValidateHtml = /*#__PURE__*/ (str: any, allowedHtmlTags?: string[], disallowedHtmlTags?: string[]) => {
     const original = str
     const converted = pipe(ToString, FromEntities)(str)
     let val = converted.value

@@ -1,4 +1,4 @@
-const CSSRulesFromSelector = selector => {
+const CSSRulesFromSelector = /*#__PURE__*/ selector => {
     const sheets = Array.from(document.body.ownerDocument.styleSheets) as CSSStyleSheet[]
     const rules = []
 

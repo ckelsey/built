@@ -17,7 +17,7 @@ const formatter = (host, value, key) => {
 const template = require('./index.html')
 const componentName = `dropdown-select`
 const componentRoot = `.${componentName}-container`
-const DropdownSelect = Constructor({
+const DropdownSelect = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

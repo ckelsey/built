@@ -3,7 +3,7 @@ import { FromEntities } from '../convert/entities'
 import { ToString } from '../convert/string'
 import pipe from '../pipe'
 
-const ValidateUsPhone = val => {
+const ValidateUsPhone = /*#__PURE__*/ val => {
     const original = val
     const reason = []
     const converted = pipe(ToString, FromEntities, IfInvalid(``))(val)

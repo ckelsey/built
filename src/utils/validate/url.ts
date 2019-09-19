@@ -2,7 +2,7 @@ import pipe from '../pipe'
 import { ToString } from '../convert/string'
 import { FromEntities } from '../convert/entities'
 
-const ValidateUrl = str => {
+const ValidateUrl = /*#__PURE__*/ str => {
     const original = str
     const converted = pipe(ToString, FromEntities)(str)
     const val = converted.value

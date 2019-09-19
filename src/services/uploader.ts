@@ -19,7 +19,7 @@ import { UseIf } from '../utils/convert/if'
 // TODO pre upload chunk function?
 // TODO pre upload function?
 
-const UploadService = (options, file) => {
+const UploadService = /*#__PURE__*/ (options, file) => {
 
     if (!file) { return { upload() { }, cancel() { } } }
 

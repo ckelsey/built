@@ -1,4 +1,4 @@
-const ValidateOneOf = (options, val) => {
+const ValidateOneOf = /*#__PURE__*/ (options, val) => {
     const original = val
     const reasons: string[] = []
     let result = val

@@ -1,4 +1,4 @@
-const ValidateDateAfter = (after: Date, val: Date) => {
+const ValidateDateAfter = /*#__PURE__*/ (after: Date, val: Date) => {
     const original = val
     const reasons: string[] = []
     const parsedAfter = Date.parse(!!after ? after.toString() : ``)

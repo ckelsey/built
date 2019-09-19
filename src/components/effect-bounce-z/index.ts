@@ -6,7 +6,7 @@ import { trigger, unloadTargets } from './methods'
 const template = require('./index.html')
 const componentName = `effect-bounce-z`
 const componentRoot = `.effect-push-container`
-const EffectBounceZ = Constructor({
+const EffectBounceZ = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

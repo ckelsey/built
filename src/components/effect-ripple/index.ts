@@ -19,7 +19,7 @@ const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = `effect-ripple`
 const componentRoot = `.effect-ripple-container`
-const EffectRipple = Constructor({
+const EffectRipple = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

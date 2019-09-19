@@ -19,7 +19,7 @@ const template = require('./index.html')
 const componentName = `input-field`
 const componentRoot = `.input-field-container`
 
-const InputField = Constructor({
+const InputField = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

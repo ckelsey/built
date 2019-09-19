@@ -3,7 +3,7 @@ import { ToString } from '../convert/string'
 import pipe from '../pipe'
 import ValidateHtml from './html'
 
-const ValidateText = str => {
+const ValidateText = /*#__PURE__*/ str => {
     const original = str
     const reasons = []
     const converted = pipe(ToString, FromEntities)(str)

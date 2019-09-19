@@ -1,5 +1,5 @@
 import { ToUsZip } from '../convert/postal'
-const ValidateUsZip = val => {
+const ValidateUsZip = /*#__PURE__*/ val => {
     const original = val
     const reason: string[] = []
 

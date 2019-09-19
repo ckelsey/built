@@ -15,7 +15,7 @@ const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = `content-drawer`
 const componentRoot = `.content-drawer-container`
-const ContentDrawer = Constructor({
+const ContentDrawer = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

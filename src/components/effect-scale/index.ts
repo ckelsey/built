@@ -10,7 +10,7 @@ const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = `effect-scale`
 const componentRoot = `.effect-scale-container`
-const EffectScale = Constructor({
+const EffectScale = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

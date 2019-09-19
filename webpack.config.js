@@ -22,63 +22,57 @@ try {
     })
 } catch (error) { }
 
-// const getFiles = source => {
-//     const result = {}
+const getFiles = source => {
+    const result = {}
 
-//     const getsEM = (current, prefixes) => {
-//         const items = fs.readdirSync(current)
+    const getsEM = (current, prefixes) => {
+        const items = fs.readdirSync(current)
 
-//         items.forEach(p => {
-//             const pre = prefixes.slice()
-//             const itemPath = path.join(current, p)
-//             const stat = fs.statSync(itemPath)
-//             const ext = path.extname(itemPath)
-//             const dir = path.basename(itemPath, ext)
-//             const componentIndex = itemPath.indexOf(path.join(__dirname, `src/components`)) === 0 && dir === `index`
-//             const nonComponent = itemPath.indexOf(`src/components`) === -1
-//             const isIndex = dir === `index`
-//             const isMain = isIndex && itemPath === path.join(__dirname, `src/index.ts`)
+        items.forEach(p => {
+            const pre = prefixes.slice()
+            const itemPath = path.join(current, p)
+            const stat = fs.statSync(itemPath)
+            const ext = path.extname(itemPath)
+            const dir = path.basename(itemPath, ext)
+            const componentIndex = itemPath.indexOf(path.join(__dirname, `src/components`)) === 0 && dir === `index`
+            const nonComponent = itemPath.indexOf(`src/components`) === -1
+            const isIndex = dir === `index`
+            const isMain = isIndex && itemPath === path.join(__dirname, `src/index.ts`)
 
-//             if (!stat.isDirectory())
-//             {
-//                 if (ext === `.ts`)
-//                 {
-//                     if (nonComponent || componentIndex)
-//                     {
-//                         if (isMain)
-//                         {
-//                             pre.push(`builtjs`)
-//                         } else if (!isIndex)
-//                         {
-//                             pre.push(dir)
-//                         }
-//                         result[`${pre.join(`_`)}`] = itemPath
-//                     }
-//                 }
-//             } else
-//             {
-//                 pre.push(dir)
-//                 getsEM(itemPath, pre)
-//             }
-//         })
-//     }
+            if (!stat.isDirectory()) {
+                if (ext === `.ts`) {
+                    if (nonComponent || componentIndex) {
+                        if (isMain) {
+                            pre.push(`builtjs`)
+                        } else if (!isIndex) {
+                            pre.push(dir)
+                        }
+                        result[`${pre.join(`_`)}`] = itemPath
+                    }
+                }
+            } else {
+                pre.push(dir)
+                getsEM(itemPath, pre)
+            }
+        })
+    }
 
-//     getsEM(source, [])
-//     return result
-// }
-
-// let entries = env === `production`
-//     ? getFiles(path.resolve(`${__dirname}/src/`))
-//     : {
-//         'builtjs': path.join(__dirname, 'src')
-//     }
-
-let entries = {
-    'builtjs': path.join(__dirname, 'src'),
-    'utilities': path.join(__dirname, 'src/utils'),
-    'components': path.join(__dirname, 'src/components'),
-    'services': path.join(__dirname, 'src/services'),
+    getsEM(source, [])
+    return result
 }
+
+let entries = env === `production`
+    ? getFiles(path.resolve(`${__dirname}/src/`))
+    : {
+        'builtjs': path.join(__dirname, 'src')
+    }
+
+// let entries = {
+//     'builtjs': path.join(__dirname, 'src'),
+//     'utilities': path.join(__dirname, 'src/utils'),
+//     'components': path.join(__dirname, 'src/components'),
+//     'services': path.join(__dirname, 'src/services'),
+// }
 
 const objectToString = obj => {
     const isArray = Array.isArray(obj)
@@ -147,7 +141,14 @@ let plugins = []
 let postPluginHasRan = false
 
 const optimization = {
-    minimize: false
+    minimize: false,
+    splitChunks: {
+        name: true,
+        chunks: 'async',
+    },
+    sideEffects: false,
+    usedExports: true,
+    providedExports: true,
 }
 
 const postPlugin = {
@@ -238,11 +239,25 @@ const exported = {
             {
                 test: /\.ts$/,
                 exclude: /node_modules/,
-                use: ['babel-loader', 'ts-loader']
+                use: [{
+                    loader: "babel-loader",
+                    options: {
+                        presets: [
+                            ["@babel/env", { modules: false }],
+                        ]
+                    }
+                }, 'ts-loader']
             }, {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                use: ['babel-loader']
+                use: [{
+                    loader: "babel-loader",
+                    options: {
+                        presets: [
+                            ["@babel/env", { modules: false }],
+                        ]
+                    }
+                }]
             }, {
                 test: /\.html$/,
                 exclude: /node_modules/,

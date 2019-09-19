@@ -20,7 +20,7 @@ const template = require('./index.html')
 const componentName = `horizontal-slider`
 const componentRoot = `.horizontal-slider-container`
 
-const HorizontalSlider = Constructor({
+const HorizontalSlider = /*#__PURE__*/ Constructor({
     componentName,
     componentRoot,
     template,

@@ -1,4 +1,4 @@
-const ValidatePhone = val => {
+const ValidatePhone = /*#__PURE__*/ val => {
     const original = val
     const reasons: string[] = []
     let result = null
