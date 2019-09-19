@@ -1,8 +1,7 @@
 /**
- * hide before ready(refresh a bunch of times) - opacity doesn't seem to work?
- * box-shadow
+ * dropdown-select doesn't work on mobile
+ * box-shadow property
  * mutation observer for elements
- * when adding items synchronously, shouldn't need to explicitly call refresh()
  */
 
 import { Define, Constructor } from '../../utils/webcomponent/constructor'

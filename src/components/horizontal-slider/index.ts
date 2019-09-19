@@ -1,9 +1,11 @@
 /**
- * prevent initial trnsform in
+ * on load, images seem stretched then go to normal
  * cover flow
  * single item
  * onslidestart
  * onslideend
+ * odd flicker when scrolling back
+ * page scroll when center is messed up
  */
 import { Define, Constructor } from '../../utils/webcomponent/constructor'
 import './style.scss'

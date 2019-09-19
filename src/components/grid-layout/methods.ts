@@ -54,7 +54,7 @@ const removeSlots = host => {
         .forEach((slot: HTMLSlotElement) => !slot.parentElement ? undefined : slot.parentElement.removeChild(slot))
 }
 
-const AssignItem = (container, containerWidth) => (item, lastSlot) => {
+const AssignItem = (container, containerWidth, fillrow) => (item, lastSlot) => {
     let slot = lastSlot
 
     if (slot === undefined) {
@@ -69,11 +69,15 @@ const AssignItem = (container, containerWidth) => (item, lastSlot) => {
 
     let slotName = slot.getAttribute(`name`)
     const possibleSlotWidth = slot.width + item.element.width
-    const canBeAssignedToSlot =
-        possibleSlotWidth <= containerWidth ||
-        (containerWidth - slot.width) / item.element.width > 0.38
+    const tooWide = possibleSlotWidth >= containerWidth
+    const butTolerable = (containerWidth - slot.width) / item.element.width > 0.38
+    const isTolerable = !tooWide
+        ? true
+        : !fillrow
+            ? false
+            : butTolerable
 
-    if (canBeAssignedToSlot) {
+    if (isTolerable) {
         slot.width = possibleSlotWidth
         item.element.setAttribute(`slot`, slotName)
     } else {
@@ -90,9 +94,7 @@ const initializeItem = (host, item) => {
     item.element.removeAttribute(`slot`)
     item.element.style.height = !!host.targetheight ? /^\d+$/.test(host.targetheight) ? `${host.targetheight}px` : host.targetheight : ``
     item.element.style.removeProperty(`width`)
-
     itemEvents(host, item)
-
     return item
 }
 
@@ -120,7 +122,7 @@ export const refresh = host => () => new Promise(resolve => {
         hardCloseContentDrawer(host)
 
         const containerWidth = container.getBoundingClientRect().width
-        const assignItem = AssignItem(container, containerWidth)
+        const assignItem = AssignItem(container, containerWidth, host.fillrow)
         const loaded = []
         const assigned = []
         let assignedIndex = 0
@@ -140,8 +142,8 @@ export const refresh = host => () => new Promise(resolve => {
 
             requestAnimationFrame(() => {
                 host.rendering = undefined
-                host.dispatchEvent(new CustomEvent(`itemsrendered`, { detail: host }))
                 host.setAttribute(`ready`, `true`)
+                host.dispatchEvent(new CustomEvent(`itemsrendered`, { detail: host }))
                 resolve()
             })
         }

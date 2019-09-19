@@ -1,33 +1,3 @@
-// const getAssignedElements = slot => {
-
-//     if (!slot) { return [] }
-
-//     if (typeof slot.assignedElements === `function`) {
-//         return Array.from(slot.assignedElements())
-//     }
-
-//     // let nodes = [...(slot.childNodes.length ? slot.childNodes : [])]
-
-//     // nodes = nodes.filter(
-//     //     node => node.slot === '' || node.slot === null
-//     // )
-
-//     // return nodes
-
-//     return []
-// }
-
-// export const slotItemElements = host => ({
-//     get() {
-//         return Array
-//             .from(host.shadowRoot.querySelectorAll(`slot:not([name="content-drawer"])`))
-//             .reduce(
-//                 (target: [], current: any) => target.concat(getAssignedElements(current) as any),
-//                 []
-//             )
-//     }
-// })
-
 const getFilteredKeywords = (element, filter) => {
     if (!element) { return [] }
     const keywordAttr = element.getAttribute(`keywords`)
