@@ -9,8 +9,6 @@ import ObserveEvent from '../../utils/observeEvent'
 const tagType = type =>
     type === `textarea`
         ? `textarea`
-        // : type === `select`
-        //     ? `dropdown-select`
         : `input`
 
 const getInputType = (tag, type) => {
@@ -58,19 +56,6 @@ export const setInput = host => {
         container.inputElements = []
         container.focusedElement = null
         container.tabIndex = -1
-
-        /**
-         type: {
-            type: string,
-            options: any,
-            emptyoption: any,
-            formatlabel: function,
-            formatvalue: function,
-            formatvaluelabel: function,
-            pattern: string,
-            styles: string
-         }
-         */
 
         host.type.forEach(type => {
             const input = (type.type === `span` ? document.createElement(`span`) : createInput(type.type)) as any

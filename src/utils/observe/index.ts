@@ -1,6 +1,6 @@
 import ID from "../id"
 
-export const Observe = (initialValue, noInit = false) => {
+const Observe = (initialValue, noInit = false) => {
 
     let values = Object.assign({}, {
         value: initialValue,

@@ -3,7 +3,7 @@ import pipe from '../pipe'
 import { FromJSON } from './json'
 import { ToPlainText } from './string'
 import { StopIfInvalid, UseIf } from './if'
-import { getType } from '../type'
+import { Type } from '../type'
 import { JoinMeta } from './meta'
 
 export const ToArray = value => {
@@ -18,7 +18,7 @@ export const ToArray = value => {
             pipe(ToPlainText, FromJSON)(value)
         )
 
-    result.type = getType(result.value)
+    result.type = Type(result.value)
     result.valid = result.type === `array`
     result.instanceof.push(`ToArray`)
     return result
@@ -55,7 +55,7 @@ export const Map = fn => value => {
     if (result.stop) { return result }
 
     const map = v => {
-        if (getType(v.value) !== `array`) {
+        if (Type(v.value) !== `array`) {
             v.valid = false
             return v
         }

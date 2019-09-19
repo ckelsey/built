@@ -1,4 +1,5 @@
-import { Constructor, Define } from '../../utils/webcomponent/constructor'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
 import { observedAttributes, properties, hasTargets, hasTriggers$, hasTriggers, hasStart, canLoadTriggers, canStart, canEnd, canRunStart, canRunEnd } from './properties'
 import { toggle, open, close, unloadTriggers, loadTriggers } from './methods'
 import elements from './elements'

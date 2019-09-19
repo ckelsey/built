@@ -1,5 +1,5 @@
 import { Tmonad } from './t-monad'
-import { empty } from '../type'
+import { isEmpty } from '../type'
 
 export const IfInvalid = newValue => value => {
     const result = Tmonad(value)
@@ -34,7 +34,7 @@ export const IfEmpty = newValue => value => {
 
     result.instanceof.push(`IfEmpty`)
 
-    if (result.stop || empty(result.value)) { return result }
+    if (result.stop || isEmpty(result.value)) { return result }
 
     return Object.assign(
         {},
@@ -48,7 +48,7 @@ export const IfNotEmpty = newValue => value => {
 
     result.instanceof.push(`IfNotEmpty`)
 
-    if (result.stop || !empty(result.value)) { return result }
+    if (result.stop || !isEmpty(result.value)) { return result }
 
     return Object.assign(
         {},
@@ -84,7 +84,7 @@ export const StopIfValid = value => {
 export const StopIfEmpty = value => {
     const result = Tmonad(value)
 
-    if (empty(result.value)) {
+    if (isEmpty(result.value)) {
         result.stop = true
     }
 

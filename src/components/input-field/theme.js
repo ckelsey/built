@@ -13,7 +13,6 @@ module.exports = {
     errortext: process.env.INPUTFIELD_ERRORTEXT || ``,
     format: process.env.INPUTFIELD_FORMAT || null,
     helptext: process.env.INPUTFIELD_HELPTEXT || ``,
-    hidefilteredout: process.env.INPUTFIELD_EMPTYSELECT !== undefined ? process.env.INPUTFIELD_EMPTYSELECT : false,
     icon: process.env.INPUTFIELD_ICON || null,
     label: process.env.INPUTFIELD_LABEL || ``,
     max: process.env.INPUTFIELD_MAX || null,

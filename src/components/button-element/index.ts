@@ -1,4 +1,5 @@
-import { Define, Constructor } from '../../utils/webcomponent/constructor'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
 import pipe from '../../utils/pipe'
 import { IfInvalid } from '../../utils/convert/if'
 import { ToBool } from '../../utils/convert/bool'

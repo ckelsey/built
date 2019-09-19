@@ -27,9 +27,7 @@ export const elementSelectors = Object.freeze({
     max: `.input-field-character-count-max`,
     ripple: `.input-field-input-container effect-ripple`,
     root: `.input-field-container`,
-    rotary: `rotary-list`,
     underline: `.input-field-input-container effect-underline`,
-    valueInput: `.input-field-value-input`,
     injectedStyles: `style.injectedStyles`
 })
 
@@ -77,22 +75,6 @@ export const setColors = host => {
     }
 }
 
-export const setOptions = (input, options) => {
-    if (!input) { return }
-
-    input.options = options
-}
-
-// export const setSelectProperties = host => {
-//     const input = host.elements.input
-
-//     if (!input) { return }
-
-//     input.styles = host.styles
-//     input.emptyoption = host.emptyoption
-//     input.class = host.class
-// }
-
 const elementMethods = {
     input: (input, host) => {
         inputAttributeList(host)
@@ -101,8 +83,6 @@ const elementMethods = {
         setInputID(host, host.inputID)
         setEffects(host)
         setDroppable(host)
-        setOptions(input, host.options)
-        // setSelectProperties(host)
     },
 
     clearButton: (el, host) => {

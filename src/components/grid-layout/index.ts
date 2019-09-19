@@ -4,7 +4,8 @@
  * mutation observer for elements
  */
 
-import { Define, Constructor } from '../../utils/webcomponent/constructor'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
 import './style.scss'
 import elements from './elements'
 import { observedAttributes, properties } from './properties'

@@ -1,5 +1,5 @@
 import { Tmonad } from './t-monad'
-import { getType } from '../type'
+import { Type } from '../type'
 
 export const ToDate = value => {
     let result = Tmonad(value)
@@ -20,7 +20,7 @@ export const ToDate = value => {
         && result.value instanceof Date
     )
 
-    result.type = isDate ? `date` : getType(result.value)
+    result.type = isDate ? `date` : Type(result.value)
     result.valid = result.type === `date`
     result.instanceof.push(`ToDate`)
 

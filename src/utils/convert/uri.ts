@@ -1,5 +1,5 @@
 import { Tmonad } from './t-monad'
-import { getType } from '../type'
+import { Type } from '../type'
 
 export const doURI = (value, encode = false, component = false) => {
     const result = Tmonad(value)
@@ -24,7 +24,7 @@ export const doURI = (value, encode = false, component = false) => {
         result.valid = false
     }
 
-    result.type = getType(result.value)
+    result.type = Type(result.value)
     result.instanceof.push(encode ? `encodeUri` : `decodeUri`)
 
     return result

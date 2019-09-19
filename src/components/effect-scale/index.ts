@@ -1,4 +1,5 @@
-import { Constructor, Define } from '../../utils/webcomponent/constructor'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
 import { observedAttributes, properties } from './properties'
 import { dispose, run } from './methods'
 import elements from './elements'

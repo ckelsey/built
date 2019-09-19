@@ -1,4 +1,5 @@
-import { Constructor, Define } from '../../utils/webcomponent/constructor'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
 import { observedAttributes, properties } from './properties'
 import { setEffects } from './methods-elements'
 import { processedValue, labelContainer, formattedValue } from './computed'
@@ -10,9 +11,6 @@ import '../effect-bounce-z'
 import '../effect-ripple'
 import '../effect-underline'
 import '../icon-element'
-import '../overlay-content'
-import '../country-dropdown'
-import '../dropdown-select'
 import './style.scss'
 import { setError } from './methods-value'
 
@@ -35,9 +33,7 @@ const InputField = Constructor({
     computed: {
         processedValue,
         formattedValue,
-        labelContainer,
-        // selected,
-        // optionElements
+        labelContainer
     },
     getters: {
         value: host => host.formattedValue,

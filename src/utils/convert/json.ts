@@ -1,5 +1,5 @@
 import { Tmonad } from './t-monad'
-import { getType } from '../type'
+import { Type } from '../type'
 import { DecodeUriComponent } from './uri'
 
 export const FromJSON = value => {
@@ -14,7 +14,7 @@ export const FromJSON = value => {
         result.valid = false
     }
 
-    result.type = getType(result.value)
+    result.type = Type(result.value)
     result.instanceof.push(`FromJSON`)
 
     if ([`object`, `array`].indexOf(result.type) > -1) {
@@ -36,7 +36,7 @@ export const ToJSON = value => {
         result.valid = false
     }
 
-    result.type = getType(result.value)
+    result.type = Type(result.value)
     result.instanceof.push(`ToJSON`)
     return result
 }

@@ -1,5 +1,6 @@
-import { Constructor, Define } from '../../utils/webcomponent/constructor'
-import { Observe } from '../../utils/observe'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
+import Observe from '../../utils/observe'
 import { wcClassObject } from '../../utils/html/attr'
 import { setStyleRules } from '../../utils/html/markup'
 import { ICONELEMENT } from './theme'

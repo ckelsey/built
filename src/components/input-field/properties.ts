@@ -1,4 +1,3 @@
-import { Options } from '../../utils/convert/options'
 import pipe from '../../utils/pipe'
 import { IfInvalid, IfNot } from '../../utils/convert/if'
 import { CommasToArray } from '../../utils/convert/commas-to-array'
@@ -9,7 +8,7 @@ import { IndexOf, ToArray } from '../../utils/convert/array'
 import { ToString } from '../../utils/convert/string'
 import { setInput, setInputID, setInputAttribute, setLabel } from './methods-elements'
 import { ValidateHtml } from '../../utils/validate'
-import { setColors, setOptions, setStyles } from './elements'
+import { setColors, setStyles } from './elements'
 import { processValue } from './methods-value'
 import { setDroppable } from './methods-events'
 import { setAttribute, wcClassObject } from '../../utils/html/attr'
@@ -68,12 +67,6 @@ const inputAttributes = {
             addRemoveContainerClass(val, host, `disabled`)
         }
     },
-    // emptyoption: {
-    //     format: val => val !== undefined ? val : INPUTFIELD.emptyoption,
-    //     onChange: (_val, host) => {
-    //         setSelectProperties(host)
-    //     }
-    // },
     maxlength: {
         format: val => pipe(ToNumber, IfInvalid(INPUTFIELD.maxlength))(val).value,
         onChange: (val, host) => {
@@ -96,10 +89,6 @@ const inputAttributes = {
             addRemoveContainerClass(val, host, `min`)
             processValue(host)
         },
-    },
-    multiple: {
-        format: val => ToBool(val).value,
-        onChange: (val, host) => setInputAttribute(host, `multiple`, val),
     },
     name: {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.name))(val).value,
@@ -135,14 +124,7 @@ const inputAttributes = {
     },
     value: {
         format: val => val,
-        onChange: (_val, host) => {
-
-            // if (host.type === `select`) {
-            //     host.elements.input.value = val
-            // }
-
-            processValue(host)
-        },
+        onChange: (_val, host) => processValue(host),
     },
 }
 
@@ -187,10 +169,6 @@ const inputFieldProperties = {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.helptext))(val).value,
         onChange: (val, host) => replaceElementContents(host.elements.help, ValidateHtml(val, [], [`script`]).sanitized || ``),
     },
-    hideonfilter: {
-        format: val => ToBool(val).value,
-        onChange: (val, host) => addRemoveContainerClass(val, host, `hidefilteredout`),
-    },
     icon: {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.icon))(val).value,
         onChange: (val, host) => {
@@ -215,15 +193,12 @@ const inputFieldProperties = {
             setLabel(host.label, val, host)
         },
     },
+
     label: {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.label))(val).value,
         onChange: (val, host) => setLabel(val, host.labelposition, host),
     },
 
-    options: {
-        format: val => pipe(Options, IfInvalid([]))(val).value,
-        onChange: (val, host) => setOptions(host.elements.input, val),
-    },
     processedErrorText: {
         format: val => pipe(ToString, IfInvalid(``))(val).value,
         onChange: (val, host) => !!val ? replaceElementContents(host.elements.error, val) : undefined,
@@ -233,17 +208,17 @@ const inputFieldProperties = {
         format: val => pipe(IndexOf(resizeOptions), IfInvalid(INPUTFIELD.resize))(val).value,
         onChange: (val, host) => setAttribute(host.elements.container, `resize`, val),
     },
+
     showcount: {
         format: trueOrNull,
         onChange: (val, host) => addRemoveContainerClass(val, host, `showcount`),
     },
+
     styles: {
         format: val => typeof val === `string` ? val : INPUTFIELD.styles,
-        onChange: (val, host) => {
-            setStyles(host.elements.injectedStyles, val)
-            // setSelectProperties(host)
-        }
+        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
+
     warningcolor: {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.warningcolor))(val).value,
         onChange: (_val, host) => setColors(host),

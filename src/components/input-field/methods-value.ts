@@ -11,8 +11,6 @@ import { processedFileValue } from './definitions'
 import { setAttribute } from '../../utils/html/attr'
 import { RemoveMeta } from '../../utils/convert/meta'
 
-// const countries = require('../../data/country_codes.json')
-
 export const setMaskPositions = (input, positions) => {
     if (!input) { return }
 
@@ -80,7 +78,6 @@ export const valueToMask = (value, masks, positions) => {
 
     if (!mask) { return { value: ``, positions } }
 
-    // const valueParts = value.replace(/\D/g, ``).split(``)
     const valueParts = value.split(``)
     const newValue = mask
         .split(``)

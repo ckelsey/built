@@ -1,4 +1,4 @@
-import { getType } from '../type'
+import { Type } from '../type'
 
 export interface TMonad {
     value: any,
@@ -11,11 +11,11 @@ export interface TMonad {
 export const isTMonad: (v: any) => boolean = value =>
     !!value &&
     value.hasOwnProperty(`valid`) &&
-    getType(value.valid) === `boolean` &&
+    Type(value.valid) === `boolean` &&
     value.hasOwnProperty(`instanceof`) &&
-    getType(value.instanceof) === `array` &&
+    Type(value.instanceof) === `array` &&
     value.hasOwnProperty(`type`) &&
-    getType(value.type) === `string` &&
+    Type(value.type) === `string` &&
     value.hasOwnProperty(`value`)
 
 export const Tmonad = value => {
@@ -24,7 +24,7 @@ export const Tmonad = value => {
         return {
             valid: value.valid,
             value: value.value,
-            type: getType(value.value),
+            type: Type(value.value),
             stringChanges: value.stringChanges,
             instanceof: value.instanceof,
             stop: value.stop
@@ -33,39 +33,16 @@ export const Tmonad = value => {
         return {
             valid: true,
             value: value,
-            type: getType(value),
+            type: Type(value),
             stringChanges: [],
             instanceof: [],
             stop: false
         }
     }
-
-    // Object.assign(
-    //     {},
-    //     (isTMonad(value) ? value : {}),
-    //     (
-    //         isTMonad(value)
-    //             ? {
-    //                 valid: value.valid,
-    //                 value: value.value,
-    //                 type: getType(value.value),
-    //                 caretPosition: value.caretPosition,
-    //                 instanceof: value.instanceof
-    //             }
-    //             :
-    //             {
-    //                 valid: true,
-    //                 value: value,
-    //                 type: getType(value),
-    //                 caretPosition: 0,
-    //                 instanceof: []
-    //             }
-    //     )
-    // )
 }
 
 export const finishTMonad = (result, expectedType, instanceName) => {
-    result.type = getType(result.value)
+    result.type = Type(result.value)
     result.valid = expectedType === `?` ? true : result.type === expectedType
     result.instanceof.push(instanceName)
     return result

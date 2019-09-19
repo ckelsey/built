@@ -1,22 +1,4 @@
-import { Observe } from '../observe'
-import Get from '../get'
-import pipe from '../pipe'
-import { ToFunction } from '../convert/function'
-import { IfInvalid } from '../convert/if'
-
-const unsub = (el, elementProperty, eventKey) => pipe(ToFunction, IfInvalid(() => { }))(Get(el, `${elementProperty}.${eventKey}`)).value()
-
-export const unsubscribeEvents = (el, elementProperty = `eventSubscriptions`) => {
-    if (!el || !el[elementProperty]) { return }
-
-    Object.keys(el[elementProperty]).forEach(eventKey => unsub(el, elementProperty, eventKey))
-}
-
-export const unsubscribeEvent = (el, eventKey, elementProperty = `eventSubscriptions`) => {
-    if (!el || !el[elementProperty]) { return }
-
-    unsub(el, elementProperty, eventKey)
-}
+import Observe from '../observe'
 
 const removeOld = el => {
     if (!el || !el.parentNode) { return }
@@ -24,7 +6,7 @@ const removeOld = el => {
     el.parentNode.removeChild(el)
 }
 
-export const Elements = (host, elements) => {
+const Elements = (host, elements) => {
     const elStates = {}
     const state = {}
 
@@ -47,21 +29,8 @@ export const Elements = (host, elements) => {
         })
 
         elStates[key].subscribe(newElement => {
-            unsubscribeEvents(elStates[key].previous)
+            host.unsubscribeEvents(elStates[key].previous)
             removeOld(elStates[key].previous)
-
-            // const loop = () => {
-            //     if (Object.getOwnPropertyNames(newElement).length) {
-            //         if (typeof elements[key].onChange === `function`) {
-            //             elements[key].onChange(newElement, host)
-            //         }
-            //         return
-            //     }
-
-            //     requestAnimationFrame(() => loop())
-            // }
-
-            // loop()
 
             if (typeof elements[key].onChange === `function`) {
                 elements[key].onChange(newElement, host)
@@ -76,3 +45,5 @@ export const Elements = (host, elements) => {
         })
     }
 }
+
+export default Elements

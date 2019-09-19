@@ -4,7 +4,6 @@ import { contentDrawerContainer, contentDrawerItems, itemRowSelector } from './e
 import Timer from '../../services/timer'
 import { EaseInOut } from '../../utils/curve'
 import { setItemDefaultTransform, setItemHoverTransform } from './methods'
-import { unsubscribeEvents } from '../../utils/webcomponent/elements'
 import { imageLoader } from '../image-loader'
 
 
@@ -172,7 +171,7 @@ export const eventObervers = host => ({
 })
 
 export const itemEvents = (host, item) => {
-    unsubscribeEvents(item.element)
+    host.unsubscribeEvents(item.element)
 
     item.element.eventSubscriptions = {
         click: ObserveEvent(item.element, `click`)

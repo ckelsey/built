@@ -1,4 +1,5 @@
-import { Constructor, Define } from '../../utils/webcomponent/constructor'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
 import { observedAttributes, properties, selectedIndex, selectedOptionElement, optionElements } from './properties'
 import elements from './elements'
 import { initInput, focus, blur } from './methods'

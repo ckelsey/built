@@ -2,7 +2,6 @@ import { setStyleRules } from '../../utils/html/markup'
 import ObserveEvent from '../../utils/observeEvent'
 import Get from '../../utils/get'
 import { goToNextPage, goToPreviousPage, autoplay } from './methods'
-import { unsubscribeEvents } from '../../utils/webcomponent/elements'
 import { imageLoader } from '../image-loader'
 
 const sliderItemSelectedClass = `active-horizontal-slider-item`
@@ -101,7 +100,7 @@ export const setChicklets = host => {
 
     if (!host.chicklets) {
         const currentChicklets: any[] = Array.from(chicklets.querySelectorAll(`.${chickletSelector}`))
-        currentChicklets.forEach(chicklet => unsubscribeEvents(chicklet))
+        currentChicklets.forEach(chicklet => host.unsubscribeEvents(chicklet))
         chicklets.innerHTML = ``
     }
 
@@ -129,7 +128,7 @@ export const setPrevious = (el, host) => {
 
     el.classList[host.arrows ? `add` : `remove`](arrowClass)
 
-    unsubscribeEvents(el)
+    host.unsubscribeEvents(el)
 
     el.eventSubscriptions = {
         click: ObserveEvent(el, `click`).subscribe(() => goToPreviousPage(host, host.currentindex))
@@ -141,7 +140,7 @@ export const setNext = (el, host) => {
 
     el.classList[host.arrows ? `add` : `remove`](arrowClass)
 
-    unsubscribeEvents(el)
+    host.unsubscribeEvents(el)
 
     el.eventSubscriptions = {
         click: ObserveEvent(el, `click`).subscribe(() => goToNextPage(host, host.currentindex))

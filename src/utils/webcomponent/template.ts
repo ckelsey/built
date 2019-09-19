@@ -1,6 +1,6 @@
-import { AppendStyle } from './css'
+import AppendStyle from './append-style'
 
-export const Template = (tagname, element, templateString, styleString, notWebComponent = false, appendStylesToHead = false) => {
+const Template = (tagname, element, templateString, styleString, notWebComponent = false, appendStylesToHead = false) => {
 
     if (notWebComponent) {
         element.shadowRoot = element
@@ -18,3 +18,5 @@ export const Template = (tagname, element, templateString, styleString, notWebCo
         AppendStyle(styleString, document.head, tagname)
     }
 }
+
+export default Template

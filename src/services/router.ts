@@ -1,4 +1,4 @@
-import { Observe } from '../utils/observe'
+import Observe from '../utils/observe'
 
 const Router = (routes, storeLocally = false) => {
     let current

@@ -13,10 +13,6 @@ export const onInput = host => {
     const input = host.elements.input
     let value = getValue(input)
 
-    // if (host.type === `select`) {
-    //     value = input.value
-    // }
-
     if (host.type === `file`) {
         value = UseIf(v => v.length, () => ``, getFileValue(input)).value
     }

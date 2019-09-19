@@ -15,8 +15,7 @@ let themeConfig = {}
 
 const Type = require(path.resolve(`${__dirname}/type.js`))
 
-try
-{
+try {
     themeConfig = require(themeConfigPath)
     Object.keys(themeConfig).forEach(key => {
         process.env[key] = themeConfig[key]
@@ -74,16 +73,19 @@ try
 //         'builtjs': path.join(__dirname, 'src')
 //     }
 
-let entries = { 'builtjs': path.join(__dirname, 'src') }
-
+let entries = {
+    'builtjs': path.join(__dirname, 'src'),
+    'utilities': path.join(__dirname, 'src/utils'),
+    'components': path.join(__dirname, 'src/components'),
+    'services': path.join(__dirname, 'src/services'),
+}
 
 const objectToString = obj => {
     const isArray = Array.isArray(obj)
     const result = `${!isArray ? `{` : `[`}${Object.keys(obj)
         .map(key => {
             const keyString = isArray ? `` : `${key}:`
-            switch (Type(obj[key]))
-            {
+            switch (Type(obj[key])) {
                 case `object`:
                     return `${keyString}${objectToString(obj[key])}`
 
@@ -123,10 +125,8 @@ const getThemes = () => {
         .forEach(componentKey => {
             const themePath = path.join(themeDir, componentKey, `theme.js`)
 
-            try
-            {
-                if (fs.existsSync(themePath))
-                {
+            try {
+                if (fs.existsSync(themePath)) {
                     const theme = require(themePath)
                     const themeString = objectToString(theme)
 
@@ -134,8 +134,7 @@ const getThemes = () => {
 
                     fs.writeFileSync(path.join(themeDir, componentKey, `theme.ts`), `/** DO NOT EDIT, AUTO-GENERATED */\nexport const ${componentKey.split(`-`).join(``).toUpperCase()} = ${themeString}`)
                 }
-            } catch (err)
-            {
+            } catch (err) {
                 console.log(err)
             }
         })
@@ -161,20 +160,17 @@ const postPlugin = {
                 })
             }
 
-            if (!postPluginHasRan)
-            {
+            if (!postPluginHasRan) {
                 postPluginHasRan = true
                 exec(`cp -r ${path.resolve(`${__dirname}/node_modules/@webcomponents`)}/. dist`, alert)
-            } else
-            {
+            } else {
                 alert()
             }
         })
     )
 }
 
-if (env === `development`)
-{
+if (env === `development`) {
     devServer = {
         contentBase: __dirname,
         compress: false,
@@ -200,8 +196,7 @@ if (env === `development`)
     ]
 }
 
-if (env === `production`)
-{
+if (env === `production`) {
     optimization.minimizer = [new TerserPlugin({ terserOptions: { mangle: true } }),]
     optimization.minimize = true
     plugins = [
@@ -210,10 +205,8 @@ if (env === `production`)
     ]
 }
 
-try
-{
-    if (fs.accessSync(path.resolve(`${__dirname}/node_modules`)))
-    {
+try {
+    if (fs.accessSync(path.resolve(`${__dirname}/node_modules`))) {
         plugins.push(new HardSourceWebpackPlugin())
     }
 } catch (error) { }

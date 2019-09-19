@@ -1,5 +1,5 @@
 import { Tmonad } from './t-monad'
-import { getType } from '../type'
+import { Type } from '../type'
 
 export const ToBool = value => {
     const result = Tmonad(value)
@@ -33,7 +33,7 @@ export const ToBool = value => {
             break;
     }
 
-    result.type = getType(result.value)
+    result.type = Type(result.value)
     result.instanceof.push(`ToBool`)
     return result
 }

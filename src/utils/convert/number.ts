@@ -1,5 +1,5 @@
 import { Tmonad } from './t-monad'
-import { getType, empty } from '../type'
+import { Type, isEmpty } from '../type'
 import { RemoveMeta } from './meta'
 import { ToString } from './string'
 
@@ -8,11 +8,11 @@ export const ToNumber = value => {
 
     if (result.stop) { return result }
 
-    if (result.type === `string` && !empty(result.value)) {
+    if (result.type === `string` && !isEmpty(result.value)) {
         result.value = parseFloat(result.value)
     }
 
-    result.type = getType(result.value)
+    result.type = Type(result.value)
     result.instanceof.push(`ToNumber`)
     result.valid = !isNaN(result.value)
 
@@ -35,7 +35,7 @@ export const ToDigits = value => {
         result.valid = false
     }
 
-    result.type = getType(result.value)
+    result.type = Type(result.value)
     result.instanceof.push(`ToDigits`)
 
     return result

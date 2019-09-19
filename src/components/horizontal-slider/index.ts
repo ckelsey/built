@@ -7,12 +7,13 @@
  * odd flicker when scrolling back
  * page scroll when center is messed up
  */
-import { Define, Constructor } from '../../utils/webcomponent/constructor'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
+import AppendStyle from '../../utils/webcomponent/append-style'
 import './style.scss'
 import elements from './elements'
 import { observedAttributes, properties } from './properties'
 import { scrollToIndex } from './methods'
-import { AppendStyle } from '../../utils/webcomponent/css'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')

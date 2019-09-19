@@ -2,8 +2,8 @@ import './style.scss'
 import pipe from '../../utils/pipe'
 import { ToString } from '../../utils/convert/string'
 import { IfInvalid } from '../../utils/convert/if'
-import { Define, Constructor } from '../../utils/webcomponent/constructor'
-import { unsubscribeEvents, unsubscribeEvent } from '../../utils/webcomponent/elements'
+import Constructor from '../../utils/webcomponent/constructor'
+import Define from '../../utils/webcomponent/define'
 import ObserveEvent from '../../utils/observeEvent'
 import { IsElement } from '../../utils/convert/dom'
 import { ToBool } from '../../utils/convert/bool'
@@ -45,7 +45,7 @@ const loadSrc = host => new Promise(resolve => {
     host.loading = true
     img.crossOrigin = `Anonymous`
 
-    unsubscribeEvents(img)
+    host.unsubscribeEvents(img)
 
     if (!img.eventSubscriptions) { img.eventSubscriptions = {} }
 
@@ -85,8 +85,8 @@ const loadImage = (host, img) => new Promise(resolve => {
 
     host.loading = true
 
-    unsubscribeEvent(img, `error`)
-    unsubscribeEvent(img, `load`)
+    host.unsubscribeEvent(img, `error`)
+    host.unsubscribeEvent(img, `load`)
 
     img.crossOrigin = `Anonymous`
 

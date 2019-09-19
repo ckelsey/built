@@ -3,7 +3,7 @@ import pipe from '../pipe'
 import { DecodeUriComponent } from './uri'
 import { FromEntities } from './entities'
 import { FromJSON } from './json'
-import { getType } from '../type'
+import { Type } from '../type'
 
 export const ToObject = value => {
     let result = Tmonad(value)
@@ -18,7 +18,7 @@ export const ToObject = value => {
         )(result)
     }
 
-    result.valid = getType(result.value) === `object`
+    result.valid = Type(result.value) === `object`
     result.instanceof.push(`ToObject`)
     return result
 }
@@ -34,7 +34,7 @@ export const KeysAre = compare => value => {
 
     const keys = Object.keys(result.value)
 
-    result.valid = keys.length === 0 ? true : keys.filter(v => getType(v) === compare).length > 0
+    result.valid = keys.length === 0 ? true : keys.filter(v => Type(v) === compare).length > 0
 
     return result
 }

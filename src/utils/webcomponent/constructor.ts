@@ -1,43 +1,23 @@
-import { Template } from './template'
-import { Elements } from './elements'
-import { Observe } from '../observe'
+import Template from './template'
+import Elements from './elements'
+import Observe from '../observe'
 import { ToBool } from '../convert/bool'
 import ID from '../id';
 import { IfInvalid } from '../convert/if'
 import pipe from '../pipe'
-import { ObjectAssignPolyfill, MutationObserverPolyfill, WebComponentPolyFill } from '../polyfills'
+import Get from '../get'
+import { ToFunction } from '../convert/function'
 
-export interface ConstructorOptions {
-    componentName: string
-    observedAttributes: string[]
-    template: string
-    style: string
-    componentRoot: string
-    properties?: {
-        [key: string]: {
-            format: (v, t) => any
-            onChange: (v, t) => any
-        }
-    }
-    elements?: {
-        [key: string]: {
-            selector: (v, t) => any
-            onChange: (v, t) => any
-        }
-    }
-    methods?: {
-        [key: string]: () => {}
-    }
-    computed?: {
-        [key: string]: (host) => () => {}
-    },
-    getters?: {
-        [key: string]: (host) => {}
-    },
-    setters?: {
-        [key: string]: (host) => {}
-    },
-    onConnected?: (host) => {}
+const unsub = (el, elementProperty, eventKey) => pipe(ToFunction, IfInvalid(() => { }))(Get(el, `${elementProperty}.${eventKey}`)).value()
+
+const unsubscribeEvents = (el, elementProperty = `eventSubscriptions`) => {
+    if (!el || !el[elementProperty]) { return }
+    Object.keys(el[elementProperty]).forEach(eventKey => unsub(el, elementProperty, eventKey))
+}
+
+const unsubscribeEvent = (el, eventKey, elementProperty = `eventSubscriptions`) => {
+    if (!el || !el[elementProperty]) { return }
+    unsub(el, elementProperty, eventKey)
 }
 
 const setProperty = (host, key, formatter, getter, setter) => {
@@ -78,7 +58,7 @@ const setStateProperty = (host, key, formatter, onChange, getter, setter) => {
     host.state[key].subscribe(val => onChange(val, host))
 }
 
-export const Constructor = options => {
+const Constructor = options => {
     const componentName = options.componentName
     const observedAttributes = options.observedAttributes || []
     const template = options.template || `<slot></slot>`
@@ -97,6 +77,8 @@ export const Constructor = options => {
 
     const ConnectedFn = element => {
         element.wcID = ID(`wc`)
+        element.unsubscribeEvent = unsubscribeEvent
+        element.unsubscribeEvents = unsubscribeEvents
 
         if (computed) {
             Object.keys(computed).forEach(key => {
@@ -193,13 +175,6 @@ export const Constructor = options => {
             ConnectedFn(element)
 
             return element
-            // return {
-            //     observedAttributes: observedAttributes.slice(),
-            //     wcID: ID(`wc`),
-            //     state: {},
-            //     elements: {},
-            //     disconnectElements: () => { },
-            // }
         }
     }
 
@@ -209,27 +184,4 @@ export const Constructor = options => {
     }
 }
 
-export const Define = (componentName, componentClass) => {
-    const wc = (window as any).WebComponents
-    const ce = (window as any).customElements
-
-    const defineComponent = () => {
-        if (!ce) {
-            ObjectAssignPolyfill()
-            MutationObserverPolyfill(window)
-            return WebComponentPolyFill(window, componentName, componentClass.object)
-        }
-
-        if (!ce.get(componentName)) {
-            ce.define(componentName, componentClass.component)
-        }
-    }
-
-    if (wc && wc.ready) {
-        defineComponent()
-    } else {
-        window.addEventListener('WebComponentsReady', function () {
-            defineComponent()
-        })
-    }
-}
+export default Constructor
