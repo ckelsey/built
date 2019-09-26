@@ -1,12 +1,12 @@
 import './style.scss'
 import pipe from '../../utils/pipe'
-import { ToString } from '../../utils/convert/string'
-import { IfInvalid } from '../../utils/convert/if'
+import ToString from '../../utils/convert/to_string'
+import IfInvalid from '../../utils/convert/if_invalid'
 import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import ObserveEvent from '../../utils/observeEvent'
 import { IsElement } from '../../utils/convert/dom'
-import { ToBool } from '../../utils/convert/bool'
+import ToBool from '../../utils/convert/bool'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')

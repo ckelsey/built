@@ -6,9 +6,9 @@ import { COOKIEMESSAGE } from './theme'
 import './style.scss'
 import '../button-element'
 import pipe from '../../utils/pipe'
-import { ToBool } from '../../utils/convert/bool'
-import { IfInvalid } from '../../utils/convert/if'
-import { ToString } from '../../utils/convert/string'
+import ToBool from '../../utils/convert/bool'
+import IfInvalid from '../../utils/convert/if_invalid'
+import ToString from '../../utils/convert/to_string'
 import ObserveEvent from '../../utils/observeEvent'
 
 const style = require('./style.scss').toString()

@@ -1,7 +1,7 @@
-import { ToString } from '../convert/string'
+import ToString from '../convert/to_string'
 import Get from '../get'
 import ID from '../id'
-import { ToJSON } from '../convert/json'
+import ToJSON from '../convert/to_json'
 
 const ObserveWorker = func => {
     let value

@@ -1,7 +1,7 @@
 import { Tmonad } from './t-monad'
-import { ToString } from './string'
 import { ToNumber, ToDigits } from './number';
 import pipe from '../pipe';
+import ToString from './to_string';
 
 export const ReplacementPattern = string => {
     if (!string) {

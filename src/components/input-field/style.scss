@@ -159,6 +159,26 @@ input-field {
                 position: relative;
                 opacity: 0;
                 pointer-events: none;
+
+                &::-webkit-input-placeholder {
+                    color: currentColor;
+                    opacity: 0.62;
+                }
+
+                &:-webkit-input-placeholder {
+                    color: currentColor;
+                    opacity: 0.62;
+                }
+
+                &:-ms-input-placeholder {
+                    color: currentColor;
+                    opacity: 0.62;
+                }
+
+                &::placeholder {
+                    color: currentColor;
+                    opacity: 0.62;
+                }
             }
 
             effect-underline {

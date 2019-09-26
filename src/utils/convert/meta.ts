@@ -1,5 +1,5 @@
 import { ToRegex, ReplacementPattern } from './regex'
-import { ToString } from './string'
+import ToString from './to_string'
 
 export const MatchMeta = (string, search, justOne = false) => {
     const matches = []

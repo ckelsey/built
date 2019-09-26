@@ -1,5 +1,5 @@
 import pipe from '../pipe'
-import { ToString } from '../convert/string'
+import ToString from '../convert/to_string'
 import { FromEntities } from '../convert/entities'
 
 const ValidateUrl = /*#__PURE__*/ str => {

@@ -1,0 +1,325 @@
+.spinner-element-container {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+
+    &.fullpage {
+        position: fixed;
+        pointer-events: all;
+    }
+
+    &.shown {
+        opacity: 1;
+        pointer-events: all;
+
+        &[type="column"] {
+
+            .spin,
+            .spin:before,
+            .spin:after {
+                background: currentColor;
+                width: 1em;
+                height: 4em;
+                position: relative;
+                box-shadow: 0 0px;
+                animation: column 1s infinite ease-in-out;
+            }
+
+            .spin:before,
+            .spin:after {
+                content: "";
+                position: absolute;
+                top: 0;
+            }
+
+            .spin {
+                animation-delay: -0.16s;
+
+                &:before {
+                    left: -1.38em;
+                    animation-delay: -0.32s;
+                }
+
+                &:after {
+                    left: 1.38em;
+                }
+            }
+
+            @keyframes column {
+
+                0%,
+                80%,
+                100% {
+                    box-shadow: 0 0;
+                    height: 4em;
+                }
+
+                40% {
+                    box-shadow: 0 -2em;
+                    height: 5em;
+                }
+            }
+        }
+
+        &[type="circle"] {
+
+            .spin,
+            .spin:after {
+                border-radius: 50%;
+                box-sizing: content-box;
+            }
+
+            .spin {
+                position: relative;
+                border: 0.5em solid transparent;
+                border-top-color: inherit;
+                width: 5em;
+                height: 5em;
+                animation: circle 1s infinite linear;
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    border: 0.5em solid currentColor;
+                    opacity: 0.19;
+                    top: -0.5em;
+                    left: -0.5em;
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            @keyframes circle {
+
+                0% {
+                    transform: translateZ(0) rotate(0deg);
+                }
+
+                100% {
+                    transform: translateZ(0) rotate(360deg);
+                }
+            }
+        }
+
+        &[type="ripple"] {
+
+            .spin,
+            .spin:after,
+            .spin:before {
+                border-radius: 50%;
+                box-sizing: content-box;
+            }
+
+            .spin {
+                position: relative;
+                width: 5em;
+                height: 5em;
+
+                &:after,
+                &:before {
+                    content: "";
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    border: 0.5em solid;
+                    opacity: 0;
+                    transform: translateZ(0) scale(0);
+                    animation: ripple 1s infinite ease-in-out;
+                }
+
+                &:after {
+                    animation-delay: 0.33s;
+                }
+            }
+
+            @keyframes ripple {
+
+                0% {
+                    opacity: 0;
+                    transform: translateZ(0) scale(0);
+                }
+
+                7% {
+                    opacity: 0.38;
+                }
+
+                100% {
+                    opacity: 0;
+                    transform: translateZ(0) scale(1);
+                }
+            }
+        }
+
+        &[type="boading"] {
+
+            .spin,
+            .spin:after,
+            .spin:before {
+                border-radius: 50%;
+                box-sizing: content-box;
+            }
+
+            .spin {
+                position: relative;
+                width: 5em;
+                height: 5em;
+
+                &:after,
+                &:before {
+                    content: "";
+                    position: absolute;
+                    width: 50%;
+                    height: 50%;
+                    background: currentColor;
+                    opacity: 1;
+                    transform: translateZ(0) translateX(0) scale(0);
+                    animation: boading 1s infinite linear;
+                }
+
+                &:after {
+                    opacity: 0.75;
+                    animation-delay: 0.5s;
+                }
+            }
+
+            @keyframes boading {
+
+                0% {
+                    transform: translateZ(0) translateX(25%) scale(0);
+                }
+
+                25% {
+                    transform: translateZ(0) translateX(75%) scale(0.5);
+                }
+
+                50% {
+                    transform: translateZ(0) translateX(0%) scale(1);
+                }
+
+                75% {
+                    transform: translateZ(0) translateX(-75%) scale(0.5);
+                }
+
+                100% {
+                    transform: translateZ(0) translateX(-25%) scale(0);
+                }
+            }
+        }
+
+        &[type="tail"] {
+
+            .spin {
+                font-size: 300%;
+                overflow: hidden;
+                width: 1em;
+                height: 1em;
+                border-radius: 50%;
+                position: relative;
+                transform: translateZ(0);
+                animation: tail 1.2s infinite ease, tail-round 1.2s infinite ease;
+            }
+
+            $scale1: -0.3em;
+            $scale2: -0.34em;
+            $scale3: -0.37em;
+            $scale4: -0.41em;
+            $scale5: -0.44em;
+
+            $base: -0.83em;
+
+            $pos1: 0 $base 0 $scale1,
+            0 $base 0 $scale2,
+            0 $base 0 $scale3,
+            0 $base 0 $scale4,
+            0 $base 0 $scale5;
+
+            $pos2: 0 $base 0 $scale1,
+            $base*0.124 $base*0.974 0 $scale2,
+            $base*0.228 $base*0.958 0 $scale3,
+            $base*0.328 $base*0.930 0 $scale4,
+            $base*0.377 $base*0.913 0 $scale5;
+
+            $pos3:0 $base 0 $scale1,
+            $base*0.247 $base*0.883 0 $scale2,
+            $base*0.588 $base*0.703 0 $scale3,
+            $base*0.768 $base*0.507 0 $scale4,
+            $base*0.882 $base*0.249 0 $scale5;
+
+            $pos4:0 $base 0 $scale1,
+            $base*0.294 $base*0.871 0 $scale2,
+            $base*0.697 $base*0.588 0 $scale3,
+            $base*0.893 $base*0.277 0 $scale4,
+            $base*0.967 $base*0.008 0 $scale5;
+
+            @keyframes tail {
+                0% {
+                    box-shadow: $pos1;
+                }
+
+                5%,
+                95% {
+                    box-shadow: $pos1;
+                }
+
+                10%,
+                59% {
+                    box-shadow: $pos2;
+                }
+
+                20% {
+                    box-shadow: $pos3;
+                }
+
+                38% {
+                    box-shadow: $pos4;
+                }
+
+                100% {
+                    box-shadow: $pos1;
+                }
+            }
+
+            @keyframes tail-round {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+        }
+    }
+
+    &.showscrim {
+        .spinner-element-scrim {
+            opacity: 1;
+        }
+    }
+
+    .spinner-element-scrim {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        pointer-events: none;
+        background: rgba(0, 0, 0, 0.38);
+        transition: opacity 0.3s;
+    }
+
+    .spinner-element-inner {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

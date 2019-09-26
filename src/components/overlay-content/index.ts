@@ -1,7 +1,6 @@
 import pipe from '../../utils/pipe'
-import { ToBool } from '../../utils/convert/bool'
-import { IfInvalid } from '../../utils/convert/if'
-import { IndexOf } from '../../utils/convert/array'
+import ToBool from '../../utils/convert/bool'
+import IfInvalid from '../../utils/convert/if_invalid'
 import { ToNumber } from '../../utils/convert/number'
 import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
@@ -10,6 +9,7 @@ import { wcClassObject } from '../../utils/html/attr'
 import { setStyleRules } from '../../utils/html/markup'
 import { OVERLAYCONTENT } from './theme'
 import './style.scss'
+import IndexOf from '../../utils/convert/indexof'
 
 const style = require('./style.scss').toString()
 
@@ -131,7 +131,12 @@ const setPositions = host => () => {
     container.style.minWidth = widths.minWidth
     container.style.height = `auto`
     container.style.maxHeight = `${host.height}px`
-    container.style.left = `${targetBox.left}px`
+
+    const left = targetBox.left + container.offsetWidth >= window.innerWidth
+        ? targetBox.right - container.offsetWidth
+        : targetBox.left
+
+    container.style.left = `${left}px`
     container.style.top = `${isOnTop ? targetBox.top - container.offsetHeight : host.spaceAbove + targetBox.height}px`
     let origin = `center ${isOnTop ? `bottom` : `top`}`
 
@@ -214,6 +219,7 @@ const OverlayContent = Constructor({
             if (host.showing) { return Promise.resolve() }
 
             return new Promise(resolve => {
+                host.elements.root.classList.add(`activating`)
                 host.showing = true
                 setPositions(host)()
 
@@ -236,6 +242,7 @@ const OverlayContent = Constructor({
                         setTimeout(() => loop(), time)
                     } else {
                         host.elements.root.classList.add(`active`)
+                        host.elements.root.classList.remove(`activating`)
                         resolve()
                         host.dispatchEvent(new CustomEvent(`shown`))
                     }
@@ -249,6 +256,7 @@ const OverlayContent = Constructor({
             if (!host.showing) { return Promise.resolve() }
 
             return new Promise(resolve => {
+                host.elements.root.classList.remove(`activating`)
                 host.showing = false
                 const scalePoints = GetCurve([1, 0])
                 const timeout = GetCurve([0, host.speed / scalePoints.length])

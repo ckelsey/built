@@ -1,7 +1,7 @@
 import { Tmonad } from './t-monad'
 import { Type } from '../type'
 
-export const ToBool = value => {
+const ToBool = value => {
     const result = Tmonad(value)
 
     if (result.stop) {
@@ -37,3 +37,5 @@ export const ToBool = value => {
     result.instanceof.push(`ToBool`)
     return result
 }
+
+export default ToBool

@@ -41,12 +41,18 @@
                 width: auto
             }
 
+            spinner-element {
+                position: relative;
+                z-index: 999999999;
+            }
+
         </style>
         <script src="/dist/webcomponentsjs/custom-elements-es5-adapter.js"></script>
         <script src="/dist/webcomponentsjs/webcomponents-loader.js"></script>
     </head>
 
     <body>
+        <spinner-element page="true" visible="true" scrim="true" blur="3" type="column"></spinner-element>
         <image-loader src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg" id="image-loader"></image-loader>
 
         <dropdown-select id="country"></dropdown-select>

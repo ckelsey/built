@@ -1,7 +1,7 @@
-import { IfInvalid } from '../convert/if'
 import { FromEntities } from '../convert/entities'
-import { ToString } from '../convert/string'
+import ToString from '../convert/to_string'
 import pipe from '../pipe'
+import IfInvalid from '../convert/if_invalid'
 
 const ValidateIntlPhone = /*#__PURE__*/ val => {
     const original = val

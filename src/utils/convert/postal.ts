@@ -1,8 +1,9 @@
 import { Tmonad } from './t-monad'
 import pipe from '../pipe'
 import { ToDigits } from './number'
-import { Split } from './string'
-import { Map, Join } from './array'
+import Split from './split'
+import Map from './map'
+import Join from './join'
 
 export const ToUsZip = value => {
     let result = Tmonad(value)

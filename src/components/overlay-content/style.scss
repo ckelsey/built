@@ -43,6 +43,7 @@ overlay-content {
         left: 0px;
         pointer-events: none;
         overflow: hidden;
+        display: none;
     }
 
     .overlay-content-content-container {
@@ -60,9 +61,19 @@ overlay-content {
     }
 
     &.active {
+        .overlay-content-container-inner {
+            display: block;
+        }
+
         .overlay-content-content-container {
             pointer-events: all;
             opacity: 1;
+        }
+    }
+
+    &.activating {
+        .overlay-content-container-inner {
+            display: block;
         }
     }
 

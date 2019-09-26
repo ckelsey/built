@@ -1,7 +1,7 @@
 import { Tmonad, finishTMonad } from './t-monad'
 import pipe from '../pipe'
-import { Map } from './array'
-import { IfInvalid } from './if'
+import Map from './map'
+import IfInvalid from './if_invalid'
 import { CommasToArray } from './commas-to-array'
 
 export const Options = (value: any) => {

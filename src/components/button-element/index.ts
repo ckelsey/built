@@ -1,15 +1,15 @@
 import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import pipe from '../../utils/pipe'
-import { IfInvalid } from '../../utils/convert/if'
-import { ToBool } from '../../utils/convert/bool'
+import IfInvalid from '../../utils/convert/if_invalid'
 import { wcClassObject } from '../../utils/html/attr'
-import { ToString } from '../../utils/convert/string'
+import ToString from '../../utils/convert/to_string'
 import { setStyleRules } from '../../utils/html/markup'
 import { BUTTONELEMENT } from './theme'
 import './style.scss'
 import '../effect-bounce-z'
 import '../effect-ripple'
+import ToBool from '../../utils/convert/bool'
 
 const style = require('./style.scss').toString()
 

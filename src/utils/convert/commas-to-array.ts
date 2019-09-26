@@ -1,7 +1,9 @@
 import { Tmonad } from './t-monad'
 import pipe from '../pipe'
-import { Split, ToPlainText, Trim } from './string'
-import { Map } from './array'
+import Split from './split'
+import Map from './map'
+import ToPlainText from './to_plain_text'
+import Trim from './trim'
 
 export const CommasToArray = value => {
     let result = Tmonad(value)

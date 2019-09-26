@@ -1,13 +1,13 @@
-import { ToBool } from '../../utils/convert/bool'
+import ToBool from '../../utils/convert/bool'
 import pipe from '../../utils/pipe'
-import { Map } from '../../utils/convert/array'
-import { IfInvalid } from '../../utils/convert/if'
+import Map from '../../utils/convert/map'
+import IfInvalid from '../../utils/convert/if_invalid'
 import { ToNumber } from '../../utils/convert/number'
 import { unloadTriggers, loadTriggers } from './methods'
 import { SelectorArrayToElements } from '../../utils/convert/dom'
 import { CommasToArray } from '../../utils/convert/commas-to-array'
 import { wcClassObject } from '../../utils/html/attr'
-import { ToString } from '../../utils/convert/string'
+import ToString from '../../utils/convert/to_string'
 import { EFFECTFADE } from './theme'
 
 const resetTriggers = host => {

@@ -1,14 +1,16 @@
 import pipe from '../../utils/pipe'
-import { IndexOf, Map } from '../../utils/convert/array'
-import { IfInvalid, IfEmpty } from '../../utils/convert/if'
-import { ToString } from '../../utils/convert/string'
-import { ToBool } from '../../utils/convert/bool'
+import IfInvalid from '../../utils/convert/if_invalid'
+import IfEmpty from '../../utils/convert/if_empty'
+import ToBool from '../../utils/convert/bool'
 import { ToNumber } from '../../utils/convert/number'
 import { toggle } from './methods'
 import { setHeaderIcon, setStyles } from './elements'
 import { CommasToArray } from '../../utils/convert/commas-to-array'
 import { wcClassObject } from '../../utils/html/attr'
 import { CONTENTDRAWER } from './theme'
+import ToString from '../../utils/convert/to_string'
+import Map from '../../utils/convert/map'
+import IndexOf from '../../utils/convert/indexof'
 
 const directions = [
     `auto`,

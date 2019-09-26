@@ -1,7 +1,7 @@
 import { Tmonad } from './t-monad'
 import { Type, isEmpty } from '../type'
 import { RemoveMeta } from './meta'
-import { ToString } from './string'
+import ToString from './to_string'
 
 export const ToNumber = value => {
     const result = Tmonad(value)

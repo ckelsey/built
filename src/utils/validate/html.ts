@@ -1,5 +1,5 @@
 import { FromEntities } from '../convert/entities'
-import { ToString } from '../convert/string'
+import ToString from '../convert/to_string'
 import pipe from '../pipe'
 import { svgTags, htmlTags } from '../html'
 
@@ -65,7 +65,9 @@ const ValidateHtml = /*#__PURE__*/ (str: any, allowedHtmlTags?: string[], disall
             let index = 0
 
             while (index < childrenLength) {
-                el.parentNode.insertBefore(el.children[index], el)
+                try {
+                    el.parentNode.insertBefore(el.children[index], el)
+                } catch (error) { }
                 index = index + 1
             }
 

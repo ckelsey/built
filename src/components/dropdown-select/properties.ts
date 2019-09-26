@@ -1,19 +1,21 @@
 import pipe from '../../utils/pipe'
-import { IfInvalid, IfNot, IfIs } from '../../utils/convert/if'
-import { ToString } from '../../utils/convert/string'
+import IfInvalid from '../../utils/convert/if_invalid'
+import IfNot from '../../utils/convert/if_not'
+import IfIs from '../../utils/convert/if_is'
+import ToString from '../../utils/convert/to_string'
 import { setSelectOptions } from './methods'
-import { ToBool } from '../../utils/convert/bool'
+import ToBool from '../../utils/convert/bool'
 import { addRemoveAttr, wcClassObject } from '../../utils/html/attr'
 import { ToNumber } from '../../utils/convert/number'
 import { Options } from '../../utils/convert/options'
 import { isMobile } from '../../utils/platform'
 import { dispatch } from './methods'
-import { ToJSON } from '../../utils/convert/json'
 import { setLabel, setStyles } from './elements'
 import { findIn } from '../../utils/html/query'
-import { IndexOf } from '../../utils/convert/array'
+import IndexOf from '../../utils/convert/indexof'
 import { DROPDOWNSELECT } from './theme'
 import { ToFunction } from '../../utils/convert/function'
+import { ToJSON } from '../../utils'
 
 const attributes = {
     arrow: {
@@ -34,6 +36,11 @@ const attributes = {
     disablefilter: {
         format: val => pipe(ToBool, IfInvalid(DROPDOWNSELECT.disablefilter))(val).value,
         onChange: (val, host) => host.elements.root.classList[val ? `add` : `remove`](`disablefilter`)
+    },
+
+    statictext: {
+        format: val => pipe(ToString, IfInvalid(``))(val).value,
+        onChange: (_val, host) => setLabel(host)
     },
 
     showempty: {

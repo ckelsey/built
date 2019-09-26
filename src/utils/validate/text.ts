@@ -1,5 +1,5 @@
 import { FromEntities } from '../convert/entities'
-import { ToString } from '../convert/string'
+import ToString from '../convert/to_string'
 import pipe from '../pipe'
 import ValidateHtml from './html'
 

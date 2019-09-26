@@ -1,7 +1,7 @@
 import { Tmonad } from './t-monad'
 import Get from '../get'
-import { ToArray } from './array'
-import { UseIf } from './if'
+import ToArray from '../../utils/convert/to_array'
+import UseIf from './use_if'
 
 export const IsElement = value => {
     const result = Tmonad(value)

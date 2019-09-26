@@ -3,10 +3,10 @@ import { setStyles, activeElementClass, contentDrawerContainer, contentDrawerIte
 import { GRIDLAYOUT } from './theme'
 import pipe from '../../utils/pipe'
 import { IsElement } from '../../utils/convert/dom'
-import { IfInvalid } from '../../utils/convert/if'
+import IfInvalid from '../../utils/convert/if_invalid'
 import { triggerContentDrawer, removeContentDrawerItems } from './events'
 import { ToNumber } from '../../utils/convert/number'
-import { ToBool } from '../../utils/convert/bool'
+import ToBool from '../../utils/convert/bool'
 
 const attributes = {
     class: wcClassObject,

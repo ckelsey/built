@@ -25,6 +25,10 @@ export const setInput = host => {
 }
 
 export const setLabel = host => {
+    if (!!host.statictext) {
+        return replaceElementContents(host.elements.label, ValidateHtml(host.statictext, [], [`script`]).sanitized || ``)
+    }
+
     const formatFunction = host.formatvaluelabel && typeof host.formatvaluelabel === `function`
         ? host.formatvaluelabel
         : o => o.label

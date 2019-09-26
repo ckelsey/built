@@ -2,8 +2,8 @@ import { Tmonad } from './t-monad'
 import pipe from '../pipe'
 import { DecodeUriComponent } from './uri'
 import { FromEntities } from './entities'
-import { FromJSON } from './json'
 import { Type } from '../type'
+import FromJSON from './from_json'
 
 export const ToObject = value => {
     let result = Tmonad(value)

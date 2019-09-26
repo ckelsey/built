@@ -1,6 +1,6 @@
 import ObserveWorker from '../utils/observeWorker'
 import { ToObject } from '../utils/convert/object'
-import { UseIf } from '../utils/convert/if'
+import UseIf from '../utils/convert/use_if'
 // TODO pako is not so great, minimal size savings. Is there anything else?
 // const pako = require('../lib/pako/dist/pako.min.js')
 // var reader = new FileReader();

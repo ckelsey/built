@@ -2,7 +2,7 @@ import { getValue } from '../../utils/html'
 import { processValue, getFileValue } from './methods-value'
 import DragDropService from '../../services/dragDrop'
 import ObserveEvent from '../../utils/observeEvent'
-import { UseIf } from '../../utils/convert/if'
+import UseIf from '../../utils/convert/use_if'
 
 export const dispatch = (host, type, data) =>
     host.dispatchEvent(

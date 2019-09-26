@@ -11,18 +11,28 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
         methods.route(history.state)
     }
 
+    const invalidQuery = searchString => !searchString || typeof searchString.split !== `function` || searchString === ``
+
     const getQuery = search => {
         const result = {}
+        let searchString = search
 
-        if (!search) { return result }
+        if (invalidQuery(searchString)) {
+            searchString = location.search
 
-        const q = search.split(`?`)[1]
+            if (invalidQuery(searchString)) {
+                return result
+            }
+        }
 
-        if (!q) { return result }
+        const queryString = searchString.split(`?`)[1]
 
-        q
+        if (invalidQuery(queryString)) { return result }
+
+        queryString
             .split(`&`)
             .forEach(v => {
+                if (!v || typeof v.split !== `function`) { return }
                 result[v.split(`=`)[0]] = v.split(`=`)[1]
             })
 
@@ -49,7 +59,7 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
         if (history.pushState && route) {
             const full = joinUrl(route.pathname, route.query)
             const state = {
-                title: route.title,
+                title: route.title || document.title,
                 pathname: route.pathname,
                 full
             }
@@ -74,10 +84,18 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
         return {}
     }
 
+    const parseUrl = url => typeof url === `string`
+        ? url.split(`?`)[0]
+        : !!url.pathname
+            ? url.pathname
+            : ``
+
     const methods = {
         get current() { return current || {} },
 
         getRouteByPath,
+        getQuery,
+        routes: _routes,
 
         updateQuery(query) {
             if (!current) { return }
@@ -88,32 +106,12 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
             updateState(current)
         },
 
-        getQuery(str) {
-            const result = {}
-
-            if (!str || str === ``) {
-                str = location.search
-
-                if (!str || str === ``) {
-                    return result
-                }
-            }
-
-            const str2 = str.split(`?`)[1]
-
-            if (!str2 || str2 === ``) { return result }
-
-            str2.split(`&`).forEach(element => result[element.split(`=`)[0]] = element.split(`=`)[1])
-
-            return result
-        },
-
         route(url) {
-            const route = methods.getRouteByPath(typeof url === `string` ? url.split(`?`)[0] : !!url.pathname ? url.pathname : ``)
+            const route = methods.getRouteByPath(parseUrl(url))
 
             if (!route) { return methods.route(`/`) }
 
-            document.title = route.title
+            if (!!route.title) { document.title = route.title }
 
             if (current && route.pathname === current.pathname) { return true }
 

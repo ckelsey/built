@@ -2,16 +2,30 @@ import ObserveWorker from '../utils/observeWorker'
 
 const Request = /*#__PURE__*/ apiBase => reqData => {
     const base = apiBase
-    const path = `${base}/${reqData.path || ''}`
+    const path = `${base}${`/${reqData.path || ``}`.split(`//`).join(`/`)}`
     const REQ = Object.assign({}, {
         data: undefined,
         headers: {},
         method: `POST`
     },
-        reqData, { path }
+        reqData,
+        { path }
     )
 
-    if (REQ.data && typeof REQ.data !== `string`) {
+    const isFormData = REQ.data instanceof FormData
+
+    if (!isFormData && REQ.data && typeof REQ.data !== `string`) {
+        REQ.data = JSON.stringify(REQ.data)
+    }
+
+    if (isFormData) {
+        REQ.toForm = true
+
+        const jsonData = {}
+        REQ.data.forEach(function (value, key) {
+            jsonData[key] = value
+        })
+
         REQ.data = JSON.stringify(REQ.data)
     }
 
@@ -19,8 +33,16 @@ const Request = /*#__PURE__*/ apiBase => reqData => {
         const worker$ = ObserveWorker(
             function () {
                 self.onmessage = function (e) {
-                    var xhr = new XMLHttpRequest();
-                    var data = JSON.parse(e.data);
+                    var xhr = new XMLHttpRequest()
+                    var data = JSON.parse(e.data)
+                    var formData = data.data
+
+                    if (data.toForm) {
+                        const form = new FormData()
+                        Object.keys(formData).forEach(key => form.append(key, formData[key]))
+                        formData = form
+                    }
+
                     xhr.open(data.method, data.path, false);
                     Object.keys(data.headers).forEach(key => xhr.setRequestHeader(key, data.headers[key]));
                     xhr.onload = () => postMessage({ status: xhr.status, response: xhr.responseText || xhr.statusText });

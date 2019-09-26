@@ -1,9 +1,9 @@
 import Template from './template'
 import Elements from './elements'
 import Observe from '../observe'
-import { ToBool } from '../convert/bool'
+import ToBool from '../convert/bool'
 import ID from '../id';
-import { IfInvalid } from '../convert/if'
+import IfInvalid from '../convert/if_invalid'
 import pipe from '../pipe'
 import Get from '../get'
 import { ToFunction } from '../convert/function'
@@ -63,8 +63,8 @@ const Constructor = /*#__PURE__*/ options => {
     const observedAttributes = options.observedAttributes || []
     const template = options.template || `<slot></slot>`
     const style = options.style || ``
-    const properties = options.properties
-    const elements = options.elements
+    const properties = options.properties || {}
+    const elements = options.elements || {}
     const methods = options.methods
     const computed = options.computed
     const getters = options.getters || {}
@@ -96,7 +96,7 @@ const Constructor = /*#__PURE__*/ options => {
             element.disconnectElements = ElementData.disconnect
         }
 
-        if (!properties.ready) {
+        if (properties && !properties.ready) {
             setStateProperty(
                 element,
                 `ready`,
@@ -115,12 +115,17 @@ const Constructor = /*#__PURE__*/ options => {
             onConnected(element)
         }
 
-        element.state[`ready`].subscribe(() => element.dispatchEvent(new CustomEvent(`ready`, { detail: element })))
+        if (element.state[`ready`]) {
+            element.state[`ready`].subscribe(() => element.dispatchEvent(new CustomEvent(`ready`, { detail: element })))
+        }
+
         element[`ready`] = true
 
         if (onReady) {
             onReady(element)
         }
+
+        element.dispatchEvent(new CustomEvent(`ready`, { detail: element }))
     }
 
     class componentClass extends HTMLElement {

@@ -48,6 +48,6 @@ module.exports = {
         inputfield_optionActiveColor: process.env.INPUTFIELD_OPTIONACTIVECOLOR || process.env.ACCENT_OFFSET_COLOR || `#fff`,
         inputfield_optionActiveBackgroundColor: process.env.INPUTFIELD_OPTIONACTIVEBACKGROUNDCOLOR || process.env.INPUTFIELD_ACCENTCOLOR || process.env.ACCENT_COLOR || `#59a2d8`,
         inputfield_shadowColor: process.env.INPUTFIELD_SHADOWCOLOR || `rgba(0, 0, 0, .31)`,
-        inputfield_shadow: process.env.INPUTFIELD_SHADOW || `inset 0px 0px 0px 1px ${process.env.INPUTFIELD_SHADOWCOLOR || `rgba(0, 0, 0, .21)`}`,
+        inputfield_shadow: process.env.INPUTFIELD_SHADOW || `inset 0px 0px 0px 1px ${process.env.INPUTFIELD_SHADOWCOLOR || ``}`,
     }
 }

@@ -1,8 +1,10 @@
 import pipe from '../pipe'
-import { IfInvalid } from '../convert/if'
-import { ToString, Split } from '../convert/string'
-import { Map, Filter } from '../convert/array'
+import IfInvalid from '../../utils/convert/if_invalid'
 import { CommasToArray } from '../convert/commas-to-array'
+import ToString from '../convert/to_string'
+import Split from '../convert/split'
+import Filter from '../convert/filter'
+import Map from '../convert/map'
 
 export const setAttribute = /*#__PURE__*/ (element, name, value, asProperty = false) => {
     if (!element || !name) { return element }

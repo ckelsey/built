@@ -1,0 +1,2 @@
+/** DO NOT EDIT, AUTO-GENERATED */
+export const SPINNERELEMENT = {page:false,scrim:false,blur:0,color:'#fff',scrimcolor:'rgba(0,0,0,0.62)',scrimopacity:1,speed:1000,styles:'',visible:false,type:'column',sass:{}}
