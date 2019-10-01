@@ -59,7 +59,7 @@ export const properties = Object.freeze(Object.assign({}, attributes, {
     activeElement: {
         format: val => pipe(IsElement, IfInvalid(null))(val).value,
         onChange: (val, host) => {
-            if (!val || val.classList.contains(activeElementClass)) { return }
+            if (!val || (val.classList && val.classList.contains(activeElementClass))) { return }
 
             triggerContentDrawer(host, val)
             host.itemElements.forEach(el => el.classList[el === val ? `add` : `remove`](activeElementClass))

@@ -75,9 +75,47 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
         let r
         let i = 0
         const keys = Object.keys(_routes)
+        const urlParts = typeof path === `string` ? path.split(`/`) : []
 
         while (i < keys.length && !r) {
             if (_routes[keys[i]].pathname === path) { return _routes[keys[i]] }
+
+            if (_routes[keys[i]].pathname.indexOf(`/*`) > -1) {
+                const pathParts = _routes[keys[i]].pathname.split(`/`)
+
+                if (pathParts.length > urlParts.length) {
+                    if (pathParts[urlParts.length - 1] !== `**`) {
+                        i = i + 1
+                        continue
+                    }
+                }
+
+                if (pathParts.length < urlParts.length) {
+                    if (pathParts[pathParts.length - 1] !== `**`) {
+                        i = i + 1
+                        continue
+                    }
+                }
+
+                let match = false
+
+                let partsIndex = 0
+
+                while (partsIndex < pathParts.length) {
+                    if (urlParts[partsIndex] !== pathParts[partsIndex] && pathParts[partsIndex].indexOf(`*`) === -1) {
+                        match = false
+                        break
+                    }
+
+                    match = true
+                    partsIndex = partsIndex + 1
+                }
+
+                if (match) {
+                    return _routes[keys[i]]
+                }
+            }
+
             i = i + 1
         }
 
@@ -106,8 +144,18 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
             updateState(current)
         },
 
+        addQuery(query) {
+            if (!current) { return }
+
+            current = Object.assign({}, current)
+            current.query = Object.assign({}, current.query, query)
+
+            updateState(current)
+        },
+
         route(url) {
-            const route = methods.getRouteByPath(parseUrl(url))
+            const parsedUrl = parseUrl(url)
+            const route = methods.getRouteByPath(parsedUrl)
 
             if (!route) { return methods.route(`/`) }
 
@@ -117,7 +165,7 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
 
             current = Object.assign({}, route)
             current.query = getQuery(url)
-
+            current.pathname = parsedUrl
             updateState(current)
 
             methods.route$.next(current)

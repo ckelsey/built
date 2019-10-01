@@ -16,9 +16,28 @@ const setStyles = (el, styles) => {
     setStyleRules(el, styles)
 }
 
+const setTheme = (value, host) => {
+    const themeElement = host.elements.theme
+    if (!themeElement || value === undefined) { return }
+    setStyleRules(themeElement, value)
+}
+
 const template = require('./index.html')
 const componentName = `spinner-element`
 const componentRoot = `.${componentName}-container`
+
+const doAllTheThings = host => {
+    const root = host.elements.root
+    if (!root) { return }
+
+    root.setAttribute(`type`, host.type)
+    setRootClass(host, host.page, `fullpage`)
+    setRootClass(host, host.scrim, `showscrim`)
+    setType(host)
+    setScrimColor(host)
+    setScrimOpacity(host)
+    setBlur(host)
+}
 
 const setRootClass = (host, condition, clss) => {
     const root = host.elements.root
@@ -28,19 +47,6 @@ const setRootClass = (host, condition, clss) => {
     root.classList[condition ? `add` : `remove`](clss)
 }
 
-const getSpinner = host => {
-    const slotted = host.children[0]
-
-    if (slotted) { return slotted }
-
-    const slot = host.elements.slot
-    if (!slot) { return }
-
-    return slot.children[0]
-}
-
-const setPage = host => setRootClass(host, host.page, `fullpage`)
-const setScrim = host => setRootClass(host, host.scrim, `showscrim`)
 const setType = host => {
     const root = host.elements.root
     if (!root) { return }
@@ -53,13 +59,6 @@ const setBlur = host => {
     scrim.style.backdropFilter = `blur(${host.blur}px)`
 }
 
-const setColor = host => {
-    const spinner = getSpinner(host)
-    console.log(host.color, spinner)
-    if (!spinner) { return }
-    spinner.style.color = host.color
-}
-
 const setScrimColor = host => {
     const scrim = host.elements.scrim
     if (!scrim) { return }
@@ -68,6 +67,7 @@ const setScrimColor = host => {
 
 const setScrimOpacity = host => {
     const scrim = host.elements.scrim
+
     if (!scrim) { return }
 
     if (host.scrim) {
@@ -77,28 +77,26 @@ const setScrimOpacity = host => {
     scrim.style.opacity = 0
 }
 
-const toggleVisibility = host => host.elements.root.classList[host.visible ? `add` : `remove`](`shown`)
+const toggleVisibility = host => {
+    host.elements.root.classList[host.visible ? `add` : `remove`](`shown`)
+}
 
 const elements = {
     root: {
         selector: componentRoot,
-        onChange: (_el, host) => setPage(host)
+        onChange: (_el, host) => doAllTheThings(host)
     },
     scrim: {
         selector: `.spinner-element-scrim`,
-        onChange: (_el, host) => {
-            setScrim(host)
-            setBlur(host)
-            setScrimOpacity(host)
-            setScrimColor(host)
-        }
+        onChange: (_el, host) => doAllTheThings(host)
     },
-    inner: {
-        selector: `.spinner-element-inner`,
-        onChange: (_el, host) => setColor(host)
-    },
+    inner: { selector: `.spinner-element-inner` },
     slot: { selector: `slot` },
-    injectedStyles: { selector: `style.injectedStyles`, onChange: (el, host) => setStyles(el, host.styles) }
+    injectedStyles: { selector: `style.injectedStyles`, onChange: (el, host) => setStyles(el, host.styles) },
+    theme: {
+        selector: `style.themeStyles`,
+        onChange: (_el, host) => setTheme(host.theme, host)
+    }
 }
 
 const properties = {
@@ -109,19 +107,19 @@ const properties = {
     },
     page: {
         format: val => pipe(ToBool, IfInvalid(SPINNERELEMENT.page))(val).value,
-        onChange: (_val, host) => setPage(host)
+        onChange: (_val, host) => doAllTheThings(host)
     },
     scrim: {
         format: val => pipe(ToBool, IfInvalid(SPINNERELEMENT.scrim))(val).value,
-        onChange: (_val, host) => setScrim(host)
+        onChange: (_val, host) => doAllTheThings(host)
     },
     blur: {
         format: val => pipe(ToNumber, IfInvalid(SPINNERELEMENT.blur))(val).value,
-        onChange: (_val, host) => setBlur(host)
+        onChange: (_val, host) => doAllTheThings(host)
     },
     scrimopacity: {
         format: val => pipe(ToNumber, IfInvalid(SPINNERELEMENT.scrimopacity))(val).value,
-        onChange: (_val, host) => setScrimOpacity(host)
+        onChange: (_val, host) => doAllTheThings(host)
     },
     styles: {
         format: val => typeof val === `string` ? val : SPINNERELEMENT.styles,
@@ -129,7 +127,11 @@ const properties = {
     },
     type: {
         format: val => typeof val === `string` ? val : SPINNERELEMENT.type,
-        onChange: (_val, host) => setType(host)
+        onChange: (_val, host) => doAllTheThings(host)
+    },
+    theme: {
+        format: (val, host) => typeof val === `string` ? val : host.theme,
+        onChange: setTheme
     }
 }
 

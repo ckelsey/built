@@ -1,6 +1,8 @@
 import Timer from '../../services/timer'
 import { EaseInOut } from '../../utils/curve'
 
+const style = require('./style.scss').toString()
+
 const removeAtAllCosts = el => {
     try { el.parentNode.removeChild(el) } catch (error) { }
 }
@@ -15,38 +17,113 @@ const animator = (from, to, speed, stepFn) => new Promise(resolve =>
 )
 
 const animateHeight = (from, to, el, speed) => animator(from, to, speed, heightStep => el.style.height = `${heightStep}px`)
+const animateLeft = (from, to, el, speed) => animator(from, to, speed, leftStep => el.style.transform = `translateZ(0) translateX(${leftStep}%)`)
 const animateOpacity = (from, to, el, speed) => animator(from, to, speed, opacityStep => el.style.opacity = opacityStep)
 
-export const transitionChild = host => child => new Promise(resolve => {
+const getTransitionElements = (host, indexOrChild) => {
     const nextContainer = host.elements.nextContainer
     const currentContainer = host.elements.currentContainer
     const root = host.elements.root
+    const child = isNaN(indexOrChild) ? indexOrChild : host.children[indexOrChild]
 
-    if (!root || !nextContainer || !currentContainer) { return }
+    if (!root || !nextContainer || !currentContainer || !child) { return }
 
-    const startHeight = root.offsetHeight
-    root.style.height = `${startHeight}px`
+    return { nextContainer, currentContainer, root, child }
+}
 
-    child.setAttribute(`slot`, `next`)
+const transitionSlide = (hostElement, index, speed) => new Promise(resolve => {
+    hostElement.dispatchEvent(new CustomEvent(`transitioning`, { detail: hostElement }))
+    const elements = getTransitionElements(hostElement, index)
 
-    host.appendChild(child)
+    if (!elements) { return resolve() }
 
-    animateOpacity(1, 0, currentContainer, host.speed * 0.75)
-    animateOpacity(0, 1, nextContainer, host.speed)
+    const current: any = Array.from(hostElement.children).filter((c: any) => !c.getAttribute(`slot`))[0]
+    const startHeight = elements.root.offsetHeight
+    elements.root.style.height = `${startHeight}px`
+    elements.root.classList.add(`sliding`)
+    elements.child.setAttribute(`slot`, `next`)
 
-    animateHeight(startHeight, child.offsetHeight, root, host.speed)
+    animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed)
         .then(() => {
-            while (host.children.length > 1) {
-                removeAtAllCosts(host.children[0])
+            requestAnimationFrame(() => elements.root.style.removeProperty(`height`))
+        })
+
+    setTimeout(() => {
+        requestAnimationFrame(() => {
+            animateOpacity(0, 1, elements.nextContainer, speed * 0.25)
+        })
+    }, speed * 0.1)
+
+    animateOpacity(1, 0, elements.currentContainer, speed * 0.8)
+
+    animateLeft(0, 100, elements.currentContainer, speed * 0.8)
+        .then(() => current.setAttribute(`slot`, `hidden`))
+
+    animateLeft(-100, 0, elements.nextContainer, speed)
+        .then(() => {
+            elements.currentContainer.removeAttribute(`style`)
+            elements.child.removeAttribute(`slot`)
+            elements.nextContainer.removeAttribute(`style`)
+            elements.root.classList.remove(`sliding`)
+            hostElement.dispatchEvent(new CustomEvent(`transitioned`, { detail: hostElement }))
+            return resolve()
+        })
+})
+
+const transitionFade = (hostElement, child, speed, keepchildren) => new Promise(resolve => {
+    hostElement.dispatchEvent(new CustomEvent(`transitioning`, { detail: hostElement }))
+    const elements = getTransitionElements(hostElement, child)
+
+    if (!elements) { return resolve() }
+
+    const startHeight = elements.root.offsetHeight
+    elements.root.style.height = `${startHeight}px`
+    elements.child.setAttribute(`slot`, `next`)
+    hostElement.appendChild(elements.child)
+
+    animateOpacity(1, 0, elements.currentContainer, speed * 0.75)
+    animateOpacity(0, 1, elements.nextContainer, speed)
+
+    animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed)
+        .then(() => {
+
+            if (!keepchildren) {
+                while (hostElement.children.length > 1) {
+                    removeAtAllCosts(hostElement.children[0])
+                }
             }
 
-            child.removeAttribute(`slot`)
-            currentContainer.style.removeProperty(`opacity`)
-
+            elements.child.removeAttribute(`slot`)
+            elements.currentContainer.style.removeProperty(`opacity`)
 
             requestAnimationFrame(() => {
-                root.style.removeProperty(`height`)
-                return resolve(host.children[0])
+                elements.root.style.removeProperty(`height`)
+                hostElement.dispatchEvent(new CustomEvent(`transitioned`, { detail: hostElement }))
+                return resolve(hostElement.children[0])
             })
         })
 })
+
+export const transitionTo = host => index => new Promise(resolve => {
+    switch (host.type) {
+        case `slide`:
+            return transitionSlide(host, index, host.speed)
+                .then(resolve)
+        case `fade`:
+            return transitionFade(host, index, host.speed, host.keepchildren)
+                .then(resolve)
+    }
+})
+
+export const transitionChild = host => child => new Promise(resolve => {
+    switch (host.type) {
+        case `slide`:
+            return transitionSlide(host, child, host.speed)
+                .then(resolve)
+        case `fade`:
+            return transitionFade(host, child, host.speed, host.keepchildren)
+                .then(resolve)
+    }
+})
+
+export const getComponentStyles = host => () => `${style}${host.styles}`

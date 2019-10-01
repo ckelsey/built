@@ -3,14 +3,14 @@ import Define from '../../utils/webcomponent/define'
 import './style.scss'
 import elements from './elements'
 import { observedAttributes, properties } from './properties'
-import { transitionChild } from './methods'
+import { transitionChild, transitionTo, getComponentStyles } from './methods'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = `content-transition`
 const componentRoot = `.content-transition-container`
 
-const ContentTransition = /*#__PURE__*/ Constructor({
+const ContentTransition = Constructor({
     componentName,
     componentRoot,
     template,
@@ -19,7 +19,9 @@ const ContentTransition = /*#__PURE__*/ Constructor({
     properties,
     elements,
     methods: {
-        transitionChild
+        transitionChild,
+        transitionTo,
+        getComponentStyles
     }
 })
 

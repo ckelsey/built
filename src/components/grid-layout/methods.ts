@@ -1,6 +1,7 @@
 import ID from '../../utils/id'
 import { itemEvents, hardCloseContentDrawer } from './events'
 import { itemRowSelector, itemRowClass } from './elements'
+import throttle from '../../utils/throttle'
 
 const createSlot = (index, container) => {
     const slot = document.createElement(`slot`) as any
@@ -108,7 +109,7 @@ export const setItemDefaultTransform = (host, element) => setElementTransform(el
 
 export const setItemHoverTransform = (host, element) => setElementTransform(element, host.hoverspacing)
 
-export const refresh = host => () => new Promise(resolve => {
+export const refresh = host => throttle(() => {
     let maxTries = 5000
 
     const run = container => {
@@ -129,7 +130,7 @@ export const refresh = host => () => new Promise(resolve => {
         let currentSlot = undefined
 
         const finishRender = () => {
-            if (host.rendering !== renderID) { return resolve(`invalid render`) }
+            if (host.rendering !== renderID) { return }
 
             Array
                 .from(container.querySelectorAll(itemRowSelector))
@@ -139,17 +140,15 @@ export const refresh = host => () => new Promise(resolve => {
                 })
 
             host.elements.root.classList.remove(`refreshing`)
-
             requestAnimationFrame(() => {
                 host.rendering = undefined
                 host.setAttribute(`ready`, `true`)
                 host.dispatchEvent(new CustomEvent(`itemsrendered`, { detail: host }))
-                resolve()
             })
         }
 
         const assignNext = () => {
-            if (host.rendering !== renderID) { return resolve(`invalid render`) }
+            if (host.rendering !== renderID) { return }
 
             if (loaded.indexOf(assignedIndex) === -1) { return }
 
@@ -167,28 +166,47 @@ export const refresh = host => () => new Promise(resolve => {
         }
 
         items.forEach(item => {
-            const imagesDone = () => {
+            const imagesDone = results => {
                 if (host.rendering !== renderID) { return }
+
+                if (results.filter(v => !!v).length) {
+                    return run(container)
+                }
+
                 loaded.push(item.index)
                 assignNext()
             }
 
-            if (!Array.isArray(item.images)) { return imagesDone() }
+            if (!Array.isArray(item.images)) { return imagesDone([]) }
 
             return Promise.all(item.images
                 .map(image => {
-                    if (!image || !image.src || (image.width && image.height)) { return Promise.resolve() }
+
 
                     return new Promise(resolve => {
-                        image.addEventListener(`load`, function loaded() {
-                            image.removeEventListener(`load`, loaded, false)
-                            return resolve()
-                        }, false)
+                        let hasErrored = false
+
+                        const hasDimensions = () => !!image.width && image.width > 0 && !!image.height && image.height > 0
+
+                        if (!image || !image.src || hasDimensions()) {
+                            return resolve(false)
+                        }
+
+                        const checkDimensions = () => {
+                            if (hasErrored || hasDimensions()) {
+                                return resolve(true)
+                            }
+
+                            requestAnimationFrame(checkDimensions)
+                        }
 
                         image.addEventListener(`error`, function errored() {
                             image.removeEventListener(`error`, errored, false)
-                            return resolve()
+                            hasErrored = true
+                            return resolve(true)
                         }, false)
+
+                        checkDimensions()
                     })
                 })
             )
@@ -197,7 +215,7 @@ export const refresh = host => () => new Promise(resolve => {
     }
 
     const tryRun = () => {
-        if (!maxTries) { return resolve(`elements not found`) }
+        if (!maxTries) { return }
 
         const container = host.elements.itemsContainer
 
@@ -207,4 +225,6 @@ export const refresh = host => () => new Promise(resolve => {
     }
 
     tryRun()
-})
+}, 100)
+
+export const getComponentStyles = host => () => `${require('./style.scss').toString()}${host.styles}`

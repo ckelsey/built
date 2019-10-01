@@ -139,7 +139,7 @@ export const positionContentDrawer = host => {
 
 export const triggerContentDrawer = (host, element) => {
 
-    if (!element) { return }
+    if (!element || typeof element.getAttribute !== `function`) { return }
 
     const container = contentDrawerContainer(host)
     const currentRow = container.rowIndex

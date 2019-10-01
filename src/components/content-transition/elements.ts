@@ -5,6 +5,14 @@ export const setStyles = (el, host, styles) => {
     setStyleRules(el, styles || host.styles)
 }
 
+export const setKeepChildren = host => {
+    const root = host.elements.root
+
+    if (!root) { return }
+
+    root.classList[host.keepchildren ? `add` : `remove`](`keepchildren`)
+}
+
 const elements = {
     root: {
         selector: `.content-transition-container`,
@@ -21,6 +29,12 @@ const elements = {
     },
     nextContainer: {
         selector: `.next-slot`
+    },
+    hidden: {
+        selector: `slot[name="hidden"]`,
+    },
+    hiddentContainer: {
+        selector: `.hidden-slot`
     },
     currentContainer: {
         selector: `.current-slot`

@@ -1,7 +1,8 @@
 const Get = (
     el: any = {},
     path: string = ``,
-    emptyVal: any = undefined
+    emptyVal: any = undefined,
+    conditionFn = v => v
 ) => {
     if (!el) {
         return emptyVal
@@ -14,7 +15,7 @@ const Get = (
     }
 
     const result = Path.reduce((accumulator, currentValue) => {
-        if (accumulator === undefined) {
+        if (accumulator === undefined || accumulator === null) {
             return emptyVal
         }
 
@@ -37,11 +38,11 @@ const Get = (
 
     })
 
-    if (result === undefined) {
+    if (result === undefined || result === null) {
         return emptyVal
     }
 
-    return result
+    return conditionFn(result)
 }
 
 export default Get

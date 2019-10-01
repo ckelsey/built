@@ -52,7 +52,8 @@
     </head>
 
     <body>
-        <spinner-element page="true" visible="true" scrim="true" blur="3" type="column"></spinner-element>
+        <spinner-element page="true" scrim="true" blur="3" type="boading"></spinner-element>
+
         <image-loader src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg" id="image-loader"></image-loader>
 
         <dropdown-select id="country"></dropdown-select>
@@ -96,10 +97,18 @@
             </horizontal-slider>
         </div>
 
-        <content-transition>
+        <content-transition keepchildren="true">
             <div id="content-transition">
                 <div>The slotchange event is fired on an HTMLSlotElement instance (slot element) when the node(s) contained in that slot change.</div>
             </div>
+            <!-- <div id="content-transition2" slot="hidden">
+                <div>Well Hello!</div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
+            </div>
+            <div id="content-transition3" slot="hidden">
+                <div>Ahhh hahahahaha!</div>
+                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
+            </div> -->
         </content-transition>
 
         <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
@@ -206,23 +215,33 @@
             //     type: 'text'
             // }]
 
-            // const contentTransition = document.body.querySelector('content-transition')
+            var contentTransition = document.body.querySelector('content-transition')
 
-            // setTimeout(function ()
-            // {
-            //     const newNode = document.createElement('div')
-            //     newNode.textContent = 'This causes the animations to run that were created in the previous step. Because the baked animations are already eased, the timing function needs to be set to linear otherwise you’ll ease between each keyframe which will look very weird! When it comes to collapsing the element back down there are two options: update the CSS animation to run in reverse rather than forwards. This will work just fine, but the "feel" of the animation will be reversed, so if you used an ease-out curve the reverse will feel eased in, which will make it feel sluggish. A more appropriate solution is to create a second pair of animations for collapsing the element. These can be created in exactly the same way as the expand keyframe animations, but with swapped start and end values.'
-            //     contentTransition.transitionChild(newNode)
-
+            // setTimeout(function () {
+            //     contentTransition.transitionTo(1)
             // }, 2000)
 
-            // setTimeout(function ()
-            // {
-            //     const newNode = document.createElement('div')
-            //     newNode.textContent = 'A more advanced version: circular reveals'
-            //     contentTransition.transitionChild(newNode)
+            // setTimeout(function () {
+            //     contentTransition.transitionTo(2)
+            // }, 4000)
 
-            // }, 5000)
+            // setTimeout(function () {
+            //     contentTransition.transitionTo(0)
+            // }, 6000)
+
+            setTimeout(function () {
+                const newNode = document.createElement('div')
+                newNode.textContent = 'This causes the animations to run that were created in the previous step. Because the baked animations are already eased, the timing function needs to be set to linear otherwise you’ll ease between each keyframe which will look very weird! When it comes to collapsing the element back down there are two options: update the CSS animation to run in reverse rather than forwards. This will work just fine, but the "feel" of the animation will be reversed, so if you used an ease-out curve the reverse will feel eased in, which will make it feel sluggish. A more appropriate solution is to create a second pair of animations for collapsing the element. These can be created in exactly the same way as the expand keyframe animations, but with swapped start and end values.'
+                contentTransition.transitionChild(newNode)
+
+            }, 2000)
+
+            setTimeout(function () {
+                const newNode = document.createElement('div')
+                newNode.textContent = 'A more advanced version: circular reveals'
+                contentTransition.transitionChild(newNode)
+
+            }, 5000)
 
             const grid = document.querySelector('grid-layout')
             const gridfilter = document.getElementById('gridfilter')

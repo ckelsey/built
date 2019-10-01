@@ -7,6 +7,8 @@ import IfInvalid from '../convert/if_invalid'
 import pipe from '../pipe'
 import Get from '../get'
 import { ToFunction } from '../convert/function'
+import AppendStyle from './append-style';
+import ComponentStore from '../../services/componentStore'
 
 const unsub = (el, elementProperty, eventKey) => pipe(ToFunction, IfInvalid(() => { }))(Get(el, `${elementProperty}.${eventKey}`)).value()
 
@@ -21,29 +23,30 @@ const unsubscribeEvent = (el, eventKey, elementProperty = `eventSubscriptions`) 
 }
 
 const setProperty = (host, key, formatter, getter, setter) => {
+    try {
+        Object.defineProperty(host, key, {
+            get() {
+                if (typeof getter === `function`) { return getter(host) }
+                return host.state[key].value
+            },
+            set(value) {
+                if (!host.state[key]) { return }
 
-    Object.defineProperty(host, key, {
-        get() {
-            if (typeof getter === `function`) { return getter(host) }
-            return host.state[key].value
-        },
-        set(value) {
-            if (!host.state[key]) { return }
+                if (typeof setter === `function`) { return setter(host)(value) }
 
-            if (typeof setter === `function`) { return setter(host)(value) }
+                const formattedValue = formatter(value, host)
+                const previous = host.state[key].value
 
-            const formattedValue = formatter(value, host)
-            const previous = host.state[key].value
+                if (typeof previous === `function` && typeof formattedValue === `function` && formattedValue.toString() !== previous.toString()) {
+                    return host.state[key].next(formattedValue)
+                }
 
-            if (typeof previous === `function` && typeof formattedValue === `function` && formattedValue.toString() !== previous.toString()) {
-                return host.state[key].next(formattedValue)
+                if (host.state[key].value !== formattedValue) {
+                    host.state[key].next(formattedValue)
+                }
             }
-
-            if (host.state[key].value !== formattedValue) {
-                host.state[key].next(formattedValue)
-            }
-        }
-    })
+        })
+    } catch (error) { }
 }
 
 const setStateProperty = (host, key, formatter, onChange, getter, setter) => {
@@ -58,7 +61,7 @@ const setStateProperty = (host, key, formatter, onChange, getter, setter) => {
     host.state[key].subscribe(val => onChange(val, host))
 }
 
-const Constructor = /*#__PURE__*/ options => {
+const Constructor = options => {
     const componentName = options.componentName
     const observedAttributes = options.observedAttributes || []
     const template = options.template || `<slot></slot>`
@@ -76,13 +79,18 @@ const Constructor = /*#__PURE__*/ options => {
     if (!componentName) { return }
 
     const ConnectedFn = element => {
+
+        if (options.appendStylesToParent) {
+            AppendStyle(style, element.parentElement, componentName)
+        }
+
         element.wcID = ID(`wc`)
         element.unsubscribeEvent = unsubscribeEvent
         element.unsubscribeEvents = unsubscribeEvents
 
         if (computed) {
             Object.keys(computed).forEach(key => {
-                Object.defineProperty(element, key, computed[key](element))
+                try { Object.defineProperty(element, key, computed[key](element)) } catch (error) { }
             })
         }
 
@@ -143,9 +151,14 @@ const Constructor = /*#__PURE__*/ options => {
 
         public attributeChangedCallback(attrName, oldValue, newValue) { if (newValue !== oldValue) { this[attrName] = newValue } }
 
-        public connectedCallback() { ConnectedFn(this) }
+        public connectedCallback() {
+            ComponentStore.addComponent(this)
+            ConnectedFn(this)
+        }
 
         public disconnectedCallback() {
+            ComponentStore.removeComponent(this)
+
             if (this.state) {
                 Object.keys(this.state).forEach(key => {
                     this.state[key].complete()

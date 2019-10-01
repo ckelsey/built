@@ -9,7 +9,7 @@ import Define from '../../utils/webcomponent/define'
 import './style.scss'
 import elements from './elements'
 import { observedAttributes, properties } from './properties'
-import { refresh } from './methods'
+import { refresh, getComponentStyles } from './methods'
 import { itemElements, itemsData } from './computed'
 import { setHostEvents } from './events'
 
@@ -18,7 +18,7 @@ const template = require('./index.html')
 const componentName = `grid-layout`
 const componentRoot = `.${componentName}-container`
 
-const GridLayout = /*#__PURE__*/ Constructor({
+const GridLayout = Constructor({
     componentName,
     componentRoot,
     template,
@@ -26,10 +26,36 @@ const GridLayout = /*#__PURE__*/ Constructor({
     observedAttributes,
     properties,
     elements,
-    methods: { refresh },
+    methods: { refresh, getComponentStyles },
     computed: { itemElements, itemsData },
-    onConnected: host => setHostEvents(host),
-    appendStylesToHead: true
+    onConnected: host => {
+        setHostEvents(host)
+
+        host.slotObserver = new MutationObserver(mutationsList => {
+            let refresh = false
+            let i = 0
+
+            while (!refresh && i < mutationsList.length) {
+                if (mutationsList[i].type === `childList`) {
+                    refresh = true
+                    break
+                }
+
+                i = i++
+            }
+
+            if (refresh) {
+                return host.refresh()
+            }
+        })
+
+        host.slotObserver.observe(host, { childList: true })
+    },
+    onDisconnected: host => {
+        host.slotObserver.disconnect()
+    },
+    appendStylesToHead: true,
+    // appendStylesToParent: true
 })
 
 Define(componentName, GridLayout)

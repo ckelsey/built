@@ -180,7 +180,7 @@ const methods = {
         .then(canvas => canvas.getContext(`2d`).getImageData(x, y, w ? w : canvas.width, h ? h : canvas.height)),
 }
 
-const ImageLoader = /*#__PURE__*/ Constructor({
+const ImageLoader = Constructor({
     componentName,
     componentRoot,
     template,
@@ -193,7 +193,7 @@ const ImageLoader = /*#__PURE__*/ Constructor({
 
 Define(componentName, ImageLoader)
 
-export const imageLoader = /*#__PURE__*/ val => new Promise((resolve, reject) => {
+export const imageLoader = val => new Promise((resolve, reject) => {
     let prop
 
     if (typeof val === `string`) {
@@ -201,7 +201,7 @@ export const imageLoader = /*#__PURE__*/ val => new Promise((resolve, reject) =>
     } else if (IsElement(val).valid) {
         prop = `element`
     } else {
-        return Promise.resolve()
+        return resolve()
     }
 
     const loader = document.createElement(`image-loader`) as any

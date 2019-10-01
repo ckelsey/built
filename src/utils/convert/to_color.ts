@@ -8,7 +8,6 @@ const ToColor = value => {
     if (result.valid) {
         const el = document.createElement(`option`)
         el.style.color = result.value
-        console.log(`ToColor`, result.value, el.style.color)
         result.valid = el.style.color === result.value
     }
 

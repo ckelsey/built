@@ -106,10 +106,11 @@ const elementMethods = {
     icon: (el, host) => {
         el.eventSubscriptions = {
             click: ObserveEvent(el, `click`).subscribe(() => {
-                const input = host.elements.input
-                if (input) {
-                    input.focus()
-                }
+                // const input = host.elements.input
+
+                // if (input) {
+                //     input.focus()
+                // }
 
                 host.dispatchEvent(new CustomEvent(`iconclick`, { detail: host }))
             })

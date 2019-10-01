@@ -1,6 +1,9 @@
 import { wcClassObject } from '../../utils/html/attr'
-import { setStyles } from './elements'
+import { setStyles, setKeepChildren } from './elements'
 import { CONTENTTRANSITION } from './theme'
+import pipe from '../../utils/pipe'
+import { ToBool } from '../../utils'
+import IfInvalid from '../../utils/convert/if_invalid'
 
 export const properties = {
     class: wcClassObject,
@@ -12,6 +15,15 @@ export const properties = {
 
     speed: {
         format: val => isNaN(val) ? CONTENTTRANSITION.speed : val
+    },
+
+    type: {
+        format: val => [`fade`, `slide`].indexOf(val) > -1 ? val : `fade`
+    },
+
+    keepchildren: {
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
+        onChange: (_val, host) => setKeepChildren(host)
     }
 }
 

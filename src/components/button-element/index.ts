@@ -18,6 +18,12 @@ const setStyles = (el, host, styles) => {
     setStyleRules(el, styles || host.styles)
 }
 
+const setTheme = (value, host) => {
+    const themeElement = host.elements.theme
+    if (!themeElement || value === undefined) { return }
+    setStyleRules(themeElement, value)
+}
+
 const properties = {
     accentcolor: {
         format: val => pipe(ToString, IfInvalid(BUTTONELEMENT.accentcolor))(val).value,
@@ -50,6 +56,10 @@ const properties = {
     styles: {
         format: val => typeof val === `string` ? val : BUTTONELEMENT.styles,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, host, val)
+    },
+    theme: {
+        format: (val, host) => typeof val === `string` ? val : host.theme,
+        onChange: setTheme
     }
 }
 
@@ -78,6 +88,10 @@ const elements = {
     injectedStyles: {
         selector: `style.injectedStyles`,
         onChange: setStyles
+    },
+    theme: {
+        selector: `style.themeStyles`,
+        onChange: (_el, host) => setTheme(host.theme, host)
     }
 }
 

@@ -126,7 +126,7 @@ input-field {
 
         &[input-kind="checkbox"],
         &[input-kind="radio"] {
-            min-height: 5.25rem;
+            min-height: 5.25em;
             display: flex;
             flex-direction: column;
             justify-content: center;
