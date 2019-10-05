@@ -1,0 +1,104 @@
+.overlay-message-container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+
+    .overlay-message-scrim {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(31, 31, 31, 0.9);
+        backdrop-filter: blur(2px);
+    }
+
+    .overlay-message-content-container {
+        position: relative;
+        top: 50%;
+        width: 80%;
+        max-width: 600px;
+        margin: auto;
+        border-radius: 5px;
+        color: #fff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 2px 22px rgba(0, 0, 0, 0.62);
+        transform: translateY(-50%);
+    }
+
+    .overlay-message-content {
+        padding: 0.62em;
+    }
+
+    .overlay-message-header {
+        font-size: 162%;
+        text-transform: capitalize;
+        font-weight: bold;
+        padding: 0.125em 0;
+        box-sizing: border-box;
+        position: relative;
+
+        &:after {
+            content: "";
+            display: block;
+            width: 100%;
+            box-shadow: 0 1px 0 0;
+            height: 1px;
+            opacity: 0.25;
+            margin-top: 0.25em;
+            margin-bottom: 0.75em;
+        }
+
+        &:empty {
+            display: none;
+        }
+    }
+
+    .overlay-message-body {
+        opacity: 0.62;
+    }
+
+    .overlay-message-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: calc(100% + 0.5em);
+        margin-left: -0.25em;
+
+        ::slotted(*) {
+            margin: 0 0.25em;
+        }
+    }
+
+    &.shown {
+        opacity: 1;
+        pointer-events: all;
+        z-index: 99999999999999999;
+    }
+
+    &[colortheme="light"],
+    &[colortheme="dark"] {
+        .overlay-message-content-container {
+            text-shadow: none;
+            padding: 1.5em;
+            box-sizing: border-box;
+            box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.38);
+        }
+    }
+
+    &[colortheme="light"] {
+        .overlay-message-content-container {
+            background: #fafafa;
+            color: #333;
+        }
+    }
+
+    &[colortheme="dark"] {
+        .overlay-message-content-container {
+            background: #1f1f1f;
+            color: #e2e2e2;
+        }
+    }
+}

@@ -2,11 +2,11 @@ import pipe from '../../utils/pipe'
 import IfInvalid from '../../utils/convert/if_invalid'
 import IfEmpty from '../../utils/convert/if_empty'
 import ToBool from '../../utils/convert/bool'
-import { ToNumber } from '../../utils/convert/number'
+import ToNumber from '../../utils/convert/to_number'
 import { toggle } from './methods'
 import { setHeaderIcon, setStyles } from './elements'
-import { CommasToArray } from '../../utils/convert/commas-to-array'
-import { wcClassObject } from '../../utils/html/attr'
+import CommasToArray from '../../utils/convert/commas-to-array'
+import ComponentClassObject from '../../utils/html/component-class-object'
 import { CONTENTDRAWER } from './theme'
 import ToString from '../../utils/convert/to_string'
 import Map from '../../utils/convert/map'
@@ -53,7 +53,7 @@ const attributes = {
         format: val => pipe(ToNumber, IfInvalid(CONTENTDRAWER.bouncespeed))(val).value,
     },
 
-    class: wcClassObject,
+    class: ComponentClassObject,
 
     drawergroup: {
         format: val => val,

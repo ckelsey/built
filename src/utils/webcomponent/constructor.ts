@@ -84,7 +84,7 @@ const Constructor = options => {
             AppendStyle(style, element.parentElement, componentName)
         }
 
-        element.wcID = ID(`wc`)
+        element.wcID = ID()
         element.unsubscribeEvent = unsubscribeEvent
         element.unsubscribeEvents = unsubscribeEvents
 

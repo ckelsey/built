@@ -2,9 +2,9 @@ import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import pipe from '../../utils/pipe'
 import IfInvalid from '../../utils/convert/if_invalid'
-import { wcClassObject } from '../../utils/html/attr'
+import ComponentClassObject from '../../utils/html/component-class-object'
 import ToString from '../../utils/convert/to_string'
-import { setStyleRules } from '../../utils/html/markup'
+import SetStyleRules from '../../utils/html/set-style-rules'
 import { BUTTONELEMENT } from './theme'
 import './style.scss'
 import '../effect-bounce-z'
@@ -15,13 +15,13 @@ const style = require('./style.scss').toString()
 
 const setStyles = (el, host, styles) => {
     if (!el) { return }
-    setStyleRules(el, styles || host.styles)
+    SetStyleRules(el, styles || host.styles)
 }
 
 const setTheme = (value, host) => {
     const themeElement = host.elements.theme
     if (!themeElement || value === undefined) { return }
-    setStyleRules(themeElement, value)
+    SetStyleRules(themeElement, value)
 }
 
 const properties = {
@@ -36,7 +36,7 @@ const properties = {
             }
         }
     },
-    class: wcClassObject,
+    class: ComponentClassObject,
     ready: {
         format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (val, host) => {

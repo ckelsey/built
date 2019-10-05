@@ -1,5 +1,6 @@
 import { Tmonad } from './t-monad'
-import { ToNumber, ToDigits } from './number';
+import ToDigits from './to_digits'
+import ToNumber from './to_number'
 import pipe from '../pipe';
 import ToString from './to_string';
 

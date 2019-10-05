@@ -1,4 +1,5 @@
 import Observe from '../utils/observe'
+import Get from '../utils/get'
 
 const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
     let current
@@ -39,7 +40,7 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
         return result
     }
 
-    const formatQuery = query => {
+    const queryObjectToString = query => {
         if (!Object.keys(query).length) { return `` }
 
         const queries = Object
@@ -53,7 +54,7 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
         return ``
     }
     const addLeadingSlash = pathname => !pathname ? `` : pathname[0] === `/` ? pathname : `/${pathname}`
-    const joinUrl = (pathname, query) => `${location.protocol}//${location.host}${addLeadingSlash(pathname)}${formatQuery(query)}`
+    const joinUrl = (pathname, query) => `${location.protocol}//${location.host}${addLeadingSlash(pathname)}${queryObjectToString(query)}`
 
     const updateState = (route) => {
         if (history.pushState && route) {
@@ -129,10 +130,19 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
             : ``
 
     const methods = {
-        get current() { return current || {} },
+        get current() {
+            return Object.assign(
+                {},
+                current || {},
+                {
+                    path: location.pathname,
+                    base: `${location.protocol}//${location.host}${!!location.port ? `:${location.port}` : ``}`
+                })
+        },
 
         getRouteByPath,
         getQuery,
+        queryObjectToString,
         routes: _routes,
 
         updateQuery(query) {
@@ -166,6 +176,7 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
             current = Object.assign({}, route)
             current.query = getQuery(url)
             current.pathname = parsedUrl
+
             updateState(current)
 
             methods.route$.next(current)
@@ -195,7 +206,9 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
 
         if (!link && tag !== `a`) { return }
 
-        const url = new URL(link ? link.href : target.href)
+        Get(link, `href`, Get(target, `href`, ``))
+
+        const url = new URL(Get(link, `href`, Get(target, `href`, ``)))
 
         if (url.host !== location.host) { return }
         if (methods.route(url)) { e.preventDefault() }

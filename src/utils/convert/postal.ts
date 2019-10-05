@@ -1,6 +1,6 @@
 import { Tmonad } from './t-monad'
 import pipe from '../pipe'
-import { ToDigits } from './number'
+import ToDigits from './to_digits'
 import Split from './split'
 import Map from './map'
 import Join from './join'

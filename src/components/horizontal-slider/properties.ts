@@ -1,4 +1,4 @@
-import { wcClassObject } from '../../utils/html/attr'
+import ComponentClassObject from '../../utils/html/component-class-object'
 import { setStyles, unsetItemEvents, setItemEvents, setChicklets, setPrevious, setNext } from './elements'
 import { HORIZONTALSLIDER } from './theme'
 import pipe from '../../utils/pipe'
@@ -7,10 +7,10 @@ import IfInvalid from '../../utils/convert/if_invalid'
 import Get from '../../utils/get'
 import { autoplay, setLoop } from './methods'
 import ToBool from '../../utils/convert/bool'
-import { ToNumber } from '../../utils/convert/number'
+import ToNumber from '../../utils/convert/to_number'
 
 export const attributes = {
-    class: wcClassObject,
+    class: ComponentClassObject,
 
     styles: {
         format: val => typeof val === `string` ? val : HORIZONTALSLIDER.styles,

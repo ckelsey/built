@@ -1,6 +1,6 @@
 import ObserveEvent from '../../utils/observeEvent'
 import { toEffectStartFrom } from './properties'
-import { setStyleRules } from '../../utils/html/markup'
+import SetStyleRules from '../../utils/html/set-style-rules'
 
 export const elementSelectors = {
     root: `.content-drawer-container`,
@@ -64,7 +64,7 @@ export const setHeaderIcon = host => {
 
 export const setStyles = (el, styles) => {
     if (!el) { return }
-    setStyleRules(el, styles)
+    SetStyleRules(el, styles)
 }
 
 const elementMethods = {

@@ -98,7 +98,7 @@ const ObserveWorker = func => {
                 next,
                 error,
                 complete,
-                id: ID(`observeWorker`)
+                id: ID()
             }
 
             subscriptions[subscriber.id] = subscriber

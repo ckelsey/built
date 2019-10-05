@@ -1,4 +1,4 @@
-import { setStyleRules } from '../html/markup'
+import SetStyleRules from '../html/set-style-rules'
 
 const AppendStyle = /*#__PURE__*/ (rulesString, parent, name = ``) => {
     var style = document.createElement(`style`) as any
@@ -6,7 +6,7 @@ const AppendStyle = /*#__PURE__*/ (rulesString, parent, name = ``) => {
     style.setAttribute(`name`, name)
     style.style.display = `none`
     parent.appendChild(style)
-    setStyleRules(style, rulesString)
+    SetStyleRules(style, rulesString)
 }
 
 export default AppendStyle

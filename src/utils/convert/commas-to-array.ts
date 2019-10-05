@@ -5,7 +5,7 @@ import Map from './map'
 import ToPlainText from './to_plain_text'
 import Trim from './trim'
 
-export const CommasToArray = value => {
+const CommasToArray = value => {
     let result = Tmonad(value)
 
     if (result.stop) { return result }
@@ -27,3 +27,5 @@ export const CommasToArray = value => {
         Map(v => Trim(v).value)
     )(result)
 }
+
+export default CommasToArray

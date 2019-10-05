@@ -2,8 +2,9 @@ import ObserveEvent from '../../utils/observeEvent'
 import { filter, toggleOptions, setUnselectedOption, setSelectedOption } from './methods'
 import { findIn } from '../../utils/html/query'
 import Get from '../../utils/get'
-import { ValidateHtml } from '../../utils/validate'
-import { setStyleRules, replaceElementContents } from '../../utils/html/markup'
+import ValidateHtml from '../../utils/validate/html'
+import { replaceElementContents } from '../../utils/html/markup'
+import SetStyleRules from '../../utils/html/set-style-rules'
 
 export const elementSelectors = {
     root: `.dropdown-select-container`,
@@ -60,7 +61,7 @@ export const setStyles = host => {
     const optionSelectedColors = `.dropdown-select-container overlay-content .select-option.selected,.dropdown-select-container overlay-content .select-option:hover{color:${host.optionselectedcolor};background-color:${host.optionselectedbackground};}`
     const styles = `${host.styles}${optionColors}${optionSelectedColors}${labelSize}`
 
-    setStyleRules(el, styles)
+    SetStyleRules(el, styles)
 }
 
 const elements = {}

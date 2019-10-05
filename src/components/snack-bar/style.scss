@@ -1,0 +1,131 @@
+.snack-bar-container {
+    pointer-events: none;
+    opacity: 0;
+    position: fixed;
+    left: 5%;
+    width: 90%;
+    background-color: #fff;
+    z-index: 10;
+    box-shadow: 0 7px 10px -5px rgba(0, 0, 0, 0.61);
+    box-sizing: border-box;
+    transition: opacity 0.2s ease-in-out;
+
+    &[align="top"] {
+        top: 4em;
+    }
+
+    &[align="bottom"] {
+        bottom: 2em;
+    }
+
+    &.shown {
+        pointer-events: all;
+        opacity: 1;
+    }
+
+    .snack-bar-inner {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+
+        ::slotted(*) {
+            padding: 1em;
+            box-sizing: border-box;
+            align-items: center;
+            display: flex;
+        }
+    }
+
+    .snack-bar-text {
+        flex-grow: 1;
+    }
+
+    .snack-bar-text,
+    .snack-bar-icon,
+    .snack-bar-close,
+    .snack-bar-type-bar {
+        display: flex;
+        align-self: stretch;
+    }
+
+    .snack-bar-type-bar {
+        width: 3px;
+        min-width: 3px;
+        display: none;
+    }
+
+    .snack-bar-icon {
+        color: #fff;
+        background-image: linear-gradient(-75deg, rgba(0, 0, 0, 0.125), transparent 36%);
+    }
+
+    .infoicon,
+    .successicon,
+    .warningicon,
+    .erroricon {
+        padding: 1em;
+        display: none;
+        box-sizing: border-box;
+        align-items: center;
+    }
+
+    &[type="info"] {
+        .infoicon {
+            display: flex;
+        }
+
+        .snack-bar-icon {
+            background-color: #4fa8b8;
+        }
+
+        .snack-bar-type-bar {
+            display: flex;
+            background-color: #4fa8b8;
+        }
+    }
+
+    &[type="error"] {
+        .erroricon {
+            display: flex;
+        }
+
+        .snack-bar-icon {
+            background-color: #ce0000;
+        }
+
+        .snack-bar-type-bar {
+            display: flex;
+            background-color: #ce0000;
+        }
+    }
+
+    &[type="warning"] {
+        .warningicon {
+            display: flex;
+        }
+
+        .snack-bar-icon {
+            background-color: #f1813a;
+        }
+
+        .snack-bar-type-bar {
+            display: flex;
+            background-color: #f1813a;
+        }
+    }
+
+    &[type="success"] {
+        .successicon {
+            display: flex;
+        }
+
+        .snack-bar-icon {
+            background-color: #5eb344;
+        }
+
+        .snack-bar-type-bar {
+            display: flex;
+            background-color: #5eb344;
+        }
+    }
+}

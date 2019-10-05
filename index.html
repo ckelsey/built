@@ -41,6 +41,10 @@
                 width: auto
             }
 
+            .c-grid-item img {
+                width: 100%;
+            }
+
             spinner-element {
                 position: relative;
                 z-index: 999999999;
@@ -52,6 +56,15 @@
     </head>
 
     <body>
+        <overlay-message id="overlaymessage">
+            <div slot="header">A heading</div>
+            <div slot="body">The slotchange event is fired on an HTMLSlotElement instance (slot element) when the node(s) contained in that slot change.</div>
+            <div slot="button">
+                <button-element overlay-message-closed>Ok</button-element>
+            </div>
+            <div slot="button" overlay-message-close>Cancel</div>
+        </overlay-message>
+        <snack-bar id="snackbar"></snack-bar>
         <spinner-element page="true" scrim="true" blur="3" type="boading"></spinner-element>
 
         <image-loader src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg" id="image-loader"></image-loader>
@@ -64,7 +77,26 @@
 
         <input-field label="Filter grid" id="gridfilter"></input-field>
 
-        <grid-layout fillrow="false">
+        <grid-items width="1em">
+            <div class="c-grid-item" keywords="Dickinson, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
+            <div class="c-grid-item" keywords="Art of racing in the rain, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
+            <div class="c-grid-item" keywords="Men in black 4, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
+            <div class="c-grid-item" keywords="For All Mankind, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/fam_poster.jpg"></div>
+            <div class="c-grid-item" keywords="Angry Birds 2, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ab2_poster.jpg"></div>
+            <div class="c-grid-item" keywords="The Morning Show, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/tms_poster.jpg"></div>
+            <div class="c-grid-item" keywords="text">
+                <p>Hi, some text</p>
+            </div>
+            <div class="c-grid-item" keywords="See, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/see_poster.jpg"></div>
+            <div class="c-grid-item" keywords="47 degrees, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/47_poster.jpg"></div>
+            <div class="c-grid-item" keywords="Stuber, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/s_poster.jpg"></div>
+            <div class="c-grid-item" keywords="Downton Abbey, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/dta_poster.jpg"></div>
+            <div class="c-grid-item" keywords="Once upon a time in Hollywood, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ouatih_poster.jpg"></div>
+        </grid-items>
+
+        <p>&nbsp;</p>
+
+        <!-- <grid-layout fillrow="true">
             <div class="grid-item" keywords="Dickinson, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
             <div class="grid-item" keywords="Art of racing in the rain, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
             <div class="grid-item" keywords="Men in black 4, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
@@ -81,6 +113,8 @@
             <div class="grid-item" keywords="Once upon a time in Hollywood, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ouatih_poster.jpg"></div>
         </grid-layout>
 
+        <p>&nbsp;</p>
+
         <div style="height: 300px;color: #fff;">
             <horizontal-slider>
                 <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
@@ -95,7 +129,7 @@
                 <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
                 <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
             </horizontal-slider>
-        </div>
+        </div> -->
 
         <content-transition keepchildren="true">
             <div id="content-transition">
@@ -162,9 +196,9 @@
         <input-field type="tel" label="Telephone" format="tel"></input-field>
         <input-field type="radio" label="Radio" labelposition="right" value="true"></input-field>
         <input-field type="checkbox" label="Click me" labelposition="right" value="true"></input-field>
-        <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready" labelposition="right"></input-field>
+        <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready" labelposition="right" id="showalert"></input-field>
         <input-field type="select" label="function(host, label){console.log(label, host)}" options="ab,abb,cb,db,eb,fb,gb,hb,ib,jb,kb,lb,mb,nb,ob,pb,qb,rb,sb,tb,ub,vb,wb,xb,yb,zb" hideonfilter="true" id="select"></input-field>
-        <cookie-message></cookie-message>
+        <!-- <cookie-message></cookie-message> -->
 
         <script>
             // var countries = [{
@@ -260,6 +294,25 @@
                         grid.filter = gridfilter.value
                     })
                 }
+            }
+
+            if (gridfilter) {
+                gridfilter.addEventListener('click', function () {
+                    var snackbar = document.getElementById('snackbar')
+
+                    if (snackbar) {
+                        snackbar.shown = true
+                        snackbar.innerHTML = '<icon-element slot="icon" svg=\'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>\'></icon-element><div slot="body">Howdy</div>'
+                        // snackbar.innerHTML = '<div slot="body">Howdy</div>'
+                    }
+                })
+            }
+
+            var showalert = document.getElementById('showalert')
+            var overlaymessage = document.getElementById('overlaymessage')
+
+            if (showalert && overlaymessage) {
+                showalert.addEventListener('input', function () { overlaymessage.shown = true })
             }
 
             // const imageLoader = document.getElementById('image-loader')

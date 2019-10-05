@@ -1,15 +1,15 @@
-import { wcClassObject } from '../../utils/html/attr'
 import { setStyles, activeElementClass, contentDrawerContainer, contentDrawerItems } from './elements'
 import { GRIDLAYOUT } from './theme'
 import pipe from '../../utils/pipe'
 import { IsElement } from '../../utils/convert/dom'
 import IfInvalid from '../../utils/convert/if_invalid'
 import { triggerContentDrawer, removeContentDrawerItems } from './events'
-import { ToNumber } from '../../utils/convert/number'
+import ToNumber from '../../utils/convert/to_number'
 import ToBool from '../../utils/convert/bool'
+import ComponentClassObject from '../../utils/html/component-class-object'
 
 const attributes = {
-    class: wcClassObject,
+    class: ComponentClassObject,
 
     targetheight: {
         format: val => typeof val !== `string` ? `200px` : val,

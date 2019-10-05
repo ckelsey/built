@@ -4,11 +4,11 @@ import { setInputID, setEffects, inputAttributeList, setInputValue } from './met
 import { clearInput } from './methods-value'
 import { dispatch, onInput, onFocus, onBlur, onKeyDown, onLabelClick, setDroppable } from './methods-events'
 import { addRemoveAttr } from '../../utils/html/attr'
-import { setStyleRules } from '../../utils/html/markup'
+import SetStyleRules from '../../utils/html/set-style-rules'
 
 export const setStyles = (el, styles) => {
     if (!el) { return }
-    setStyleRules(el, styles)
+    SetStyleRules(el, styles)
 }
 
 export const elementSelectors = Object.freeze({
@@ -28,7 +28,8 @@ export const elementSelectors = Object.freeze({
     ripple: `.input-field-input-container effect-ripple`,
     root: `.input-field-container`,
     underline: `.input-field-input-container effect-underline`,
-    injectedStyles: `style.injectedStyles`
+    injectedStyles: `style.injectedStyles`,
+    themeStyles: `style.themeStyles`,
 })
 
 const setInputEvents = (input, host) => {
@@ -64,8 +65,7 @@ const setElementColor = (element, property, color) =>
         ? Set(element, property, color)
         : undefined
 
-export const setColors = host => {
-    const invalid = host.invalid
+export const setColors = (host, invalid) => {
     const color = invalid ? host.warningcolor : host.accentcolor
     setElementColor(host.elements.ripple, `color`, color)
     setElementColor(host.elements.underline, `color`, color)
@@ -97,11 +97,12 @@ const elementMethods = {
         }
     },
 
-    ripple: (_el, host) => setColors(host),
+    ripple: (_el, host) => setColors(host, host.invalid),
 
-    underline: (_el, host) => setColors(host),
+    underline: (_el, host) => setColors(host, host.invalid),
 
     injectedStyles: (el, host) => setStyles(el, host.styles),
+    themeStyles: (el, host) => setStyles(el, host.theme),
 
     icon: (el, host) => {
         el.eventSubscriptions = {

@@ -1,0 +1,25 @@
+<div class="snack-bar-container">
+    <div class="snack-bar-inner">
+        <div class="snack-bar-icon">
+            <icon-element size="1.5em" class="infoicon"></icon-element>
+            <icon-element size="1.5em" class="successicon"></icon-element>
+            <icon-element size="1.5em" class="erroricon"></icon-element>
+            <icon-element size="1.5em" class="warningicon"></icon-element>
+        </div>
+        <div class="snack-bar-text">
+            <slot name="body"></slot>
+        </div>
+        <div class="snack-bar-close">
+            <slot name="close">
+                <div style="padding: 1em;box-sizing:border-box;">
+                    <button-element class="snack-bar-default-button" styles=".button-element.snack-bar-default-button{margin:0;} .button-element.snack-bar-default-button button,.button-element.snack-bar-default-button button:hover{background-color:transparent;box-shadow:none;padding:0.25em;}">
+                        <icon-element size="1.5em" svg='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>'></icon-element>
+                    </button-element>
+                </div>
+            </slot>
+        </div>
+        <div class="snack-bar-type-bar"></div>
+    </div>
+    <style type="text/css" rel="stylesheet" style="display:none;" class="themeStyles"></style>
+    <style type="text/css" rel="stylesheet" style="display:none;" class="injectedStyles"></style>
+</div>

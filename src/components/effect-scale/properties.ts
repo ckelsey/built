@@ -2,11 +2,11 @@ import ToBool from '../../utils/convert/bool'
 import pipe from '../../utils/pipe'
 import IndexOf from '../../utils/convert/indexof'
 import IfInvalid from '../../utils/convert/if_invalid'
-import { ToNumber } from '../../utils/convert/number'
+import ToNumber from '../../utils/convert/to_number'
 import { unloadTargets, unloadTriggers, loadTriggers, setOrigin, run, loadTargets } from './methods'
 import ToString from '../../utils/convert/to_string'
 import { SelectorArrayToAllElements } from '../../utils/convert/dom'
-import { wcClassObject } from '../../utils/html/attr'
+import ComponentClassObject from '../../utils/html/component-class-object'
 import { EFFECTSCALE } from './theme'
 
 const reset = host => {
@@ -38,7 +38,7 @@ const attributes = {
         onChange,
     },
 
-    class: wcClassObject,
+    class: ComponentClassObject,
 
     end: {
         format: val => pipe(ToString, IfInvalid(EFFECTSCALE.end))(val).value,

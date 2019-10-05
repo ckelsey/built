@@ -1,7 +1,6 @@
 import Get from '../../utils/get'
 import { processedNullValue } from './definitions'
 import { sanitizeValue, isEmpty, InputFieldFormatValue, maxMin, pattern } from './methods-value'
-import { isMultiInput } from './methods-elements'
 
 const processedErrorText = sanitized => sanitized && sanitized.reason ? sanitized.reason.join(`, `) : ``
 
@@ -14,21 +13,27 @@ export const multiProcessedValue = (host, value) => {
     return sanitized
 }
 
+const getVal = (host, value) => {
+    const sanitized = sanitizeValue(value, host.type, host.allowhtml, host.disallowhtml)
+    const maxMined = maxMin(host, pattern(host, sanitized.sanitized))
+    sanitized.valid = !sanitized.valid ? false : maxMined.valid
+
+    if (!!maxMined.errorText) { sanitized.reason.push(maxMined.errorText) }
+
+    host.processedErrorText = processedErrorText(sanitized)
+
+    sanitized.sanitized = maxMined.value
+
+    return sanitized
+}
+
 export const processedValue = host => ({
     get() {
         const value = Get(host.state, `value.value`)
 
         if (isEmpty(value)) { return processedNullValue() }
 
-        if (isMultiInput(host)) {
-            return multiProcessedValue(host, value)
-        }
-
-        const sanitized = sanitizeValue(value, host.type, host.allowhtml, host.disallowhtml)
-        host.processedErrorText = processedErrorText(sanitized)
-        sanitized.sanitized = maxMin(host, pattern(host, sanitized.sanitized))
-
-        return sanitized
+        return getVal(host, value)
     }
 })
 
@@ -62,16 +67,9 @@ export const formattedValue = host => ({
 
         if (isEmpty(value)) { return processedNullValue().sanitized }
 
-        if (isMultiInput(host)) {
-            return multiFormattedValue(host, value)
-        }
-
         const formatted = InputFieldFormatValue(value, host.format || host.type)
 
-        const sanitized = sanitizeValue(formatted.value, host.type, host.allowhtml, host.disallowhtml)
-        sanitized.sanitized = maxMin(host, pattern(host, sanitized.sanitized))
-        host.processedErrorText = processedErrorText(sanitized)
-        return sanitized.sanitized
+        return getVal(host, formatted.value).sanitized
     }
 })
 

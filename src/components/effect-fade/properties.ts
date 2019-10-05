@@ -2,11 +2,11 @@ import ToBool from '../../utils/convert/bool'
 import pipe from '../../utils/pipe'
 import Map from '../../utils/convert/map'
 import IfInvalid from '../../utils/convert/if_invalid'
-import { ToNumber } from '../../utils/convert/number'
+import ToNumber from '../../utils/convert/to_number'
 import { unloadTriggers, loadTriggers } from './methods'
 import { SelectorArrayToElements } from '../../utils/convert/dom'
-import { CommasToArray } from '../../utils/convert/commas-to-array'
-import { wcClassObject } from '../../utils/html/attr'
+import CommasToArray from '../../utils/convert/commas-to-array'
+import ComponentClassObject from '../../utils/html/component-class-object'
 import ToString from '../../utils/convert/to_string'
 import { EFFECTFADE } from './theme'
 
@@ -43,7 +43,7 @@ const attributes = {
         format: selectorsToDom,
         onChange: (_val, host) => resetTriggers(host)
     },
-    class: wcClassObject,
+    class: ComponentClassObject,
 }
 
 export const properties = Object.assign({

@@ -1,4 +1,4 @@
-import { wcClassObject } from '../../utils/html/attr'
+import ComponentClassObject from '../../utils/html/component-class-object'
 import { setStyles, setKeepChildren } from './elements'
 import { CONTENTTRANSITION } from './theme'
 import pipe from '../../utils/pipe'
@@ -6,7 +6,7 @@ import { ToBool } from '../../utils'
 import IfInvalid from '../../utils/convert/if_invalid'
 
 export const properties = {
-    class: wcClassObject,
+    class: ComponentClassObject,
 
     styles: {
         format: val => typeof val === `string` ? val : CONTENTTRANSITION.styles,

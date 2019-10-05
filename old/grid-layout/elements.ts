@@ -1,9 +1,9 @@
-import { setStyleRules } from '../../utils/html/markup'
+import SetStyleRules from '../../utils/html/set-style-rules'
 import { closeDrawerEvents } from './events'
 
 export const setStyles = (el, host, styles) => {
     if (!el) { return }
-    setStyleRules(el, styles || host.styles)
+    SetStyleRules(el, styles || host.styles)
 }
 
 export const itemRowClass = `item-row`

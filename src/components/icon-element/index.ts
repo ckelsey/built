@@ -1,8 +1,8 @@
 import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import Observe from '../../utils/observe'
-import { wcClassObject } from '../../utils/html/attr'
-import { setStyleRules } from '../../utils/html/markup'
+import ComponentClassObject from '../../utils/html/component-class-object'
+import SetStyleRules from '../../utils/html/set-style-rules'
 import { ICONELEMENT } from './theme'
 import './style.scss'
 import ObserveWorker from '../../utils/observeWorker'
@@ -17,7 +17,7 @@ const elementSelectors = {
 
 const setStyles = (el, styles) => {
     if (!el) { return }
-    setStyleRules(el, styles)
+    SetStyleRules(el, styles)
 }
 
 const elements = {}
@@ -139,7 +139,7 @@ const attributes = {
         format: (val: any) => typeof val === `string` ? val : ICONELEMENT.size,
         onChange: (value, host) => host.elements.svgContainer.style.height = host.elements.svgContainer.style.width = value
     },
-    class: wcClassObject,
+    class: ComponentClassObject,
     styles: {
         format: val => typeof val === `string` ? val : ICONELEMENT.styles,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)

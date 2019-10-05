@@ -43,7 +43,7 @@ const InputField = /*#__PURE__*/ Constructor({
         value: host => value => host.state.value.next(value)
     },
     onConnected: host => {
-        host.inputID = ID(`input-field`)
+        host.inputID = ID()
         setEffects(host)
 
         requestAnimationFrame(() => {

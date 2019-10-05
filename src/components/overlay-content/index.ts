@@ -1,12 +1,12 @@
 import pipe from '../../utils/pipe'
 import ToBool from '../../utils/convert/bool'
 import IfInvalid from '../../utils/convert/if_invalid'
-import { ToNumber } from '../../utils/convert/number'
+import ToNumber from '../../utils/convert/to_number'
 import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import { GetCurve } from '../../utils/curve'
-import { wcClassObject } from '../../utils/html/attr'
-import { setStyleRules } from '../../utils/html/markup'
+import ComponentClassObject from '../../utils/html/component-class-object'
+import SetStyleRules from '../../utils/html/set-style-rules'
 import { OVERLAYCONTENT } from './theme'
 import './style.scss'
 import IndexOf from '../../utils/convert/indexof'
@@ -15,7 +15,7 @@ const style = require('./style.scss').toString()
 
 export const setStyles = (el, styles) => {
     if (!el) { return }
-    setStyleRules(el, styles)
+    SetStyleRules(el, styles)
 }
 
 const alignments = [
@@ -74,7 +74,7 @@ const attributes = {
     speed: {
         format: val => pipe(ToNumber, IfInvalid(OVERLAYCONTENT.speed))(val).value
     },
-    class: wcClassObject,
+    class: ComponentClassObject,
     widthbasis: {
         format: val => pipe(IndexOf(widths), IfInvalid(OVERLAYCONTENT.widthbasis))(val).value
     },

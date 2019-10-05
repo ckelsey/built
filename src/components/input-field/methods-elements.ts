@@ -37,8 +37,6 @@ export const setInputValue = (input, host) => {
     return input
 }
 
-export const isMultiInput = host => Array.isArray(host.type)
-
 export const setInput = host => {
     const inputContainer = host.elements.inputContainer
 

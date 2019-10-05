@@ -29,7 +29,7 @@ const loop = () => {
 const Timer = /*#__PURE__*/ (duration, stepFn, frameValues = undefined, completeFn = () => { }) => {
     if (!duration && duration !== 0) { return }
 
-    const id = ID(`timer`)
+    const id = ID()
 
     subscriptions[id] = {
         id,

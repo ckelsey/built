@@ -1,3 +1,4 @@
+- icon-element change type attr to url, svg to markup
  * TODO - INPUT-FIELD - MULTI INPUT
  * intlphone if no value in text, treat as if it has no value
  * TODO - INPUT-FIELD - error/help should not take up more space when present except when over 1 line

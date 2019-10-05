@@ -5,8 +5,8 @@ import IfIs from '../../utils/convert/if_is'
 import ToString from '../../utils/convert/to_string'
 import { setSelectOptions } from './methods'
 import ToBool from '../../utils/convert/bool'
-import { addRemoveAttr, wcClassObject } from '../../utils/html/attr'
-import { ToNumber } from '../../utils/convert/number'
+import { addRemoveAttr } from '../../utils/html/attr'
+import ToNumber from '../../utils/convert/to_number'
 import { Options } from '../../utils/convert/options'
 import { isMobile } from '../../utils/platform'
 import { dispatch } from './methods'
@@ -16,6 +16,7 @@ import IndexOf from '../../utils/convert/indexof'
 import { DROPDOWNSELECT } from './theme'
 import { ToFunction } from '../../utils/convert/function'
 import { ToJSON } from '../../utils'
+import ComponentClassObject from '../../utils/html/component-class-object'
 
 const attributes = {
     arrow: {
@@ -23,7 +24,7 @@ const attributes = {
         onChange: (val, host) => host.elements.root.setAttribute(`arrow`, val)
     },
 
-    class: wcClassObject,
+    class: ComponentClassObject,
 
     disabled: {
         format: val => pipe(ToBool, IfNot(true, DROPDOWNSELECT.disabled))(val).value,

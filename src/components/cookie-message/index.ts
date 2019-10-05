@@ -1,7 +1,7 @@
 import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
-import { wcClassObject } from '../../utils/html/attr'
-import { setStyleRules } from '../../utils/html/markup'
+import ComponentClassObject from '../../utils/html/component-class-object'
+import SetStyleRules from '../../utils/html/set-style-rules'
 import { COOKIEMESSAGE } from './theme'
 import './style.scss'
 import '../button-element'
@@ -18,7 +18,7 @@ const componentRoot = `.cookie-message-container`
 
 const setStyles = (el, host, styles) => {
     if (!el) { return }
-    setStyleRules(el, styles || host.styles)
+    SetStyleRules(el, styles || host.styles)
 }
 
 const setButton = host => {
@@ -59,7 +59,7 @@ const getCookie = () => !!document.cookie
     .map(c => JSON.parse(c.split(`=`)[1]))[0]
 
 const properties = {
-    class: wcClassObject,
+    class: ComponentClassObject,
     shown: {
         format: val => pipe(ToBool, IfInvalid(!getCookie()))(val).value,
         onChange: (val, host) => {

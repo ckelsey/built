@@ -1,8 +1,8 @@
 import pipe from '../../utils/pipe'
 import IfNot from '../../utils/convert/if_not'
 import IfInvalid from '../../utils/convert/if_invalid'
-import { CommasToArray } from '../../utils/convert/commas-to-array'
-import { ToNumber } from '../../utils/convert/number'
+import CommasToArray from '../../utils/convert/commas-to-array'
+import ToNumber from '../../utils/convert/to_number'
 import ToBool from '../../utils/convert/bool'
 import { ToObject } from '../../utils/convert/object'
 import IndexOf from '../../utils/convert/indexof'
@@ -13,10 +13,11 @@ import { ValidateHtml } from '../../utils/validate'
 import { setColors, setStyles } from './elements'
 import { processValue } from './methods-value'
 import { setDroppable } from './methods-events'
-import { setAttribute, wcClassObject } from '../../utils/html/attr'
+import { setAttribute } from '../../utils/html/attr'
 import { replaceElementContents } from '../../utils/html/markup'
 import { labelPositions, resizeOptions } from './definitions'
 import { INPUTFIELD } from './theme'
+import ComponentClassObject from '../../utils/html/component-class-object'
 
 const trueOrNull = val => pipe(ToBool, IfNot(true, null))(val).value
 const addRemoveContainerClass = (val, host, clss) => host.elements.container.classList[!!val ? `add` : `remove`](clss)
@@ -34,7 +35,7 @@ const inputStates = {
     invalid: {
         format: val => ToBool(val).value,
         onChange: (val, host) => {
-            setColors(host)
+            setColors(host, val)
             setAttribute(host.elements.container, `valid`, val)
             addRemoveContainerClass(val, host, `invalid`)
         },
@@ -133,13 +134,13 @@ const inputAttributes = {
 const inputFieldProperties = {
     accentcolor: {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.accentcolor))(val).value,
-        onChange: (_val, host) => setColors(host)
+        onChange: (_val, host) => setColors(host, host.invalid)
     },
     allowhtml: {
         format: val => pipe(CommasToArray, IfInvalid(INPUTFIELD.allowhtml))(val).value,
         onChange
     },
-    class: wcClassObject,
+    class: ComponentClassObject,
     clearbutton: {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.clearbutton))(val).value,
         onChange: (val, host) => {
@@ -221,9 +222,14 @@ const inputFieldProperties = {
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
 
+    theme: {
+        format: val => typeof val === `string` ? val : ``,
+        onChange: (val, host) => setStyles(host.elements.themeStyles, val)
+    },
+
     warningcolor: {
         format: val => pipe(ToString, IfInvalid(INPUTFIELD.warningcolor))(val).value,
-        onChange: (_val, host) => setColors(host),
+        onChange: (_val, host) => setColors(host, host.invalid),
     },
 }
 

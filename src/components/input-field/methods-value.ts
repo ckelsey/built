@@ -2,7 +2,7 @@ import { ValidateNumber, ValidateBool, ValidateEmail, ValidateHtml, ValidateText
 import { isAutoFilled, setInputCaret, getInvalidMessage } from '../../utils/html'
 import { ToPhone, ToIntlPhone } from '../../utils/convert/phone'
 import { ToUsZip } from '../../utils/convert/postal'
-import { textareaHeight, isMultiInput } from './methods-elements'
+import { textareaHeight } from './methods-elements'
 import { Tmonad } from '../../utils/convert/t-monad'
 import Join from '../../utils/convert/join'
 import pipe from '../../utils/pipe'
@@ -318,9 +318,11 @@ export const InputFieldFormatValue = (value, format) => {
 
 export const maxMin = (host, value) => {
     const nonStringTypes = [`number`, `checkbox`, `radio`, `file`]
+    let valid = true
+    let errorText = ``
 
     if (value === undefined || value === null) {
-        return value
+        return { value, valid, errorText }
     }
 
     if (host.type === `number`) {
@@ -338,12 +340,13 @@ export const maxMin = (host, value) => {
             value = value.slice(0, host.max)
         }
 
-        if (!!host.min && host.min > value.length) {
-            value = value.slice(0, host.min)
+        if (!!host.min && !!value && host.min > value.length && !host.focused) {
+            errorText = `Must be at least ${host.min} characters`
+            valid = false
         }
     }
 
-    return value
+    return { value, valid, errorText }
 }
 
 export const pattern = (host, value) => {
@@ -354,42 +357,10 @@ export const pattern = (host, value) => {
 export const getFileValue = input => !input || !input.files || input.files.length === 0 ? null : Array.from(input.files)
 const getDroppedFiles = value => Array.isArray(value) && value.filter(f => f instanceof File).length ? value : null
 
-const multiProcessValue = (host, _input) => {
-    const processed = host.processedValue
-    const sanitized = processed.map(s => s.sanitized)
-    const errors = processed.map(s => s.reason.join(``))
-    const valid = errors
-        .map((e, i) => {
-            if (!!e && !!sanitized[i]) {
-                return false
-            }
-
-            return true
-        })
-        .filter(e => !e)
-        .length === 0
-
-    const empty = sanitized.filter(s => !!s).length === 0
-
-    // sanitized.forEach((s, i) => {
-    // TODO
-    // })
-
-    host.notempty = !empty
-
-    if (valid) { return host.invalid = false }
-    if (empty) { return host.invalid = false }
-    if (!host.focused) { return host.invalid = true }
-}
-
 export const processValue = host => {
     const input = host.elements.input
 
     if (!input) { return }
-
-    if (isMultiInput(host)) {
-        return multiProcessValue(host, input)
-    }
 
     const validationMessage = [getInvalidMessage(input)].filter(v => !!v)
     const processed = host.processedValue

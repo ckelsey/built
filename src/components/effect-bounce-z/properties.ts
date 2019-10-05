@@ -1,9 +1,9 @@
 import pipe from '../../utils/pipe'
 import IfInvalid from '../../utils/convert/if_invalid'
-import { ToNumber } from '../../utils/convert/number'
+import ToNumber from '../../utils/convert/to_number'
 import { unloadTargets, loadTargets } from './methods'
 import { SelectorArrayToElements } from '../../utils/convert/dom'
-import { wcClassObject } from '../../utils/html/attr'
+import ComponentClassObject from '../../utils/html/component-class-object'
 import { EFFECTBOUNCEZ } from './theme'
 import ToString from '../../utils/convert/to_string'
 
@@ -21,7 +21,7 @@ const attributes = {
         onChange
     },
 
-    class: wcClassObject,
+    class: ComponentClassObject,
 
     speed: {
         format: val => pipe(ToNumber, IfInvalid(EFFECTBOUNCEZ.speed))(val).value,

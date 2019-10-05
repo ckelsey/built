@@ -1,4 +1,4 @@
-import { ToNumber } from '../convert/number'
+import ToNumber from '../convert/to_number'
 
 const ValidateNumber = /*#__PURE__*/ num => {
     const original = num

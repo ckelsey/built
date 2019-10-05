@@ -227,4 +227,4 @@ export const refresh = host => throttle(() => {
     tryRun()
 }, 100)
 
-export const getComponentStyles = host => () => `${require('./style.scss').toString()}${host.styles}`
+export const getComponentStyles = host => () => `${require('./style.scss').toString()}${host.theme || ``}${host.styles}`

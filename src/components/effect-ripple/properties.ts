@@ -1,10 +1,10 @@
 import pipe from '../../utils/pipe'
 import IfInvalid from '../../utils/convert/if_invalid'
-import { ToNumber } from '../../utils/convert/number'
+import ToNumber from '../../utils/convert/to_number'
 import { unloadTargets, loadTargets } from './methods'
 import ToString from '../../utils/convert/to_string'
 import { SelectorArrayToElements } from '../../utils/convert/dom'
-import { wcClassObject } from '../../utils/html/attr'
+import ComponentClassObject from '../../utils/html/component-class-object'
 import { EFFECTRIPPLE } from './theme'
 import { setStyles } from './elements'
 
@@ -17,7 +17,7 @@ const onChange = () => { }
 const selectorsToDom = val => SelectorArrayToElements(null, val).value
 
 const attributes = {
-    class: wcClassObject,
+    class: ComponentClassObject,
 
     color: {
         format: val => pipe(ToString, IfInvalid(EFFECTRIPPLE.color))(val).value,

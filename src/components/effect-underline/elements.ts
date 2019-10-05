@@ -1,4 +1,4 @@
-import { setStyleRules } from '../../utils/html/markup'
+import SetStyleRules from '../../utils/html/set-style-rules'
 
 export const elementSelectors = {
     root: `.effect-underline-container`,
@@ -8,7 +8,7 @@ export const elementSelectors = {
 
 export const setStyles = (el, styles) => {
     if (!el) { return }
-    setStyleRules(el, styles)
+    SetStyleRules(el, styles)
 }
 
 const elements = {}
