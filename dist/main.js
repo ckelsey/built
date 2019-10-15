@@ -1,5 +1,14 @@
-var builtjs =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["builtjs"] = factory();
+	else
+		root["builtjs"] = factory();
+})(window, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -17252,3 +17261,4 @@ exports["default"] = UploadService;
 
 /***/ })
 /******/ ]);
+});

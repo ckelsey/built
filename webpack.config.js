@@ -225,7 +225,7 @@ const exported = {
     output: {
         filename: '[name].js',
         path: path.resolve(outDirPath),
-        // libraryTarget: 'umd',
+        libraryTarget: 'umd',
         library: 'builtjs'
     },
     // node: {
