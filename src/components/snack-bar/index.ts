@@ -10,6 +10,7 @@ import IfInvalid from '../../utils/convert/if_invalid'
 import ToString from '../../utils/convert/to_string'
 import ObserveEvent from '../../utils/observeEvent'
 import IndexOf from '../../utils/convert/indexof'
+import EventName from '../../utils/html/events'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')
@@ -30,6 +31,18 @@ const setShown = host => {
     const root = host.elements.root
 
     if (!root) { return }
+
+    const endEventName = EventName(`transitionend`)
+    const dispatch = () => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host }))
+
+    if (!!endEventName) {
+        root.addEventListener(endEventName, function startEvent() {
+            root.removeEventListener(endEventName, startEvent)
+            requestAnimationFrame(dispatch)
+        })
+    } else {
+        requestAnimationFrame(dispatch)
+    }
 
     root.classList[host.shown ? `add` : `remove`](`shown`)
 }
@@ -82,6 +95,11 @@ const setWarningIcon = host => {
     warningicon[host.warningicon[0] === `<` ? `svg` : `type`] = host.warningicon
 }
 
+const showHideClose = (el, show) => {
+    if (!el) { return }
+    el.style.display = show ? `flex` : `none`
+}
+
 const properties = {
     class: ComponentClassObject,
     shown: {
@@ -112,6 +130,10 @@ const properties = {
         format: val => pipe(ToString, IfInvalid(warningicon))(val).value,
         onChange: (_val, host) => setWarningIcon(host)
     },
+    hideclose: {
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
+        onChange: (val, host) => showHideClose(host.elements.button, !val)
+    },
     styles: {
         format: val => pipe(ToString, IfInvalid(``))(val).value,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
@@ -138,6 +160,8 @@ const elements = {
             el.eventListeners = {
                 click: ObserveEvent(el, `click`).subscribe(() => host.shown = false)
             }
+
+            showHideClose(el, !host.hideclose)
         }
     },
     injectedStyles: {

@@ -17,7 +17,6 @@
         "dist",
         "README.md"
     ],
-    "sideEffects": false,
     "repository": {
         "type": "git",
         "url": "https://github.com/ckelsey/built.git"

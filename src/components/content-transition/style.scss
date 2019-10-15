@@ -69,5 +69,9 @@ content-transition {
     height: 0px;
     max-width: 100%;
     overflow: hidden;
-    pointer-events: none;
+    pointer-events: none;z-index: -1;
+
+    * {
+        pointer-events: none;
+    }
 }

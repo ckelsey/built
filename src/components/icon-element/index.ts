@@ -86,26 +86,6 @@ const getIcon = (path) => {
             path,
             method: `GET`
         })
-
-        // const fnString = `
-        // self.onmessage = function(e){
-        //     var xhr = new XMLHttpRequest();
-        //     xhr.open('GET', e.data, false);
-        //     xhr.onload = () => postMessage({ status: xhr.status, svg: xhr.responseText });
-        //     xhr.send();
-        // }`
-        // const blobURL = window.URL.createObjectURL(new Blob([fnString]))
-        // const worker = new Worker(blobURL)
-
-        // worker.onmessage = (e) => {
-        //     if (e.data.status === 200) {
-        //         AvailableIcons[path].next(e.data.svg)
-        //     } else {
-        //         AvailableIcons[path].error(e.data.status)
-        //     }
-        // }
-
-        // worker.postMessage(path)
     })
 }
 
@@ -119,6 +99,7 @@ const attributes = {
                 .then((subject: any) => {
                     host.subscription = subject.subscribe(icon => {
                         host.elements.svgContainer.innerHTML = icon
+                        host.dispatchEvent(new CustomEvent(`iconloaded`, { detail: host }))
                     })
                 })
         }
@@ -129,6 +110,7 @@ const attributes = {
             if (!value) { return }
             if (host.subscription) { host.subscription() }
             host.elements.svgContainer.innerHTML = value
+            host.dispatchEvent(new CustomEvent(`iconloaded`, { detail: host }))
         }
     },
     color: {

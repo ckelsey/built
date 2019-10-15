@@ -1,4 +1,5 @@
 import SetStyleRules from '../../utils/html/set-style-rules'
+import { setStyleElement } from '.'
 
 export const setStyles = (el, host, styles) => {
     if (!el) { return }
@@ -16,6 +17,7 @@ export const setKeepChildren = host => {
 const elements = {
     root: {
         selector: `.content-transition-container`,
+        onChange: (_el, host) => setStyleElement(host)
     },
     slot: {
         selector: `slot[current]`,

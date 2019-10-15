@@ -1,6 +1,8 @@
-import { setOptions } from '../../utils/html/markup'
 import { findIn } from '../../utils/html/query'
 import { setInput, setLabel } from './elements'
+import replaceElementContents from '../../utils/html/replace-element-contents'
+import ValidateHtml from '../../utils/validate/html'
+import ObserveEvent from '../../utils/observeEvent'
 
 export const dispatch = (host, type) => host.dispatchEvent(new CustomEvent(type, { detail: host }))
 
@@ -8,6 +10,56 @@ export const initInput = host => {
     setSelectOptions(host)
     setInput(host)
     setLabel(host)
+}
+
+const setOptions = (input, options, emptySelect, optionTag = `option`) => {
+    if (!input || !options) { return }
+
+    const optionElements = []
+
+    const createOption = option => {
+        const optionElement = document.createElement(optionTag)
+        optionElement.className = `select-option${!!option.class ? ` ${option.class}` : ``}`
+        optionElement[`value`] = option.value
+        optionElement.innerHTML = ValidateHtml(option.label, [], [`script`]).sanitized || ``
+        optionElements.push(optionElement)
+    }
+
+    if (emptySelect !== false) {
+        createOption({
+            value: ``,
+            label: emptySelect,
+            class: 'blank'
+        })
+    }
+
+    options.forEach(option => createOption(option))
+
+    replaceElementContents(input, optionElements)
+
+    if (optionTag !== `option`) {
+        optionElements.forEach(optionElement => {
+            const link = !!optionElement.href ? optionElement : optionElement.querySelector(`a`)
+
+            optionElement.eventSubscriptions = {
+                mousedown: ObserveEvent(optionElement, `mousedown`).subscribe(() => {
+                    optionElements.forEach(o => o.classList.remove(`selected`))
+                    optionElement.classList.add(`selected`)
+                    input.value = optionElement.value
+                    input.dispatchEvent(new Event(`input`))
+                    optionElement.dispatchEvent(new Event(`click`))
+
+                    if (link) { link.click() }
+                })
+            }
+        })
+    }
+
+    return {
+        input,
+        options,
+        optionElements
+    }
 }
 
 export const scrollToSelectedOption = (overlay, option) => {

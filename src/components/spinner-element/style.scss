@@ -97,8 +97,8 @@ spinner-element {
                 position: relative;
                 border: 0.5em solid transparent;
                 border-top-color: inherit;
-                width: 5em;
-                height: 5em;
+                width: 4em;
+                height: 4em;
                 animation: circle 1s infinite linear;
 
                 &:after {
@@ -327,6 +327,8 @@ spinner-element {
         position: absolute;
         width: 100%;
         height: 100%;
+        top: 0;
+        left: 0;
         opacity: 0;
         pointer-events: none;
         background: rgba(0, 0, 0, 0.38);

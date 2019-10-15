@@ -56,28 +56,7 @@
     </head>
 
     <body>
-        <overlay-message id="overlaymessage">
-            <div slot="header">A heading</div>
-            <div slot="body">The slotchange event is fired on an HTMLSlotElement instance (slot element) when the node(s) contained in that slot change.</div>
-            <div slot="button">
-                <button-element overlay-message-closed>Ok</button-element>
-            </div>
-            <div slot="button" overlay-message-close>Cancel</div>
-        </overlay-message>
-        <snack-bar id="snackbar"></snack-bar>
-        <spinner-element page="true" scrim="true" blur="3" type="boading"></spinner-element>
-
-        <image-loader src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg" id="image-loader"></image-loader>
-
-        <dropdown-select id="country"></dropdown-select>
-
-        <dropdown-select style="margin: 1em 0;width:auto" options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);" disablefilter="true"></dropdown-select>
-
-        <dropdown-select options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);"></dropdown-select>
-
-        <input-field label="Filter grid" id="gridfilter"></input-field>
-
-        <grid-items width="1em">
+        <grid-layout>
             <div class="c-grid-item" keywords="Dickinson, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
             <div class="c-grid-item" keywords="Art of racing in the rain, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
             <div class="c-grid-item" keywords="Men in black 4, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
@@ -92,26 +71,40 @@
             <div class="c-grid-item" keywords="Stuber, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/s_poster.jpg"></div>
             <div class="c-grid-item" keywords="Downton Abbey, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/dta_poster.jpg"></div>
             <div class="c-grid-item" keywords="Once upon a time in Hollywood, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ouatih_poster.jpg"></div>
-        </grid-items>
-
-        <p>&nbsp;</p>
-
-        <!-- <grid-layout fillrow="true">
-            <div class="grid-item" keywords="Dickinson, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg"></div>
-            <div class="grid-item" keywords="Art of racing in the rain, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
-            <div class="grid-item" keywords="Men in black 4, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
-            <div class="grid-item" keywords="For All Mankind, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/fam_poster.jpg"></div>
-            <div class="grid-item" keywords="Angry Birds 2, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ab2_poster.jpg"></div>
-            <div class="grid-item" keywords="The Morning Show, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/tms_poster.jpg"></div>
-            <div class="grid-item" keywords="text">
-                <p>Hi, some text</p>
-            </div>
-            <div class="grid-item" keywords="See, episodic"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/see_poster.jpg"></div>
-            <div class="grid-item" keywords="47 degrees, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/47_poster.jpg"></div>
-            <div class="grid-item" keywords="Stuber, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/s_poster.jpg"></div>
-            <div class="grid-item" keywords="Downton Abbey, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/dta_poster.jpg"></div>
-            <div class="grid-item" keywords="Once upon a time in Hollywood, feature"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/ouatih_poster.jpg"></div>
         </grid-layout>
+
+        <!-- <overlay-message id="overlaymessage">
+            <div slot="header">A heading</div>
+            <div slot="body">The slotchange event is fired on an HTMLSlotElement instance (slot element) when the node(s) contained in that slot change.</div>
+            <div slot="button">
+                <button-element overlay-message-closed margintop="0" marginbottom="0">Ok</button-element>
+            </div>
+            <div slot="button" overlay-message-close>Cancel</div>
+        </overlay-message>
+        <snack-bar id="snackbar" shown="true"></snack-bar>
+        <spinner-element page="true" scrim="true" blur="3" type="boading"></spinner-element>
+
+        <image-loader src="https://d1g1aamoxberjq.cloudfront.net/apple/images/d_poster.jpg" id="image-loader"></image-loader>
+
+        <dropdown-select id="country"></dropdown-select>
+
+        <drop-down id="dd">
+            <div slot="label">Hey there</div>
+            <div slot="option"><a href="/a">one</a></div>
+            <div slot="option">2</div>
+            <div slot="option">thr33</div>
+        </drop-down>
+
+        <dropdown-select style="margin: 1em 0;width:auto" options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);" disablefilter="true"></dropdown-select>
+
+        <dropdown-select options="a,b,c,d" style="background:rgba(255, 255, 255, 0.6);"></dropdown-select>
+
+        <dropdown-select options="<a href='/hi'>Hi</a>,<a href='bye'>Bye</a>" style="background:rgba(255, 255, 255, 0.6);"></dropdown-select>
+
+        <input-field label="Filter grid" id="gridfilter"></input-field>
+
+        
+
 
         <p>&nbsp;</p>
 
@@ -129,23 +122,15 @@
                 <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
                 <div class="slider-item"><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
             </horizontal-slider>
-        </div> -->
+        </div>  -->
 
-        <content-transition keepchildren="true">
+        <!-- <content-transition keepchildren="true">
             <div id="content-transition">
                 <div>The slotchange event is fired on an HTMLSlotElement instance (slot element) when the node(s) contained in that slot change.</div>
             </div>
-            <!-- <div id="content-transition2" slot="hidden">
-                <div>Well Hello!</div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/mib4_poster.jpg"></div>
-            </div>
-            <div id="content-transition3" slot="hidden">
-                <div>Ahhh hahahahaha!</div>
-                <div><img src="https://d1g1aamoxberjq.cloudfront.net/apple/images/aorir_poster.jpg"></div>
-            </div> -->
-        </content-transition>
+        </content-transition> -->
 
-        <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
+        <!-- <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
             <span slot="header">Heading</span>
             <div slot="content">Some content .content-drawer-header,
                 .content-drawer-content,
@@ -163,10 +148,10 @@
                 align-items: center;
                 flex-wrap: nowrap;
                 }</div>
-        </content-drawer>
+        </content-drawer> -->
 
 
-        <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
+        <!-- <content-drawer open="false" openfrom="top" underline="true" ripple="true" fade="true" drawergroup="a">
             <span slot="header">Another Heading</span>
             <div slot="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
         </content-drawer>
@@ -174,7 +159,7 @@
             <span slot="header">Group B</span>
             <div slot="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
         </content-drawer>
-        <button-element id="scale-hey">
+        <button-element id="scale-hey" class="slim">
             <icon-element type="icons/pets.svg"></icon-element>&nbsp;Scale it
             <effect-scale triggers='["#scale-hey"]' targets='[".scale-target"]' x="false" y="true" start="click" scaled="true" startfrom="left top" amount="-1"></effect-scale>
         </button-element>
@@ -198,7 +183,7 @@
         <input-field type="checkbox" label="Click me" labelposition="right" value="true"></input-field>
         <input-field type="checkbox" label="Click me again input-field-container-inner checked notempty ready" labelposition="right" id="showalert"></input-field>
         <input-field type="select" label="function(host, label){console.log(label, host)}" options="ab,abb,cb,db,eb,fb,gb,hb,ib,jb,kb,lb,mb,nb,ob,pb,qb,rb,sb,tb,ub,vb,wb,xb,yb,zb" hideonfilter="true" id="select"></input-field>
-        <!-- <cookie-message></cookie-message> -->
+        <cookie-message></cookie-message> -->
 
         <script>
             // var countries = [{
@@ -249,7 +234,7 @@
             //     type: 'text'
             // }]
 
-            var contentTransition = document.body.querySelector('content-transition')
+            // var contentTransition = document.body.querySelector('content-transition')
 
             // setTimeout(function () {
             //     contentTransition.transitionTo(1)
@@ -263,57 +248,57 @@
             //     contentTransition.transitionTo(0)
             // }, 6000)
 
-            setTimeout(function () {
-                const newNode = document.createElement('div')
-                newNode.textContent = 'This causes the animations to run that were created in the previous step. Because the baked animations are already eased, the timing function needs to be set to linear otherwise you’ll ease between each keyframe which will look very weird! When it comes to collapsing the element back down there are two options: update the CSS animation to run in reverse rather than forwards. This will work just fine, but the "feel" of the animation will be reversed, so if you used an ease-out curve the reverse will feel eased in, which will make it feel sluggish. A more appropriate solution is to create a second pair of animations for collapsing the element. These can be created in exactly the same way as the expand keyframe animations, but with swapped start and end values.'
-                contentTransition.transitionChild(newNode)
+            // setTimeout(function () {
+            //     const newNode = document.createElement('div')
+            //     newNode.textContent = 'This causes the animations to run that were created in the previous step. Because the baked animations are already eased, the timing function needs to be set to linear otherwise you’ll ease between each keyframe which will look very weird! When it comes to collapsing the element back down there are two options: update the CSS animation to run in reverse rather than forwards. This will work just fine, but the "feel" of the animation will be reversed, so if you used an ease-out curve the reverse will feel eased in, which will make it feel sluggish. A more appropriate solution is to create a second pair of animations for collapsing the element. These can be created in exactly the same way as the expand keyframe animations, but with swapped start and end values.'
+            //     contentTransition.transitionChild(newNode)
 
-            }, 2000)
+            // }, 2000)
 
-            setTimeout(function () {
-                const newNode = document.createElement('div')
-                newNode.textContent = 'A more advanced version: circular reveals'
-                contentTransition.transitionChild(newNode)
+            // setTimeout(function () {
+            //     const newNode = document.createElement('div')
+            //     newNode.textContent = 'A more advanced version: circular reveals'
+            //     contentTransition.transitionChild(newNode)
 
-            }, 5000)
+            // }, 5000)
 
-            const grid = document.querySelector('grid-layout')
-            const gridfilter = document.getElementById('gridfilter')
+            // const grid = document.querySelector('grid-layout')
+            // const gridfilter = document.getElementById('gridfilter')
 
-            if (grid) {
-                grid.addEventListener('contentdraweropen', function (e) {
-                    const drawerContent = document.createElement('div')
-                    drawerContent.className = 'content-drawer-stuff'
-                    drawerContent.innerHTML = e.detail.element.innerHTML
-                    drawerContent.setAttribute('slot', 'content-drawer')
-                    grid.appendChild(drawerContent)
-                })
+            // if (grid) {
+            //     grid.addEventListener('contentdraweropen', function (e) {
+            //         const drawerContent = document.createElement('div')
+            //         drawerContent.className = 'content-drawer-stuff'
+            //         drawerContent.innerHTML = e.detail.element.innerHTML
+            //         drawerContent.setAttribute('slot', 'content-drawer')
+            //         grid.appendChild(drawerContent)
+            //     })
 
-                if (gridfilter) {
-                    gridfilter.addEventListener('input', function (e) {
-                        grid.filter = gridfilter.value
-                    })
-                }
-            }
+            //     if (gridfilter) {
+            //         gridfilter.addEventListener('input', function (e) {
+            //             grid.filter = gridfilter.value
+            //         })
+            //     }
+            // }
 
-            if (gridfilter) {
-                gridfilter.addEventListener('click', function () {
-                    var snackbar = document.getElementById('snackbar')
+            // if (gridfilter) {
+            //     gridfilter.addEventListener('click', function () {
+            //         var snackbar = document.getElementById('snackbar')
 
-                    if (snackbar) {
-                        snackbar.shown = true
-                        snackbar.innerHTML = '<icon-element slot="icon" svg=\'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>\'></icon-element><div slot="body">Howdy</div>'
-                        // snackbar.innerHTML = '<div slot="body">Howdy</div>'
-                    }
-                })
-            }
+            //         if (snackbar) {
+            //             snackbar.shown = true
+            //             snackbar.innerHTML = '<icon-element slot="icon" svg=\'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>\'></icon-element><div slot="body">Howdy</div>'
+            //             // snackbar.innerHTML = '<div slot="body">Howdy</div>'
+            //         }
+            //     })
+            // }
 
-            var showalert = document.getElementById('showalert')
-            var overlaymessage = document.getElementById('overlaymessage')
+            // var showalert = document.getElementById('showalert')
+            // var overlaymessage = document.getElementById('overlaymessage')
 
-            if (showalert && overlaymessage) {
-                showalert.addEventListener('input', function () { overlaymessage.shown = true })
-            }
+            // if (showalert && overlaymessage) {
+            //     showalert.addEventListener('input', function () { overlaymessage.shown = true })
+            // }
 
             // const imageLoader = document.getElementById('image-loader')
 

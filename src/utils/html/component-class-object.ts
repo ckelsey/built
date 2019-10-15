@@ -6,48 +6,36 @@ import Map from '../convert/map'
 import Filter from '../convert/filter'
 import CommasToArray from '../convert/commas-to-array'
 
-const addRemoveClassOld = (el, classArr, remove = false) => {
-    const newClasses = (el.className || ``).split(` `).map(clss => clss.trim())
-
-    classArr.forEach(clss => {
-        const index = newClasses.indexOf(clss)
-
-        if (remove && index > -1) {
-            newClasses.splice(index, 1)
-        } else if (!remove && index === -1) {
-            newClasses.push(clss)
-        }
-    })
-
-    el.className = newClasses.join(` `)
-}
-
-const wcClass = /*#__PURE__*/ (el, newClasses, previousClasses) => {
+const wcClass = (el, newClasses, previousClasses) => {
     if (!el) { return }
 
-    let oldClassList = false
-
-    if (!(window as any).DOMTokenList.prototype.replace) {
-        oldClassList = true
+    if (Array.isArray(el)) {
+        el = el[0]
     }
 
-    let newClass = pipe(CommasToArray, IfInvalid([]))(newClasses).value
-    let previousClass = pipe(CommasToArray, IfInvalid([]))(previousClasses).value
+    let oldBrowser = !(window as any).DOMTokenList.prototype.replace
 
-    if (!!previousClass && previousClass.length) {
-        if (oldClassList) {
-            addRemoveClassOld(el, previousClass, true)
-        } else {
-            el.classList.remove(...previousClass)
+    let newClassArray = pipe(CommasToArray, IfInvalid([]))(newClasses).value
+    let previousClassArray = pipe(CommasToArray, IfInvalid([]))(previousClasses).value
+
+    if (oldBrowser) {
+        if (previousClassArray.length && !!el.className) {
+            previousClassArray.forEach(c => el.className = el.className.split(c).map(cl => cl.trim()).join(``))
         }
+
+        if (newClassArray.length) {
+            newClassArray.forEach(c => el.className = `${!!el.className ? el.className : ``} ${c}`)
+        }
+
+        return
     }
 
-    if (!!newClass && newClass.length) {
-        if (oldClassList) {
-            addRemoveClassOld(el, newClass)
-        } else {
-            el.classList.add(...newClass)
-        }
+    if (previousClassArray.length) {
+        el.classList.remove(...previousClassArray)
+    }
+
+    if (newClassArray.length) {
+        el.classList.add(...newClassArray)
     }
 }
 

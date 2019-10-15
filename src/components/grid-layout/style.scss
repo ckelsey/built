@@ -10,8 +10,9 @@ grid-layout {
     /*
     display: flex;
     flex-wrap: wrap;
-    */
     display: -ms-grid;
+    */
+    display: flex;
     display: grid;
     /*
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -20,4 +21,10 @@ grid-layout {
     justify-items: center;
     grid-auto-flow: dense;
     width: 100%;
+    flex-wrap: wrap;
+
+    &>*,
+    ::slotted(*) {
+        width: 100%
+    }
 }

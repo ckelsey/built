@@ -1,21 +1,25 @@
 import Observe from '../utils/observe'
-import Get from '../utils/get'
+import ValidateHtml from '../utils/validate/html'
+import Get from './../utils/get'
+import FromJSON from '../utils/convert/from_json'
 
-const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
+const Router = routes => {
     let current
+    const localStorageKey = `routestate`
     const _routes = Object.assign({}, routes)
     const navigated = () => {
-        if (!history.state || !history.state.pathname) {
-            return methods.route(_routes.home)
-        }
-
-        methods.route(history.state)
+        if (!!Get(history, `state.pathname`)) { methods.route(history.state) }
     }
 
     const invalidQuery = searchString => !searchString || typeof searchString.split !== `function` || searchString === ``
 
     const getQuery = search => {
         const result = {}
+
+        if (!!search && !!search.search) {
+            search = search.search
+        }
+
         let searchString = search
 
         if (invalidQuery(searchString)) {
@@ -53,23 +57,69 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
 
         return ``
     }
+
     const addLeadingSlash = pathname => !pathname ? `` : pathname[0] === `/` ? pathname : `/${pathname}`
     const joinUrl = (pathname, query) => `${location.protocol}//${location.host}${addLeadingSlash(pathname)}${queryObjectToString(query)}`
+    const getStorage = () => {
+        let val = { query: ``, pathname: `` }
+        try { val = FromJSON(localStorage.getItem(localStorageKey)).value || {} } catch (error) { }
+        return val
+    }
 
-    const updateState = (route) => {
-        if (history.pushState && route) {
-            const full = joinUrl(route.pathname, route.query)
-            const state = {
-                title: route.title || document.title,
-                pathname: route.pathname,
-                full
-            }
-            history.pushState(state, document.title, full)
+    const setStorage = state => {
+        try {
+            localStorage.setItem(localStorageKey, JSON.stringify(state))
+        } catch (error) { }
+    }
 
-            if (storeLocally) {
-                localStorage.setItem(`route`, JSON.stringify(state))
-            }
+    const updateState = route => {
+        if (!route) { return }
+
+        const lastState = getStorage()
+        const lastQuery = queryObjectToString(getQuery(`?${lastState.query}`))
+        const currentQuery = queryObjectToString(route.query)
+        const full = joinUrl(route.pathname, route.query)
+        const state = {
+            title: route.title || document.title,
+            pathname: route.pathname,
+            full,
+            query: route.query || {}
         }
+
+        if (route.pathname === lastState.pathname && lastQuery === currentQuery) { return }
+
+        if (history.pushState) {
+            history.pushState(state, document.title, full)
+        }
+
+        setStorage(state)
+
+        if (lastQuery !== currentQuery) {
+            methods.query$.next(route.query)
+        }
+    }
+
+    const replaceState = route => {
+        if (!route) { return }
+
+        const lastState = getStorage()
+        const lastQuery = queryObjectToString(getQuery(`?${lastState.query}`))
+        const currentQuery = queryObjectToString(route.query)
+        const full = joinUrl(route.pathname, route.query)
+        const state = {
+            title: route.title || document.title,
+            pathname: route.pathname,
+            full,
+            query: route.query || {}
+        }
+
+        if (route.pathname === lastState.pathname && lastQuery === currentQuery) { return }
+
+        if (history.replaceState) {
+            history.replaceState(state, document.title, full)
+        }
+
+        setStorage(state)
     }
 
     const getRouteByPath = path => {
@@ -124,9 +174,9 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
     }
 
     const parseUrl = url => typeof url === `string`
-        ? url.split(`?`)[0]
+        ? ValidateHtml(url.split(`?`)[0]).sanitized // prevent XSS
         : !!url.pathname
-            ? url.pathname
+            ? ValidateHtml(url.pathname).sanitized // prevent XSS
             : ``
 
     const methods = {
@@ -144,12 +194,14 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
         getQuery,
         queryObjectToString,
         routes: _routes,
+        logs: [],
 
         updateQuery(query) {
             if (!current) { return }
 
-            current = Object.assign({}, current)
-            current.query = query
+            current = Object.assign({}, current, { query })
+
+            methods.logs.push({ data: Object.assign({}, current), arg: Object.assign({}, query), log: `updateQuery` })
 
             updateState(current)
         },
@@ -160,18 +212,33 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
             current = Object.assign({}, current)
             current.query = Object.assign({}, current.query, query)
 
+            methods.logs.push({ data: Object.assign({}, current), arg: Object.assign({}, query), log: `addQuery` })
+
             updateState(current)
+        },
+
+        replaceQuery(query) {
+            if (!current) { return }
+
+            current = Object.assign({}, current)
+            current.query = query
+
+            methods.logs.push({ data: Object.assign({}, current), arg: Object.assign({}, query), log: `replaceQuery` })
+
+            replaceState(current)
         },
 
         route(url) {
             const parsedUrl = parseUrl(url)
             const route = methods.getRouteByPath(parsedUrl)
 
+            methods.logs.push({ data: { parsedUrl, route, current: Object.assign({}, current) }, arg: url, log: `route` })
+
             if (!route) { return methods.route(`/`) }
 
             if (!!route.title) { document.title = route.title }
 
-            if (current && route.pathname === current.pathname) { return true }
+            if (current && route.pathname === current.pathname && queryObjectToString(current.query) === queryObjectToString(getQuery(url))) { return true }
 
             current = Object.assign({}, route)
             current.query = getQuery(url)
@@ -184,36 +251,53 @@ const Router = /*#__PURE__*/ (routes, storeLocally = false) => {
             return true
         },
 
-        route$: Observe(undefined)
+        route$: Observe(undefined),
+        query$: Observe(undefined)
     }
 
     methods.route(`${location.pathname}${location.search}`)
 
-    window.document.body.addEventListener(`click`, e => {
-        let link
-        const path = (e as any).path
+    window.document.body.addEventListener(`click`, (e: any) => {
         const target = e.target as any
         const tag = target.tagName.toLowerCase()
+        let link
 
-        if (path && Array.isArray(path)) {
-            for (let i = 0; i < path.length; i++) {
-                if (path[i] && path[i].tagName && path[i].tagName.toLowerCase() === `a`) {
-                    link = path[i]
-                    break
+        if (tag === `a`) {
+            link = target
+        }
+
+        if (Array.isArray(e.path)) {
+            let pathIndex = 0
+
+            while (!link && pathIndex < e.path.length) {
+                if (Get(e, `path.${pathIndex}.tagName`, ``).toLowerCase() === `a` && !!Get(e, `path.${pathIndex}.href`)) {
+                    link = Get(e, `path.${pathIndex}`)
                 }
+
+                pathIndex = pathIndex + 1
             }
         }
 
-        if (!link && tag !== `a`) { return }
+        if (!link) {
+            let parent = target.parentElement
 
-        Get(link, `href`, Get(target, `href`, ``))
+            while (!link && parent && parent !== document.body) {
+                if (Get(parent, `tagName`).toLowerCase() === `a`) {
+                    link = parent
+                }
 
-        const url = new URL(Get(link, `href`, Get(target, `href`, ``)))
+                parent = parent.parentElement
+            }
+        }
 
-        if (url.host !== location.host) { return }
-        if (methods.route(url)) { e.preventDefault() }
+        if (!link) { return }
 
-    }, true)
+        try {
+            const url = new URL(link.href)
+            if (url.host !== location.host) { return }
+            if (methods.route(url)) { e.preventDefault() }
+        } catch (error) { }
+    }, false)
 
     window.addEventListener('popstate', navigated, false)
 

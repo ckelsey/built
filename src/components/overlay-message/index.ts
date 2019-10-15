@@ -12,6 +12,7 @@ import IndexOf from '../../utils/convert/indexof'
 import Get from '../../utils/get'
 import Set from '../../utils/set'
 import ObserveEvent from '../../utils/observeEvent'
+import EventName from '../../utils/html/events'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')
@@ -27,6 +28,18 @@ const setShown = host => {
     const root = host.elements.root
 
     if (!root) { return }
+
+    const endEventName = EventName(`transitionend`)
+    const dispatch = () => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host }))
+
+    if (!!endEventName) {
+        root.addEventListener(endEventName, function startEvent() {
+            root.removeEventListener(endEventName, startEvent)
+            requestAnimationFrame(dispatch)
+        })
+    } else {
+        requestAnimationFrame(dispatch)
+    }
 
     root.classList[host.shown ? `add` : `remove`](`shown`)
 }

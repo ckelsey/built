@@ -146,7 +146,7 @@ const optimization = {
         name: true,
         chunks: 'async',
     },
-    sideEffects: false,
+    // sideEffects: false,
     usedExports: true,
     providedExports: true,
 }
@@ -179,6 +179,7 @@ if (env === `development`) {
         https: true,
         inline: false,
         open: false,
+        host: `0.0.0.0`,
         hot: true,
         liveReload: true,
         watchOptions: {
@@ -198,10 +199,11 @@ if (env === `development`) {
 }
 
 if (env === `production`) {
-    optimization.minimizer = [new TerserPlugin({ terserOptions: { mangle: true } }),]
-    optimization.minimize = true
+    // optimization.minimizer = [new TerserPlugin({ terserOptions: { mangle: true } }),]
+    // optimization.minimize = true
     plugins = [
         new webpack.LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
+        // new CompressionPlugin(),
         postPlugin
     ]
 }
@@ -215,14 +217,15 @@ try {
 const exported = {
     mode: 'production',
     context: __dirname,
-    entry: entries,
+    // entry: entries,
+    entry: path.resolve(`./src/index.ts`),
     resolve: { extensions: ['*', '.ts', '.html'] },
     optimization,
     devServer,
     output: {
         filename: '[name].js',
         path: path.resolve(outDirPath),
-        libraryTarget: 'umd',
+        // libraryTarget: 'umd',
         library: 'builtjs'
     },
     // node: {

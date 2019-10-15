@@ -2,10 +2,12 @@
     pointer-events: none;
     opacity: 0;
     position: fixed;
-    left: 5%;
-    width: 90%;
-    background-color: #fff;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
+    width: 90%;
+    max-width: 600px;
+    background-color: #fff;
     box-shadow: 0 7px 10px -5px rgba(0, 0, 0, 0.61);
     box-sizing: border-box;
     transition: opacity 0.2s ease-in-out;
@@ -27,17 +29,36 @@
         display: flex;
         align-items: center;
         flex-wrap: nowrap;
+        flex: 0 1 auto;
+
+        [slot="body"] {
+            padding: 1em;
+            box-sizing: border-box;
+            align-items: center;
+            display: flex;
+            width: 100%;
+        }
 
         ::slotted(*) {
             padding: 1em;
             box-sizing: border-box;
             align-items: center;
             display: flex;
+            width: 100%;
         }
     }
 
     .snack-bar-text {
         flex-grow: 1;
+        width: calc(100% - 7.5em);
+
+        .snack-bar-text-inner {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            flex: 0 1 auto;
+        }
     }
 
     .snack-bar-text,
@@ -46,6 +67,7 @@
     .snack-bar-type-bar {
         display: flex;
         align-self: stretch;
+        flex: 0 1 auto;
     }
 
     .snack-bar-type-bar {
@@ -54,16 +76,38 @@
         display: none;
     }
 
+    .snack-bar-close {
+        width: 4em;
+        -ms-flex-preferred-size: 4em;
+
+        .snack-bar-close-inner {
+            padding: 1em;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+        }
+    }
+
     .snack-bar-icon {
+        width: 3.5em;
+        -ms-flex-preferred-size: 3.5em;
         color: #fff;
         background-image: linear-gradient(-75deg, rgba(0, 0, 0, 0.125), transparent 36%);
+
+        .snack-bar-icon-inner {
+            width: 100%;
+            padding: 1em;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     }
 
     .infoicon,
     .successicon,
     .warningicon,
     .erroricon {
-        padding: 1em;
         display: none;
         box-sizing: border-box;
         align-items: center;

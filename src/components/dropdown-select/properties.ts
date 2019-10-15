@@ -121,7 +121,6 @@ const attributes = {
 
     styles: {
         format: val => typeof val === `string` ? val : DROPDOWNSELECT.styles,
-        // onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
         onChange: (_val, host) => setStyles(host)
     },
 

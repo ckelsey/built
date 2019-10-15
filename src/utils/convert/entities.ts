@@ -5,7 +5,7 @@ export const ToEntities = value => {
 
     if (result.stop) { return result }
 
-    if (result.type === `string`) {
+    if (result.type === `string` && !!result.value) {
         result.value = result.value
             .replace(/\&/g, `&amp;`)
             .replace(/\>/g, `&gt;`)
@@ -27,7 +27,7 @@ export const FromEntities = value => {
 
     if (result.stop) { return result }
 
-    if (result.type === `string`) {
+    if (result.type === `string` && !!result.value) {
 
         result.value = result.value
             .replace(/&amp;/g, `&`)

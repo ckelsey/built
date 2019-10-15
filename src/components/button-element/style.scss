@@ -17,6 +17,22 @@ button-element {
     position: relative;
     margin: 1.4em 0;
 
+    &.nomargin {
+        margin: 0;
+    }
+
+    &.slim {
+        button {
+            padding: 0.25em;
+        }
+    }
+
+    &.short {
+        button {
+            padding: 0.5em 1em;
+        }
+    }
+
     button {
         opacity: 0;
         background: $buttonelement_background_color;

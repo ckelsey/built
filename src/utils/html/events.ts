@@ -1,26 +1,34 @@
 const events = {
     transitionend: {
-        "transition": "transitionend",
-        "OTransition": "oTransitionEnd",
-        "MozTransition": "transitionend",
-        "WebkitTransition": "webkitTransitionEnd"
-    }
+        transition: `transitionend`,
+        OTransition: `oTransitionEnd`,
+        MozTransition: `transitionend`,
+        WebkitTransition: `webkitTransitionEnd`,
+        msTransition: `msTransitionEnd`,
+    },
 
+    transitionstart: {
+        transition: `transitionstart`,
+        OTransition: `oTransitionStart`,
+        MozTransition: `transitionstart`,
+        WebkitTransition: `webkitTransitionStart`,
+        msTransition: `msTransitionStart`,
+    }
 }
 
-const el = document.createElement("fakeelement")
+const el = document.createElement("fake-element")
 
-export const EventName = key => {
+const EventName = key => {
     if (!events[key]) { return `` }
     let e
 
-    if (key.indexOf(`transition`) > -1) {
-        for (e in events[key]) {
-            if (el.style[e] !== undefined) {
-                return events[key][e]
-            }
+    for (e in events[key]) {
+        if (el.style[e] !== undefined) {
+            return events[key][e]
         }
     }
 
     return ``
 }
+
+export default EventName

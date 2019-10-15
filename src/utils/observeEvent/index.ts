@@ -15,7 +15,7 @@ const ObserveEvent = (element, eventName, options: Opts = {}): ObserveEventObjec
     options = Object.assign({}, {
         preventDefault: false,
         stopPropagation: false,
-        useCapture: false
+        useCapture: true
     }, options)
 
     if (!element || !eventName) { return }

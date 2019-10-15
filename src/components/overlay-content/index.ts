@@ -40,7 +40,6 @@ const componentName = `overlay-content`
 const componentRoot = `.overlay-content-container`
 const positionPadding = 40
 const elements = {}
-const onChange = () => { }
 
 const elementSelectors = {
     root: componentRoot,
@@ -132,7 +131,7 @@ const setPositions = host => () => {
     container.style.height = `auto`
     container.style.maxHeight = `${host.height}px`
 
-    const left = targetBox.left + container.offsetWidth >= window.innerWidth
+    const left = targetBox.left + container.offsetWidth >= (window.innerWidth - 10)
         ? targetBox.right - container.offsetWidth
         : targetBox.left
 
@@ -164,20 +163,14 @@ const OverlayContent = Constructor({
     style,
     observedAttributes: Object.keys(attributes),
     properties: Object.assign({
-        positionTimer: {
-            format: val => val,
-            onChange
-        },
-        showing: {
-            format: val => ToBool(val).value,
-            onChange
-        },
+        positionTimer: { format: val => val, },
+        showing: { format: val => ToBool(val).value, },
         width: {
             format: val => val,
             onChange: (_val, host) => {
                 host.dispatchEvent(new CustomEvent(`widthchange`, { detail: host }))
             }
-        }
+        },
     }, attributes),
     computed: {
         height: host => ({ get() { return (host.isOnTop ? host.spaceAbove : host.spaceBelow) - positionPadding } }),

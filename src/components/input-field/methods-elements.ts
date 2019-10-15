@@ -2,7 +2,7 @@ import { elementSelectors } from './elements'
 import { InputFieldInputAttributes } from './definitions'
 import { ValidateHtml } from '../../utils/validate'
 import { setAttribute, addRemoveAttr } from '../../utils/html/attr'
-import { replaceElementContents } from '../../utils/html/markup'
+import replaceElementContents from '../../utils/html/replace-element-contents'
 import { findIn } from '../../utils/html/query'
 import ObserveEvent from '../../utils/observeEvent'
 
