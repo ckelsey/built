@@ -58,6 +58,8 @@ const setCloseButton = host => {
             try { Get(el, `eventSubscriptions.closeOverlay`, () => { })() } catch (error) { }
         })
 
+    if (!host.closeselector) { return }
+
     Array.from(host.querySelectorAll(host.closeselector))
         .forEach(el => Set(el, `eventSubscriptions.closeOverlay`,
             ObserveEvent(el, `click`).subscribe(() => host.shown = false)

@@ -116,10 +116,10 @@ const ObserveEvent = (element, eventName, options: Opts = {}): ObserveEventObjec
     const waitForParent = () => {
         if (element === window) { return }
 
-        if (!!element.parentNode) {
+        if (!!element.offsetParent) {
             try {
-                mObserver.observe(element.parentNode, { childList: true })
-                return
+                mObserver.observe(element.offsetParent, { childList: true })
+                return true
             } catch (error) { }
         }
 

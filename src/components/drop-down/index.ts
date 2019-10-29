@@ -8,7 +8,6 @@ import AppendStyle from '../../utils/webcomponent/append-style'
 import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import '../overlay-content'
-
 import './style.scss'
 const style = require('./style.scss').toString()
 
@@ -57,13 +56,26 @@ const properties = {
 const template = require('./index.html')
 const componentName = `drop-down`
 const componentRoot = `.${componentName}-container`
-const closeIfOpen = host => {
-    if (host.open) {
-        requestAnimationFrame(() => {
-            host.open = false
-            host.blur()
-        })
+const openClose = (open, host) => {
+    const change = () => {
+        const needsFocusBlur = host.open !== open
+        host.open = open
+
+        if (needsFocusBlur) {
+            if (open) {
+                host.focus()
+            } else {
+                host.blur()
+            }
+        }
+
+        Array.from(host.children).forEach((c: any) => c.blur())
     }
+    if (open) {
+        return change()
+    }
+
+    setTimeout(change, 333)
 }
 
 const elements = {
@@ -72,7 +84,15 @@ const elements = {
         selector: `.drop-down-heading`,
         onChange: (el, host) => {
             el.eventSubscriptions = {
-                mousedown: ObserveEvent(el, `mousedown`).subscribe(() => closeIfOpen(host))
+                mousedown: ObserveEvent(el, `mousedown`).subscribe(() => {
+                    if (!host.open) {
+                        return openClose(true, host)
+                    }
+
+                    requestAnimationFrame(() => {
+                        openClose(false, host)
+                    })
+                })
             }
         }
     },
@@ -124,6 +144,7 @@ const DropDown = Constructor({
             Array.from(host.children)
                 .forEach((child: any) => {
                     if (child.getAttribute(`slot`) === `option`) {
+                        child.tabIndex = `-1`
                         child.classList.add(`drop-down-option`)
                     }
                 })
@@ -145,15 +166,16 @@ const DropDown = Constructor({
         slotObserver.observe(host, { childList: true })
 
         host.eventSubscriptions = {
-            blur: ObserveEvent(host, `focusout`).subscribe(() => host.open = false),
-            focus: ObserveEvent(host, `focus`).subscribe(() => host.open = true),
+            blur: ObserveEvent(host, `focusout`).subscribe(() => {
+                openClose(false, host)
+            }),
+            focus: ObserveEvent(host, `focus`).subscribe(() => openClose(true, host)),
             slotObserver: slotObserver.disconnect
         }
 
         const overlay = host.elements.overlay
 
         overlay.target = host
-        overlay.eventSubscriptions = { click: ObserveEvent(overlay, `click`).subscribe(() => closeIfOpen(host)) }
     },
     onDisconnected(host) {
         Object.keys(host.eventSubscriptions).forEach(key => {

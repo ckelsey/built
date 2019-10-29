@@ -11,16 +11,15 @@ const Split = delimeter => value => {
         result = ToString(result)
     }
 
-    try {
-        const splat = SplitMeta(result.value, delimeter)
+    const splat = SplitMeta(result.value, delimeter)
 
-        if (typeof splat.value === `string`) { throw new Error(`not array`) }
-
-        result.stringChanges = result.stringChanges.concat(splat.stringChanges)
-        result.value = splat.value
-    } catch (error) {
+    if (typeof splat.value === `string`) {
         result.valid = false
+        return finishTMonad(result, `array`, `Split`)
     }
+
+    result.stringChanges = result.stringChanges.concat(splat.stringChanges)
+    result.value = splat.value
 
     return finishTMonad(result, `array`, `Split`)
 }

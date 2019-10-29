@@ -162,7 +162,7 @@ export const SplitMeta = (string, delimeter = ``) => {
 
         delimeter = ToRegex(delimeter).value
 
-        let str = result.value.toString()
+        let str = !!result.value ? result.value.toString() : ``
 
         if (delimeter.toString() === `/(?:)/`) {
             return {

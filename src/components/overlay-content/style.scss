@@ -47,7 +47,6 @@ overlay-content {
     }
 
     .overlay-content-content-container {
-        display: inline-block;
         max-height: 80vh;
         max-width: 80vw;
         overflow: auto;
@@ -57,6 +56,8 @@ overlay-content {
         transform: scale(1, 0);
         pointer-events: none;
         opacity: 0;
+        display: inline-flex;
+        flex-direction: column;
         transition: opacity 0.2s ease-in-out;
     }
 

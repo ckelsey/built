@@ -24,6 +24,10 @@ export const properties = {
     keepchildren: {
         format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (_val, host) => setKeepChildren(host)
+    },
+
+    current: {
+        format: val => val
     }
 }
 
