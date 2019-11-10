@@ -5,7 +5,6 @@ import { unloadTargets, loadTargets } from './methods'
 import ToString from '../../utils/convert/to_string'
 import { SelectorArrayToElements } from '../../utils/convert/dom'
 import ComponentClassObject from '../../utils/html/component-class-object'
-import { EFFECTRIPPLE } from './theme'
 import { setStyles } from './elements'
 
 const resetTargets = host => {
@@ -20,27 +19,27 @@ const attributes = {
     class: ComponentClassObject,
 
     color: {
-        format: val => pipe(ToString, IfInvalid(EFFECTRIPPLE.color))(val).value,
+        format: val => pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
         onChange
     },
 
     opacity: {
-        format: val => Math.min(1, Math.max(0, pipe(ToNumber, IfInvalid(EFFECTRIPPLE.opacity))(val).value)),
+        format: val => Math.min(1, Math.max(0, pipe(ToNumber, IfInvalid(0.2))(val).value)),
         onChange
     },
 
     speed: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTRIPPLE.speed))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(600))(val).value,
         onChange
     },
 
     start: {
-        format: val => pipe(ToString, IfInvalid(EFFECTRIPPLE.start))(val).value,
+        format: val => pipe(ToString, IfInvalid(`mousedown`))(val).value,
         onChange: (_val, host) => resetTargets(host)
     },
 
     styles: {
-        format: val => typeof val === `string` ? val : EFFECTRIPPLE.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
 

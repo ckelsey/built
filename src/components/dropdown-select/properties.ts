@@ -13,21 +13,20 @@ import { dispatch } from './methods'
 import { setLabel, setStyles } from './elements'
 import { findIn } from '../../utils/html/query'
 import IndexOf from '../../utils/convert/indexof'
-import { DROPDOWNSELECT } from './theme'
 import { ToFunction } from '../../utils/convert/function'
 import { ToJSON } from '../../utils'
 import ComponentClassObject from '../../utils/html/component-class-object'
 
 const attributes = {
     arrow: {
-        format: val => pipe(ToString, IndexOf([`right`, `left`, `true`, `false`]), IfInvalid(`true`), IfIs(`true`, DROPDOWNSELECT.arrow))(val).value,
+        format: val => pipe(ToString, IndexOf([`right`, `left`, `true`, `false`]), IfInvalid(`true`), IfIs(`true`, `right`))(val).value,
         onChange: (val, host) => host.elements.root.setAttribute(`arrow`, val)
     },
 
     class: ComponentClassObject,
 
     disabled: {
-        format: val => pipe(ToBool, IfNot(true, DROPDOWNSELECT.disabled))(val).value,
+        format: val => pipe(ToBool, IfNot(true, null))(val).value,
         onChange: (val, host) => {
             host.elements.root.classList[val ? `add` : `remove`](`disabled`)
             addRemoveAttr(host.elements.input, `disabled`, val)
@@ -35,7 +34,7 @@ const attributes = {
     },
 
     disablefilter: {
-        format: val => pipe(ToBool, IfInvalid(DROPDOWNSELECT.disablefilter))(val).value,
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (val, host) => host.elements.root.classList[val ? `add` : `remove`](`disablefilter`)
     },
 
@@ -53,59 +52,59 @@ const attributes = {
         format: val => val === false || val === `false`
             ? false
             : val === undefined
-                ? DROPDOWNSELECT.emptyoption
+                ? `Select...`
                 : val,
         onChange: (_val, host) => setSelectOptions(host)
     },
 
     hideonfilter: {
-        format: val => pipe(ToBool, IfInvalid(DROPDOWNSELECT.hideonfilter))(val).value,
+        format: val => pipe(ToBool, IfInvalid(true))(val).value,
         onChange: (val, host) => host.elements.root.classList[val ? `add` : `remove`](`hidefilteredout`)
     },
 
     multiple: {
-        format: val => pipe(ToBool, IfInvalid(DROPDOWNSELECT.multiple))(val).value,
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (val, host) => {
             addRemoveAttr(host.elements.input, `multiple`, val)
         }
     },
 
     name: {
-        format: val => pipe(ToString, IfInvalid(DROPDOWNSELECT.name))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (val, host) => {
             addRemoveAttr(host.elements.input, `name`, val)
         }
     },
 
     native: {
-        format: val => pipe(ToBool, IfInvalid(DROPDOWNSELECT.native || isMobile))(val).value,
+        format: val => pipe(ToBool, IfInvalid(false || isMobile))(val).value,
         onChange: (val, host) => {
             host.elements.root.classList[val ? `add` : `remove`](`native-select`)
         }
     },
 
     options: {
-        format: val => pipe(Options, IfInvalid(DROPDOWNSELECT.options))(val).value,
+        format: val => pipe(Options, IfInvalid([]))(val).value,
         onChange: (_val, host) => setSelectOptions(host)
     },
 
     formatlabel: {
-        format: val => pipe(ToFunction, IfInvalid(DROPDOWNSELECT.formatlabel))(val).value,
+        format: val => pipe(ToFunction, IfInvalid(function (v) { return v.label }))(val).value,
         onChange: (_val, host) => setSelectOptions(host)
     },
 
     formatvaluelabel: {
-        format: val => typeof val === `function` ? val : DROPDOWNSELECT.formatvaluelabel,
+        format: val => typeof val === `function` ? val : function (v) { return v.label },
         onChange: (_val, host) => setSelectOptions(host)
     },
 
     formatvalue: {
-        format: val => pipe(ToFunction, IfInvalid(DROPDOWNSELECT.formatvalue))(val).value,
+        format: val => pipe(ToFunction, IfInvalid(function (v) { return v.value }))(val).value,
         onChange: (_val, host) => setSelectOptions(host)
     },
 
     readonly: {
-        format: val => pipe(ToBool, IfNot(true, DROPDOWNSELECT.readonly))(val).value,
+        format: val => pipe(ToBool, IfNot(true, null))(val).value,
         onChange: (val, host) => {
             host.elements.root.classList[val ? `add` : `remove`](`readonly`)
             addRemoveAttr(host.elements.input, `readonly`, val)
@@ -113,19 +112,19 @@ const attributes = {
     },
 
     required: {
-        format: val => pipe(ToBool, IfNot(true, DROPDOWNSELECT.required))(val).value,
+        format: val => pipe(ToBool, IfNot(true, null))(val).value,
         onChange: (val, host) => {
             addRemoveAttr(host.elements.input, `required`, val)
         }
     },
 
     styles: {
-        format: val => typeof val === `string` ? val : DROPDOWNSELECT.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (_val, host) => setStyles(host)
     },
 
     tabindex: {
-        format: val => pipe(ToNumber, IfInvalid(DROPDOWNSELECT.tabindex))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(-1))(val).value,
         onChange: (val, host) => {
             addRemoveAttr(host.elements.input, `tabindex`, val)
         }

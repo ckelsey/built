@@ -7,7 +7,6 @@ import Define from '../../utils/webcomponent/define'
 import { GetCurve } from '../../utils/curve'
 import ComponentClassObject from '../../utils/html/component-class-object'
 import SetStyleRules from '../../utils/html/set-style-rules'
-import { OVERLAYCONTENT } from './theme'
 import './style.scss'
 import IndexOf from '../../utils/convert/indexof'
 
@@ -65,20 +64,20 @@ const attributes = {
         format: val => val instanceof HTMLElement ? val : null
     },
     align: {
-        format: val => pipe(IndexOf(alignments), IfInvalid(OVERLAYCONTENT.align))(val).value
+        format: val => pipe(IndexOf(alignments), IfInvalid(`center`))(val).value
     },
     from: {
-        format: val => pipe(IndexOf(alignments), IfInvalid(OVERLAYCONTENT.from))(val).value
+        format: val => pipe(IndexOf(alignments), IfInvalid(`center`))(val).value
     },
     speed: {
-        format: val => pipe(ToNumber, IfInvalid(OVERLAYCONTENT.speed))(val).value
+        format: val => pipe(ToNumber, IfInvalid(333))(val).value
     },
     class: ComponentClassObject,
     widthbasis: {
-        format: val => pipe(IndexOf(widths), IfInvalid(OVERLAYCONTENT.widthbasis))(val).value
+        format: val => pipe(IndexOf(widths), IfInvalid(`content`))(val).value
     },
     styles: {
-        format: val => typeof val === `string` ? val : OVERLAYCONTENT.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
 }

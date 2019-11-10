@@ -8,7 +8,7 @@ export const multiProcessedValue = (host, value) => {
 
     const sanitized = host.type.map((t, i) => sanitizeValue(value[i], t.type, host.allowhtml, host.disallowhtml))
 
-    host.processedErrorText = sanitized.map(processedErrorText).filter(s => !!s).join(`, `)
+    host.processedError = sanitized.map(processedErrorText).filter(s => !!s).join(`, `)
 
     return sanitized
 }
@@ -16,11 +16,36 @@ export const multiProcessedValue = (host, value) => {
 const getVal = (host, value) => {
     const sanitized = sanitizeValue(value, host.type, host.allowhtml, host.disallowhtml)
     const maxMined = maxMin(host, pattern(host, sanitized.sanitized))
-    sanitized.valid = !sanitized.valid ? false : maxMined.valid
+    let mustHaveValid = true
+    let matchInputValid = true
+
+    if (host.musthave) {
+        mustHaveValid = new RegExp(host.musthave, `g`).test(maxMined.value)
+    }
+
+    if (host.matchinput) {
+        matchInputValid = maxMined.value === Get(host, `matchinput.value`)
+    }
+
+    sanitized.valid = sanitized.valid && maxMined.valid && mustHaveValid && matchInputValid
 
     if (!!maxMined.errorText) { sanitized.reason.push(maxMined.errorText) }
 
-    host.processedErrorText = processedErrorText(sanitized)
+    if (!mustHaveValid) {
+        sanitized.reason.push(`Invalid value.`)
+    }
+
+    if (!matchInputValid) {
+        const toMatch = host.matchinput
+        const label = toMatch.label || toMatch.getAttribute(`label`)
+        const placeholder = toMatch.placeholder || toMatch.getAttribute(`placeholder`)
+        const name = toMatch.name || toMatch.getAttribute(`name`)
+        const toMatchName = label || placeholder || name
+
+        sanitized.reason.push(`Value does not match${toMatchName ? ` '${toMatchName}'` : ``}.`)
+    }
+
+    host.processedError = processedErrorText(sanitized)
 
     sanitized.sanitized = maxMined.value
 
@@ -56,7 +81,7 @@ export const multiFormattedValue = (host, value) => {
         errors.push(processedErrorText(s))
     })
 
-    host.processedErrorText = errors.filter(s => !!s).join(`, `)
+    host.processedError = errors.filter(s => !!s).join(`, `)
 
     return values
 }
@@ -77,5 +102,20 @@ export const labelContainer = host => ({
     get() {
         if (!host.shadowRoot) { return }
         return host.shadowRoot.querySelector(`.input-field-label-${host.labelposition}`)
+    }
+})
+
+export const valid = host => ({
+    get() {
+        return (!host.processedError || host.processedError === ``) && Get(host, `elements.input.validity.valid`)
+    }
+})
+
+export const validationMessage = host => ({
+    get() {
+        return [
+            host.processedError,
+            Get(host, `elements.input.validationMessage`)
+        ].filter(m => !!m)
     }
 })

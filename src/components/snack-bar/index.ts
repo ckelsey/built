@@ -74,7 +74,7 @@ const setIcon = (host, key) => {
 
 const showHideClose = (el, show) => {
     if (!el) { return }
-    el.style.display = show ? `flex` : `none`
+    el.classList[show ? `remove` : `add`](`hide-close-btn`)
 }
 
 const properties = {
@@ -109,7 +109,7 @@ const properties = {
     },
     hideclose: {
         format: val => pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (val, host) => showHideClose(host.elements.button, !val)
+        onChange: (val, host) => showHideClose(host.elements.root, !val)
     },
     styles: {
         format: val => pipe(ToString, IfInvalid(``))(val).value,
@@ -138,7 +138,7 @@ const elements = {
                 click: ObserveEvent(el, `click`).subscribe(() => host.shown = false)
             }
 
-            showHideClose(el, !host.hideclose)
+            showHideClose(host.elements.root, !host.hideclose)
         }
     },
     injectedStyles: {

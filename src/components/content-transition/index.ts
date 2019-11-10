@@ -3,7 +3,7 @@ import Define from '../../utils/webcomponent/define'
 import './style.scss'
 import elements, { setStyles } from './elements'
 import { observedAttributes, properties } from './properties'
-import { transitionChild, transitionTo, getComponentStyles } from './methods'
+import { transitionChild, transitionTo, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren } from './methods'
 
 import AppendStyle from '../../utils/webcomponent/append-style'
 
@@ -46,7 +46,12 @@ const ContentTransition = Constructor({
     methods: {
         transitionChild,
         transitionTo,
-        getComponentStyles
+        getComponentStyles,
+        getIndex,
+        getCurrent,
+        getChildren,
+        start$,
+        end$
     },
 })
 

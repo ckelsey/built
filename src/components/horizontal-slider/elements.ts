@@ -2,7 +2,6 @@ import SetStyleRules from '../../utils/html/set-style-rules'
 import ObserveEvent from '../../utils/observeEvent'
 import Get from '../../utils/get'
 import { goToNextPage, goToPreviousPage, autoplay } from './methods'
-import { imageLoader } from '../image-loader'
 
 const sliderItemSelectedClass = `active-horizontal-slider-item`
 const sliderItemClass = `horizontal-slider-item`
@@ -67,7 +66,23 @@ export const setSlot = (el, host) => {
                 })
 
             Promise
-                .all(images.map(image => imageLoader(image)))
+                .all(
+                    images.map(image =>
+                        new Promise(resolve => {
+
+                            if (image.complete) { return resolve(image) }
+
+                            function onComplete() {
+                                image.removeEventListener(`load`, onComplete, true)
+                                image.removeEventListener(`error`, onComplete, true)
+                                return resolve(image)
+                            }
+
+                            image.addEventListener(`load`, onComplete, true)
+                            image.addEventListener(`error`, onComplete, true)
+                        })
+                    )
+                )
                 .then(() => host.items = items)
         })
     }

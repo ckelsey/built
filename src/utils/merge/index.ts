@@ -19,7 +19,7 @@ const merge = (obj1, obj2) => {
     const type2 = Type(obj2)
 
     if (type1 !== type2 || [`array`, `object`].indexOf(type1) === -1) {
-        return Object.assign({}, obj2)
+        return obj2
     }
 
     if (type1 === `array`) {
@@ -31,7 +31,7 @@ const merge = (obj1, obj2) => {
     for (const key in obj2) {
         if (!obj2[key]) { continue }
 
-        result[key] = mutateMerge(obj1[key], obj2[key])
+        result[key] = merge(obj1[key], obj2[key])
     }
 
     return result

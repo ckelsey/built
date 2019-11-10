@@ -39,7 +39,7 @@ const setDimensions = host => {
         style,
         themeStyles ? themeStyles.innerHTML : ``,
         injectedStyles ? injectedStyles.innerHTML : ``,
-        `.grid-layout-items{grid-gap:${gap}; grid-template-columns:repeat(auto-fit, minmax(${columnwidth}, 1fr));}${unsupportedCSS}`
+        `.grid-layout-items{grid-gap:${gap}; grid-template-columns:repeat(auto-fit, minmax(${columnwidth}, 0fr));}${unsupportedCSS}`
     ].join(``)
 
     if (!outerStyle) {

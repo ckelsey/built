@@ -75,18 +75,25 @@ export const onDone = host => {
 
     input.blur()
 
+    const valid = host.valid
+    const error = host.validationMessage.join(`, `)
+
+    if (!valid && error) {
+        return host.setError(error)
+    }
+
     dispatch(host, `done`, {
         processedValue: host.processedValue,
         value: host.value,
-        valid: !host.invalid,
-        errortext: host.errortext
+        valid,
+        error
     })
 }
 
 export const onInvalid = host => dispatch(host, `invalid`, {
     processedValue: host.processedValue,
     value: host.value,
-    errortext: host.errortext
+    error: host.validationMessage.join(`, `)
 })
 
 export const setDroppable = host => {

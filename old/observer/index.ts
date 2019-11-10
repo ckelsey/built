@@ -1,7 +1,5 @@
-import { ObserverClass, ObserverObject } from '../../../typings'
-
-class Observer implements ObserverClass {
-    public handler: ObserverObject
+class Observer {
+    public handler: any
     public isUnsubscribed: boolean
     public id: string
 

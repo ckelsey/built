@@ -16,7 +16,6 @@ import { setDroppable } from './methods-events'
 import { setAttribute } from '../../utils/html/attr'
 import replaceElementContents from '../../utils/html/replace-element-contents'
 import { labelPositions, resizeOptions } from './definitions'
-import { INPUTFIELD } from './theme'
 import ComponentClassObject from '../../utils/html/component-class-object'
 
 const trueOrNull = val => pipe(ToBool, IfNot(true, null))(val).value
@@ -45,33 +44,33 @@ const inputStates = {
         onChange: (val, host) => addRemoveContainerClass(val, host, `ready`),
     },
     count: {
-        format: val => pipe(ToNumber, IfInvalid(INPUTFIELD.count))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(0))(val).value,
         onChange: (val, host) => replaceElementContents(host.elements.count, val)
     },
 }
 
 const inputAttributes = {
     accept: {
-        format: val => pipe(CommasToArray, IfInvalid(INPUTFIELD.accept))(val).value,
+        format: val => pipe(CommasToArray, IfInvalid(null))(val).value,
         onChange: (val, host) => setInputAttribute(host, `accept`, val)
     },
     autocomplete: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.autocomplete))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (val, host) => setInputAttribute(host, `autocomplete`, val)
     },
     autofocus: {
-        format: val => pipe(ToBool, IfNot(true, INPUTFIELD.autofocus))(val).value,
+        format: val => pipe(ToBool, IfNot(true, null))(val).value,
         onChange: (val, host) => setInputAttribute(host, `autofocus`, val)
     },
     disabled: {
-        format: val => pipe(ToBool, IfNot(true, INPUTFIELD.disabled))(val).value,
+        format: val => pipe(ToBool, IfNot(true, null))(val).value,
         onChange: (val, host) => {
             setInputAttribute(host, `disabled`, val)
             addRemoveContainerClass(val, host, `disabled`)
         }
     },
     maxlength: {
-        format: val => pipe(ToNumber, IfInvalid(INPUTFIELD.maxlength))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(null))(val).value,
         onChange: (val, host) => {
             replaceElementContents(host.elements.max, val || ``)
             addRemoveContainerClass(val, host, `maxlength`)
@@ -79,7 +78,7 @@ const inputAttributes = {
         },
     },
     max: {
-        format: val => pipe(ToNumber, IfInvalid(INPUTFIELD.max))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(null))(val).value,
         onChange: (val, host) => {
             replaceElementContents(host.elements.max, val || ``)
             addRemoveContainerClass(val, host, `max`)
@@ -87,22 +86,22 @@ const inputAttributes = {
         },
     },
     min: {
-        format: val => pipe(ToNumber, IfInvalid(INPUTFIELD.min))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(null))(val).value,
         onChange: (val, host) => {
             addRemoveContainerClass(val, host, `min`)
             processValue(host)
         },
     },
     name: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.name))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (val, host) => setInputAttribute(host, `name`, val),
     },
     pattern: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.pattern))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (_val, host) => processValue(host),
     },
     placeholder: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.placeholder))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (val, host) => setInputAttribute(host, `placeholder`, val)
     },
     readonly: {
@@ -114,15 +113,15 @@ const inputAttributes = {
         onChange: (val, host) => setInputAttribute(host, `required`, val),
     },
     step: {
-        format: val => pipe(ToNumber, IfInvalid(INPUTFIELD.step))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(null))(val).value,
         onChange: (val, host) => setInputAttribute(host, `step`, val)
     },
     tabindex: {
-        format: val => pipe(ToNumber, IfInvalid(INPUTFIELD.tabindex))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(1))(val).value,
         onChange: (val, host) => setInputAttribute(host, `tabIndex`, val)
     },
     type: {
-        format: val => pipe(ToArray, IfInvalid(val))(val).value || INPUTFIELD.type,
+        format: val => pipe(ToArray, IfInvalid(val))(val).value || `text`,
         onChange: (_val, host) => setInput(host),
     },
     value: {
@@ -133,16 +132,16 @@ const inputAttributes = {
 
 const inputFieldProperties = {
     accentcolor: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.accentcolor))(val).value,
+        format: val => pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
         onChange: (_val, host) => setColors(host, host.invalid)
     },
     allowhtml: {
-        format: val => pipe(CommasToArray, IfInvalid(INPUTFIELD.allowhtml))(val).value,
+        format: val => pipe(CommasToArray, IfInvalid(null))(val).value,
         onChange
     },
     class: ComponentClassObject,
     clearbutton: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.clearbutton))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (val, host) => {
             setAttribute(host.elements.clearButton, `type`, val)
             addRemoveContainerClass(!!val, host, `clearbutton`)
@@ -153,27 +152,24 @@ const inputFieldProperties = {
         onChange: (val, host) => addRemoveContainerClass(val, host, `disablefilter`)
     },
     disallowhtml: {
-        format: val => pipe(CommasToArray, IfInvalid(INPUTFIELD.disallowhtml))(val).value,
+        format: val => pipe(CommasToArray, IfInvalid(null))(val).value,
         onChange
     },
     droppable: {
         format: val => ToBool(val).value,
         onChange: (_val, host) => setDroppable(host),
     },
-    errortext: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.errortext))(val).value,
-        onChange: (val, host) => replaceElementContents(host.elements.error, ValidateHtml(val, [], [`script`]).sanitized || ``),
-    },
+
     format: {
-        format: val => pipe(ToObject, IfInvalid(pipe(ToString, IfInvalid(INPUTFIELD.format))(val).value))(val).value,
+        format: val => pipe(ToObject, IfInvalid(pipe(ToString, IfInvalid(null))(val).value))(val).value,
         onChange: (_val, host) => processValue(host),
     },
     helptext: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.helptext))(val).value,
+        format: val => pipe(ToString, IfInvalid(``))(val).value,
         onChange: (val, host) => replaceElementContents(host.elements.help, ValidateHtml(val, [], [`script`]).sanitized || ``),
     },
     icon: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.icon))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (val, host) => {
             setAttribute(host.elements.icon, `type`, val)
             addRemoveContainerClass(val, host, `icon`)
@@ -198,17 +194,25 @@ const inputFieldProperties = {
     },
 
     label: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.label))(val).value,
+        format: val => pipe(ToString, IfInvalid(``))(val).value,
         onChange: (val, host) => setLabel(val, host.labelposition, host),
     },
 
-    processedErrorText: {
-        format: val => pipe(ToString, IfInvalid(``))(val).value,
+    musthave: {
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
+    },
+
+    matchinput: {
+        format: val => val,
+    },
+
+    processedError: {
+        format: val => ValidateHtml(pipe(ToString, IfInvalid(``))(val).value, [], [`script`]).sanitized || ``,
         onChange: (val, host) => !!val ? replaceElementContents(host.elements.error, val) : undefined,
     },
 
     resize: {
-        format: val => pipe(IndexOf(resizeOptions), IfInvalid(INPUTFIELD.resize))(val).value,
+        format: val => pipe(IndexOf(resizeOptions), IfInvalid(`auto`))(val).value,
         onChange: (val, host) => setAttribute(host.elements.container, `resize`, val),
     },
 
@@ -218,7 +222,7 @@ const inputFieldProperties = {
     },
 
     styles: {
-        format: val => typeof val === `string` ? val : INPUTFIELD.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
 
@@ -228,7 +232,7 @@ const inputFieldProperties = {
     },
 
     warningcolor: {
-        format: val => pipe(ToString, IfInvalid(INPUTFIELD.warningcolor))(val).value,
+        format: val => pipe(ToString, IfInvalid(`#a10005`))(val).value,
         onChange: (_val, host) => setColors(host, host.invalid),
     },
 }

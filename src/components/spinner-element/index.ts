@@ -6,7 +6,6 @@ import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import ComponentClassObject from '../../utils/html/component-class-object'
 import SetStyleRules from '../../utils/html/set-style-rules'
-import { SPINNERELEMENT } from './theme'
 import './style.scss'
 
 const style = require('./style.scss').toString()
@@ -102,31 +101,31 @@ const elements = {
 const properties = {
     class: ComponentClassObject,
     visible: {
-        format: val => pipe(ToBool, IfInvalid(SPINNERELEMENT.visible))(val).value,
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (_val, host) => toggleVisibility(host)
     },
     page: {
-        format: val => pipe(ToBool, IfInvalid(SPINNERELEMENT.page))(val).value,
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (_val, host) => doAllTheThings(host)
     },
     scrim: {
-        format: val => pipe(ToBool, IfInvalid(SPINNERELEMENT.scrim))(val).value,
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (_val, host) => doAllTheThings(host)
     },
     blur: {
-        format: val => pipe(ToNumber, IfInvalid(SPINNERELEMENT.blur))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(0))(val).value,
         onChange: (_val, host) => doAllTheThings(host)
     },
     scrimopacity: {
-        format: val => pipe(ToNumber, IfInvalid(SPINNERELEMENT.scrimopacity))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(1))(val).value,
         onChange: (_val, host) => doAllTheThings(host)
     },
     styles: {
-        format: val => typeof val === `string` ? val : SPINNERELEMENT.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
     type: {
-        format: val => typeof val === `string` ? val : SPINNERELEMENT.type,
+        format: val => typeof val === `string` ? val : `column`,
         onChange: (_val, host) => doAllTheThings(host)
     },
     theme: {

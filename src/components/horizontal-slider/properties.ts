@@ -1,6 +1,5 @@
 import ComponentClassObject from '../../utils/html/component-class-object'
 import { setStyles, unsetItemEvents, setItemEvents, setChicklets, setPrevious, setNext } from './elements'
-import { HORIZONTALSLIDER } from './theme'
 import pipe from '../../utils/pipe'
 import ToArray from '../../utils/convert/to_array'
 import IfInvalid from '../../utils/convert/if_invalid'
@@ -13,7 +12,7 @@ export const attributes = {
     class: ComponentClassObject,
 
     styles: {
-        format: val => typeof val === `string` ? val : HORIZONTALSLIDER.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, host, val)
     },
 

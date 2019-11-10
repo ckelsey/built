@@ -5,7 +5,6 @@ import IfInvalid from '../../utils/convert/if_invalid'
 import ComponentClassObject from '../../utils/html/component-class-object'
 import ToString from '../../utils/convert/to_string'
 import SetStyleRules from '../../utils/html/set-style-rules'
-import { BUTTONELEMENT } from './theme'
 import './style.scss'
 import '../effect-bounce-z'
 import '../effect-ripple'
@@ -26,7 +25,7 @@ const setTheme = (value, host) => {
 
 const properties = {
     accentcolor: {
-        format: val => pipe(ToString, IfInvalid(BUTTONELEMENT.accentcolor))(val).value,
+        format: val => pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
         onChange: (val, host) => {
             if (host.hasRipple) {
                 host.elements.ripple.color = val
@@ -46,15 +45,15 @@ const properties = {
         }
     },
     ripple: {
-        format: val => pipe(ToBool, IfInvalid(BUTTONELEMENT.ripple))(val).value,
+        format: val => pipe(ToBool, IfInvalid(true))(val).value,
         onChange: (_val, host) => setRipple(host)
     },
     bounce: {
-        format: val => pipe(ToBool, IfInvalid(BUTTONELEMENT.bounce))(val).value,
+        format: val => pipe(ToBool, IfInvalid(true))(val).value,
         onChange: (_val, host) => setBounce(host)
     },
     styles: {
-        format: val => typeof val === `string` ? val : BUTTONELEMENT.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, host, val)
     },
     theme: {
@@ -116,7 +115,7 @@ const setBounce = host => {
 const template = require('./index.html')
 const componentName = `button-element`
 const componentRoot = `.button-element`
-const ButtonElement = /*#__PURE__*/ Constructor({
+const ButtonElement = Constructor({
     componentName,
     componentRoot,
     template,

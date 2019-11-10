@@ -3,7 +3,6 @@ import Define from '../../utils/webcomponent/define'
 import Observe from '../../utils/observe'
 import ComponentClassObject from '../../utils/html/component-class-object'
 import SetStyleRules from '../../utils/html/set-style-rules'
-import { ICONELEMENT } from './theme'
 import './style.scss'
 import ObserveWorker from '../../utils/observeWorker'
 
@@ -91,7 +90,7 @@ const getIcon = (path) => {
 
 const attributes = {
     type: {
-        format: (val: any) => typeof val === `string` ? val : ICONELEMENT.type,
+        format: (val: any) => typeof val === `string` ? val : null,
         onChange: (value, host) => {
             if (!value) { return }
             if (host.subscription) { host.subscription() }
@@ -105,7 +104,7 @@ const attributes = {
         }
     },
     svg: {
-        format: (val: any) => typeof val === `string` ? val : ICONELEMENT.svg,
+        format: (val: any) => typeof val === `string` ? val : null,
         onChange: (value, host) => {
             if (!value) { return }
             if (host.subscription) { host.subscription() }
@@ -114,16 +113,16 @@ const attributes = {
         }
     },
     color: {
-        format: (val: any) => typeof val === `string` ? val : ICONELEMENT.color,
+        format: (val: any) => typeof val === `string` ? val : null,
         onChange: (value, host) => host.elements.svgContainer.style.color = value
     },
     size: {
-        format: (val: any) => typeof val === `string` ? val : ICONELEMENT.size,
+        format: (val: any) => typeof val === `string` ? val : `1.5em`,
         onChange: (value, host) => host.elements.svgContainer.style.height = host.elements.svgContainer.style.width = value
     },
     class: ComponentClassObject,
     styles: {
-        format: val => typeof val === `string` ? val : ICONELEMENT.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
 }

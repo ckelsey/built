@@ -7,10 +7,11 @@ import { toggle } from './methods'
 import { setHeaderIcon, setStyles } from './elements'
 import CommasToArray from '../../utils/convert/commas-to-array'
 import ComponentClassObject from '../../utils/html/component-class-object'
-import { CONTENTDRAWER } from './theme'
 import ToString from '../../utils/convert/to_string'
 import Map from '../../utils/convert/map'
 import IndexOf from '../../utils/convert/indexof'
+
+const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>`
 
 const directions = [
     `auto`,
@@ -34,7 +35,7 @@ const setElementParam = (el, key, value) => !el ? undefined : el[key] = value
 
 const attributes = {
     accentcolor: {
-        format: val => pipe(ToString, IfEmpty(CONTENTDRAWER.accentcolor))(val).value,
+        format: val => pipe(ToString, IfEmpty(`#59a2d8`))(val).value,
         onChange: (val, host) => {
             setElementParam(host.elements.ripple, `color`, val)
             setElementParam(host.elements.underline, `color`, val)
@@ -42,15 +43,15 @@ const attributes = {
     },
 
     bounce: {
-        format: val => pipe(ToString, IfInvalid(CONTENTDRAWER.bounce))(val).value,
+        format: val => pipe(ToString, IfInvalid(`all`))(val).value,
     },
 
     bounceamount: {
-        format: val => pipe(ToNumber, IfInvalid(CONTENTDRAWER.bounceamount))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(null))(val).value,
     },
 
     bouncespeed: {
-        format: val => pipe(ToNumber, IfInvalid(CONTENTDRAWER.bouncespeed))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(null))(val).value,
     },
 
     class: ComponentClassObject,
@@ -60,19 +61,19 @@ const attributes = {
     },
 
     fade: {
-        format: val => pipe(ToBool, IfInvalid(CONTENTDRAWER.fade))(val).value,
+        format: val => pipe(ToBool, IfInvalid(true))(val).value,
     },
 
     fadeamount: {
-        format: val => pipe(CommasToArray, IfInvalid(CONTENTDRAWER.fadeamount), Map(v => ToNumber(v).value))(val).value,
+        format: val => pipe(CommasToArray, IfInvalid([0, 1]), Map(v => ToNumber(v).value))(val).value,
     },
 
     fadespeed: {
-        format: val => pipe(ToNumber, IfInvalid(CONTENTDRAWER.fadespeed))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(null))(val).value,
     },
 
     headericon: {
-        format: val => val === `true` || val === undefined || val === null ? CONTENTDRAWER.arrowIcon : val === `false` ? false : val,
+        format: val => val === `true` || val === undefined || val === null ? arrowIcon : val === `false` ? false : val,
         onChange: (_val, host) => setHeaderIcon(host)
     },
 
@@ -80,7 +81,7 @@ const attributes = {
         format: val =>
             pipe(
                 IndexOf(directions),
-                IfInvalid(CONTENTDRAWER.openfrom)
+                IfInvalid(`top`)
             )(val).value,
         onChange: (val, host) => {
             setElementParam(host.elements.scaler, `startfrom`, toEffectStartFrom(val))
@@ -95,7 +96,7 @@ const attributes = {
     },
 
     ripple: {
-        format: val => pipe(ToString, IfInvalid(CONTENTDRAWER.ripple))(val).value,
+        format: val => pipe(ToString, IfInvalid(`auto`))(val).value,
     },
 
     rippleamount: {
@@ -114,13 +115,13 @@ const attributes = {
         format: val =>
             pipe(
                 ToNumber,
-                IfInvalid(CONTENTDRAWER.speed)
+                IfInvalid(333)
             )(val).value,
         onChange: (val, host) => setElementParam(host.elements.scaler, `speed`, val)
     },
 
     styles: {
-        format: val => typeof val === `string` ? val : CONTENTDRAWER.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
 

@@ -1,2 +1,0 @@
-/** DO NOT EDIT, AUTO-GENERATED */
-export const BUTTONELEMENT = {accentcolor:'#59a2d8',bounce:true,ripple:true,styles:'',sass:{buttonelement_border_radius:'2px',buttonelement_color:'inherit',buttonelement_background_color:'#fafafa',buttonelement_hover_background_color:'#fff',buttonelement_hover_color:'inherit',buttonelement_box_shadow:'inset 0px -2px 0px rgba(0,0,0,0.13), inset 0px 0px 0px 1px rgba(0,0,0,0.25)',buttonelement_hover_box_shadow:'inset 0px -2px 0px rgba(0,0,0,0.13), inset 0px 0px 0px 1px rgba(0,0,0,0.25), 0px 10px 9px -6px rgba(0,0,0,0.2)'}}

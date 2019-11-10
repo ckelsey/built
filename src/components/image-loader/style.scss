@@ -1,20 +1,86 @@
 :host {
-    position: fixed;
-    z-index: -1;
-    opacity: 0;
-    pointer-events: none;
+    display: inline-block;
 }
 
 image-loader {
-    position: fixed;
-    z-index: -1;
-    opacity: 0;
-    pointer-events: none;
+    display: inline-block;
+
+    &[fit] {
+        width: 100%;
+        height: 100%;
+
+        &[error="true"] {
+            width: auto;
+            height: auto;
+        }
+    }
 }
 
 .image-loader-container {
-    position: fixed;
-    z-index: -1;
+    position: relative;
+    width: 0%;
+    height: 0%;
+
+    spinner-element {
+        top: 0;
+        left: 0;
+    }
+
+    &.animate {
+        transition: width 0.2s, height 0.2s;
+    }
+}
+
+.image-loader-container.notready {
+    spinner-element {
+        opacity: 0;
+    }
+}
+
+.image-loader-container.fill.show-text[loaded="false"],
+.image-loader-container.fill[loaded="true"],
+.image-loader-container.fill[loaded="true"]>img {
+    width: 100%;
+    height: 100%;
+}
+
+.image-loader-container.fill[loaded="true"][fit="width"]>img {
+    width: 100%;
+    height: auto;
+}
+
+.image-loader-container.errored,
+.image-loader-container.errored>img {
+    width: auto;
+    height: auto;
+}
+
+.image-loader-container,
+.image-loader-container>img {
+    display: inline-block;
+}
+
+.image-loader-container .image-loader-text {
+    display: none;
+}
+
+.image-loader-container.show-text {
+    .image-loader-text {
+        display: inline-block;
+    }
+
+    &>img {
+        display: none;
+    }
+}
+
+.image-loader-container>img {
+    object-fit: contain;
+    display: block;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.image-loader-container.loading>img {
     opacity: 0;
-    pointer-events: none;
 }

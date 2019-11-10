@@ -7,7 +7,6 @@ import { unloadTargets, unloadTriggers, loadTriggers, setOrigin, run, loadTarget
 import ToString from '../../utils/convert/to_string'
 import { SelectorArrayToAllElements } from '../../utils/convert/dom'
 import ComponentClassObject from '../../utils/html/component-class-object'
-import { EFFECTSCALE } from './theme'
 
 const reset = host => {
     unloadTargets(host)
@@ -34,39 +33,39 @@ const selectorsToDom = val => SelectorArrayToAllElements(null, val).value
 
 const attributes = {
     amount: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTSCALE.amount))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(-1))(val).value,
         onChange,
     },
 
     class: ComponentClassObject,
 
     end: {
-        format: val => pipe(ToString, IfInvalid(EFFECTSCALE.end))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (_val, host) => reset(host),
     },
 
     scaled: {
-        format: val => pipe(ToBool, IfInvalid(EFFECTSCALE.scaled))(val).value,
+        format: val => pipe(ToBool, IfInvalid(null))(val).value,
         onChange: (val, host) => host.ready ? run(val, host) : undefined
     },
 
     speed: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTSCALE.speed))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(333))(val).value,
         onChange,
     },
 
     spring: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTSCALE.spring))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(4))(val).value,
         onChange,
     },
 
     start: {
-        format: val => pipe(ToString, IfInvalid(EFFECTSCALE.start))(val).value,
+        format: val => pipe(ToString, IfInvalid(`mousedown`))(val).value,
         onChange: (_val, host) => reset(host),
     },
 
     startfrom: {
-        format: val => pipe(IndexOf(directions), IfInvalid(EFFECTSCALE.startfrom))(val).value,
+        format: val => pipe(IndexOf(directions), IfInvalid(`center`))(val).value,
         onChange: setOrigin,
     },
 
@@ -81,12 +80,12 @@ const attributes = {
     },
 
     x: {
-        format: val => pipe(ToBool, IfInvalid(EFFECTSCALE.x))(val).value,
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange,
     },
 
     y: {
-        format: val => pipe(ToBool, IfInvalid(EFFECTSCALE.y))(val).value,
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
         onChange,
     },
 

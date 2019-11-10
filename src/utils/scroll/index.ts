@@ -37,8 +37,7 @@ const ScrollTo = options => {
 
     /** TODO - handle x */
 
-    const box = target !== window ? target.getBoundingClientRect() : {}
-    const fromY = target.scrollY || box.top
+    const fromY = target.scrollY || target.scrollTop
     const toY = Get(options, `y`)
     const toX = Get(options, `x`)
     const speed = Get(options, `speed`)

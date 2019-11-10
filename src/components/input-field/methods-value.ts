@@ -1,5 +1,5 @@
 import { ValidateNumber, ValidateBool, ValidateEmail, ValidateHtml, ValidateText, ValidateUsZip, ValidateUsPhone, ValidateUrl, ValidateIntlPhone } from '../../utils/validate'
-import { isAutoFilled, setInputCaret, getInvalidMessage } from '../../utils/html'
+import { isAutoFilled, setInputCaret } from '../../utils/html'
 import { ToPhone, ToIntlPhone } from '../../utils/convert/phone'
 import { ToUsZip } from '../../utils/convert/postal'
 import { textareaHeight } from './methods-elements'
@@ -183,8 +183,8 @@ export const inputCaretPositions = input => {
 export const clearInput = host => host.value = ``
 
 export const setError = host => error => {
-    host.errortext = error
-    host.invalid = true
+    host.processedError = error
+    host.invalid = !error ? false : true
 }
 
 export const isEmpty = val => (val === `` || val === null || val === undefined)
@@ -362,16 +362,17 @@ export const processValue = host => {
 
     if (!input) { return }
 
-    const validationMessage = [getInvalidMessage(input)].filter(v => !!v)
     const processed = host.processedValue
     const sanitized = processed.sanitized
-    const errors = validationMessage.concat(processed.reason)
-    const valid = errors.length ? false : processed.valid
+
+    host.processedError = processed.reason.join(`, `)
+
+    const errors = host.validationMessage
+    const valid = (errors.length ? false : processed.valid) || (!host.focused && host.valid)
     const autofilled = isAutoFilled(input)
     const stringEmpty = (isNaN(sanitized) || typeof sanitized === `string`) && !sanitized.length
     const empty = stringEmpty && !autofilled
 
-    host.processedErrorText = errors.join(`, `)
     host.count = host.type === `number` ? sanitized : sanitized ? sanitized.length : 0
     host.elements.container.classList[!!sanitized ? `add` : `remove`](`checked`)
 

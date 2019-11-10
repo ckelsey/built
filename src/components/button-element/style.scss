@@ -35,7 +35,7 @@ button-element {
 
     button {
         opacity: 0;
-        background: $buttonelement_background_color;
+        background: #fafafa;
         position: relative;
         border: none;
         display: flex;
@@ -45,14 +45,14 @@ button-element {
         width: auto;
         padding: 1em;
         font: inherit;
-        color: $buttonelement_color;
+        color: inherit;
         cursor: pointer;
         appearance: none;
         box-sizing: border-box;
         text-overflow: ellipsis;
         hyphens: auto;
-        box-shadow: $buttonelement_box_shadow;
-        border-radius: $buttonelement_border_radius;
+        box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.13), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.25);
+        border-radius: 2px;
         outline: 0px !important;
         transform: scale(1);
         transition: box-shadow 0.2s, color 0.4s, background-color 0.4s, opacity 0.2s ease-in-out 0.01s;
@@ -62,9 +62,8 @@ button-element {
         }
 
         &:hover {
-            background-color: $buttonelement_hover_background_color;
-            color: $buttonelement_hover_color;
-            box-shadow: $buttonelement_hover_box_shadow;
+            background-color: #fff;
+            box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.13), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.25), 0px 10px 9px -6px rgba(0, 0, 0, 0.2);
         }
     }
 

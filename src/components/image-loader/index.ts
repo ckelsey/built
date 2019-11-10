@@ -5,167 +5,243 @@ import IfInvalid from '../../utils/convert/if_invalid'
 import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import ObserveEvent from '../../utils/observeEvent'
-import { IsElement } from '../../utils/convert/dom'
 import ToBool from '../../utils/convert/bool'
+import SetStyleRules from '../../utils/html/set-style-rules'
+import AppendStyle from '../../utils/webcomponent/append-style'
+import ValidateHtml from '../../utils/validate/html'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = `image-loader`
 const componentRoot = `.image-loader-container`
 
-const properties = {
+const setStyles = (el, styles) => {
+    if (!el) { return }
+    SetStyleRules(el, styles)
+}
 
+const setStyleElement = host => {
+    let outerStyle = host.querySelector(`style[name="outer"]`)
+    const componentStyle = host.shadowRoot.querySelector(`style[name=""]`)
+    const styleString = [style, host.theme, host.styles].join(``)
+
+    if (!outerStyle) {
+        AppendStyle(styleString, host, `outer`)
+        outerStyle = host.querySelector(`style[name="outer"]`)
+    }
+
+    setStyles(host.elements.themedStyles, styleString)
+    setStyles(componentStyle, styleString)
+    setStyles(outerStyle, styleString)
+}
+
+const setInternalStyle = host => {
+    const internalStyle = !host.fit ?
+        `` :
+        `.image-loader-container>img.image-loader-image{
+            object-position:${!!host.position ? host.position : `50% 50%`};
+            object-fit:${!!host.fit ? host.fit : `contain`};
+        }`
+
+    setStyles(host.elements.internalStyles, internalStyle)
+    waitForEl(host, `root`)
+        .then((root: any) => {
+
+            if (!!host.fit) {
+                root.classList.add(`fill`)
+                root.setAttribute(`fit`, host.fit)
+            } else {
+                root.classList.remove(`fill`)
+                root.removeAttribute(`fit`)
+            }
+        })
+}
+
+const waitForEl = (host, key) => new Promise(resolve => {
+    let el = host.elements[key]
+
+    const checkIfReady = () => {
+        cancelAnimationFrame(host[`timerFor${key}`])
+
+        el = host.elements[key]
+
+        return !el ?
+            host[`timerFor${key}`] = requestAnimationFrame(checkIfReady) :
+            resolve(el)
+    }
+
+    checkIfReady()
+})
+
+const waitForEls = (host, keys) => Promise.all(keys.map(key => waitForEl(host, key)))
+
+const toggleLoad = host => waitForEls(host, [`root`, `spinner`])
+    .then((elements: any) => {
+        clearTimeout(host.spinnerTimer)
+        const root = elements[0]
+        const spinner = elements[1]
+        const loaded = !host.loading && !!host.src
+
+        host.setAttribute(`loaded`, loaded)
+        host.setAttribute(`errored`, host.error)
+
+        root.setAttribute(`loaded`, loaded)
+        root.classList[host.loading ? `add` : `remove`](`loading`)
+        root.classList[host.error ? `add` : `remove`](`errored`)
+
+        host.dispatchEvent(new CustomEvent(
+            host.error ?
+                `imageerror` :
+                host.loading ?
+                    `imageloading` :
+                    `imageloaded`,
+            { detail: host }
+        ))
+
+        if (!host.loading) {
+            host.complete = true
+            host.dispatchEvent(new CustomEvent(`imagecomplete`, { detail: host }))
+        }
+
+        toggleText(host)
+
+        if (!host.loading) {
+            spinner.setAttribute(`visible`, false)
+            return
+        }
+
+        host.spinnerTimer = setTimeout(() =>
+            spinner.setAttribute(`visible`,
+                host.loading && host.spinner ? true : false
+            ), 333
+        )
+    })
+
+const toggleText = host => waitForEl(host, `root`)
+    .then((root: any) => {
+        const showingtext = (host.error && !host.loading) || !host.src
+        root.classList[showingtext ? `add` : `remove`](`show-text`)
+        host.setAttribute(`showingtext`, showingtext)
+    })
+
+const properties = {
     src: {
         format: val => pipe(ToString, IfInvalid(null))(val).value,
-        onChange: (_val, host) => loadSrc(host)
+        onChange: (val, host) => loadSrc(host, val)
     },
 
-    element: {
-        format: val => pipe(IsElement, IfInvalid(null))(val).value,
-        onChange: (val, host) => loadImage(host, val)
-    },
+    altsrc: { format: val => pipe(ToString, IfInvalid(null))(val).value, },
 
-    image: { format: val => pipe(IsElement, IfInvalid(null))(val).value },
+    alttext: {
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
+        onChange(val, host) {
+            if (!val) { return }
+
+            waitForEl(host, `text`).then((textEl: any) => {
+                textEl.innerHTML = ValidateHtml(val, [], [`script`]).sanitized
+                toggleText(host)
+            })
+        }
+    },
 
     loading: {
-        format: val => pipe(ToBool, IfInvalid(false))(val).value
-    }
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
+        onChange(_val, host) { toggleLoad(host) }
+    },
+    error: {
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
+    },
+    complete: {
+        format: val => pipe(ToBool, IfInvalid(false))(val).value,
+    },
+    theme: {
+        format: val => typeof val === `string` ? val : ``,
+        onChange: (_val, host) => setStyleElement(host)
+    },
+    fit: {
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
+        onChange(_val, host) { setInternalStyle(host) }
+    },
+    position: {
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
+        onChange(_val, host) { setInternalStyle(host) }
+    },
+
+    spinner: { format: val => pipe(ToBool, IfInvalid(false))(val).value },
 }
 
 const observedAttributes = Object.keys(properties)
-const elements = { root: { selector: componentRoot }, img: { selector: `img`, onChange: (_el, host) => loadSrc(host) } }
-
-const loadSrc = host => new Promise(resolve => {
-    const img = host.elements.img
-
-    if (!img || !host.src) { return resolve() }
-
-    if (img.src === host.src) { return resolve(img) }
-
-    host.loading = true
-    img.crossOrigin = `Anonymous`
-
-    host.unsubscribeEvents(img)
-
-    if (!img.eventSubscriptions) { img.eventSubscriptions = {} }
-
-    const finish = (name, event) => {
-        host.image = img
-        host.loading = false
-        host.dispatchEvent(new CustomEvent(name, { detail: { img, event } }))
-        resolve(img)
-    }
-
-    img.eventSubscriptions.error = ObserveEvent(img, `error`).subscribe(event => finish(`imageerror`, event))
-    img.eventSubscriptions.load = ObserveEvent(img, `load`).subscribe(event => finish(`imageloaded`, event))
-
-    const getDimensions = () => {
-        if (img.width && img.width > 0 && img.height && img.height > 0) {
-            return host.dispatchEvent(new CustomEvent(`imagesize`, {
-                detail: {
-                    img,
-                    size: {
-                        width: img.width,
-                        height: img.height
-                    }
-                }
-            }))
+const elements = {
+    root: {
+        selector: componentRoot,
+        onChange(el) {
+            requestAnimationFrame(() => {
+                el.classList.remove(`notready`)
+                el.style.removeProperty(`opacity`)
+            })
         }
-
-        requestAnimationFrame(getDimensions)
-    }
-
-    getDimensions()
-
-    img.src = host.src
-})
-
-const loadImage = (host, img) => new Promise(resolve => {
-    if (!img) { return resolve() }
-
-    host.loading = true
-
-    host.unsubscribeEvent(img, `error`)
-    host.unsubscribeEvent(img, `load`)
-
-    img.crossOrigin = `Anonymous`
-
-    if (!img.eventSubscriptions) { img.eventSubscriptions = {} }
-
-    const finish = (name, event) => {
-        host.image = img
-        host.loading = false
-        host.dispatchEvent(new CustomEvent(name, { detail: { img, event } }))
-        resolve(img)
-    }
-
-    img.eventSubscriptions.error = ObserveEvent(img, `error`).subscribe(event => finish(`imageerror`, event))
-    img.eventSubscriptions.load = ObserveEvent(img, `load`).subscribe(event => finish(`imageloaded`, event))
-
-    const getDimensions = () => {
-        if (img.width && img.width > 0 && img.height && img.height > 0) {
-            return host.dispatchEvent(new CustomEvent(`imagesize`, {
-                detail: {
-                    img,
-                    size: {
-                        width: img.width,
-                        height: img.height
-                    }
-                }
-            }))
+    },
+    spinner: {
+        selector: `${componentRoot} spinner-element`,
+        onChange(el) {
+            const remove = () => el.style.removeProperty(`opacity`)
+            setTimeout(() => requestAnimationFrame(remove), 66)
         }
+    },
+    img: {
+        selector: `img`,
+        onChange(el, host) {
+            el.eventSubscriptions = {
+                load: ObserveEvent(el, `load`)
+                    .subscribe(() => {
+                        host.error = false
+                        host.loading = false
+                    }),
 
-        requestAnimationFrame(getDimensions)
+                error: ObserveEvent(el, `error`)
+                    .subscribe(() => {
+                        host.error = true
+                        host.loading = false
+                    }),
+            }
+        }
+    },
+    text: { selector: `.image-loader-text` },
+    themedStyles: {
+        selector: `style.themeStyles`,
+        onChange: (_el, host) => setStyleElement(host)
+    },
+    internalStyles: {
+        selector: `style.internalStyles`,
+        onChange: (_el, host) => setInternalStyle(host)
     }
+}
 
-    getDimensions()
-})
+const loadSrc = (host, src) => new Promise(resolve => {
+    if (!src) { return resolve() }
 
-const waitForLoad = host => new Promise(resolve => {
-    let sub = () => { }
-
-    const finish = () => {
-        sub()
-        return resolve()
-    }
-
-    const waitForLoading = () => {
-        sub()
-        if (!host.loading) { return finish() }
-        sub = host.state.loading.subscribe(() => !host.loading ? finish() : undefined)
-    }
-
-    const waitForImg = () => {
-        if (!!host.image) { return waitForLoading() }
-        sub = host.state.image.subscribe(() => !!host.image ? waitForLoading() : undefined)
-    }
-
-    waitForImg()
+    waitForEl(host, `img`).then((img: any) => {
+        if (img.src === src) { return resolve(img) }
+        host.error = false
+        host.loading = true
+        img.src = src
+    })
 })
 
 const methods = {
-    load: host => () => new Promise((resolve, reject) =>
-        waitForLoad(host)
-            .then(() => host.image)
-            .then(resolve)
-            .catch(reject)
-    ),
-    toCanvas: host => () => waitForLoad(host)
-        .then(() => {
-            try {
-                const dpr = window.devicePixelRatio || 1
-                const ctx = document.createElement('canvas').getContext('2d')
-                ctx.canvas.width = host.image.width * dpr
-                ctx.canvas.height = host.image.height * dpr
-                ctx.scale(dpr, dpr)
-                ctx.drawImage(host.image, 0, 0)
-                return ctx.canvas
-
-            } catch (error) {
-
-                throw Error(error)
-            }
-        }),
+    toCanvas: host => () => {
+        try {
+            const dpr = window.devicePixelRatio || 1
+            const ctx = document.createElement('canvas').getContext('2d')
+            ctx.canvas.width = host.image.width * dpr
+            ctx.canvas.height = host.image.height * dpr
+            ctx.scale(dpr, dpr)
+            ctx.drawImage(host.image, 0, 0)
+            return ctx.canvas
+        } catch (error) {
+            throw Error(error)
+        }
+    },
 
     toDataUrl: host => (mime = `image/jpeg`, quality = 1) => host.toCanvas()
         .then(canvas => canvas.toDataURL(mime, quality)),
@@ -188,33 +264,13 @@ const ImageLoader = Constructor({
     observedAttributes,
     properties,
     elements,
-    methods
+    methods,
+    onConnected(host) {
+        setStyleElement(host)
+        setInternalStyle(host)
+    }
 })
 
 Define(componentName, ImageLoader)
-
-export const imageLoader = val => new Promise((resolve, reject) => {
-    let prop
-
-    if (typeof val === `string`) {
-        prop = `src`
-    } else if (IsElement(val).valid) {
-        prop = `element`
-    } else {
-        return resolve()
-    }
-
-    const loader = document.createElement(`image-loader`) as any
-    document.body.appendChild(loader)
-    loader[prop] = val
-
-    return loader
-        .load()
-        .then(img => {
-            document.body.removeChild(loader)
-            return resolve(img)
-        })
-        .catch(reject)
-})
 
 export default ImageLoader

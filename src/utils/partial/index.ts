@@ -1,4 +1,3 @@
-import { Partial } from '../../../typings'
 import pipe from '../pipe'
 
 const Partial = (func, args = []) => {
@@ -70,6 +69,16 @@ const Partial = (func, args = []) => {
 
         bind(This) {
             return Partial(func.bind(This), args)
+        },
+
+        apply(x) {
+            console.log(x)
+            return func.apply(null, formatArgs(args).concat(Array.isArray(x) ? x : [x]))
+        },
+
+        call: function (...x) {
+            console.log(`call`, ...x)
+            return func.call(null, ...formatArgs(args), ...x)
         }
     }
 

@@ -41,7 +41,7 @@ dropdown-select {
     }
 
     &.disabled {
-        opacity: $dropdownselect_disabled_opacity;
+        opacity: 0.25;
     }
 
     &.disabled,
@@ -167,20 +167,20 @@ dropdown-select {
     }
 
     .select-option {
-        color: $dropdownselect_option_color;
-        background-color: $dropdownselect_option_background_color;
+        color: inherit;
+        background-color: #fafafa;
         padding: 0.5em 1em;
         cursor: pointer;
         transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 
         &:hover {
-            color: $dropdownselect_option_hover_color;
-            background-color: $dropdownselect_option_hover_background_color;
+            color: #fff;
+            background-color: #59a2d8;
         }
 
         &.selected {
-            color: $dropdownselect_option_active_color;
-            background-color: $dropdownselect_option_active_background_color;
+            color: #fff;
+            background-color: #59a2d8;
         }
     }
 

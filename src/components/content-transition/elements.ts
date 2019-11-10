@@ -17,14 +17,21 @@ export const setKeepChildren = host => {
 const elements = {
     root: {
         selector: `.content-transition-container`,
-        onChange: (_el, host) => setStyleElement(host)
+        onChange: (el, host) => {
+            setStyleElement(host)
+            el.setAttribute(`type`, host.type)
+        }
     },
-    slot: {
-        selector: `slot[current]`,
+    current: {
+        selector: `slot[name="current"]`,
     },
     injectedStyles: {
         selector: `style.injectedStyles`,
         onChange: setStyles
+    },
+    themeStyles: {
+        selector: `style.themeStyles`,
+        onChange: (el, host) => setStyles(el, host, host.theme)
     },
     next: {
         selector: `slot[name="next"]`,

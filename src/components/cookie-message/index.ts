@@ -2,7 +2,6 @@ import Constructor from '../../utils/webcomponent/constructor'
 import Define from '../../utils/webcomponent/define'
 import ComponentClassObject from '../../utils/html/component-class-object'
 import SetStyleRules from '../../utils/html/set-style-rules'
-import { COOKIEMESSAGE } from './theme'
 import './style.scss'
 import '../button-element'
 import pipe from '../../utils/pipe'
@@ -53,10 +52,14 @@ const setCookie = () => {
     document.cookie = `${cookieName}=true`
 }
 
-const getCookie = () => !!document.cookie
-    .split(';')
-    .filter(c => c.indexOf(cookieName) > -1)
-    .map(c => JSON.parse(c.split(`=`)[1]))[0]
+const getCookie = () => {
+    try {
+        return !!document.cookie
+            .split(';')
+            .filter(c => c.indexOf(cookieName) > -1)
+            .map(c => JSON.parse(c.split(`=`)[1]))[0]
+    } catch (error) { }
+}
 
 const properties = {
     class: ComponentClassObject,
@@ -64,7 +67,9 @@ const properties = {
         format: val => pipe(ToBool, IfInvalid(!getCookie()))(val).value,
         onChange: (val, host) => {
             if (val) {
-                localStorage.removeItem(cookieName)
+                try {
+                    localStorage.removeItem(cookieName)
+                } catch (error) { }
                 host.elements.root.classList.add(`shown`)
             } else {
                 setCookie()
@@ -73,27 +78,27 @@ const properties = {
         }
     },
     message: {
-        format: val => typeof val === `string` ? val : COOKIEMESSAGE.message,
+        format: val => typeof val === `string` ? val : `By clicking "Continue" or continuing to use our site, you acknowledge that you accept our use of cookies, which are used to provide you with the best possible experience and no personal information is stored.`,
         onChange: (_val, host) => setMessage(host)
     },
     buttontext: {
-        format: val => typeof val === `string` ? val : COOKIEMESSAGE.buttontext,
+        format: val => typeof val === `string` ? val : `Continue`,
         onChange: (_val, host) => setButton(host)
     },
     buttonripple: {
-        format: val => pipe(ToBool, IfInvalid(COOKIEMESSAGE.buttonripple))(val).value,
+        format: val => pipe(ToBool, IfInvalid(true))(val).value,
         onChange: (_val, host) => setButton(host)
     },
     buttonbounce: {
-        format: val => pipe(ToBool, IfInvalid(COOKIEMESSAGE.buttonbounce))(val).value,
+        format: val => pipe(ToBool, IfInvalid(true))(val).value,
         onChange: (_val, host) => setButton(host)
     },
     buttonaccent: {
-        format: val => pipe(ToString, IfInvalid(COOKIEMESSAGE.buttonaccent))(val).value,
+        format: val => pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
         onChange: (_val, host) => setButton(host)
     },
     styles: {
-        format: val => typeof val === `string` ? val : COOKIEMESSAGE.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, host, val)
     }
 }

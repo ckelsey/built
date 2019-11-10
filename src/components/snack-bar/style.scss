@@ -181,4 +181,14 @@
             background-color: #5eb344;
         }
     }
+
+    &.hide-close-btn {
+        .snack-bar-close {
+            display: none;
+        }
+
+        .snack-bar-text {
+            width: calc(100% - 3.5em);
+        }
+    }
 }

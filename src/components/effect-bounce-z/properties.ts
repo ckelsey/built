@@ -4,7 +4,6 @@ import ToNumber from '../../utils/convert/to_number'
 import { unloadTargets, loadTargets } from './methods'
 import { SelectorArrayToElements } from '../../utils/convert/dom'
 import ComponentClassObject from '../../utils/html/component-class-object'
-import { EFFECTBOUNCEZ } from './theme'
 import ToString from '../../utils/convert/to_string'
 
 const resetTargets = host => {
@@ -17,19 +16,19 @@ const selectorsToDom = val => SelectorArrayToElements(null, val).value
 
 const attributes = {
     amount: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTBOUNCEZ.amount))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(0))(val).value,
         onChange
     },
 
     class: ComponentClassObject,
 
     speed: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTBOUNCEZ.speed))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(300))(val).value,
         onChange
     },
 
     start: {
-        format: val => pipe(ToString, IfInvalid(EFFECTBOUNCEZ.start))(val).value,
+        format: val => pipe(ToString, IfInvalid(`mousedown`))(val).value,
         onChange: (_val, host) => resetTargets(host)
     },
 

@@ -8,7 +8,6 @@ import { SelectorArrayToElements } from '../../utils/convert/dom'
 import CommasToArray from '../../utils/convert/commas-to-array'
 import ComponentClassObject from '../../utils/html/component-class-object'
 import ToString from '../../utils/convert/to_string'
-import { EFFECTFADE } from './theme'
 
 const resetTriggers = host => {
     unloadTriggers(host)
@@ -20,19 +19,19 @@ const selectorsToDom = val => SelectorArrayToElements(null, CommasToArray(val).v
 
 const attributes = {
     end: {
-        format: val => pipe(ToString, IfInvalid(EFFECTFADE.end))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (_val, host) => resetTriggers(host)
     },
     opacity: {
-        format: val => pipe(CommasToArray, IfInvalid(EFFECTFADE.opacity), Map(v => ToNumber(v).value))(val).value,
+        format: val => pipe(CommasToArray, IfInvalid([0, 1]), Map(v => ToNumber(v).value))(val).value,
         onChange
     },
     speed: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTFADE.speed))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(600))(val).value,
         onChange
     },
     start: {
-        format: val => pipe(ToString, IfInvalid(EFFECTFADE.start))(val).value,
+        format: val => pipe(ToString, IfInvalid(`mousedown`))(val).value,
         onChange: (_val, host) => resetTriggers(host)
     },
     targets: {

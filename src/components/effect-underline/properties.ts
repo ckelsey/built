@@ -6,7 +6,6 @@ import { unloadTargets, loadTargets } from './methods'
 import ToString from '../../utils/convert/to_string'
 import { SelectorArrayToElements } from '../../utils/convert/dom'
 import ComponentClassObject from '../../utils/html/component-class-object'
-import { EFFECTUNDERLINE } from './theme'
 import { setStyles } from './elements'
 
 const resetTargets = host => {
@@ -19,35 +18,35 @@ const selectorsToDom = val => SelectorArrayToElements(null, val).value
 
 const attributes = {
     color: {
-        format: val => pipe(ToString, IfInvalid(EFFECTUNDERLINE.color))(val).value,
+        format: val => pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
         onChange: (val, host) => !val || !host.elements.underline ? undefined : host.elements.underline.style.backgroundColor = `${val}`
     },
     direction: {
-        format: val => pipe(ToString, IfInvalid(EFFECTUNDERLINE.direction))(val).value,
+        format: val => pipe(ToString, IfInvalid(`auto`))(val).value,
         onChange
     },
     end: {
-        format: val => pipe(ToString, IfInvalid(EFFECTUNDERLINE.end))(val).value,
+        format: val => pipe(ToString, IfInvalid(null))(val).value,
         onChange: (_val, host) => resetTargets(host)
     },
     opacity: {
-        format: val => Math.min(1, Math.max(0, pipe(ToNumber, IfInvalid(EFFECTUNDERLINE.opacity))(val).value)),
+        format: val => Math.min(1, Math.max(0, pipe(ToNumber, IfInvalid(0.2))(val).value)),
         onChange
     },
     speed: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTUNDERLINE.speed))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(700))(val).value,
         onChange
     },
     start: {
-        format: val => pipe(ToString, IfInvalid(EFFECTUNDERLINE.start))(val).value,
+        format: val => pipe(ToString, IfInvalid(`mousedown`))(val).value,
         onChange: (_val, host) => resetTargets(host)
     },
     styles: {
-        format: val => typeof val === `string` ? val : EFFECTUNDERLINE.styles,
+        format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
     spring: {
-        format: val => pipe(ToNumber, IfInvalid(EFFECTUNDERLINE.spring))(val).value,
+        format: val => pipe(ToNumber, IfInvalid(4))(val).value,
         onChange
     },
     targets: {
