@@ -85,6 +85,15 @@ const getIcon = (path) => {
     })
 }
 
+const trySet = (host, icon) => {
+    if (!host.elements.svgContainer) {
+        return requestAnimationFrame(() => trySet(host, icon))
+    }
+
+    host.elements.svgContainer.innerHTML = icon
+    host.dispatchEvent(new CustomEvent(`iconloaded`, { detail: host }))
+}
+
 const attributes = {
     type: {
         format: val => typeof val === `string` ? val : null,
@@ -94,8 +103,8 @@ const attributes = {
             return getIcon(value)
                 .then(subject => {
                     host.subscription = subject.subscribe(icon => {
-                        host.elements.svgContainer.innerHTML = icon
-                        host.dispatchEvent(new CustomEvent(`iconloaded`, { detail: host }))
+                        trySet(host, icon)
+
                     })
                 })
         }

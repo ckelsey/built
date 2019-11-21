@@ -3,8 +3,6 @@ import { Observer } from '../..'
 export function ObserveEvent(element, eventName, options = {}) {
     if (!element || !eventName) { return }
 
-    if (element !== window && !element.parentElement) { return }
-
     options = Object.assign({}, {
         preventDefault: false,
         stopPropagation: false,
@@ -47,8 +45,21 @@ export function ObserveEvent(element, eventName, options = {}) {
         if (foundElement) { dispose() }
     })
 
-    mObserver.observe(element.parentElement, { childList: true })
-    element.addEventListener(eventName, eventHandler, options.useCapture)
+    let max = 1000
+    const tryIt = () => {
+        max = max - 1
+
+        if (!max) { return }
+
+        if (!element.parentElement) {
+            return requestAnimationFrame(tryIt)
+        }
+
+        mObserver.observe(element.parentElement, { childList: true })
+        element.addEventListener(eventName, eventHandler, options.useCapture)
+    }
+
+    tryIt()
 
     return observer
 }
