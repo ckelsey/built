@@ -4184,8 +4184,6 @@ var drop_down_componentName = "drop-down";
 var drop_down_componentRoot = ".".concat(drop_down_componentName, "-container");
 
 var openClose = function openClose(open, host) {
-  console.log("openClose");
-
   var change = function change() {
     var needsFocusBlur = host.open !== open;
     host.open = open;
@@ -4299,7 +4297,6 @@ var DropDown = WCConstructor({
     });
     host.eventSubscriptions = {
       blur: ObserveEvent(host, "focusout").subscribe(function () {
-        console.log("Focus out?");
         openClose(false, host);
       }),
       focus: ObserveEvent(host, "focus").subscribe(function () {
