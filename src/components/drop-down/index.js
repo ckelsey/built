@@ -135,13 +135,13 @@ export const DropDown = WCConstructor({
     elements,
     observedAttributes: Object.keys(properties),
     onConnected(host) {
-        host.tabIndex = `-1`
+        host.tabIndex = `0`
 
         const addClasses = () => {
             Array.from(host.children)
                 .forEach(child => {
                     if (child.getAttribute(`slot`) === `option`) {
-                        child.tabIndex = `-1`
+                        child.tabIndex = `0`
                         child.classList.add(`drop-down-option`)
                     }
                 })
