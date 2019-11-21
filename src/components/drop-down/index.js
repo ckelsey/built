@@ -54,6 +54,7 @@ const template = require(`./index.html`)
 const componentName = `drop-down`
 const componentRoot = `.${componentName}-container`
 const openClose = (open, host) => {
+    console.log(`openClose`)
     const change = () => {
         const needsFocusBlur = host.open !== open
         host.open = open
@@ -164,6 +165,7 @@ export const DropDown = WCConstructor({
 
         host.eventSubscriptions = {
             blur: ObserveEvent(host, `focusout`).subscribe(() => {
+                console.log(`Focus out?`)
                 openClose(false, host)
             }),
             focus: ObserveEvent(host, `focus`).subscribe(() => openClose(true, host)),

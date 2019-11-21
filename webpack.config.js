@@ -23,7 +23,7 @@ let plugins = []
 // let postPluginHasRan = false
 
 const optimization = {
-    minimize: true,
+    minimize: false,
     splitChunks: {
         name: true,
         chunks: `async`,
