@@ -1,0 +1,19 @@
+import { TMonad } from "../.."
+
+export function IfIs(compare, replace) {
+    return function (value) {
+        let result = TMonad(value)
+        compare = TMonad(compare)
+
+        result.valid = result.value === compare.value
+
+        if (result.value === compare.value) {
+            result.value = TMonad(replace).value
+            result = TMonad(result.value)
+        }
+
+        result.instanceof.push(`IfIs`)
+
+        return result
+    }
+}

@@ -1,24 +1,32 @@
-/* global require, process, __dirname, module */
+/* eslint-disable tree-shaking/no-side-effects-in-initialization */
+/* eslint-disable no-empty */
 
-const webpack = require('webpack')
-const path = require('path')
-const fs = require('fs')
-const exec = require('child_process').exec
-const autoprefixer = require('autoprefixer')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
+const WatchIgnorePlugin = require(`webpack`).WatchIgnorePlugin
+const NamedModulesPlugin = require(`webpack`).NamedModulesPlugin
+const HotModuleReplacementPlugin = require(`webpack`).HotModuleReplacementPlugin
+const LoaderOptionsPlugin = require(`webpack`).LoaderOptionsPlugin
+const join = require(`path`).join
+const _resolve = require(`path`).resolve
+
+const accessSync = require(`fs`).accessSync
+const exec = require(`child_process`).exec
+const autoprefixer = require(`autoprefixer`)
+const HtmlWebpackPlugin = require(`html-webpack-plugin`)
+const HardSourceWebpackPlugin = require(`hard-source-webpack-plugin`)
+const BundleAnalyzerPlugin = require(`webpack-bundle-analyzer`).BundleAnalyzerPlugin
+
 const env = process.env.NODE_ENV || `production`
-const outDirPath = process.env.OUTDIR || path.resolve(`${__dirname}/dist`)
+const outDirPath = _resolve(`${__dirname}/dist`)
 
 let devServer = {}
 let plugins = []
-let postPluginHasRan = false
+// let postPluginHasRan = false
 
 const optimization = {
-    minimize: false,
+    minimize: true,
     splitChunks: {
         name: true,
-        chunks: 'async',
+        chunks: `async`,
     },
     usedExports: true,
     providedExports: true,
@@ -26,20 +34,23 @@ const optimization = {
 
 const postPlugin = {
     apply: compiler => compiler.hooks.afterEmit.tap(
-        'AfterEmitPlugin',
+        `AfterEmitPlugin`,
         () => new Promise(resolve => {
-            const alert = () => {
-                exec(`osascript -e 'display notification "Complete" with title "WEBPACK"'`, () => {
-                    return resolve()
-                })
-            }
+            exec(`osascript -e 'display notification "Complete" with title "WEBPACK"'`, () => {
+                return resolve()
+            })
+            // const alert = () => {
+            //     exec(`osascript -e 'display notification "Complete" with title "WEBPACK"'`, () => {
+            //         return resolve()
+            //     })
+            // }
 
-            if (!postPluginHasRan) {
-                postPluginHasRan = true
-                exec(`cp -r ${path.resolve(`${__dirname}/node_modules/@webcomponents`)}/. dist`, alert)
-            } else {
-                alert()
-            }
+            // if (!postPluginHasRan) {
+            //     postPluginHasRan = true
+            //     exec(`cp -r ${_resolve(`${__dirname}/node_modules/@webcomponents`)}/. dist`, alert)
+            // } else {
+            //     alert()
+            // }
         })
     )
 }
@@ -53,8 +64,8 @@ if (env === `development`) {
         inline: false,
         open: false,
         host: `0.0.0.0`,
-        hot: true,
-        liveReload: true,
+        hot: false,
+        liveReload: false,
         writeToDisk: true,
         watchOptions: {
             aggregateTimeout: 300,
@@ -63,87 +74,76 @@ if (env === `development`) {
     }
 
     plugins = [
-        new webpack.WatchIgnorePlugin([path.join(__dirname, "node_modules")]),
-        new HtmlWebpackPlugin({ filename: 'index.html', template: 'index.html' }),
-        new webpack.NamedModulesPlugin(),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
+        new WatchIgnorePlugin([join(__dirname, `node_modules`)]),
+        new HtmlWebpackPlugin({ filename: `index.html`, template: `index.html` }),
+        new NamedModulesPlugin(),
+        new HotModuleReplacementPlugin(),
+        new LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
+        new BundleAnalyzerPlugin(),
         postPlugin
     ]
 }
 
 if (env === `production`) {
     plugins = [
-        new webpack.LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
+        new LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
         postPlugin
     ]
 }
 
 try {
-    if (fs.accessSync(path.resolve(`${__dirname}/node_modules`))) {
+    if (accessSync(_resolve(`${__dirname}/node_modules`))) {
         plugins.push(new HardSourceWebpackPlugin())
     }
 } catch (error) { }
 
 const exported = {
-    mode: 'production',
+    mode: `production`,
     context: __dirname,
-    entry: path.resolve(`./src/index.ts`),
-    resolve: { extensions: ['*', '.ts', '.html'] },
+    entry: _resolve(`./src/index`),
+    resolve: { extensions: [`*`, `.js`, `.html`] },
     optimization,
     devServer,
     output: {
-        filename: '[name].js',
-        path: path.resolve(outDirPath),
-        libraryTarget: 'umd',
-        library: 'builtjs'
+        filename: `built.js`,
+        path: outDirPath,
+        libraryTarget: `umd`,
+        library: `builtjs`
     },
     plugins,
     module: {
-        rules: [
-            {
-                test: /\.ts$/,
-                exclude: /node_modules/,
-                use: [{
-                    loader: "babel-loader",
+        rules: [{
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: [{
+                loader: `babel-loader`,
+                options: {
+                    presets: [
+                        [`@babel/env`, { modules: false }],
+                    ]
+                }
+            }]
+        }, {
+            test: /\.html$/,
+            exclude: /node_modules/,
+            use: [
+                {
+                    loader: `html-loader`,
                     options: {
-                        presets: [
-                            ["@babel/env", { modules: false }],
-                        ]
+                        minimize: true
                     }
-                }, 'ts-loader']
-            }, {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: [{
-                    loader: "babel-loader",
-                    options: {
-                        presets: [
-                            ["@babel/env", { modules: false }],
-                        ]
-                    }
-                }]
-            }, {
-                test: /\.html$/,
-                exclude: /node_modules/,
-                use: [
-                    {
-                        loader: 'html-loader',
-                        options: {
-                            minimize: true
-                        }
-                    }
-                ]
-            },
-            {
-                test: /\.(scss|css)$/,
-                exclude: /node_modules/,
-                use: [
-                    'css-loader',
-                    'sass-loader',
-                    'postcss-loader',
-                ],
-            },
+                }
+            ]
+        },
+        {
+            test: /\.(scss|css)$/,
+            exclude: /node_modules/,
+            use: [
+                `css-loader`,
+                `sass-loader`,
+                `postcss-loader`,
+            ],
+        },
         ]
     }
 }

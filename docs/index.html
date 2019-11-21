@@ -1,0 +1,2369 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset='utf-8'>
+  <title>Documentation</title>
+  <meta name='description' content='Useful things for UI'>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link href='assets/bass.css' rel='stylesheet'>
+  <link href='assets/style.css' rel='stylesheet'>
+  <link href='assets/github.css' rel='stylesheet'>
+  <link href='assets/split.css' rel='stylesheet'>
+</head>
+<body class='documentation m0'>
+    <div class='flex'>
+      <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
+        <div class='py1 px2'>
+          <h3 class='mb0 no-anchor'>builtjs</h3>
+          <div class='mb1'><code>0.2.8</code></div>
+          <input
+            placeholder='Filter'
+            id='filter-input'
+            class='col12 block input'
+            type='text' />
+          <div id='toc'>
+            <ul class='list-reset h5 py1-ul'>
+              
+                
+                <li><a
+                  href='#transducemap'
+                  class="">
+                  TransduceMap
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#transducefilter'
+                  class="">
+                  TransduceFilter
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#setstylerules'
+                  class="">
+                  SetStyleRules
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#reducefilter'
+                  class="">
+                  ReduceFilter
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#pipe'
+                  class="">
+                  Pipe
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#observerunsubscribe'
+                  class="">
+                  ObserverUnsubscribe
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#tmonad'
+                  class="">
+                  TMonad
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#type'
+                  class="">
+                  Type
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#setshadowroot'
+                  class="">
+                  SetShadowRoot
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#tofunction'
+                  class="">
+                  ToFunction
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#tmonadupdate'
+                  class="">
+                  TMonadUpdate
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#observer'
+                  class="">
+                  Observer
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#reducemap'
+                  class="">
+                  ReduceMap
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#isdate'
+                  class="">
+                  IsDate
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#isdom'
+                  class="">
+                  IsDom
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#map'
+                  class="">
+                  Map
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#appendstyleelement'
+                  class="">
+                  AppendStyleElement
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#ifinvalid'
+                  class="">
+                  IfInvalid
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#isobject'
+                  class="">
+                  IsObject
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#functiontopartial'
+                  class="">
+                  FunctionToPartial
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#isempty'
+                  class="">
+                  IsEmpty
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#istmonad'
+                  class="">
+                  IsTMonad
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#isnoncollection'
+                  class="">
+                  IsNonCollection
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#get'
+                  class="">
+                  Get
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#id'
+                  class="">
+                  ID
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#superfunction'
+                  class="">
+                  SuperFunction
+                  
+                </a>
+                
+                </li>
+              
+            </ul>
+          </div>
+          <div class='mt1 h6 quiet'>
+            <a href='https://documentation.js.org/reading-documentation.html'>Need help reading this?</a>
+          </div>
+        </div>
+      </div>
+      <div id='split-right' class='relative overflow-auto height-viewport-100'>
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='transducemap'>
+      TransduceMap
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new TransduceMap(conversionFunction: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>conversionFunction</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='transducefilter'>
+      TransduceFilter
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new TransduceFilter(predicateFunction: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>predicateFunction</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='setstylerules'>
+      SetStyleRules
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new SetStyleRules(styleElement: any, ruleString: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>styleElement</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ruleString</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='reducefilter'>
+      ReduceFilter
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new ReduceFilter(predicateFunction: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>predicateFunction</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='pipe'>
+      Pipe
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new Pipe(functions: ...any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>functions</span> <code class='quiet'>(...any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='observerunsubscribe'>
+      ObserverUnsubscribe
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new ObserverUnsubscribe(subscription: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>subscription</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='tmonad'>
+      TMonad
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new TMonad(value: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='type'>
+      Type
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new Type(value: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='setshadowroot'>
+      SetShadowRoot
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new SetShadowRoot(tagname: any, element: any, templateString: any, styleString: any, notWebComponent: any, appendStylesToHead: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>tagname</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>element</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>templateString</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>styleString</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>notWebComponent</span> <code class='quiet'>(any
+            = <code>false</code>)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>appendStylesToHead</span> <code class='quiet'>(any
+            = <code>false</code>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='tofunction'>
+      ToFunction
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new ToFunction(value: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='tmonadupdate'>
+      TMonadUpdate
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new TMonadUpdate(tmonad: any, expectedType: any, instanceName: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>tmonad</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>expectedType</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>instanceName</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='observer'>
+      Observer
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new Observer(initialValue: any, noInit: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>initialValue</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>noInit</span> <code class='quiet'>(any
+            = <code>false</code>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='reducemap'>
+      ReduceMap
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Takes a mapping function and returns a reducer</p>
+
+    <div class='pre p1 fill-light mt0'>ReduceMap(mapFunction: function (item: any): any): function (accumulator: [], current: any): []</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>mapFunction</span> <code class='quiet'>(function (item: any): any)</code>
+	    The function to be called on every element, performs the mapping operation
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>function (accumulator: [], current: any): []</code>:
+        ReduceMapResult - The reducer function
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>[<span class="hljs-string">`A`</span>, <span class="hljs-string">`B`</span>].reduce(ReduceMap(mapFunction), []) <span class="hljs-comment">// [`a`, `b`,]</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='isdate'>
+      IsDate
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Determines if a value is or can be a valid date</p>
+
+    <div class='pre p1 fill-light mt0'>IsDate(value: any): any</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    The value to test
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>any</code>:
+        (boolean) If the value is a valid date
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>IsDate(<span class="hljs-string">`Mon Nov 18 2019 07:41:48 GMT-0800`</span>).value <span class="hljs-comment">// true</span>
+IsDate(<span class="hljs-string">`Not a date`</span>).value <span class="hljs-comment">// false</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='isdom'>
+      IsDom
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Determines if a value is a valid DOM element</p>
+
+    <div class='pre p1 fill-light mt0'>IsDom(value: any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    The value to test
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
+        If the value is a DOM element
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> element = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">`div`</span>)
+IsDom(element) <span class="hljs-comment">// true</span>
+IsDom(<span class="hljs-string">`nope`</span>) <span class="hljs-comment">// false</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='map'>
+      Map
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Performs a provided mapping operation to a provided collection. Intended to be used inconjunction with a transducer.</p>
+
+    <div class='pre p1 fill-light mt0'>Map(mapFunction: function (), collection: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;any>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;any></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>mapFunction</span> <code class='quiet'>(function ())</code>
+	    The function to be called on every element, performs the mapping operation
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>collection</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;any>)</code>
+	    The collection to iterate over
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;any></code>:
+        Mapped collection
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-built_in">Map</span>(<span class="hljs-function"><span class="hljs-params">v</span>=&gt;</span>v.toLowerCase(), [<span class="hljs-string">`A`</span>, <span class="hljs-string">`B`</span>]) <span class="hljs-comment">// [`a`, `b`]</span>
+TODO - be able to take an object, <span class="hljs-built_in">Set</span>, Weak map, etc</pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='appendstyleelement'>
+      AppendStyleElement
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Appends a style element with the provided rules to a provided element</p>
+
+    <div class='pre p1 fill-light mt0'>AppendStyleElement(rulesString: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, parent: <a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>, name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>rulesString</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The rules to add to the style element
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>parent</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
+	    The element to append to
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Optional. A name to give the style element
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>AppendStyleElement(<span class="hljs-string">`.selector { color: black;}`</span>, <span class="hljs-built_in">document</span>.head, <span class="hljs-string">`dark-text-n-stuff`</span>)</pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='ifinvalid'>
+      IfInvalid
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Returns a function that then takes a TMonad. If that value is invalid, it returns the replacement instead</p>
+
+    <div class='pre p1 fill-light mt0'>IfInvalid(replacement: any): any</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>replacement</span> <code class='quiet'>(any)</code>
+	    The value to be returned if the resulting funtion is invalid
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>any</code>:
+        Either the original value or the replacement
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> ifInvalid = IfInvalid(<span class="hljs-string">`hey`</span>)
+<span class="hljs-keyword">const</span> value = ToNumber(<span class="hljs-string">`hola`</span>)
+<span class="hljs-keyword">const</span> result = ifInvalid(value).value <span class="hljs-comment">// `hey`</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='isobject'>
+      IsObject
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Determines if the value is an object</p>
+
+    <div class='pre p1 fill-light mt0'>IsObject(value: any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
+        Whether or not the value is an object
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>IsObject() <span class="hljs-comment">// false</span>
+IsObject(<span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span>{}) <span class="hljs-comment">// false</span>
+IsObject(<span class="hljs-string">``</span>) <span class="hljs-comment">// false</span>
+IsObject(<span class="hljs-literal">true</span>) <span class="hljs-comment">// false</span>
+IsObject(<span class="hljs-literal">null</span>) <span class="hljs-comment">// false</span>
+IsObject(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()) <span class="hljs-comment">// false</span>
+IsObject([]) <span class="hljs-comment">// false</span>
+IsObject({}) <span class="hljs-comment">// true</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='functiontopartial'>
+      FunctionToPartial
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Converts a function to a curried partial function. Arguments are added by calling the
+partial(no set arity) until all possible arguments are met, which then
+calls the original function</p>
+
+    <div class='pre p1 fill-light mt0'>FunctionToPartial(function: function (), args: any?): function ()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>function</span> <code class='quiet'>(function ())</code>
+	    The function to convert
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>args</span> <code class='quiet'>(any?)</code>
+	    The arguments to prepopulate the curried version of the function
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>function ()</code>:
+        A curried proxy of the passed in function
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> curried = FunctionToPartial( <span class="hljs-function">(<span class="hljs-params">a, b, c</span>) =&gt;</span> { <span class="hljs-built_in">console</span>.log(a, b, c) })
+curried(<span class="hljs-string">`one`</span>) <span class="hljs-comment">// proxy with argument `a` populated with `one`</span>
+curried(<span class="hljs-string">`two`</span>) <span class="hljs-comment">// proxy with argument `b` populated with `two`</span>
+curried(<span class="hljs-string">`three`</span>) <span class="hljs-comment">// `one two three`</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='isempty'>
+      IsEmpty
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Determines if the value is empty, whether it's an empty array, object, string or is falsey</p>
+
+    <div class='pre p1 fill-light mt0'>IsEmpty(value: any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
+        Whether or not the value is empty
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>IsEmpty() <span class="hljs-comment">// true</span>
+IsEmpty(<span class="hljs-string">`undefined`</span>) <span class="hljs-comment">// true</span>
+IsEmpty(<span class="hljs-string">``</span>) <span class="hljs-comment">// true</span>
+IsEmpty(<span class="hljs-literal">false</span>) <span class="hljs-comment">// true</span>
+IsEmpty(<span class="hljs-string">`false`</span>) <span class="hljs-comment">// true</span>
+IsEmpty(<span class="hljs-string">`null`</span>) <span class="hljs-comment">// true</span>
+IsEmpty(<span class="hljs-literal">null</span>) <span class="hljs-comment">// true</span>
+IsEmpty({}) <span class="hljs-comment">// true</span>
+IsEmpty([]) <span class="hljs-comment">// true</span>
+IsEmpty([<span class="hljs-string">`value`</span>]) <span class="hljs-comment">// false</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='istmonad'>
+      IsTMonad
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Determines if a value is a TMonad</p>
+
+    <div class='pre p1 fill-light mt0'>IsTMonad(value: any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    The value to test
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
+        Whether or not the value is a TMonad
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>IsTMonad({}) <span class="hljs-comment">// false</span>
+IsTMonad([]) <span class="hljs-comment">// false</span>
+IsTMonad(<span class="hljs-string">``</span>) <span class="hljs-comment">// false</span>
+IsTMonad({
+     <span class="hljs-attr">value</span>:<span class="hljs-string">``</span>,
+     <span class="hljs-attr">valid</span>: <span class="hljs-literal">true</span>,
+     <span class="hljs-attr">instanceof</span>:[],
+     <span class="hljs-attr">type</span>: <span class="hljs-string">`string`</span>
+}) <span class="hljs-comment">// true</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='isnoncollection'>
+      IsNonCollection
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Determines if a value is not a collection</p>
+
+    <div class='pre p1 fill-light mt0'>IsNonCollection(value: any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>value</span> <code class='quiet'>(any)</code>
+	    The value to test
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
+        Whether or not the value is a collection
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'>IsNonCollection({}) <span class="hljs-comment">// false</span>
+IsNonCollection([]) <span class="hljs-comment">// false</span>
+IsNonCollection(<span class="hljs-string">``</span>) <span class="hljs-comment">// true</span>
+IsNonCollection(<span class="hljs-number">1</span>) <span class="hljs-comment">// true</span>
+IsNonCollection(<span class="hljs-literal">null</span>) <span class="hljs-comment">// true</span>
+IsNonCollection(<span class="hljs-literal">undefined</span>) <span class="hljs-comment">// true</span>
+IsNonCollection(<span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span>{}) <span class="hljs-comment">// true</span>
+IsNonCollection(<span class="hljs-literal">true</span>) <span class="hljs-comment">// true</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='get'>
+      Get
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Searches any type of item down a provided path, returning an emptyVal if provided. Also has the ability to perform a function on the end result</p>
+
+    <div class='pre p1 fill-light mt0'>Get(obj: any, path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, emptyVal: any, modifyFn: function ()): any</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>obj</span> <code class='quiet'>(any)</code>
+	    The item to search. Can really be anything, as Get will call methods if provided
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The path chain to follow. Must be dot(.) seperated. Array indice should be dot as well.
+Can have methods, but arguments can only be strings, numbers, or booleans.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>emptyVal</span> <code class='quiet'>(any)</code>
+	    If nothing resulted in the search, return this
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>modifyFn</span> <code class='quiet'>(function ())</code>
+	    A function that will be run to modify the returned result
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>any</code>:
+        Either the found item or the emptyVal if provided
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> obj = {
+     <span class="hljs-attr">a</span>:{
+         <span class="hljs-attr">b</span>:[
+             <span class="hljs-string">`C`</span>
+         ]
+     }
+}
+
+Get(obj, <span class="hljs-string">`a.b.0.toLowerCase()`</span>) <span class="hljs-comment">// `c`</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='id'>
+      ID
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Returns a runtime unique ID</p>
+
+    <div class='pre p1 fill-light mt0'>ID(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>:
+        
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='superfunction'>
+      SuperFunction
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Gives functions super powers. Allows functions to be curried, passing in
+arguments one at a time, as well as remove or completely replace arguments.
+Also has Observers to subscribe to for when arguments, curried version are
+updated as well as when the function is called</p>
+
+    <div class='pre p1 fill-light mt0'>SuperFunction(fn: function (), args: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;any>, name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, length: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?): function ()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>fn</span> <code class='quiet'>(function ())</code>
+	    The function to wrap
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>args</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;any>)</code>
+	    Arguments to set, for currying
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+	    Name of the function, curried functions inherit this.
+Defaults to passed in function's name
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>length</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
+	    Arity of function, curried functions inherit this.
+Defaults to passed in function's length
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>args</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+          : Returns or sets the stored arguments
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>complete</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+          : Returns true if the stored arguments length is that of the original functions argument length
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>curried</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>)</code>
+          : Returns a new super copy of the function
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>curry</span> <code class='quiet'>(function (...args))</code>
+          : Returns a copy of the current curried function, adding in any passed arguments
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>pushArgument</span> <code class='quiet'>(function (arg))</code>
+          : Adds a new argument
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>popArgument</span> <code class='quiet'>(function ())</code>
+          : Removes the last argument
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>subscribe</span> <code class='quiet'>(function (property: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, next: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>, error: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>, complete: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>))</code>
+          : Subscribes to a state property observer, if it exists
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>function ()</code>:
+        A proxy version of the original function with the above properties/methods
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> wonderFunction = SuperFunction( <span class="hljs-function">(<span class="hljs-params">a, b, c</span>) =&gt;</span> <span class="hljs-string">`<span class="hljs-subst">${a}</span> | <span class="hljs-subst">${b}</span> | <span class="hljs-subst">${c}</span>`</span> )
+
+wonderFunction(<span class="hljs-string">`one`</span>) <span class="hljs-comment">// `one undefined undefined`</span>
+
+<span class="hljs-keyword">const</span> curried = wonderFunction.curried
+curried(<span class="hljs-string">`one`</span>) <span class="hljs-comment">// proxy with argument `a` populated with `one`</span>
+curried(<span class="hljs-string">`two`</span>) <span class="hljs-comment">// proxy with argument `b` populated with `two`</span>
+curried(<span class="hljs-string">`three`</span>) <span class="hljs-comment">// `one | two | three`</span>
+
+<span class="hljs-keyword">const</span> curried2 = wonderFunction.curried
+curried2.pushArgument(<span class="hljs-string">`Aquaman`</span>) <span class="hljs-comment">// (`Aquaman`, b, c) =&gt; `${a} | ${b} | ${c}`</span>
+
+<span class="hljs-keyword">const</span> curried3 = curried2.curried
+curried3.pushArgument(<span class="hljs-string">`Skateman`</span>) <span class="hljs-comment">// (`Aquaman`, `Skateman`, c) =&gt; `${a} | ${b} | ${c}`</span>
+curried3.length <span class="hljs-comment">// 3</span>
+curried3.args <span class="hljs-comment">// [`Aquaman`, `Skateman`]</span>
+curried3.complete <span class="hljs-comment">// false</span>
+curried3.versions <span class="hljs-comment">// [curried, curried2]</span>
+
+curried3.popArgument()
+curried3.args <span class="hljs-comment">// [`Aquaman`]</span>
+
+curried3.curry(<span class="hljs-string">`Krypto the Superdog`</span>, <span class="hljs-string">`Arm Rip Off Boy`</span>) <span class="hljs-comment">// `Aquaman | Krypto the Superdog | Arm Rip Off Boy`</span>
+
+curried3.subscribe(<span class="hljs-string">`args`</span>, <span class="hljs-built_in">console</span>.log)
+curried3.pushArgument(<span class="hljs-string">`Squirrel Girl`</span>) 
+<span class="hljs-comment">// subscription triggered -&gt; [`Aquaman`, `Squirrel Girl`]</span>
+
+curried3.subscribe(<span class="hljs-string">`call`</span>, <span class="hljs-built_in">console</span>.log)
+curried3(<span class="hljs-string">`Razorback`</span>)
+<span class="hljs-comment">// subscription triggered -&gt; {</span>
+<span class="hljs-comment">//   arguments:[</span>
+<span class="hljs-comment">//       `Aquaman`, </span>
+<span class="hljs-comment">//       `Squirrel Girl`, </span>
+<span class="hljs-comment">//       `Razorback`</span>
+<span class="hljs-comment">//   ], </span>
+<span class="hljs-comment">//   returned: `Aquaman | Squirrel Girl | Razorback`, </span>
+<span class="hljs-comment">//   self:curried3 </span>
+<span class="hljs-comment">// }</span></pre>
+    
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+      </div>
+    </div>
+  <script src='assets/anchor.js'></script>
+  <script src='assets/split.js'></script>
+  <script src='assets/site.js'></script>
+</body>
+</html>

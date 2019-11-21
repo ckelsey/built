@@ -1,16 +1,4 @@
-:host {
-    display: block;
-    position: fixed;
-    height: 0px;
-    width: 0px;
-    top: 0px;
-    left: 0px;
-    z-index: 99999;
-    overflow: visible;
-    pointer-events: none;
-}
-
-.overlay-content-container {
+:host(overlay-content) {
     display: block;
     position: fixed;
     height: 0px;
@@ -23,6 +11,18 @@
 }
 
 overlay-content {
+    display: block;
+    position: fixed;
+    height: 0px;
+    width: 0px;
+    top: 0px;
+    left: 0px;
+    z-index: 99999;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.overlay-content-container {
     display: block;
     position: fixed;
     height: 0px;

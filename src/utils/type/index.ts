@@ -1,7 +1,0 @@
-export { default as isAnyEmpty } from './any-empty'
-export { default as isDate } from './date'
-export { default as isDom } from './dom'
-export { default as isEmpty } from './empty'
-export { default as Type } from './get'
-export { default as isObject } from './object'
-export { default as isPrimitive } from './primitives'

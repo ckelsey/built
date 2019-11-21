@@ -5,12 +5,12 @@
     "scripts": {
         "start": "NODE_ENV=development webpack-dev-server --config ./webpack.config.js",
         "build": "NODE_ENV=production webpack --progress --config ./webpack.config.js",
-        "check-types": "tsc",
-        "type-check": "tsc --noEmit",
-        "build:types": "tsc --emitDeclarationOnly",
-        "build:babel": "babel src --out-dir dust --extensions \".ts\" --source-maps inline",
         "lint": "eslint --ext .js,.html .",
-        "test": ""
+        "cypress": "cypress open",
+        "nyc": "cross-env NODE_ENV=test nyc",
+        "cypress:nyc": "cross-env NODE_ENV=test nyc --reporter html --reporter text node ./cypress/integration/index.spec.js",
+        "instrument": "cross-env NODE_ENV=test nyc instrument --compact=false src instrumented",
+        "doc": "documentation build --document-exported ./src/index.js --format html --output ./docs"
     },
     "files": [
         "dist",
@@ -18,53 +18,51 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/ckelsey/built.git"
+        "url": "git+https://github.com/ckelsey/built.git"
     },
     "devDependencies": {
-        "@babel/cli": "^7.2.3",
-        "@babel/core": "^7.6.4",
-        "@babel/plugin-proposal-class-properties": "^7.4.0",
-        "@babel/plugin-proposal-object-rest-spread": "^7.4.0",
-        "@babel/preset-env": "^7.6.3",
-        "@babel/preset-typescript": "^7.3.3",
+        "@babel/cli": "^7.7.0",
+        "@babel/core": "^7.7.2",
+        "@babel/plugin-proposal-class-properties": "^7.7.0",
+        "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+        "@babel/plugin-transform-runtime": "^7.6.2",
+        "@babel/preset-env": "^7.7.1",
+        "@babel/preset-react": "^7.7.0",
+        "@babel/register": "^7.7.0",
+        "@babel/runtime": "^7.7.2",
+        "@babel/runtime-corejs3": "^7.7.2",
         "@epegzz/sass-vars-loader": "^5.0.0",
-        "@types/node": "^12.7.1",
-        "autoprefixer": "^9.6.1",
-        "babel-loader": "^8.0.5",
-        "browser-sync": "^2.26.3",
-        "compression-webpack-plugin": "^3.0.0",
+        "autoprefixer": "^9.7.1",
+        "babel-loader": "^8.0.6",
+        "babel-plugin-istanbul": "^5.2.0",
+        "babel-preset-env": "^1.7.0",
+        "babel-preset-es2015": "^6.24.1",
+        "core-js": "^3.4.1",
+        "cross-env": "^6.0.3",
         "css-loader": "^3.2.0",
-        "css-to-string-loader": "^0.1.3",
+        "documentation": "^12.1.4",
         "eslint": "^6.6.0",
         "eslint-config-standard": "^14.1.0",
         "eslint-plugin-import": "^2.18.2",
         "eslint-plugin-node": "^10.0.0",
         "eslint-plugin-promise": "^4.2.1",
         "eslint-plugin-standard": "^4.0.1",
-        "file-loader": "^4.1.0",
-        "g": "^2.0.1",
-        "gulp": "^4.0.0",
+        "eslint-plugin-tree-shaking": "^1.7.4",
         "hard-source-webpack-plugin": "^0.13.1",
         "html-loader": "^0.5.5",
-        "html-minifier": "^4.0.0",
         "html-webpack-plugin": "^3.2.0",
-        "mini-css-extract-plugin": "^0.8.0",
-        "node-sass": "^4.12.0",
+        "istanbul-lib-coverage": "^2.0.5",
+        "node-sass": "^4.13.0",
+        "nyc": "^14.1.1",
         "postcss-loader": "^3.0.0",
+        "regenerator-runtime": "^0.13.3",
         "sass-loader": "^8.0.0",
         "style-loader": "^1.0.0",
-        "svg-inline-loader": "^0.8.0",
-        "svgo": "^1.3.0",
-        "svgo-loader": "^2.2.1",
-        "terser-webpack-plugin": "^1.4.1",
-        "ts-loader": "^5.3.3",
-        "tslint": "^5.15.0",
-        "typescript": "^3.3.3",
-        "uglifyjs-webpack-plugin": "^2.1.3",
-        "webpack": "^4.41.0",
-        "webpack-cli": "^3.1.0",
-        "webpack-dev-server": "^3.8.0",
-        "webpack-merge": "^4.2.2"
+        "terser-webpack-plugin": "^2.2.1",
+        "webpack": "^4.41.2",
+        "webpack-bundle-analyzer": "^3.6.0",
+        "webpack-cli": "^3.3.10",
+        "webpack-dev-server": "^3.9.0"
     },
     "author": "Chris Kelsey",
     "license": "MIT",
@@ -72,6 +70,29 @@
         "web components"
     ],
     "dependencies": {
-        "@webcomponents/webcomponentsjs": "^2.2.7"
+        "@webcomponents/webcomponentsjs": "^2.4.0"
+    },
+    "sideEffects": [
+        "src/utils/id/index.js"
+    ],
+    "description": "Useful things for UI",
+    "bugs": {
+        "url": "https://github.com/ckelsey/built/issues"
+    },
+    "homepage": "https://github.com/ckelsey/built#readme",
+    "directories": {
+        "example": "examples",
+        "test": "test"
+    },
+    "nyc": {
+        "require": [
+            "@babel/register"
+        ],
+        "reporter": [
+            "lcov",
+            "text"
+        ],
+        "sourceMap": false,
+        "instrument": false
     }
 }

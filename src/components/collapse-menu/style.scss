@@ -1,0 +1,183 @@
+$gap:10%;
+$vpadding:0.75em;
+$hgap:0.75em;
+$hvpadding:0.33em;
+
+:host(collapse-menu) {
+    display: inline-block;
+    width: 100%;
+}
+
+collapse-menu {
+    display: inline-block;
+    width: 100%;
+}
+
+.collapse-menu-container {
+    position: relative;
+
+    .default-toggle-icon {
+        cursor: pointer;
+        pointer-events: none;
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .collapse-menu-items {
+        transform-origin: 0;
+        height: 100%;
+    }
+
+    .collapse-menu-toggle {
+        opacity: 1;
+        transition: opacity 0.2s;
+    }
+
+    .collapse-menu-toggle-inner {
+        padding-left: 10%;
+        position: relative;
+        display: none;
+        cursor: pointer;
+        margin: 0;
+        opacity: 0;
+        height: 0;
+
+        .default-toggle-inner-icon {
+            position: relative;
+            left: -0.33em;
+            pointer-events: none;
+        }
+    }
+
+    &[direction="horizontal"] {
+        .collapse-menu-items {
+            display: inline-flex;
+            margin-left: -$hgap;
+            margin-right: -$hgap;
+        }
+    }
+
+    &[expandable="true"] {
+        .default-toggle-icon {
+            opacity: 1;
+            position: relative;
+            pointer-events: all;
+            z-index: unset;
+        }
+
+        .collapse-menu-items {
+            transform: translateX(-105%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            height: 100vh;
+        }
+
+        .collapse-menu-toggle-inner {
+            display: block;
+            margin: 1em 0;
+            height: 27px;
+            transition: margin 0.01s linear 0.4s, height 0.01s linear 0.4s;
+        }
+
+        &[align="right"] {
+            .collapse-menu-items {
+                right: 0;
+                left: unset;
+                transform: translateX(105%);
+            }
+
+            .collapse-menu-toggle-inner {
+                transform: rotate(180deg);
+                padding-left: 0;
+                padding-right: 7%;
+            }
+
+        }
+    }
+
+    &[expandable="false"] {
+        .collapse-menu-items {
+            position: relative;
+            transform: translateX(0%);
+        }
+
+        .collapse-menu-toggle-inner {
+            opacity: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+    }
+}
+
+.collapse-menu-container[expandable="true"][expanded="true"] {
+    .collapse-menu-items {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+
+    .collapse-menu-toggle {
+        opacity: 0;
+    }
+
+    /*
+    .collapse-menu-toggle-icon-inner {
+
+        &:after {
+            transform: rotate(45deg);
+        }
+
+        &:before {
+            transform: rotate(-45deg);
+        }
+    }
+
+    .collapse-menu-toggle-icon-outer {
+        transform: scaleX(0);
+    }
+    */
+
+    .collapse-menu-toggle-inner {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out 0.1s;
+    }
+}
+
+.collapse-menu-sizer,
+.collapse-menu-wrap-sizer {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+collapse-menu>[slot="item"] {
+    padding: $vpadding;
+    box-sizing: border-box;
+    /*transform: scaleX(2.25);*/
+    transform-origin: 0;
+    opacity: 0;
+}
+
+collapse-menu[expandable="false"][direction="horizontal"]>[slot="item"],
+collapse-menu[expandable="false"]:not([direction])>[slot="item"] {
+    padding: $hvpadding $hgap;
+}
+
+collapse-menu[expandable="false"]>[slot="item"],
+collapse-menu:not([expandable])>[slot="item"],
+collapse-menu[expanded="true"]>[slot="item"] {
+    opacity: 1;
+    /*transform: scaleX(1);*/
+}
+
+collapse-menu[expanded="true"]>[slot="item"] {
+    padding: $vpadding $gap;
+}
