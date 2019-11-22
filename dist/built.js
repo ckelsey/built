@@ -5909,7 +5909,10 @@ var effect_ripple_methods_runStart = function runStart(host) {
     return style.opacity = "".concat(Math.max(Math.min(1, opacity), 0));
   }, GetCurve([host.opacity * 0.5, host.opacity, host.opacity * 0.5, host.opacity * 0.125, host.opacity * 0.03, 0], 0, false, host.speed), function () {
     requestAnimationFrame(function () {
-      host.elements.ripple.removeChild(rippleInner);
+      if (host.elements.ripple) {
+        host.elements.ripple.removeChild(rippleInner);
+      }
+
       host.isRunning = false;
     });
   });

@@ -41,7 +41,7 @@ const runStart = host => {
         ),
         () => {
             requestAnimationFrame(() => {
-                host.elements.ripple.removeChild(rippleInner)
+                if (host.elements.ripple) { host.elements.ripple.removeChild(rippleInner) }
                 host.isRunning = false
             })
         }
