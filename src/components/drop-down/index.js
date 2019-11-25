@@ -46,6 +46,9 @@ const properties = {
     open: {
         format: (val) => Pipe(ToBool, IfInvalid(false))(val).value,
         onChange: toggleOptions
+    },
+    closeonclick: {
+        format: (val) => Pipe(ToBool, IfInvalid(false))(val).value
     }
 }
 
@@ -79,19 +82,19 @@ const elements = {
     root: { selector: componentRoot },
     heading: {
         selector: `.drop-down-heading`,
-        onChange: (el, host) => {
-            el.eventSubscriptions = {
-                mousedown: ObserveEvent(el, `mousedown`).subscribe(() => {
-                    if (!host.open) {
-                        return openClose(true, host)
-                    }
+        // onChange: (el, host) => {
+        //     el.eventSubscriptions = {
+        //         mousedown: ObserveEvent(el, `mousedown`).subscribe(() => {
+        //             if (!host.open) {
+        //                 return openClose(true, host)
+        //             }
 
-                    requestAnimationFrame(() => {
-                        openClose(false, host)
-                    })
-                })
-            }
-        }
+        //             requestAnimationFrame(() => openClose(false, host))
+        //                 openClose(false, host)
+        //             })
+        //         })
+        //     }
+        // }
     },
     overlay: { selector: `.drop-down-overlay` },
     injectedStyles: {
@@ -165,7 +168,16 @@ export const DropDown = WCConstructor({
         host.eventSubscriptions = {
             slotObserver: slotObserver.disconnect,
             docClick: ObserveEvent(document.body, `click`).subscribe(e =>
-                !WasClickedOn(host, e) ? openClose(false, host) : undefined
+                !WasClickedOn(host, e) ?
+                    openClose(false, host) :
+                    WasClickedOn(host.elements.heading, e) ?
+                        !host.open ?
+                            openClose(true, host) :
+                            requestAnimationFrame(() => openClose(false, host)) :
+                        host.closeonclick ?
+                            requestAnimationFrame(() => openClose(false, host)) :
+                            undefined
+
             )
         }
 

@@ -4257,6 +4257,11 @@ var drop_down_properties = {
       return Pipe(ToBool, IfInvalid(false))(val).value;
     },
     onChange: drop_down_toggleOptions
+  },
+  closeonclick: {
+    format: function format(val) {
+      return Pipe(ToBool, IfInvalid(false))(val).value;
+    }
   }
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
@@ -4295,20 +4300,19 @@ var drop_down_elements = {
     selector: drop_down_componentRoot
   },
   heading: {
-    selector: ".drop-down-heading",
-    onChange: function onChange(el, host) {
-      el.eventSubscriptions = {
-        mousedown: ObserveEvent(el, "mousedown").subscribe(function () {
-          if (!host.open) {
-            return openClose(true, host);
-          }
+    selector: ".drop-down-heading" // onChange: (el, host) => {
+    //     el.eventSubscriptions = {
+    //         mousedown: ObserveEvent(el, `mousedown`).subscribe(() => {
+    //             if (!host.open) {
+    //                 return openClose(true, host)
+    //             }
+    //             requestAnimationFrame(() => openClose(false, host))
+    //                 openClose(false, host)
+    //             })
+    //         })
+    //     }
+    // }
 
-          requestAnimationFrame(function () {
-            openClose(false, host);
-          });
-        })
-      };
-    }
   },
   overlay: {
     selector: ".drop-down-overlay"
@@ -4380,7 +4384,11 @@ var DropDown = WCConstructor({
     host.eventSubscriptions = {
       slotObserver: slotObserver.disconnect,
       docClick: ObserveEvent(document.body, "click").subscribe(function (e) {
-        return !WasClickedOn(host, e) ? openClose(false, host) : undefined;
+        return !WasClickedOn(host, e) ? openClose(false, host) : WasClickedOn(host.elements.heading, e) ? !host.open ? openClose(true, host) : requestAnimationFrame(function () {
+          return openClose(false, host);
+        }) : host.closeonclick ? requestAnimationFrame(function () {
+          return openClose(false, host);
+        }) : undefined;
       })
     };
     var overlay = host.elements.overlay;
