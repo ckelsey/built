@@ -48,7 +48,7 @@ const properties = {
         onChange: toggleOptions
     },
     closeonclick: {
-        format: (val) => Pipe(ToBool, IfInvalid(false))(val).value
+        format: (val) => Pipe(ToBool, IfInvalid(true))(val).value
     }
 }
 

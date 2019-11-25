@@ -4260,7 +4260,7 @@ var drop_down_properties = {
   },
   closeonclick: {
     format: function format(val) {
-      return Pipe(ToBool, IfInvalid(false))(val).value;
+      return Pipe(ToBool, IfInvalid(true))(val).value;
     }
   }
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
