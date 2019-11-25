@@ -1,6 +1,6 @@
 import {
     WCDefine, WCConstructor, ObserveEvent, ToBool, IfInvalid, ComponentClassObject,
-    SetStyleRules, AppendStyleElement, Pipe
+    SetStyleRules, AppendStyleElement, Pipe, WasClickedOn, ObserverUnsubscribe
 } from '../..'
 import './style.scss'
 
@@ -163,23 +163,16 @@ export const DropDown = WCConstructor({
         slotObserver.observe(host, { childList: true })
 
         host.eventSubscriptions = {
-            blur: ObserveEvent(host, `focusout`).subscribe(() => {
-                openClose(false, host)
-            }),
-            focus: ObserveEvent(host, `focus`).subscribe(() => openClose(true, host)),
-            slotObserver: slotObserver.disconnect
+            slotObserver: slotObserver.disconnect,
+            docClick: ObserveEvent(document.body, `click`).subscribe(e =>
+                !WasClickedOn(host, e) ? openClose(false, host) : undefined
+            )
         }
 
         const overlay = host.elements.overlay
-
         overlay.target = host
     },
-    onDisconnected(host) {
-        Object.keys(host.eventSubscriptions).forEach(key => {
-            if (typeof host.eventSubscriptions[key] !== `function`) { return }
-            try { host.eventSubscriptions[key]() } catch (error) { }
-        })
-    }
+    onDisconnected(host) { ObserverUnsubscribe(host) }
 })
 
 WCDefine(componentName, DropDown)

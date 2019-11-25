@@ -9,7 +9,7 @@ const findParentLink = parent => {
                 link = parent
             }
 
-            parent = parent.parentElement
+            parent = parent.parentNode
         }
         // eslint-disable-next-line no-empty
     } catch (error) { }
@@ -61,7 +61,7 @@ const clickListener = methods => {
         }
 
         if (!link) {
-            link = findParentLink(e.parentElement)
+            link = findParentLink(e.parentNode)
         }
 
         if (!link || link.getAttribute(`target`) === `_blank`) { return }

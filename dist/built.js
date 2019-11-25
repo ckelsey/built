@@ -4112,6 +4112,87 @@ var CookieMessage = WCConstructor({
   }
 });
 WCDefine(cookie_message_componentName, CookieMessage);
+// CONCATENATED MODULE: ./src/utils/was-clicked-on/index.js
+function WasClickedOn(element, event) {
+  if (!element) {
+    return false;
+  }
+
+  var target = Array.isArray(event.path) ? event.path[0] : event.composedPath && typeof event.composedPath === "function" ? event.composedPath() : event.originalTarget ? event.originalTarget : event.explicitOriginalTarget ? event.explicitOriginalTarget : event.target;
+
+  var cycleUp = function cycleUp(parent) {
+    while (parent && parent !== document.body) {
+      if (element === parent || element.contains(parent)) {
+        return true;
+      }
+
+      parent = parent.parentNode || parent.host;
+    }
+
+    return false;
+  };
+
+  return cycleUp(target);
+}
+// CONCATENATED MODULE: ./src/utils/reduce-map/index.js
+/**
+ * Takes a mapping function and returns a reducer
+ * @function ReduceMap
+ * @param {function( item:any ) :any } mapFunction - The function to be called on every element, performs the mapping operation
+ * @return {function( accumulator:[], current:any ):[] } ReduceMapResult - The reducer function
+ * @example 
+ * [`A`, `B`].reduce(ReduceMap(mapFunction), []) // [`a`, `b`,]
+ */
+function ReduceMap(mapFunction) {
+  return function ReduceMapResult(result, current) {
+    return result.concat([mapFunction(current)]);
+  };
+}
+// CONCATENATED MODULE: ./src/utils/observer-unsubscribe/index.js
+
+/**
+ * Looks for subscriptions in an object, DOM element or a subscription itself and unsubscribes.
+ * @function ObserverUnsubscribe
+ * @param {Object|HTMLElement|function()} subscription - An element that has or is a observer subscription. If is a DOM element, must be under `subscriptions` or `eventSubscriptions` properties
+ * @return {void}
+ */
+
+function ObserverUnsubscribe(subscription) {
+  // todo add filter for check
+  var callArrayOfSubscriptions = ReduceMap(function (val) {
+    return typeof val === "function" ? val() : undefined;
+  });
+
+  if (typeof subscription === "function") {
+    return subscription();
+  }
+
+  if (Array.isArray(subscription)) {
+    return subscription.reduce(callArrayOfSubscriptions, []);
+  }
+
+  if (IsDom(subscription)) {
+    var key;
+
+    if (subscription.subscriptions) {
+      key = "subscriptions";
+    }
+
+    if (subscription.eventSubscriptions) {
+      key = "eventSubscriptions";
+    }
+
+    if (!key) {
+      return;
+    }
+
+    return Object.keys(subscription[key]).reduce(callArrayOfSubscriptions, []);
+  }
+
+  if (IsObject(subscription)) {
+    Object.keys(subscription).reduce(callArrayOfSubscriptions, []);
+  }
+}
 // CONCATENATED MODULE: ./src/components/drop-down/index.js
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -4297,27 +4378,16 @@ var DropDown = WCConstructor({
       childList: true
     });
     host.eventSubscriptions = {
-      blur: ObserveEvent(host, "focusout").subscribe(function () {
-        openClose(false, host);
-      }),
-      focus: ObserveEvent(host, "focus").subscribe(function () {
-        return openClose(true, host);
-      }),
-      slotObserver: slotObserver.disconnect
+      slotObserver: slotObserver.disconnect,
+      docClick: ObserveEvent(document.body, "click").subscribe(function (e) {
+        return !WasClickedOn(host, e) ? openClose(false, host) : undefined;
+      })
     };
     var overlay = host.elements.overlay;
     overlay.target = host;
   },
   onDisconnected: function onDisconnected(host) {
-    Object.keys(host.eventSubscriptions).forEach(function (key) {
-      if (typeof host.eventSubscriptions[key] !== "function") {
-        return;
-      }
-
-      try {
-        host.eventSubscriptions[key]();
-      } catch (error) {}
-    });
+    ObserverUnsubscribe(host);
   }
 });
 WCDefine(drop_down_componentName, DropDown);
@@ -12107,7 +12177,7 @@ var click_listener_findParentLink = function findParentLink(parent) {
         link = parent;
       }
 
-      parent = parent.parentElement;
+      parent = parent.parentNode;
     } // eslint-disable-next-line no-empty
 
   } catch (error) {}
@@ -12161,7 +12231,7 @@ var click_listener_clickListener = function clickListener(methods) {
     }
 
     if (!link) {
-      link = click_listener_findParentLink(e.parentElement);
+      link = click_listener_findParentLink(e.parentNode);
     }
 
     if (!link || link.getAttribute("target") === "_blank") {
@@ -12888,20 +12958,6 @@ function IsElementType(tag) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/reduce-map/index.js
-/**
- * Takes a mapping function and returns a reducer
- * @function ReduceMap
- * @param {function( item:any ) :any } mapFunction - The function to be called on every element, performs the mapping operation
- * @return {function( accumulator:[], current:any ):[] } ReduceMapResult - The reducer function
- * @example 
- * [`A`, `B`].reduce(ReduceMap(mapFunction), []) // [`a`, `b`,]
- */
-function ReduceMap(mapFunction) {
-  return function ReduceMapResult(result, current) {
-    return result.concat([mapFunction(current)]);
-  };
-}
 // CONCATENATED MODULE: ./src/utils/map/index.js
 
 /**
@@ -12920,51 +12976,6 @@ function Map(mapFunction, collection) {
 }
 
 
-// CONCATENATED MODULE: ./src/utils/observer-unsubscribe/index.js
-
-/**
- * Looks for subscriptions in an object, DOM element or a subscription itself and unsubscribes.
- * @function ObserverUnsubscribe
- * @param {Object|HTMLElement|function()} subscription - An element that has or is a observer subscription. If is a DOM element, must be under `subscriptions` or `eventSubscriptions` properties
- * @return {void}
- */
-
-function ObserverUnsubscribe(subscription) {
-  // todo add filter for check
-  var callArrayOfSubscriptions = ReduceMap(function (val) {
-    return typeof val === "function" ? val() : undefined;
-  });
-
-  if (typeof subscription === "function") {
-    return subscription();
-  }
-
-  if (Array.isArray(subscription)) {
-    return subscription.reduce(callArrayOfSubscriptions, []);
-  }
-
-  if (IsDom(subscription)) {
-    var key;
-
-    if (subscription.subscriptions) {
-      key = "subscriptions";
-    }
-
-    if (subscription.eventSubscriptions) {
-      key = "eventSubscriptions";
-    }
-
-    if (!key) {
-      return;
-    }
-
-    return Object.keys(subscription[key]).reduce(callArrayOfSubscriptions, []);
-  }
-
-  if (IsObject(subscription)) {
-    Object.keys(subscription).reduce(callArrayOfSubscriptions, []);
-  }
-}
 // CONCATENATED MODULE: ./src/utils/super-function/index.js
 
 
@@ -13751,6 +13762,7 @@ var Merge = function Merge(obj1, obj2) {
 /* concated harmony reexport ScrollTo */__webpack_require__.d(__webpack_exports__, "ScrollTo", function() { return ScrollTo; });
 /* concated harmony reexport ToDate */__webpack_require__.d(__webpack_exports__, "ToDate", function() { return ToDate; });
 /* concated harmony reexport Merge */__webpack_require__.d(__webpack_exports__, "Merge", function() { return Merge; });
+/* concated harmony reexport WasClickedOn */__webpack_require__.d(__webpack_exports__, "WasClickedOn", function() { return WasClickedOn; });
 /** COMPONENTS */
 
 
@@ -13783,6 +13795,7 @@ var Merge = function Merge(obj1, obj2) {
 
 
 /** UTILS */
+
 
 
 
