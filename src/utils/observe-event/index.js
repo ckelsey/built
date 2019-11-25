@@ -27,8 +27,6 @@ export function ObserveEvent(element, eventName, options = {}) {
     }
 
     const mObserver = new MutationObserver(e => {
-        // if (!e || typeof e.forEach !== `function`) { return }
-
         let foundElement = false
         let ii = e.length
 
@@ -51,6 +49,7 @@ export function ObserveEvent(element, eventName, options = {}) {
 
         if (!max) { return }
 
+        /** TODO - does not work for root elements of web components as they don't have parentElement */
         if (!element.parentElement) {
             return requestAnimationFrame(tryIt)
         }
