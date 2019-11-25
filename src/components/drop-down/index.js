@@ -80,22 +80,7 @@ const openClose = (open, host) => {
 
 const elements = {
     root: { selector: componentRoot },
-    heading: {
-        selector: `.drop-down-heading`,
-        // onChange: (el, host) => {
-        //     el.eventSubscriptions = {
-        //         mousedown: ObserveEvent(el, `mousedown`).subscribe(() => {
-        //             if (!host.open) {
-        //                 return openClose(true, host)
-        //             }
-
-        //             requestAnimationFrame(() => openClose(false, host))
-        //                 openClose(false, host)
-        //             })
-        //         })
-        //     }
-        // }
-    },
+    heading: { selector: `.drop-down-heading` },
     overlay: { selector: `.drop-down-overlay` },
     injectedStyles: {
         selector: `style.injectedStyles`,
@@ -167,18 +152,26 @@ export const DropDown = WCConstructor({
 
         host.eventSubscriptions = {
             slotObserver: slotObserver.disconnect,
-            docClick: ObserveEvent(document.body, `click`).subscribe(e =>
-                !WasClickedOn(host, e) ?
-                    openClose(false, host) :
-                    WasClickedOn(host.elements.heading, e) ?
-                        !host.open ?
-                            openClose(true, host) :
-                            requestAnimationFrame(() => openClose(false, host)) :
-                        host.closeonclick ?
-                            requestAnimationFrame(() => openClose(false, host)) :
-                            undefined
+            docClick: ObserveEvent(document.body, `click`).subscribe(e => {
+                if (!WasClickedOn(host, e)) {
+                    if (host.open) {
+                        return openClose(false, host)
+                    }
+                    return
+                }
 
-            )
+                if (WasClickedOn(host.elements.heading, e) || WasClickedOn(host.querySelector(`[slot="label"]`), e)) {
+                    if (host.open) {
+                        return requestAnimationFrame(() => openClose(false, host))
+                    } else {
+                        return openClose(true, host)
+                    }
+                }
+
+                if (host.closeonclick && host.open) {
+                    return requestAnimationFrame(() => openClose(false, host))
+                }
+            })
         }
 
         const overlay = host.elements.overlay

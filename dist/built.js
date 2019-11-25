@@ -4300,19 +4300,7 @@ var drop_down_elements = {
     selector: drop_down_componentRoot
   },
   heading: {
-    selector: ".drop-down-heading" // onChange: (el, host) => {
-    //     el.eventSubscriptions = {
-    //         mousedown: ObserveEvent(el, `mousedown`).subscribe(() => {
-    //             if (!host.open) {
-    //                 return openClose(true, host)
-    //             }
-    //             requestAnimationFrame(() => openClose(false, host))
-    //                 openClose(false, host)
-    //             })
-    //         })
-    //     }
-    // }
-
+    selector: ".drop-down-heading"
   },
   overlay: {
     selector: ".drop-down-overlay"
@@ -4384,11 +4372,29 @@ var DropDown = WCConstructor({
     host.eventSubscriptions = {
       slotObserver: slotObserver.disconnect,
       docClick: ObserveEvent(document.body, "click").subscribe(function (e) {
-        return !WasClickedOn(host, e) ? openClose(false, host) : WasClickedOn(host.elements.heading, e) ? !host.open ? openClose(true, host) : requestAnimationFrame(function () {
-          return openClose(false, host);
-        }) : host.closeonclick ? requestAnimationFrame(function () {
-          return openClose(false, host);
-        }) : undefined;
+        if (!WasClickedOn(host, e)) {
+          if (host.open) {
+            return openClose(false, host);
+          }
+
+          return;
+        }
+
+        if (WasClickedOn(host.elements.heading, e) || WasClickedOn(host.querySelector("[slot=\"label\"]"), e)) {
+          if (host.open) {
+            return requestAnimationFrame(function () {
+              return openClose(false, host);
+            });
+          } else {
+            return openClose(true, host);
+          }
+        }
+
+        if (host.closeonclick && host.open) {
+          return requestAnimationFrame(function () {
+            return openClose(false, host);
+          });
+        }
       })
     };
     var overlay = host.elements.overlay;
