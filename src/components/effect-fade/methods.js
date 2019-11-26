@@ -1,6 +1,8 @@
 import { GetCurve, ObserveEvent, Timer } from '../..'
 
 const runAnimation = (host, isOn) => {
+    if (!Array.isArray(host.targets)) { return }
+
     Timer(
         host.speed,
         opacity => {

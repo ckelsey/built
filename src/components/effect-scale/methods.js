@@ -109,6 +109,8 @@ export const setOrigin = (val, host) => {
     const y = parts.length > 1 ? parts[1] : parts[0]
     const origin = `${x} ${y}`
 
+    if (!Array.isArray(host.targets)) { return }
+
     host.targets.forEach(target => {
         if (Array.isArray(target)) {
             return target.forEach(element => element.style.transformOrigin = origin)

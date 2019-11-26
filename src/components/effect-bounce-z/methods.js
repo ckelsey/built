@@ -12,6 +12,8 @@ const runStart = host => () => {
 
     host.on = true
 
+    if (!Array.isArray(host.targets)) { return }
+
     Timer(
         host.speed,
         scale => {
@@ -20,6 +22,7 @@ const runStart = host => () => {
                 const scaleFactor = (dimension - scale) / dimension
                 el.style.transform = `perspective(1px) translateZ(0) scaleX(${scaleFactor}) scaleY(${scaleFactor})`
             }
+
             host.targets.forEach(target => Array.isArray(target) ? target.forEach(set) : set(target))
         },
         GetCurve([1, -host.amount, (-host.amount * 1.125), 1], 0.5, false, host.speed),
@@ -47,6 +50,8 @@ export const loadTargets = host => {
         el.style.backfaceVisibility = `hidden`
         host.targets$.push(ObserveEvent(el, host.start).subscribe(runStart(host)))
     }
+
+    if (!Array.isArray(host.targets)) { return }
 
     host.targets.forEach(target => {
         if (Array.isArray(target)) { return target.forEach(set) }

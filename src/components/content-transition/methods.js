@@ -209,29 +209,29 @@ const transitionHeight = (host, child, speed, keepchildren) => new Promise(resol
 
 export const transitionTo = host => index => new Promise(resolve => {
     switch (host.type) {
-        case `slide`:
-            return transitionSlide(host, index, host.speed, host.keepchildren)
-                .then(resolve)
-        case `fade`:
-            return transitionFade(host, index, host.speed, host.keepchildren)
-                .then(resolve)
-        case `height`:
-            return transitionHeight(host, index, host.speed, host.keepchildren)
-                .then(resolve)
+    case `slide`:
+        return transitionSlide(host, index, host.speed, host.keepchildren)
+            .then(resolve)
+    case `fade`:
+        return transitionFade(host, index, host.speed, host.keepchildren)
+            .then(resolve)
+    case `height`:
+        return transitionHeight(host, index, host.speed, host.keepchildren)
+            .then(resolve)
     }
 })
 
 export const transitionChild = host => child => new Promise(resolve => {
     switch (host.type) {
-        case `slide`:
-            return transitionSlide(host, child, host.speed, host.keepchildren)
-                .then(resolve)
-        case `fade`:
-            return transitionFade(host, child, host.speed, host.keepchildren)
-                .then(resolve)
-        case `height`:
-            return transitionHeight(host, child, host.speed, host.keepchildren)
-                .then(resolve)
+    case `slide`:
+        return transitionSlide(host, child, host.speed, host.keepchildren)
+            .then(resolve)
+    case `fade`:
+        return transitionFade(host, child, host.speed, host.keepchildren)
+            .then(resolve)
+    case `height`:
+        return transitionHeight(host, child, host.speed, host.keepchildren)
+            .then(resolve)
     }
 })
 

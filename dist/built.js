@@ -4118,11 +4118,14 @@ function WasClickedOn(element, event) {
     return false;
   }
 
-  var target = Array.isArray(event.path) ? event.path[0] : event.composedPath && typeof event.composedPath === "function" ? event.composedPath() : event.originalTarget ? event.originalTarget : event.explicitOriginalTarget ? event.explicitOriginalTarget : event.target;
+  var target = Array.isArray(event.path) ? event.path[0] : event.composedPath && typeof event.composedPath === "function" && event.composedPath()[0] ? event.composedPath()[0] : event.originalTarget ? event.originalTarget : event.explicitOriginalTarget ? event.explicitOriginalTarget : event.target;
 
   var cycleUp = function cycleUp(parent) {
     while (parent && parent !== document.body) {
-      if (element === parent || element.contains(parent)) {
+      var isEqual = element === parent;
+      var isContained = parent instanceof Node && element.contains(parent);
+
+      if (isEqual || isContained) {
         return true;
       }
 
@@ -5555,6 +5558,11 @@ var methods_runStart = function runStart(host) {
     }
 
     host.on = true;
+
+    if (!Array.isArray(host.targets)) {
+      return;
+    }
+
     Timer(host.speed, function (scale) {
       var set = function set(el) {
         var dimension = getDimension(el);
@@ -5601,6 +5609,10 @@ var methods_loadTargets = function loadTargets(host) {
     el.style.backfaceVisibility = "hidden";
     host.targets$.push(ObserveEvent(el, host.start).subscribe(methods_runStart(host)));
   };
+
+  if (!Array.isArray(host.targets)) {
+    return;
+  }
 
   host.targets.forEach(function (target) {
     if (Array.isArray(target)) {
@@ -5690,6 +5702,10 @@ WCDefine(effect_bounce_z_componentName, EffectBounceZ);
 
 
 var methods_runAnimation = function runAnimation(host, isOn) {
+  if (!Array.isArray(host.targets)) {
+    return;
+  }
+
   Timer(host.speed, function (opacity) {
     var set = function set(el) {
       return el.style.opacity = opacity;
@@ -6044,6 +6060,10 @@ var methods_unloadTargets = function unloadTargets(host) {
 };
 var effect_ripple_methods_loadTargets = function loadTargets(host) {
   if (!host.targets || !host.start) {
+    return;
+  }
+
+  if (!Array.isArray(host.targets)) {
     return;
   }
 
@@ -6428,6 +6448,11 @@ var methods_setOrigin = function setOrigin(val, host) {
   var x = parts[0];
   var y = parts.length > 1 ? parts[1] : parts[0];
   var origin = "".concat(x, " ").concat(y);
+
+  if (!Array.isArray(host.targets)) {
+    return;
+  }
+
   host.targets.forEach(function (target) {
     if (Array.isArray(target)) {
       return target.forEach(function (element) {
@@ -6778,6 +6803,11 @@ var effect_underline_methods_loadTargets = function loadTargets(host) {
   }
 
   effect_underline_methods_unloadTargets(host);
+
+  if (!Array.isArray(host.targets)) {
+    return;
+  }
+
   host.targets.forEach(function (target) {
     if (host.canStart) {
       host.targets$.push(ObserveEvent(target, "mousedown").subscribe(function (e) {
@@ -9670,6 +9700,7 @@ var methods_value_sanitizeValue = function sanitizeValue(val, type, allowhtml, d
 
     case "email":
       validation = ValidateEmail(val);
+      break;
 
     case "tel":
     case "usphone":

@@ -196,6 +196,7 @@ export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
         break
     case `email`:
         validation = ValidateEmail(val)
+        break
     case `tel`:
     case `usphone`:
         validation = ValidateUsPhone(val)

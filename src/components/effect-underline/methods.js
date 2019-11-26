@@ -60,6 +60,8 @@ export const loadTargets = host => {
 
     unloadTargets(host)
 
+    if (!Array.isArray(host.targets)) { return }
+
     host.targets.forEach(target => {
         if (host.canStart) {
             host.targets$.push(ObserveEvent(target, `mousedown`).subscribe(e => host.downEvent = e))
