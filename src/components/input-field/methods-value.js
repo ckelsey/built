@@ -383,6 +383,13 @@ export const processValue = host => {
             input.files = (new ClipboardEvent(``).clipboardData || new DataTransfer).files
         } catch (error) { }
 
+        if (!filenames.length && host.pathvalue) {
+            host.notempty = true
+            return
+        } else if (filenames.length) {
+            host.pathvalue = ``
+        }
+
     } else {
         try {
             const selectionEnd = input.selectionEnd

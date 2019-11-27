@@ -56,6 +56,5 @@ export const MonthData = value => {
     }
 
     result.value = daysArray.concat(bufferEnd.slice())
-    result.instanceof.push(`MonthData`)
     return result
 }

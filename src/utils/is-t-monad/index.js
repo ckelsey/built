@@ -12,7 +12,6 @@ import { IsEmpty, IsObject, ReduceFilter, Type } from '../../index'
  * IsTMonad({
  *      value:``,
  *      valid: true,
- *      instanceof:[],
  *      type: `string`
  * }) // true
  */
@@ -25,9 +24,6 @@ export function IsTMonad(value) {
     const keysItShouldHave = [{
         key: `valid`,
         type: `boolean`
-    }, {
-        key: `instanceof`,
-        type: `array`
     }, {
         key: `type`,
         type: `string`

@@ -5,6 +5,7 @@
     "scripts": {
         "start": "NODE_ENV=development webpack-dev-server --config ./webpack.config.js",
         "build": "NODE_ENV=production webpack --progress --config ./webpack.config.js",
+        "watch": "NODE_ENV=production webpack --watch --progress --config ./webpack.config.js",
         "lint": "eslint --ext .js,.html .",
         "cypress": "cypress open",
         "nyc": "cross-env NODE_ENV=test nyc",

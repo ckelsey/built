@@ -19,7 +19,5 @@ export function FromEntities(value) {
         result.valid = false
     }
 
-    result.instanceof.push(`FromEntities`)
-
     return result
 }

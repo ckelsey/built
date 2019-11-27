@@ -12,6 +12,5 @@ export function ToIntlPhone(value) {
 
     result.value = `+${countryCodeMonad.value} ${r.value}`.trim()
     result.stringChanges = r.stringChanges
-    result.instanceof.push(`ToIntlPhone`)
     return result
 }

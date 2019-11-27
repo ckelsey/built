@@ -9,7 +9,6 @@ export function TMonad(value) {
         valid: true,
         value: value,
         type: Type(value),
-        instanceof: [],
         stringChanges: [], // not required
         stop: false // not required
     }

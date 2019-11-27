@@ -22,6 +22,5 @@ export function ToString(value) {
     }
 
     result.type = Type(result.value)
-    result.instanceof.push(`ToString`)
     return result
 }

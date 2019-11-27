@@ -25,6 +25,5 @@ export function ToUsZip(value) {
     )(result)
 
     result.valid = typeof result.value === `string` && (result.value.length === 5 || result.value.length === 10)
-    result.instanceof.push(`ToUsZip`)
     return result
 }

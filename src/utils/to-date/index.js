@@ -5,10 +5,6 @@ export function ToDate(value) {
 
     if (result.stop) { return result }
 
-    if (result.instanceof[result.instanceof.length] === `DateToObject`) {
-        result.value = result.value.date
-    }
-
     try {
         result.value = new Date(Date.parse(result.value))
     } catch (error) { }
@@ -21,7 +17,5 @@ export function ToDate(value) {
 
     result.type = isDate ? `date` : Type(result.value)
     result.valid = result.type === `date`
-    result.instanceof.push(`ToDate`)
-
     return result
 }

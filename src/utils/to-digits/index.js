@@ -17,7 +17,6 @@ export function ToDigits(value) {
     }
 
     result.type = Type(result.value)
-    result.instanceof.push(`ToDigits`)
 
     return result
 }

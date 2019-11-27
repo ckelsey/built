@@ -10,7 +10,6 @@ export function ToNumber(value) {
     }
 
     result.type = Type(result.value)
-    result.instanceof.push(`ToNumber`)
     result.valid = !isNaN(result.value)
 
     return result

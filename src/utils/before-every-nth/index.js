@@ -40,7 +40,6 @@ export function BeforeEveryNth(nth, insert) {
 
         r.stringChanges = r.stringChanges.concat(changes)
         r.valid = typeof r.value === `string` && r.value.length === 14
-        r.instanceof.push(`BeforeEveryNth`)
         return r
     }
 }

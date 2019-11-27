@@ -22,10 +22,6 @@ export function IfInvalid(replacement) {
         if (result.stop || !!result.valid) { return result }
 
         /** If not valid, return replacement */
-        return Object.assign(
-            {},
-            TMonad(replacement),
-            { instanceof: result.instanceof.concat([`IfInvalid`]) }
-        )
+        return TMonad(replacement)
     }
 }

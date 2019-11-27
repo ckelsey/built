@@ -13,7 +13,6 @@ export function FromJSON(value) {
     }
 
     result.type = Type(result.value)
-    result.instanceof.push(`FromJSON`)
 
     if ([`object`, `array`].indexOf(result.type) > -1) {
         result.valid = true

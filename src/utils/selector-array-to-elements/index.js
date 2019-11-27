@@ -8,7 +8,6 @@ export function SelectorArrayToElements(parent, value) {
     }
 
     if (!Value.valid || Value.type !== `array`) {
-        Value.instanceof.push(`SelectorArrayToElements`)
         return Value
     }
 
@@ -25,8 +24,5 @@ export function SelectorArrayToElements(parent, value) {
     ).filter(v => !!v)
 
     Value.valid = Value.value.length
-
-    Value.instanceof.push(`SelectorArrayToElements`)
-
     return Value
 }

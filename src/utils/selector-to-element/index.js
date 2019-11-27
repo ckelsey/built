@@ -17,7 +17,5 @@ export function SelectorToElement(parent, value) {
 
     const result = IsElement(Value)
 
-    result.instanceof.push(`SelectorToElement`)
-
     return result
 }

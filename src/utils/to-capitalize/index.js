@@ -9,6 +9,5 @@ export function ToCapitalize(string) {
         result.valid = false
     }
 
-    result.instanceof.push(`Capitalize`)
     return result
 }

@@ -25,7 +25,5 @@ export const doURI = (value, encode = false, component = false) => {
     }
 
     result.type = Type(result.value)
-    result.instanceof.push(encode ? `encodeUri` : `decodeUri`)
-
     return result
 }

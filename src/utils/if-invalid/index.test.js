@@ -29,7 +29,6 @@ describe(`IfInvalid`, () => {
         const result = ifInvalid({
             stop: true,
             valid: false,
-            instanceof: [],
             type: `string`,
             value: `Stop me!`
         })

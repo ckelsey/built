@@ -32,6 +32,5 @@ export function DateToObject(value) {
         date: result.value
     }
 
-    result.instanceof.push(`DateToObject`)
     return result
 }

@@ -1,0 +1,142 @@
+.progress-bar-container {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+
+    &.overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        .progress-bar-inner {
+            width: 90%;
+        }
+
+        .progress-bar-heading {
+            width: 90%;
+            left: 0;
+            justify-content: center;
+        }
+
+        .progress-bar-bottom-container {
+            width: 90%;
+            align-items: center;
+        }
+    }
+
+    &.visible {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    &.percentage {
+        .progress-bar-percentage {
+            display: block;
+        }
+    }
+
+    &:not(.scrim) {
+        background-color: transparent;
+    }
+
+    &:not(.track) {
+        .progress-bar-track:before {
+            background-color: transparent;
+        }
+    }
+}
+
+.progress-bar-heading {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    left: -0.25em;
+    width: calc(100% + 0.5em);
+    font-size: 1.25em;
+
+    &>* {
+        margin: 0 0.5em;
+        padding: 1em 0;
+    }
+
+    &:empty {
+        display: none;
+    }
+}
+
+.progress-bar-header {
+    &:empty {
+        display: none;
+    }
+}
+
+.progress-bar-percentage {
+    display: none;
+}
+
+.progress-bar-inner {
+    width: 100%;
+    position: relative;
+    height: 3px;
+}
+
+.progress-bar-track {
+    width: 100%;
+    height: 100%;
+
+    &:before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0.33;
+        background: currentColor;
+    }
+}
+
+.progress-bar-bottom,
+.progress-bar-top {
+    position: absolute;
+    width: 0;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: currentColor;
+    transition: width 0.2s linear;
+}
+
+.progress-bar-bottom {
+    opacity: 0.33;
+}
+
+.progress-bar-cancel {
+    display: none;
+
+    &.show {
+        display: block;
+    }
+}
+
+.progress-bar-bottom-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.progress-bar-text {
+    padding: 1em 0;
+
+    &:empty {
+        display: none;
+    }
+}

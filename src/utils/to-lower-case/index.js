@@ -7,6 +7,5 @@ export function ToLowerCase(string) {
         result.valid = false
     }
 
-    result.instanceof.push(`LowerCase`)
     return result
 }

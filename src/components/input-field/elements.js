@@ -28,6 +28,7 @@ export const elementSelectors = Object.freeze({
     underline: `.input-field-input-container effect-underline`,
     injectedStyles: `style.injectedStyles`,
     themeStyles: `style.themeStyles`,
+    filePathInput: `.input-field-file-path-overlay`
 })
 
 const setInputEvents = (input, host) => {
@@ -114,6 +115,14 @@ const elementMethods = {
                 host.dispatchEvent(new CustomEvent(`iconclick`, { detail: host }))
             })
         }
+    },
+    filePathInput(el, host) {
+        if (host.type === `file` && host.pathvalue) {
+            el.value = host.pathvalue
+            return
+        }
+
+        el.value = ``
     }
 }
 

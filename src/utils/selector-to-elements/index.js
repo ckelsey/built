@@ -21,7 +21,5 @@ export function SelectorToElements(parent, value) {
 
     result.valid = result.value.length && result.value.filter(e => IsElement(e).valid).length
 
-    result.instanceof.push(`SelectorToElements`)
-
     return result
 }

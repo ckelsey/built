@@ -7,7 +7,5 @@ export function StopIfInvalid(value) {
         result.stop = true
     }
 
-    result.instanceof.push(`StopIfInvalid`)
-
     return result
 }

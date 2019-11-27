@@ -199,6 +199,18 @@ const inputFieldProperties = {
         format: val => val,
     },
 
+    pathvalue: {
+        format: val => Pipe(ToString, IfInvalid(``))(val).value,
+        onChange: (val, host) => {
+            const filePathInput = host.elements.filePathInput
+
+            if (!filePathInput || host.type !== `file`) { return }
+
+            filePathInput.value = val.split(`/`).pop()
+            processValue(host)
+        }
+    },
+
     processedError: {
         format: val => ValidateHtml(Pipe(ToString, IfInvalid(``))(val).value, [], [`script`]).sanitized || ``,
         onChange: (val, host) => val ? ReplaceElementContents(host.elements.error, val) : undefined,

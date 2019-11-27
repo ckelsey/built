@@ -12,6 +12,5 @@ export function ToArray(value) {
 
     result.type = Type(result.value)
     result.valid = result.type === `array`
-    result.instanceof.push(`ToArray`)
     return result
 }

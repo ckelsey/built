@@ -17,7 +17,5 @@ export function ToEntities(value) {
         result.valid = false
     }
 
-    result.instanceof.push(`ToEntities`)
-
     return result
 }

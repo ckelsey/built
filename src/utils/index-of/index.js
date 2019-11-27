@@ -14,7 +14,6 @@ export function IndexOf(array) {
         }
 
         result.valid = arr.value.indexOf(result.value) > -1
-        result.instanceof.push(`IndexOf`)
         return result
     }
 }

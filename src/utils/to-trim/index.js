@@ -13,6 +13,5 @@ export function ToTrim(value) {
         result.value = result.value.trim()
     } catch (error) { }
 
-    result.instanceof.push(`Trim`)
     return result
 }

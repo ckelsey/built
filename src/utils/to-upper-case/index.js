@@ -7,6 +7,5 @@ export function ToUpperCase(string) {
         result.valid = false
     }
 
-    result.instanceof.push(`UpperCase`)
     return result
 }

@@ -37,7 +37,6 @@ export function ToSlice(start, end) {
             result.valid = false
         }
 
-        result.instanceof.push(`Slice`)
         return result
     }
 }

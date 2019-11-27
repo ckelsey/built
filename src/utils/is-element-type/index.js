@@ -9,9 +9,6 @@ export function IsElementType(tag) {
         }
 
         result.valid = Get(result, `value.tagName`, ``).toLowerCase() === tag.toLowerCase()
-
-        result.instanceof.push(`IsElementType`)
-
         return result
     }
 }

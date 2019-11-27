@@ -13,7 +13,6 @@ export function ToMatch(search) {
         result.value = matches.value
         result.valid = result.value.length === 1
         result.stringChanges = result.stringChanges.concat(matches.stringChanges)
-        result.instanceof.push(`Match`)
         return result
     }
 }

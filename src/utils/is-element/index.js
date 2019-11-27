@@ -8,8 +8,5 @@ export function IsElement(value) {
     }
 
     result.valid = Get(result, `value.nodeType`) === 1
-
-    result.instanceof.push(`IsElement`)
-
     return result
 }

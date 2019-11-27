@@ -15,7 +15,7 @@ export const onInput = host => {
     }
 
     host.value = value
-    dispatch(host, `input`, host.value)
+    dispatch(host, `inputchange`, host.value)
 }
 
 export const onFocus = host => {

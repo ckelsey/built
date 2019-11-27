@@ -32,7 +32,6 @@ export function ToRegex(string) {
     }
 
     result.valid = true
-    result.instanceof.push(`ToRegex`)
     result.type = `object`
     return result
 }

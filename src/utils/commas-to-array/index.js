@@ -6,13 +6,11 @@ export function CommasToArray(value) {
     if (result.stop) { return result }
 
     if (result.type === `array`) {
-        result.instanceof.push(`CommasToArray`)
         return result
     }
 
     if (result.type === `undefined`) {
         result.valid = false
-        result.instanceof.push(`CommasToArray`)
         return result
     }
 

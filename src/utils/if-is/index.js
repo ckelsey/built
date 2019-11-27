@@ -12,8 +12,6 @@ export function IfIs(compare, replace) {
             result = TMonad(result.value)
         }
 
-        result.instanceof.push(`IfIs`)
-
         return result
     }
 }

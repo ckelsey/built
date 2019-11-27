@@ -13,6 +13,5 @@ export function ToJSON(value) {
     }
 
     result.type = Type(result.value)
-    result.instanceof.push(`ToJSON`)
     return result
 }

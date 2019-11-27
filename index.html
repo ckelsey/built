@@ -53,10 +53,10 @@
         </style>
         <script src="/node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
         <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-        <script type="text/javascript" src="/dist/built.js"></script>
     </head>
 
     <body>
+
         <div>
             <input-field label="Hey there"></input-field>
         </div>
@@ -67,18 +67,36 @@
                 <div slot="option">Two</div>
             </drop-down>
         </div>
+
+        <div style="color: #aaa;">
+            <progress-bar visible="true" color="#328eb9" header="Here is a header" text="Have some texteroos" cancel="Start"></progress-bar>
+        </div>
+
         <script>
-            // console.log(
-            //     window.builtjs.IsTMonad({
-            //         a: 'hi',
-            //         b: 'hello',
-            //         value: 'hello?',
-            //         valid: true,
-            //         instanceof: [],
-            //         type: 'string'
-            //     })
-            // )
+            var prog = document.querySelector('progress-bar')
+            var vals = [0, 0]
+            var interval
+
+            prog.addEventListener(`canceled`, function (e) {
+                if (vals[0] === 0) {
+                    prog.cancel = 'Stop'
+                    interval = setInterval(function () {
+                        prog.text = Math.round(Math.random() * 10000)
+                        prog.value = vals
+                        vals = [vals[0] + 2, vals[1] + 5]
+                        if (vals[0] > 100) {
+                            clearInterval(interval)
+                        }
+                    }, 1000)
+                } else {
+                    clearInterval(interval)
+                    prog.cancel = 'Start'
+                    vals = [0, 0]
+                    prog.value = vals
+                }
+            })
         </script>
+        <script type="text/javascript" src="/dist/built.js"></script>
     </body>
 
 </html>

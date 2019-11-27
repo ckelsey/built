@@ -9,11 +9,8 @@ export function IfNot(compare, replace) {
 
         if (!result.valid) {
             const res = TMonad(replace)
-            res.instanceof.push(`IfNot`)
             return res
         }
-
-        result.instanceof.push(`IfNot`)
 
         return result
     }
