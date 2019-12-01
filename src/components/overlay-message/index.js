@@ -1,7 +1,8 @@
 import {
     // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool,
-    IfInvalid, ToString, IndexOf, Get, Set, ObserveEvent, EventName
+    IfInvalid, ToString, IndexOf, Get, Set, ObserveEvent, EventName,
+    ObserverUnsubscribe, ObserveSlots
 } from '../..'
 import './style.scss'
 
@@ -111,21 +112,11 @@ export const OverlayMessage = WCConstructor({
     observedAttributes,
     properties,
     elements,
+    onDisconnected(host) { ObserverUnsubscribe(host) },
     onConnected(host) {
-
-        host.slotObserver = new MutationObserver(mutationsList => {
-            let i = 0
-
-            while (i < mutationsList.length) {
-                if (mutationsList[i].type === `childList`) {
-                    return setCloseButton(host)
-                }
-
-                i = i++
-            }
-        })
-
-        host.slotObserver.observe(host, { childList: true })
+        host.subscriptions = {
+            slots: ObserveSlots(host, true).subscribe(() => setCloseButton(host))
+        }
     }
 })
 

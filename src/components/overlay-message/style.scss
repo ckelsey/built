@@ -23,7 +23,7 @@
         flex-direction: column;
         width: 80%;
         max-width: 600px;
-        max-height: 90%;
+        max-height: 90vh;
         overflow: auto;
         margin: auto;
         border-radius: 5px;
@@ -44,7 +44,7 @@
         box-sizing: border-box;
         position: relative;
         white-space: nowrap;
-        max-height: 2.5em;
+        /*max-height: 2.5em;*/
         flex-grow: 1;
 
         &:after {
@@ -76,7 +76,7 @@
         padding: 1.5em 0 0;
         box-sizing: border-box;
         white-space: nowrap;
-        max-height: 3.5em;
+        /*max-height: 3.5em;*/
         flex-grow: 1;
 
         ::slotted(*) {

@@ -19,9 +19,13 @@ if (!hasComponentStore) {
             if (!global[ComponentStoreKey].components[tag]) { global[ComponentStoreKey].components[tag] = [] }
 
             global[ComponentStoreKey].components[tag].push(element)
+            global[ComponentStoreKey].triggerTagSubscriptions(tag, element)
 
             if (global[ComponentStoreKey].themes[tag]) {
-                Object.keys(global[ComponentStoreKey].themes[tag]).forEach(property => element[property] = global[ComponentStoreKey].themes[tag][property])
+                Object.keys(global[ComponentStoreKey].themes[tag])
+                    .forEach(property =>
+                        element[property] = global[ComponentStoreKey].themes[tag][property]
+                    )
             }
         },
         removeComponent: element => {
@@ -45,6 +49,35 @@ if (!hasComponentStore) {
 
             global[ComponentStoreKey].components[tag]
                 .forEach(element => global[ComponentStoreKey].theme(global[ComponentStoreKey].themes[tag], element))
+        },
+
+        tagSubscriptions: {},
+        triggerTagSubscriptions: (tag, data) => {
+            if (!global[ComponentStoreKey].tagSubscriptions[tag]) { return }
+            global[ComponentStoreKey].tagSubscriptions[tag].forEach(sub => sub(data))
+        },
+        watchForTag: (tag, cb) => {
+            if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
+                global[ComponentStoreKey].tagSubscriptions[tag] = []
+            }
+
+            global[ComponentStoreKey].tagSubscriptions[tag].push(cb)
+
+            return function () {
+                if (!global[ComponentStoreKey].tagSubscriptions[tag]) { return }
+
+                let indexToRemove
+                let i = global[ComponentStoreKey].tagSubscriptions[tag].length
+
+                while (indexToRemove === undefined && i) {
+                    i = i - 1
+                    if (global[ComponentStoreKey].tagSubscriptions[tag][i] === cb) {
+                        indexToRemove = i
+                    }
+                }
+
+                global[ComponentStoreKey].tagSubscriptions[tag].splice(indexToRemove, 1)
+            }
         }
     }
 }

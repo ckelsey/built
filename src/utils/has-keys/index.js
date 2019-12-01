@@ -14,7 +14,7 @@ export function HasKeys(compare) {
             ? true
             : keys.length && !compare.length
                 ? false
-                : keys.filter(v => compare.indexOf(v) > -1).length > 0
+                : compare.filter(v => keys.indexOf(v) > -1).length === compare.length
 
         return result
     }

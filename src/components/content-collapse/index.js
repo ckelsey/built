@@ -83,7 +83,9 @@ const elements = {
         selector: `.${componentName}-toggler`,
         onChange(el, host) {
             el.eventSubscriptions = {
-                click: ObserveEvent(el, `click`).subscribe(() => host.expanded = !host.expanded)
+                click: ObserveEvent(el, `click`).subscribe(() => host.expanded = !host.expanded),
+                mouseenter: ObserveEvent(el, `mouseenter`).subscribe(() => el.classList.add(`hovering`)),
+                mouseleave: ObserveEvent(el, `mouseleave`).subscribe(() => el.classList.remove(`hovering`))
             }
         }
     },
