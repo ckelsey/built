@@ -3,12 +3,15 @@
  */
 
 import {
-    WCConstructor, AppendStyleElement, ComponentClassObject, WCDefine, Get,
+    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+    WCConstructor, AppendStyleElement, ComponentClassObject, WCDefine, ObserverUnsubscribe,
     ObserveEvent, ToNumber, IndexOf, ToString, IfInvalid, ToBool, Pipe, SetStyleRules
 } from '../..'
 import './style.scss'
 
+// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
+// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `collapse-menu`
 const componentRoot = `.${componentName}-container`
@@ -49,13 +52,6 @@ const waitForElement = (host, key) => new Promise((resolve, reject) => {
     here()
 })
 
-const clearSubscriptions = el => {
-    const subscriptions = Get(el, `eventSubscriptions`, {})
-    Object.keys(subscriptions).forEach(key =>
-        typeof subscriptions[key] === `function` ? subscriptions[key]() : undefined
-    )
-}
-
 const resetExpandable = host => {
     if (!host.collapseonwrap && !host.minwidth && !host.minpagewidth && host.expandable) {
         host.expandable = false
@@ -64,7 +60,7 @@ const resetExpandable = host => {
 
 const observeSize = (on, host) => {
     const run = sizer => {
-        clearSubscriptions(sizer)
+        ObserverUnsubscribe(sizer)
 
         if (!on) { return resetExpandable(host) }
 
@@ -84,7 +80,7 @@ const observeSize = (on, host) => {
 
 const observeWrapSize = (on, host) => {
     const run = sizer => {
-        clearSubscriptions(sizer)
+        ObserverUnsubscribe(sizer)
 
         if (!on) { return resetExpandable(host) }
 
@@ -113,7 +109,7 @@ const observeWrapSize = (on, host) => {
 
 const observeWindowSize = (on, host) => {
     const run = root => {
-        clearSubscriptions(root)
+        ObserverUnsubscribe(root)
 
         if (!on) { return resetExpandable(host) }
 
@@ -293,7 +289,7 @@ export const CollapseMenu = WCConstructor({
         })
     },
     onDisconnected(host) {
-        clearSubscriptions(host)
+        ObserverUnsubscribe(host)
     }
 })
 

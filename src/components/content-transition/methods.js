@@ -46,7 +46,8 @@ const getTransitionElements = (host, indexOrChild) => {
 
 const cleanup = host => {
     const children = host.getChildren()
-    children.forEach(child => child === host.current ? undefined : child.setAttribute(`slot`, `hidden`))
+    // TODO watch if this is needed. Causes issues with content-transition inside of content-transition being incorrectly changed
+    // children.forEach(child => child === host.current ? undefined : child.setAttribute(`slot`, `hidden`))
 
     const current = host.getCurrent()
     host.end = { current, index: children.indexOf(current) }
@@ -54,24 +55,16 @@ const cleanup = host => {
     return host.current
 }
 
-const transitionStart = (current, next) => new Promise(resolve => {
+const transitionStart = current => new Promise(resolve => {
     if (current) {
-        current.classList.add(`content-transition-transitioning`)
-        current.classList.remove(`content-transition-shown`)
+        current.className = current.className.split(`content-transition-shown`).join(``).split(` `).filter(s => !!s.trim()).join(` `)
     }
-
-    next.classList.add(`content-transition-transitioning`)
 
     requestAnimationFrame(resolve)
 })
 
-const transitionEnd = (current, next) => {
-    if (current) {
-        current.classList.remove(`content-transition-transitioning`)
-    }
-
-    next.classList.add(`content-transition-shown`)
-    next.classList.remove(`content-transition-transitioning`)
+const transitionEnd = (next) => {
+    next.className = `content-transition-shown ${next.className.split(`content-transition-shown`).join(``).split(` `).filter(s => !!s.trim()).join(` `)}`
 }
 
 const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolve => {
@@ -89,14 +82,14 @@ const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolv
     elements.child.setAttribute(`slot`, `next`)
     const endHeight = elements.child.offsetHeight
 
-    transitionStart(elements.current, elements.child)
+    transitionStart(elements.current)
         .then(() => {
             if (startHeight !== endHeight) {
                 animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed)
                     .then(() => {
                         requestAnimationFrame(() => {
                             elements.root.style.removeProperty(`height`)
-                            transitionEnd(elements.current, elements.child)
+                            transitionEnd(elements.child)
                         })
                     })
             }
@@ -104,6 +97,7 @@ const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolv
             setTimeout(() => {
                 requestAnimationFrame(() => {
                     animateOpacity(0, 1, elements.nextContainer, speed * 0.25)
+
                 })
             }, speed * 0.1)
 
@@ -122,7 +116,7 @@ const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolv
                     elements.child.setAttribute(`slot`, `current`)
                     elements.nextContainer.removeAttribute(`style`)
                     elements.root.classList.remove(`sliding`)
-                    transitionEnd(elements.current, elements.child)
+                    transitionEnd(elements.child)
 
                     dispatchTransitioned(host, elements.current, elements.child)
 
@@ -149,7 +143,7 @@ const runHeight = (elements, speed, keepchildren, host) => new Promise(resolve =
 
     const endHeight = elements.child.offsetHeight
 
-    transitionStart(elements.current, elements.child)
+    transitionStart(elements.current)
         .then(() => {
             const afterHeightSet = () => {
                 if (!keepchildren) {
@@ -163,12 +157,16 @@ const runHeight = (elements, speed, keepchildren, host) => new Promise(resolve =
                 }
 
                 elements.child.setAttribute(`slot`, `current`)
+                elements.child.style.removeProperty(`opacity`)
+                elements.currentContainer.style.removeProperty(`opacity`)
+                elements.nextContainer.style.removeProperty(`opacity`)
 
                 requestAnimationFrame(() => {
-                    elements.root.style.removeProperty(`height`)
                     dispatchTransitioned(host, elements.current, elements.child)
-                    transitionEnd(elements.current, elements.child)
-                    return resolve(cleanup(host))
+                    transitionEnd(elements.child)
+                    cleanup(host)
+                    elements.root.style.removeProperty(`height`)
+                    return resolve(host.current)
                 })
             }
 
@@ -190,12 +188,6 @@ const transitionFade = (host, child, speed, keepchildren) => new Promise(resolve
     animateOpacity(0, 1, elements.nextContainer, speed)
 
     return runHeight(elements, speed, keepchildren, host)
-        .then(() => {
-            elements.currentContainer.style.removeProperty(`opacity`)
-            elements.child.style.removeProperty(`opacity`)
-            elements.nextContainer.style.removeProperty(`opacity`)
-            return resolve()
-        })
 })
 
 const transitionHeight = (host, child, speed, keepchildren) => new Promise(resolve => {
@@ -209,29 +201,29 @@ const transitionHeight = (host, child, speed, keepchildren) => new Promise(resol
 
 export const transitionTo = host => index => new Promise(resolve => {
     switch (host.type) {
-    case `slide`:
-        return transitionSlide(host, index, host.speed, host.keepchildren)
-            .then(resolve)
-    case `fade`:
-        return transitionFade(host, index, host.speed, host.keepchildren)
-            .then(resolve)
-    case `height`:
-        return transitionHeight(host, index, host.speed, host.keepchildren)
-            .then(resolve)
+        case `slide`:
+            return transitionSlide(host, index, host.speed, host.keepchildren)
+                .then(resolve)
+        case `fade`:
+            return transitionFade(host, index, host.speed, host.keepchildren)
+                .then(resolve)
+        case `height`:
+            return transitionHeight(host, index, host.speed, host.keepchildren)
+                .then(resolve)
     }
 })
 
 export const transitionChild = host => child => new Promise(resolve => {
     switch (host.type) {
-    case `slide`:
-        return transitionSlide(host, child, host.speed, host.keepchildren)
-            .then(resolve)
-    case `fade`:
-        return transitionFade(host, child, host.speed, host.keepchildren)
-            .then(resolve)
-    case `height`:
-        return transitionHeight(host, child, host.speed, host.keepchildren)
-            .then(resolve)
+        case `slide`:
+            return transitionSlide(host, child, host.speed, host.keepchildren)
+                .then(resolve)
+        case `fade`:
+            return transitionFade(host, child, host.speed, host.keepchildren)
+                .then(resolve)
+        case `height`:
+            return transitionHeight(host, child, host.speed, host.keepchildren)
+                .then(resolve)
     }
 })
 
@@ -245,4 +237,29 @@ export const start$ = host => (next, error = () => { }, complete = () => { }) =>
 
 export const end$ = host => (next, error = () => { }, complete = () => { }) => {
     return host.state.end.subscribe(next, error, complete)
+}
+
+export const setCurrent = host => index => {
+    const elements = getTransitionElements(host, index)
+
+    const end = () => {
+        if (elements.current && elements.current.slot !== `hidden`) {
+            elements.current.slot = `hidden`
+        }
+
+        if (elements.child && elements.child.slot !== `current`) {
+            elements.child.slot = `current`
+        }
+    }
+
+    if (elements.current === elements.child) {
+        return Promise.resolve(end())
+    }
+
+    return transitionStart(elements.current)
+        .then(() => {
+            transitionEnd(elements.child)
+            cleanup(host)
+            return end()
+        })
 }

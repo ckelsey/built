@@ -1,6 +1,6 @@
 import { ID } from "../id"
 
-function Observer(initialValue, noInit = false) {
+function Observer(initialValue, noInit = false, onSubscribe = () => { }) {
     let values = Object.assign({}, {
         value: initialValue,
         errors: [],
@@ -77,6 +77,8 @@ function Observer(initialValue, noInit = false) {
             if (!noInit && values.value !== undefined && typeof subscription.next === `function`) {
                 subscription.next(values.value, values, subscription.id)
             }
+
+            onSubscribe(subscription)
 
             return unsubscribe(subscription)
         },

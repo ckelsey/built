@@ -2,7 +2,7 @@ import { WCConstructor, AppendStyleElement, WCDefine } from '../..'
 import './style.scss'
 import elements, { setStyles } from './elements'
 import { observedAttributes, properties } from './properties'
-import { transitionChild, transitionTo, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren } from './methods'
+import { transitionChild, transitionTo, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren, setCurrent } from './methods'
 
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -51,7 +51,8 @@ export const ContentTransition = WCConstructor({
         getCurrent,
         getChildren,
         start$,
-        end$
+        end$,
+        setCurrent
     },
 })
 

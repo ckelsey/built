@@ -3,13 +3,24 @@ import { Observer } from '../..'
 export function ObserveEvent(element, eventName, options = {}) {
     if (!element || !eventName) { return }
 
+    let isRunning = false
+    let mObserver = { disconnect: () => { } }
+
     options = Object.assign({}, {
         preventDefault: false,
         stopPropagation: false,
         useCapture: true
     }, options)
 
-    const observer = Observer()
+    const startup = () => {
+        if (!element || (!element.parentNode && !element.host) || isRunning) { return }
+
+        isRunning = true
+
+        element.addEventListener(eventName, eventHandler, options.useCapture)
+    }
+
+    const observer = Observer(undefined, undefined, startup)
 
     const eventHandler = event => {
         if (!observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0) { return shutDown() }
@@ -19,43 +30,44 @@ export function ObserveEvent(element, eventName, options = {}) {
         observer.next(event)
     }
 
-    const shutDown = () => element.removeEventListener(eventName, eventHandler, options.useCapture)
+    const shutDown = () => {
+        element.removeEventListener(eventName, eventHandler, options.useCapture)
+        isRunning = false
+    }
 
     const dispose = () => {
         shutDown()
         observer.complete()
+        mObserver.disconnect()
     }
 
-    const mObserver = new MutationObserver(e => {
-        let foundElement = false
+    mObserver = new MutationObserver(e => {
+        let elementIsRemoved = false
         let ii = e.length
 
-        while (!foundElement && ii) {
+        while (!elementIsRemoved && ii) {
             ii = ii - 1
             let i = e[ii].removedNodes.length
 
-            while (!foundElement && i) {
+            while (!elementIsRemoved && i) {
                 i = i - 1
-                foundElement = e[ii].removedNodes[i] === element
+                elementIsRemoved = e[ii].removedNodes[i] === element
             }
         }
 
-        if (foundElement) { dispose() }
+        if (elementIsRemoved) { dispose() }
     })
 
     let max = 1000
     const tryIt = () => {
+        const parent = element.parentNode || element.host
         max = max - 1
 
-        if (!max) { return }
+        if (!max) { return dispose() }
+        if (!parent) { return requestAnimationFrame(tryIt) }
 
-        /** TODO - does not work for root elements of web components as they don't have parentElement */
-        if (!element.parentElement) {
-            return requestAnimationFrame(tryIt)
-        }
-
-        mObserver.observe(element.parentElement, { childList: true })
-        element.addEventListener(eventName, eventHandler, options.useCapture)
+        mObserver.observe(parent, { childList: true })
+        startup()
     }
 
     tryIt()

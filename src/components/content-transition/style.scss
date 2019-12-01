@@ -1,9 +1,14 @@
 @mixin flexin {
+    /*
+        This seems to mess up the height calculations...flicker of incorrect heights on transition
+    */
+    /*
     flex-grow: 1;
     display: inline-flex;
     flex-direction: column;
     width: 100%;
     height: auto;
+    */
 }
 
 @mixin hostin {
@@ -35,7 +40,7 @@ content-transition {
         position: absolute;
         top: 0;
         left: 0;
-        opacity:0;
+        opacity: 0;
     }
 
     .content-transition-inner {
@@ -102,5 +107,4 @@ content-transition {
 
 [slot="next"] {
     width: 100%;
-}
-*/
+}*/

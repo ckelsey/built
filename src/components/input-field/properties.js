@@ -3,7 +3,7 @@ import {
     ToNumber, ToBool, ToObject, ToArray, ToString, ValidateHtml,
     ReplaceElementContents, SetAttribute
 } from '../..'
-import { setInput, setInputID, setInputAttribute, setLabel } from './methods-elements'
+import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition } from './methods-elements'
 import { setColors, setStyles } from './elements'
 import { processValue } from './methods-value'
 import { setDroppable } from './methods-events'
@@ -179,7 +179,7 @@ const inputFieldProperties = {
 
     // Needs to be before the label property otherwise won't be able to find labelContainer in computed
     labelposition: {
-        format: val => Pipe(IndexOf(labelPositions), IfInvalid(`inside`))(val).value,
+        format: (val, host) => Pipe(IndexOf(labelPositions), IfInvalid(setDefaultLabelPosition(host)))(val).value,
         onChange: (val, host) => {
             SetAttribute(host.elements.container, `label-position`, val)
             setLabel(host.label, val, host)

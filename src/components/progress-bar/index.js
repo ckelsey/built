@@ -25,6 +25,7 @@ const setThickness = (val, el) => el ? el.style.height = val : undefined
 const setHeading = (val, el) => el ? el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized : undefined
 const setText = (val, el) => el ? el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized : undefined
 const setColor = (val, el) => el && val ? el.style.color = val : el ? el.style.removeProperty(`color`) : undefined
+const setAnimation = (val, root) => root ? root.setAttribute(`animation`, val) : undefined
 
 const setScrim = (val, root) => {
     if (!root) { return }
@@ -122,9 +123,15 @@ const properties = {
         onChange(val, host) { setScrimBlur(val, host.elements.root) }
     },
 
+    animation: {
+        format: val => Pipe(IndexOf(animations), IfInvalid(animations[0]))(val).value,
+        onChange(val, host) {
+            setAnimation(val, host.elements.root)
+        }
+    },
+
     /** TODO */
     type: { format: val => Pipe(IndexOf(types), IfInvalid(types[0]))(val).value },
-    animation: { format: val => Pipe(IndexOf(animations), IfInvalid(animations[0]))(val).value },
 }
 
 const observedAttributes = Object.keys(properties)
@@ -140,6 +147,7 @@ const elements = {
             setTrack(host.visible, el)
             setScrimBlur(host.scrimblur, el)
             setPercentage(host.percentage, el)
+            setAnimation(host.animation, el)
         }
     },
     injectedStyles: {

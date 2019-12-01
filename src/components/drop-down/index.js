@@ -1,6 +1,8 @@
 import {
+    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     WCDefine, WCConstructor, ObserveEvent, ToBool, IfInvalid, ComponentClassObject,
-    SetStyleRules, AppendStyleElement, Pipe, WasClickedOn, ObserverUnsubscribe
+    SetStyleRules, AppendStyleElement, Pipe, WasClickedOn, ObserverUnsubscribe,
+    ObserveSlots
 } from '../..'
 import './style.scss'
 
@@ -135,23 +137,10 @@ export const DropDown = WCConstructor({
                 })
         }
 
-        const slotObserver = new MutationObserver(mutationsList => {
-            const list = Array.from(mutationsList)
-
-            while (list.length) {
-                const mutation = list.shift()
-                if (mutation.type === `childList` && mutation.addedNodes.length) {
-                    return addClasses()
-                }
-            }
-        })
-
         addClasses()
 
-        slotObserver.observe(host, { childList: true })
-
         host.eventSubscriptions = {
-            slotObserver: slotObserver.disconnect,
+            slotObserver: ObserveSlots(host, true).subscribe(addClasses),
             docClick: ObserveEvent(document.body, `click`).subscribe(e => {
                 if (!WasClickedOn(host, e)) {
                     if (host.open) {

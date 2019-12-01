@@ -1,4 +1,10 @@
+- ObserveEvent to take multiple eventNames
+- ObserveEvents to essentially do what el.eventSubscriptions = {} does but as one subscription
 - icon-element change type attr to url, svg to markup
+- Check browsers (specifically safari) to see if content transition still shows correctly without display:inline-flex
+
+
+
  * TODO - INPUT-FIELD - MULTI INPUT
  * intlphone if no value in text, treat as if it has no value
  * TODO - INPUT-FIELD - error/help should not take up more space when present except when over 1 line

@@ -2,6 +2,8 @@ import { elementSelectors } from './elements'
 import { InputFieldInputAttributes } from './definitions'
 import { ValidateHtml, ReplaceElementContents, FindElementIn, ObserveEvent, SetAttribute, AddRemoveAttribute } from '../..'
 
+export const setDefaultLabelPosition = host => [`checkbox`, `radio`].indexOf(host.type) === -1 ? `inside` : `left`
+
 const tagType = type =>
     type === `textarea`
         ? `textarea`
@@ -10,16 +12,16 @@ const tagType = type =>
 const getInputType = (tag, type) => {
     if (tag === `input`) {
         switch (type) {
-            case `checkbox`:
-            case `date`:
-            case `email`:
-            case `file`:
-            case `number`:
-            case `password`:
-            case `radio`:
-            case `tel`:
-            case `url`:
-                return type
+        case `checkbox`:
+        case `date`:
+        case `email`:
+        case `file`:
+        case `number`:
+        case `password`:
+        case `radio`:
+        case `tel`:
+        case `url`:
+            return type
         }
 
         return `text`
@@ -42,6 +44,12 @@ export const setInput = host => {
 
     if (currentInput && typeof currentInput.dispose === `function`) {
         currentInput.dispose()
+    }
+
+    const filePathInput = host.elements.filePathInput
+
+    if (filePathInput) {
+        filePathInput.style.display = host.type !== `file` ? `none` : `block`
     }
 
     if (host.type && Array.isArray(host.type) && host.type.length) {
@@ -107,6 +115,10 @@ export const setInput = host => {
         }
 
         inputContainer.appendChild(container)
+
+        if (host.getAttribute(`labelposition`) === undefined) {
+            host.labelposition = setDefaultLabelPosition(host)
+        }
 
         return
     }

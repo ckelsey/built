@@ -46,6 +46,7 @@ const setInputEvents = (input, host) => {
         host.inputContainerClick$ = ObserveEvent(host.elements.inputContainer, `click`, { stopPropagation: true, preventDefault: true }).subscribe(() => {
             host.value = !host.value
             dispatch(host, `input`, host.value)
+            dispatch(host, `inputchange`, host.value)
         })
 
     } else if (host.type === `intlphone`) {
@@ -123,6 +124,10 @@ const elementMethods = {
         }
 
         el.value = ``
+
+        if (host.type !== `file`) {
+            el.style.display = `none`
+        }
     }
 }
 

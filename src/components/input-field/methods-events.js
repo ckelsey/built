@@ -3,7 +3,7 @@ import { ObserveEvent, GetInputValue, UseIf, DragDropService } from '../..'
 
 export const dispatch = (host, type, data) =>
     host.dispatchEvent(
-        new CustomEvent(type, { detail: data || host.state })
+        new CustomEvent(type, { detail: data ? data : data === false ? false : host.state })
     )
 
 export const onInput = host => {
