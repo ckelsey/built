@@ -1,4 +1,6 @@
 const getRouteByPath = routes => path => {
+    path = typeof path === `string` ? path.toLowerCase() : path
+
     let r
     let i = 0
     const keys = Object.keys(routes || {})

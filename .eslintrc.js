@@ -32,7 +32,7 @@ module.exports = {
             'error',
             'never'
         ],
-        "tree-shaking/no-side-effects-in-initialization": 2,
+        "tree-shaking/no-side-effects-in-initialization": 0,
         "no-empty": 0
     },
     "plugins": [

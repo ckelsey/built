@@ -188,6 +188,7 @@ const transitionFade = (host, child, speed, keepchildren) => new Promise(resolve
     animateOpacity(0, 1, elements.nextContainer, speed)
 
     return runHeight(elements, speed, keepchildren, host)
+        .then(resolve)
 })
 
 const transitionHeight = (host, child, speed, keepchildren) => new Promise(resolve => {

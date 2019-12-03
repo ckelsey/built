@@ -1,7 +1,0 @@
-export { default as EaseBounce } from './ease-bounce'
-export { default as EaseInOut } from './ease-in-out'
-export { default as EaseIn } from './ease-in'
-export { default as EaseOut } from './ease-out'
-export { default as EasePower } from './ease-power'
-export { default as GetEase } from './get-ease'
-export { default as GetCurve } from './get'

@@ -1,0 +1,24 @@
+2019-12-02T19:58:42.612Z INFO @wdio/local-runner: Run worker command: run
+2019-12-02T19:58:42.784Z INFO webdriverio: Initiate new session using the webdriver protocol
+2019-12-02T19:58:42.789Z INFO webdriver: [POST] http://localhost:8282/session
+2019-12-02T19:58:42.789Z INFO webdriver: DATA {
+  capabilities: { alwaysMatch: { browserName: 'chrome' }, firstMatch: [ {} ] },
+  desiredCapabilities: { browserName: 'chrome' }
+}
+2019-12-02T19:58:44.450Z ERROR @wdio/runner: /Users/chriskelsey/Sites/ck/built/tests/utils.between.test.js:2
+import assert from 'assert'
+^^^^^^
+
+SyntaxError: Cannot use import statement outside a module
+    at Module._compile (internal/modules/cjs/loader.js:815:22)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:892:10)
+    at Module.load (internal/modules/cjs/loader.js:735:32)
+    at Module._load (internal/modules/cjs/loader.js:648:12)
+    at Module._load (electron/js2c/asar.js:717:26)
+    at Function.Module._load (electron/js2c/asar.js:717:26)
+    at Module.require (internal/modules/cjs/loader.js:775:19)
+    at require (internal/modules/cjs/helpers.js:68:18)
+    at /Users/chriskelsey/Sites/ck/equipt/node_modules/jasmine/lib/jasmine.js:89:5
+    at Array.forEach (<anonymous>)
+2019-12-02T19:58:44.451Z INFO webdriver: COMMAND deleteSession()
+2019-12-02T19:58:44.452Z INFO webdriver: [DELETE] http://localhost:8282/session/23cc853a14f38c348648c2524e325a49

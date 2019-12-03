@@ -15,8 +15,6 @@ import {
 import { toggle, unloadTargets, open, close } from './methods'
 import elements from './elements'
 
-import './style.scss'
-
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization

@@ -6,7 +6,7 @@ import getQuery from './get-query'
 import UpdateState from './update-state'
 
 const handleRoute = (methods, url, replace = false, force = false) => {
-    const parsedUrl = parseUrl(url)
+    const parsedUrl = parseUrl(url).toLowerCase()
     const route = getRoute(methods.routes, url)
 
     if (!route) { return replace ? false : methods.route(`/`) }

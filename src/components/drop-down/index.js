@@ -4,7 +4,6 @@ import {
     SetStyleRules, AppendStyleElement, Pipe, WasClickedOn, ObserverUnsubscribe,
     ObserveSlots
 } from '../..'
-import './style.scss'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()

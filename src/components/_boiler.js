@@ -3,7 +3,6 @@ import {
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules,
     Pipe, ToBool, IfInvalid, ToString
 } from '../..'
-import './style.scss'
 import '../button-element'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization

@@ -3,7 +3,6 @@ import {
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
     IndexOf, ToNumber, CommasToArray, ToMap, ValidateHtml
 } from '../..'
-import './style.scss'
 import { ObserveEvent } from '../../utils/observe-event'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization

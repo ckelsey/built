@@ -5,10 +5,11 @@
     display: block;
     pointer-events: none;
     z-index: 999999999999999999;
+}
 
-    &[page="true"] {
-        top: 0;
-    }
+:host(spinner-element)[page="true"] {
+    top: 0;
+    left: 0;
 }
 
 spinner-element {
@@ -18,10 +19,11 @@ spinner-element {
     display: block;
     pointer-events: none;
     z-index: 999999999999999999;
+}
 
-    &[page="true"] {
-        top: 0;
-    }
+spinner-element[page="true"] {
+    top: 0;
+    left: 0;
 }
 
 .spinner-element-container {

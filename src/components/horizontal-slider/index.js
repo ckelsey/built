@@ -8,7 +8,6 @@
  * page scroll when center is messed up
  */
 import { WCConstructor, WCDefine, AppendStyleElement } from '../..'
-import './style.scss'
 import elements from './elements'
 import { observedAttributes, properties } from './properties'
 import { scrollToIndex } from './methods'

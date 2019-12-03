@@ -1,4 +1,3 @@
-import './style.scss'
 import {
     Pipe, AppendStyleElement, ToBool, ToString, IfInvalid,
     WCDefine, WCConstructor, ObserveEvent, SetStyleRules, ValidateHtml

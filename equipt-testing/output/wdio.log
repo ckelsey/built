@@ -1,0 +1,9 @@
+2019-12-02T19:58:39.241Z DEBUG @wdio/sync: Couldn't load fibers package for Node v10 and above
+2019-12-02T19:58:39.252Z DEBUG @wdio/sync: Couldn't load fibers package for Node v8
+2019-12-02T19:58:40.850Z INFO @wdio/cli:launcher: Run onPrepare hook
+2019-12-02T19:58:40.969Z INFO @wdio/local-runner: Start worker 0-0 with arg: 
+2019-12-02T19:58:44.694Z INFO @wdio/local-runner: Start worker 0-1 with arg: 
+2019-12-02T19:58:47.123Z INFO @wdio/cli:launcher: Run onComplete hook
+2019-12-02T19:58:47.125Z INFO @wdio/local-runner: Shutting down spawned worker
+2019-12-02T19:58:47.380Z INFO @wdio/local-runner: Waiting for 0 to shut down gracefully
+2019-12-02T19:58:47.380Z INFO @wdio/local-runner: shutting down

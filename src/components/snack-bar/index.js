@@ -3,7 +3,6 @@ import {
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
     ObserveEvent, IndexOf, IfEmpty, EventName
 } from '../..'
-import './style.scss'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()

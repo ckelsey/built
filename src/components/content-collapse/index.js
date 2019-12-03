@@ -8,7 +8,6 @@ import {
     ToNumber, ToString, IfInvalid, ToBool, Pipe, SetStyleRules, ObserveEvent
     // ObserverUnsubscribe, ObserveSlots
 } from '../..'
-import './style.scss'
 import { iconTriangle } from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization

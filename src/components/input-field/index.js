@@ -5,7 +5,6 @@ import { setEffects } from './methods-elements'
 import { processedValue, labelContainer, formattedValue, valid, validationMessage } from './computed'
 import elements from './elements'
 import { setError } from './methods-value'
-import './style.scss'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()

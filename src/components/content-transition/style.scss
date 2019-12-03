@@ -1,8 +1,6 @@
 @mixin flexin {
     /*
-        This seems to mess up the height calculations...flicker of incorrect heights on transition
-    */
-    /*
+    This seems to mess up the height calculations...flicker of incorrect heights on transition
     flex-grow: 1;
     display: inline-flex;
     flex-direction: column;
@@ -21,8 +19,20 @@
     @include hostin();
 }
 
+:host(content-transition).flex-stretch {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 content-transition {
     @include hostin();
+
+    &.flex-stretch {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 .content-transition-container {
@@ -86,6 +96,21 @@ content-transition {
 
     &.sliding {
         overflow: hidden;
+    }
+
+    &.flex-stretch {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+
+        .content-transition-inner,
+        .current-slot,
+        .next-slot,
+        .hidden-slot {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
     }
 }
 

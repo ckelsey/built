@@ -2,7 +2,6 @@ import { WCConstructor, WCDefine } from '../..'
 import { observedAttributes, properties, selectedIndex, selectedOptionElement, optionElements } from './properties'
 import elements from './elements'
 import { initInput, focus, blur } from './methods'
-import './style.scss'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()

@@ -108,7 +108,8 @@ const exported = {
         filename: `built.js`,
         path: outDirPath,
         libraryTarget: `umd`,
-        library: `builtjs`
+        library: `builtjs`,
+        globalObject: `typeof self !== 'undefined' ? self : this`
     },
     plugins,
     module: {

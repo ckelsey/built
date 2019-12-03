@@ -4,7 +4,6 @@ import {
     hasHeaderIcon, hasFader, canUnderline, canScale, canRipple, canFade
 } from './properties'
 import elements, { setScaler, setFader, setUnderline, setRipple, setHeaderIcon } from './elements'
-import './style.scss'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
