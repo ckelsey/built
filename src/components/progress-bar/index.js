@@ -32,7 +32,7 @@ const setScrim = (val, root) => {
     root.classList[val ? `add` : `remove`](`scrim`)
 }
 
-const setCancel = (val, el) => {
+const setButton = (val, el) => {
     if (val && el) {
         el.classList.add(`show`)
         el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized
@@ -77,9 +77,9 @@ const properties = {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
         onChange(val, host) { setColor(val, host.elements.trackInner) }
     },
-    cancel: {
+    button: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange(val, host) { setCancel(val, host.elements.cancel) }
+        onChange(val, host) { setButton(val, host.elements.button) }
     },
     text: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,
@@ -175,11 +175,11 @@ const elements = {
         selector: `.progress-bar-text`,
         onChange(el, host) { setText(host.text, el) }
     },
-    cancel: {
-        selector: `.progress-bar-cancel`,
+    button: {
+        selector: `.progress-bar-button`,
         onChange(el, host) {
-            el.eventSubscriptions = { click: ObserveEvent(el, `click`).subscribe(() => host.dispatchEvent(new CustomEvent(`canceled`, { detail: host }))) }
-            setCancel(host.cancel, el)
+            el.eventSubscriptions = { click: ObserveEvent(el, `click`).subscribe(() => host.dispatchEvent(new CustomEvent(`buttonclick`, { detail: host }))) }
+            setButton(host.button, el)
         }
     },
     percentage: { selector: `.progress-bar-percentage` },

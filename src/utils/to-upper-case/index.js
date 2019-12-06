@@ -1,5 +1,6 @@
+import { TMonad } from '../..'
 export function ToUpperCase(string) {
-    const result = string
+    const result = TMonad(string)
 
     try {
         result.value = result.value.toUpperCase()

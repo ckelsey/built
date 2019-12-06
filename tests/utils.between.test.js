@@ -7,11 +7,11 @@ describe(`Between`, () => {
         assert.strictEqual(`str`, Between(`{{`, `}}`, `{{str}}`).first())
     })
 
-    // it(`should find 'str' between '{{' and '}}', given '{{str}}'`, () => {
-    //     assert.strictEqual(`str`, Between(`{{`, `}}`, `{{str}}`).last())
-    // })
+    it(`should find 'str' between '{{' and '}}', given '{{str}}'`, () => {
+        assert.strictEqual(`str`, Between(`{{`, `}}`, `{{str}}`).last())
+    })
 
-    // it(`should find 'str' between '{{' and '}}', given '{{str}}'`, () => {
-    //     assert.strictEqual(`str`, Between(`{{`, `}}`, `{{str}}`).all()[0])
-    // })
+    it(`should find 'str' between '{{' and '}}', given '{{str}}'`, () => {
+        assert.strictEqual(`str`, Between(`{{`, `}}`, `{{str}}`).all()[0])
+    })
 })

@@ -1,5 +1,6 @@
+import { TMonad } from '../..'
 export function ToLowerCase(string) {
-    const result = string
+    const result = TMonad(string)
 
     try {
         result.value = result.value.toLowerCase()

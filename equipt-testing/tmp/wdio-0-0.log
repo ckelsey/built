@@ -1,0 +1,23 @@
+2019-12-05T17:54:36.855Z INFO @wdio/local-runner: Run worker command: run
+2019-12-05T17:54:37.357Z INFO webdriverio: Initiate new session using the webdriver protocol
+2019-12-05T17:54:37.360Z INFO webdriver: [POST] http://localhost:8282/session
+2019-12-05T17:54:37.360Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: { browserName: 'chrome', 'goog:chromeOptions': { args: [Array] } }
+}
+2019-12-05T17:54:38.915Z INFO webdriver: COMMAND getLogTypes()
+2019-12-05T17:54:38.916Z INFO webdriver: [GET] http://localhost:8282/session/b1ca315950d0203b1a8478b3a678b6dd/se/log/types
+2019-12-05T17:54:38.918Z INFO webdriver: RESULT [ 'browser', 'driver' ]
+2019-12-05T17:54:38.919Z INFO webdriver: COMMAND getLogs("browser")
+2019-12-05T17:54:38.919Z INFO webdriver: [POST] http://localhost:8282/session/b1ca315950d0203b1a8478b3a678b6dd/se/log
+2019-12-05T17:54:38.919Z INFO webdriver: DATA { type: 'browser' }
+2019-12-05T17:54:38.920Z INFO webdriver: COMMAND getLogs("driver")
+2019-12-05T17:54:38.920Z INFO webdriver: [POST] http://localhost:8282/session/b1ca315950d0203b1a8478b3a678b6dd/se/log
+2019-12-05T17:54:38.920Z INFO webdriver: DATA { type: 'driver' }
+2019-12-05T17:54:38.923Z INFO webdriver: RESULT []
+2019-12-05T17:54:38.924Z INFO webdriver: RESULT []
+2019-12-05T17:54:38.925Z INFO webdriver: COMMAND deleteSession()
+2019-12-05T17:54:38.925Z INFO webdriver: [DELETE] http://localhost:8282/session/b1ca315950d0203b1a8478b3a678b6dd

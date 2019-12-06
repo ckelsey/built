@@ -1,0 +1,817 @@
+{
+    "time": 1575568484746,
+    "coverage": [
+        {
+            "file": "/src/utils/between/index.js",
+            "statements": {
+                "count": 18,
+                "covered": 17,
+                "score": 94,
+                "scoreEvaluation": "good"
+            },
+            "functions": {
+                "count": 3,
+                "covered": 3,
+                "score": 100,
+                "scoreEvaluation": "good"
+            },
+            "branches": {
+                "count": 2,
+                "covered": 1,
+                "score": 50,
+                "scoreEvaluation": "bad"
+            },
+            "score": 81,
+            "scoreEvaluation": "ok",
+            "lines": [
+                {
+                    "content": "export function Between(start, end, value) {",
+                    "covered": 3
+                },
+                {
+                    "content": "    const regex = new RegExp(`${start}([^${end}]+)${end}`, `gm`)",
+                    "covered": 3
+                },
+                {
+                    "content": "",
+                    "covered": 3
+                },
+                {
+                    "content": "    const getAll = () => {",
+                    "covered": 3
+                },
+                {
+                    "content": "        let match",
+                    "covered": 3
+                },
+                {
+                    "content": "        const matches = []",
+                    "covered": 3
+                },
+                {
+                    "content": "",
+                    "covered": 3
+                },
+                {
+                    "content": "        while ((match = regex.exec(value)) !== null) {",
+                    "covered": 3
+                },
+                {
+                    "content": "            if (match.index === regex.lastIndex) {",
+                    "covered": 0
+                },
+                {
+                    "content": "                regex.lastIndex = regex.lastIndex + 1",
+                    "covered": 0
+                },
+                {
+                    "content": "            }",
+                    "covered": 0
+                },
+                {
+                    "content": "",
+                    "covered": 3
+                },
+                {
+                    "content": "            matches.push(match[1])",
+                    "covered": 3
+                },
+                {
+                    "content": "        }",
+                    "covered": 3
+                },
+                {
+                    "content": "",
+                    "covered": 3
+                },
+                {
+                    "content": "        return matches",
+                    "covered": 3
+                },
+                {
+                    "content": "    }",
+                    "covered": 3
+                },
+                {
+                    "content": "",
+                    "covered": 3
+                },
+                {
+                    "content": "    return {",
+                    "covered": 3
+                },
+                {
+                    "content": "        all() {",
+                    "covered": 3
+                },
+                {
+                    "content": "            return getAll()",
+                    "covered": 3
+                },
+                {
+                    "content": "        },",
+                    "covered": 3
+                },
+                {
+                    "content": "        first() {",
+                    "covered": 3
+                },
+                {
+                    "content": "            try {",
+                    "covered": 3
+                },
+                {
+                    "content": "                return regex.exec(value)[1]",
+                    "covered": 3
+                },
+                {
+                    "content": "            } catch (error) {",
+                    "covered": 3
+                },
+                {
+                    "content": "                return",
+                    "covered": 3
+                },
+                {
+                    "content": "            }",
+                    "covered": 3
+                },
+                {
+                    "content": "",
+                    "covered": 3
+                },
+                {
+                    "content": "        },",
+                    "covered": 3
+                },
+                {
+                    "content": "        last() {",
+                    "covered": 3
+                },
+                {
+                    "content": "            const results = getAll()",
+                    "covered": 3
+                },
+                {
+                    "content": "            return results[results.length - 1]",
+                    "covered": 3
+                },
+                {
+                    "content": "        },",
+                    "covered": 3
+                },
+                {
+                    "content": "        at(index) {",
+                    "covered": 3
+                },
+                {
+                    "content": "            const results = getAll()",
+                    "covered": 0
+                },
+                {
+                    "content": "            return results[index]",
+                    "covered": 0
+                },
+                {
+                    "content": "        },",
+                    "covered": 3
+                },
+                {
+                    "content": "        get() {",
+                    "covered": 3
+                },
+                {
+                    "content": "            return regex.exec(value)",
+                    "covered": 0
+                },
+                {
+                    "content": "        }",
+                    "covered": 3
+                },
+                {
+                    "content": "    }",
+                    "covered": 3
+                },
+                {
+                    "content": "}",
+                    "covered": 3
+                }
+            ]
+        },
+        {
+            "file": "/src/utils/get/index.js",
+            "statements": {
+                "count": 22,
+                "covered": 22,
+                "score": 100,
+                "scoreEvaluation": "good"
+            },
+            "functions": {
+                "count": 4,
+                "covered": 4,
+                "score": 100,
+                "scoreEvaluation": "good"
+            },
+            "branches": {
+                "count": 26,
+                "covered": 21,
+                "score": 81,
+                "scoreEvaluation": "ok"
+            },
+            "score": 94,
+            "scoreEvaluation": "good",
+            "lines": [
+                {
+                    "content": "/**",
+                    "covered": 0
+                },
+                {
+                    "content": " * Searches any type of item down a provided path, returning an emptyVal if provided. Also has the ability to perform a function on the end result",
+                    "covered": 0
+                },
+                {
+                    "content": " * @function Get",
+                    "covered": 0
+                },
+                {
+                    "content": " * ",
+                    "covered": 0
+                },
+                {
+                    "content": " * @param {any} obj - The item to search. Can really be anything, as Get will call methods if provided",
+                    "covered": 0
+                },
+                {
+                    "content": " * ",
+                    "covered": 0
+                },
+                {
+                    "content": " * @param {string} path - The path chain to follow. Must be dot(.) seperated. Array indice should be dot as well. ",
+                    "covered": 0
+                },
+                {
+                    "content": " * Can have methods, but arguments can only be strings, numbers, or booleans.",
+                    "covered": 0
+                },
+                {
+                    "content": " * ",
+                    "covered": 0
+                },
+                {
+                    "content": " * @param {any} emptyVal - If nothing resulted in the search, return this",
+                    "covered": 0
+                },
+                {
+                    "content": " * ",
+                    "covered": 0
+                },
+                {
+                    "content": " * @param {function()} modifyFn - A function that will be run to modify the returned result",
+                    "covered": 0
+                },
+                {
+                    "content": " * ",
+                    "covered": 0
+                },
+                {
+                    "content": " * @return {any} Either the found item or the emptyVal if provided",
+                    "covered": 0
+                },
+                {
+                    "content": " * ",
+                    "covered": 0
+                },
+                {
+                    "content": " * @example ",
+                    "covered": 0
+                },
+                {
+                    "content": " * const obj = {",
+                    "covered": 0
+                },
+                {
+                    "content": " *      a:{",
+                    "covered": 0
+                },
+                {
+                    "content": " *          b:[",
+                    "covered": 0
+                },
+                {
+                    "content": " *              `C`",
+                    "covered": 0
+                },
+                {
+                    "content": " *          ]",
+                    "covered": 0
+                },
+                {
+                    "content": " *      }",
+                    "covered": 0
+                },
+                {
+                    "content": " * }",
+                    "covered": 0
+                },
+                {
+                    "content": " * ",
+                    "covered": 0
+                },
+                {
+                    "content": " * Get(obj, `a.b.0.toLowerCase()`) // `c`",
+                    "covered": 0
+                },
+                {
+                    "content": " */",
+                    "covered": 0
+                },
+                {
+                    "content": "",
+                    "covered": 0
+                },
+                {
+                    "content": "export function Get(obj, path, emptyVal, modifyFn = v => v) {",
+                    "covered": 0
+                },
+                {
+                    "content": "    /** If nothing to search, return */",
+                    "covered": 80004
+                },
+                {
+                    "content": "    if (!obj) { return emptyVal }",
+                    "covered": 0
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "    /** The search array, initial search item being the source */",
+                    "covered": 80004
+                },
+                {
+                    "content": "    let Path = [obj]",
+                    "covered": 80004
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "    /** Populate the search array */",
+                    "covered": 80004
+                },
+                {
+                    "content": "    if (path && path.toString().split) {",
+                    "covered": 80004
+                },
+                {
+                    "content": "        Path = [obj].concat(path.toString().split(`.`))",
+                    "covered": 80004
+                },
+                {
+                    "content": "    }",
+                    "covered": 80004
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "    const result = Path.reduce((accumulator, currentValue) => {",
+                    "covered": 80004
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "        /** If through reduce, accumulator comes out empty, stop */",
+                    "covered": 80004
+                },
+                {
+                    "content": "        if (accumulator === undefined || accumulator === null) {",
+                    "covered": 580029
+                },
+                {
+                    "content": "            return emptyVal",
+                    "covered": 580029
+                },
+                {
+                    "content": "        }",
+                    "covered": 580029
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "        /** If a function, call it */",
+                    "covered": 80004
+                },
+                {
+                    "content": "        if (currentValue.indexOf(`.`) === -1 && currentValue.indexOf(`(`) > -1) {",
+                    "covered": 560029
+                },
+                {
+                    "content": "            const reg = /\\((.*?)\\)/g.exec(currentValue)",
+                    "covered": 560029
+                },
+                {
+                    "content": "            const argsString = reg[1]",
+                    "covered": 560029
+                },
+                {
+                    "content": "            const args = argsString.split(`,`).map(arg => !isNaN(arg) ? parseFloat(arg) : arg.trim())",
+                    "covered": 560029
+                },
+                {
+                    "content": "            const functionName = currentValue.split(`(`)[0]",
+                    "covered": 560029
+                },
+                {
+                    "content": "",
+                    "covered": 560029
+                },
+                {
+                    "content": "            if (typeof accumulator[functionName] === `function`) {",
+                    "covered": 560029
+                },
+                {
+                    "content": "                return accumulator[functionName].apply(accumulator, args)",
+                    "covered": 560029
+                },
+                {
+                    "content": "            }",
+                    "covered": 560029
+                },
+                {
+                    "content": "        }",
+                    "covered": 560029
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "        return accumulator[currentValue]",
+                    "covered": 520026
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "    })",
+                    "covered": 80004
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "    /** If nothing was found return emptyVal */",
+                    "covered": 80004
+                },
+                {
+                    "content": "    if (result === undefined || result === null) { return emptyVal }",
+                    "covered": 80004
+                },
+                {
+                    "content": "",
+                    "covered": 80004
+                },
+                {
+                    "content": "    return modifyFn(result)",
+                    "covered": 80004
+                },
+                {
+                    "content": "}",
+                    "covered": 80004
+                }
+            ]
+        },
+        {
+            "file": "/src/utils/pipe/index.js",
+            "statements": {
+                "count": 5,
+                "covered": 5,
+                "score": 100,
+                "scoreEvaluation": "good"
+            },
+            "functions": {
+                "count": 3,
+                "covered": 3,
+                "score": 100,
+                "scoreEvaluation": "good"
+            },
+            "branches": {
+                "count": 2,
+                "covered": 2,
+                "score": 100,
+                "scoreEvaluation": "good"
+            },
+            "score": 100,
+            "scoreEvaluation": "good",
+            "lines": [
+                {
+                    "content": "export function Pipe(...functions) {",
+                    "covered": 8
+                },
+                {
+                    "content": "    return function PipeInnerFunction(value) {",
+                    "covered": 2
+                },
+                {
+                    "content": "        return functions.reduce(",
+                    "covered": 2
+                },
+                {
+                    "content": "            function PipeInnerFunctionReducer(result, currentFunction) {",
+                    "covered": 2
+                },
+                {
+                    "content": "                return typeof currentFunction !== `function` ?",
+                    "covered": 7
+                },
+                {
+                    "content": "                    result :",
+                    "covered": 2
+                },
+                {
+                    "content": "                    currentFunction(result)",
+                    "covered": 2
+                },
+                {
+                    "content": "            },",
+                    "covered": 2
+                },
+                {
+                    "content": "            value",
+                    "covered": 2
+                },
+                {
+                    "content": "        )",
+                    "covered": 2
+                },
+                {
+                    "content": "    }",
+                    "covered": 2
+                },
+                {
+                    "content": "}",
+                    "covered": 2
+                }
+            ]
+        }
+    ],
+    "coverageSummary": {
+        "score": 92,
+        "scoreEvaluation": "good",
+        "branchScore": 77,
+        "branchScoreEvaluation": "ok",
+        "functionScore": 100,
+        "functionScoreEvaluation": "good",
+        "statementScore": 98,
+        "statementScoreEvaluation": "good"
+    },
+    "tests": [
+        {
+            "start": "2019-12-05T17:54:38.044Z",
+            "end": "2019-12-05T17:54:38.978Z",
+            "capabilities": {
+                "acceptInsecureCerts": false,
+                "browserName": "chrome",
+                "browserVersion": "78.0.3904.108",
+                "chrome": {
+                    "chromedriverVersion": "78.0.3904.70 (edb9c9f3de0247fd912a77b7f6cae7447f6d3ad5-refs/branch-heads/3904@{#800})",
+                    "userDataDir": "/var/folders/wp/4q5s01j938s93hlz0qp2cnyw0000gn/T/.com.google.Chrome.MeWshx"
+                },
+                "goog:chromeOptions": {
+                    "debuggerAddress": "localhost:51334"
+                },
+                "networkConnectionEnabled": false,
+                "pageLoadStrategy": "normal",
+                "platformName": "mac os x",
+                "proxy": {},
+                "setWindowRect": true,
+                "strictFileInteractability": false,
+                "timeouts": {
+                    "implicit": 0,
+                    "pageLoad": 300000,
+                    "script": 30000
+                },
+                "unhandledPromptBehavior": "dismiss and notify"
+            },
+            "host": "localhost",
+            "port": 8282,
+            "framework": "jasmine",
+            "mochaOpts": {
+                "timeout": 10000
+            },
+            "suites": [
+                {
+                    "name": "Between",
+                    "duration": 28,
+                    "start": "2019-12-05T17:54:38.885Z",
+                    "end": "2019-12-05T17:54:38.913Z",
+                    "sessionId": "b1ca315950d0203b1a8478b3a678b6dd",
+                    "tests": [
+                        {
+                            "name": "should find 'str' between '{{' and '}}', given '{{str}}'",
+                            "start": "2019-12-05T17:54:38.885Z",
+                            "end": "2019-12-05T17:54:38.900Z",
+                            "duration": 15,
+                            "state": "passed"
+                        },
+                        {
+                            "name": "should find 'str' between '{{' and '}}', given '{{str}}'",
+                            "start": "2019-12-05T17:54:38.901Z",
+                            "end": "2019-12-05T17:54:38.906Z",
+                            "duration": 5,
+                            "state": "passed"
+                        },
+                        {
+                            "name": "should find 'str' between '{{' and '}}', given '{{str}}'",
+                            "start": "2019-12-05T17:54:38.906Z",
+                            "end": "2019-12-05T17:54:38.911Z",
+                            "duration": 5,
+                            "state": "passed"
+                        }
+                    ],
+                    "hooks": []
+                }
+            ],
+            "specs": [
+                "/tests/utils.between.test.js"
+            ],
+            "state": {
+                "passed": 3,
+                "failed": 0,
+                "skipped": 0
+            }
+        },
+        {
+            "start": "2019-12-05T17:54:40.929Z",
+            "end": "2019-12-05T17:54:41.961Z",
+            "capabilities": {
+                "acceptInsecureCerts": false,
+                "browserName": "chrome",
+                "browserVersion": "78.0.3904.108",
+                "chrome": {
+                    "chromedriverVersion": "78.0.3904.70 (edb9c9f3de0247fd912a77b7f6cae7447f6d3ad5-refs/branch-heads/3904@{#800})",
+                    "userDataDir": "/var/folders/wp/4q5s01j938s93hlz0qp2cnyw0000gn/T/.com.google.Chrome.CzZHK6"
+                },
+                "goog:chromeOptions": {
+                    "debuggerAddress": "localhost:51354"
+                },
+                "networkConnectionEnabled": false,
+                "pageLoadStrategy": "normal",
+                "platformName": "mac os x",
+                "proxy": {},
+                "setWindowRect": true,
+                "strictFileInteractability": false,
+                "timeouts": {
+                    "implicit": 0,
+                    "pageLoad": 300000,
+                    "script": 30000
+                },
+                "unhandledPromptBehavior": "dismiss and notify"
+            },
+            "host": "localhost",
+            "port": 8282,
+            "framework": "jasmine",
+            "mochaOpts": {
+                "timeout": 10000
+            },
+            "suites": [
+                {
+                    "name": "Get",
+                    "duration": 252,
+                    "start": "2019-12-05T17:54:41.642Z",
+                    "end": "2019-12-05T17:54:41.894Z",
+                    "sessionId": "180c80023aaa0f43a86e2d9ff278c22a",
+                    "tests": [
+                        {
+                            "name": "should find property value",
+                            "start": "2019-12-05T17:54:41.642Z",
+                            "end": "2019-12-05T17:54:41.659Z",
+                            "duration": 17,
+                            "state": "passed"
+                        },
+                        {
+                            "name": "should find length value",
+                            "start": "2019-12-05T17:54:41.660Z",
+                            "end": "2019-12-05T17:54:41.689Z",
+                            "duration": 29,
+                            "state": "failed",
+                            "error": "AssertionError: Expected values to be strictly equal:\n\n238 !== 1\n",
+                            "standardError": "error properties: Object({ generatedMessage: true, code: 'ERR_ASSERTION', actual: 238, expected: 1, operator: 'strictEqual' })\n    at <Jasmine>\n    at UserContext.<anonymous> (/Users/chriskelsey/Sites/ck/built/tests/utils.get.test.js:824:16)"
+                        },
+                        {
+                            "name": "should return method value",
+                            "start": "2019-12-05T17:54:41.689Z",
+                            "end": "2019-12-05T17:54:41.694Z",
+                            "duration": 5,
+                            "state": "passed"
+                        },
+                        {
+                            "name": "should return method value",
+                            "start": "2019-12-05T17:54:41.696Z",
+                            "end": "2019-12-05T17:54:41.701Z",
+                            "duration": 5,
+                            "state": "passed"
+                        },
+                        {
+                            "name": "should be performant",
+                            "start": "2019-12-05T17:54:41.701Z",
+                            "end": "2019-12-05T17:54:41.893Z",
+                            "duration": 192,
+                            "state": "failed",
+                            "error": "AssertionError: false == true",
+                            "standardError": "error properties: Object({ generatedMessage: true, code: 'ERR_ASSERTION', actual: false, expected: true, operator: '==' })\n    at <Jasmine>\n    at UserContext.<anonymous> (/Users/chriskelsey/Sites/ck/built/tests/utils.get.test.js:856:9)"
+                        }
+                    ],
+                    "hooks": []
+                }
+            ],
+            "specs": [
+                "/tests/utils.get.test.js"
+            ],
+            "state": {
+                "passed": 3,
+                "failed": 2,
+                "skipped": 0
+            }
+        },
+        {
+            "start": "2019-12-05T17:54:43.734Z",
+            "end": "2019-12-05T17:54:44.249Z",
+            "capabilities": {
+                "acceptInsecureCerts": false,
+                "browserName": "chrome",
+                "browserVersion": "78.0.3904.108",
+                "chrome": {
+                    "chromedriverVersion": "78.0.3904.70 (edb9c9f3de0247fd912a77b7f6cae7447f6d3ad5-refs/branch-heads/3904@{#800})",
+                    "userDataDir": "/var/folders/wp/4q5s01j938s93hlz0qp2cnyw0000gn/T/.com.google.Chrome.0165C0"
+                },
+                "goog:chromeOptions": {
+                    "debuggerAddress": "localhost:51373"
+                },
+                "networkConnectionEnabled": false,
+                "pageLoadStrategy": "normal",
+                "platformName": "mac os x",
+                "proxy": {},
+                "setWindowRect": true,
+                "strictFileInteractability": false,
+                "timeouts": {
+                    "implicit": 0,
+                    "pageLoad": 300000,
+                    "script": 30000
+                },
+                "unhandledPromptBehavior": "dismiss and notify"
+            },
+            "host": "localhost",
+            "port": 8282,
+            "framework": "jasmine",
+            "mochaOpts": {
+                "timeout": 10000
+            },
+            "suites": [
+                {
+                    "name": "Pipe",
+                    "duration": 29,
+                    "start": "2019-12-05T17:54:44.153Z",
+                    "end": "2019-12-05T17:54:44.182Z",
+                    "sessionId": "190cdc1004c9067616fce91c0701459f",
+                    "tests": [
+                        {
+                            "name": "should run all functions",
+                            "start": "2019-12-05T17:54:44.154Z",
+                            "end": "2019-12-05T17:54:44.175Z",
+                            "duration": 21,
+                            "state": "passed"
+                        },
+                        {
+                            "name": "should skip over invalid functions",
+                            "start": "2019-12-05T17:54:44.175Z",
+                            "end": "2019-12-05T17:54:44.181Z",
+                            "duration": 6,
+                            "state": "passed"
+                        }
+                    ],
+                    "hooks": []
+                }
+            ],
+            "specs": [
+                "/tests/utils.pipe.test.js"
+            ],
+            "state": {
+                "passed": 2,
+                "failed": 0,
+                "skipped": 0
+            }
+        }
+    ],
+    "logs": "{\"start\":\"2019-12-05T17:54:38.044Z\",\"end\":\"2019-12-05T17:54:38.978Z\",\"capabilities\":{\"acceptInsecureCerts\":false,\"browserName\":\"chrome\",\"browserVersion\":\"78.0.3904.108\",\"chrome\":{\"chromedriverVersion\":\"78.0.3904.70 (edb9c9f3de0247fd912a77b7f6cae7447f6d3ad5-refs/branch-heads/3904@{#800})\",\"userDataDir\":\"/var/folders/wp/4q5s01j938s93hlz0qp2cnyw0000gn/T/.com.google.Chrome.MeWshx\"},\"goog:chromeOptions\":{\"debuggerAddress\":\"localhost:51334\"},\"networkConnectionEnabled\":false,\"pageLoadStrategy\":\"normal\",\"platformName\":\"mac os x\",\"proxy\":{},\"setWindowRect\":true,\"strictFileInteractability\":false,\"timeouts\":{\"implicit\":0,\"pageLoad\":300000,\"script\":30000},\"unhandledPromptBehavior\":\"dismiss and notify\"},\"host\":\"localhost\",\"port\":8282,\"framework\":\"jasmine\",\"mochaOpts\":{\"timeout\":10000},\"suites\":[{\"name\":\"Between\",\"duration\":28,\"start\":\"2019-12-05T17:54:38.885Z\",\"end\":\"2019-12-05T17:54:38.913Z\",\"sessionId\":\"b1ca315950d0203b1a8478b3a678b6dd\",\"tests\":[{\"name\":\"should find 'str' between '{{' and '}}', given '{{str}}'\",\"start\":\"2019-12-05T17:54:38.885Z\",\"end\":\"2019-12-05T17:54:38.900Z\",\"duration\":15,\"state\":\"passed\"},{\"name\":\"should find 'str' between '{{' and '}}', given '{{str}}'\",\"start\":\"2019-12-05T17:54:38.901Z\",\"end\":\"2019-12-05T17:54:38.906Z\",\"duration\":5,\"state\":\"passed\"},{\"name\":\"should find 'str' between '{{' and '}}', given '{{str}}'\",\"start\":\"2019-12-05T17:54:38.906Z\",\"end\":\"2019-12-05T17:54:38.911Z\",\"duration\":5,\"state\":\"passed\"}],\"hooks\":[]}],\"specs\":[\"/Users/chriskelsey/Sites/ck/built/tests/utils.between.test.js\"],\"state\":{\"passed\":3,\"failed\":0,\"skipped\":0}}\n2019-12-05T17:54:36.855Z INFO @wdio/local-runner: Run worker command: run\n2019-12-05T17:54:37.357Z INFO webdriverio: Initiate new session using the webdriver protocol\n2019-12-05T17:54:37.360Z INFO webdriver: [POST] http://localhost:8282/session\n2019-12-05T17:54:37.360Z INFO webdriver: DATA {\n  capabilities: {\n    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },\n    firstMatch: [ {} ]\n  },\n  desiredCapabilities: { browserName: 'chrome', 'goog:chromeOptions': { args: [Array] } }\n}\n2019-12-05T17:54:38.915Z INFO webdriver: COMMAND getLogTypes()\n2019-12-05T17:54:38.916Z INFO webdriver: [GET] http://localhost:8282/session/b1ca315950d0203b1a8478b3a678b6dd/se/log/types\n2019-12-05T17:54:38.918Z INFO webdriver: RESULT [ 'browser', 'driver' ]\n2019-12-05T17:54:38.919Z INFO webdriver: COMMAND getLogs(\"browser\")\n2019-12-05T17:54:38.919Z INFO webdriver: [POST] http://localhost:8282/session/b1ca315950d0203b1a8478b3a678b6dd/se/log\n2019-12-05T17:54:38.919Z INFO webdriver: DATA { type: 'browser' }\n2019-12-05T17:54:38.920Z INFO webdriver: COMMAND getLogs(\"driver\")\n2019-12-05T17:54:38.920Z INFO webdriver: [POST] http://localhost:8282/session/b1ca315950d0203b1a8478b3a678b6dd/se/log\n2019-12-05T17:54:38.920Z INFO webdriver: DATA { type: 'driver' }\n2019-12-05T17:54:38.923Z INFO webdriver: RESULT []\n2019-12-05T17:54:38.924Z INFO webdriver: RESULT []\n2019-12-05T17:54:38.925Z INFO webdriver: COMMAND deleteSession()\n2019-12-05T17:54:38.925Z INFO webdriver: [DELETE] http://localhost:8282/session/b1ca315950d0203b1a8478b3a678b6dd\n\n{\"start\":\"2019-12-05T17:54:40.929Z\",\"end\":\"2019-12-05T17:54:41.961Z\",\"capabilities\":{\"acceptInsecureCerts\":false,\"browserName\":\"chrome\",\"browserVersion\":\"78.0.3904.108\",\"chrome\":{\"chromedriverVersion\":\"78.0.3904.70 (edb9c9f3de0247fd912a77b7f6cae7447f6d3ad5-refs/branch-heads/3904@{#800})\",\"userDataDir\":\"/var/folders/wp/4q5s01j938s93hlz0qp2cnyw0000gn/T/.com.google.Chrome.CzZHK6\"},\"goog:chromeOptions\":{\"debuggerAddress\":\"localhost:51354\"},\"networkConnectionEnabled\":false,\"pageLoadStrategy\":\"normal\",\"platformName\":\"mac os x\",\"proxy\":{},\"setWindowRect\":true,\"strictFileInteractability\":false,\"timeouts\":{\"implicit\":0,\"pageLoad\":300000,\"script\":30000},\"unhandledPromptBehavior\":\"dismiss and notify\"},\"host\":\"localhost\",\"port\":8282,\"framework\":\"jasmine\",\"mochaOpts\":{\"timeout\":10000},\"suites\":[{\"name\":\"Get\",\"duration\":252,\"start\":\"2019-12-05T17:54:41.642Z\",\"end\":\"2019-12-05T17:54:41.894Z\",\"sessionId\":\"180c80023aaa0f43a86e2d9ff278c22a\",\"tests\":[{\"name\":\"should find property value\",\"start\":\"2019-12-05T17:54:41.642Z\",\"end\":\"2019-12-05T17:54:41.659Z\",\"duration\":17,\"state\":\"passed\"},{\"name\":\"should find length value\",\"start\":\"2019-12-05T17:54:41.660Z\",\"end\":\"2019-12-05T17:54:41.689Z\",\"duration\":29,\"state\":\"failed\",\"error\":\"AssertionError: Expected values to be strictly equal:\\n\\n238 !== 1\\n\",\"standardError\":\"error properties: Object({ generatedMessage: true, code: 'ERR_ASSERTION', actual: 238, expected: 1, operator: 'strictEqual' })\\n    at <Jasmine>\\n    at UserContext.<anonymous> (/Users/chriskelsey/Sites/ck/built/tests/utils.get.test.js:824:16)\"},{\"name\":\"should return method value\",\"start\":\"2019-12-05T17:54:41.689Z\",\"end\":\"2019-12-05T17:54:41.694Z\",\"duration\":5,\"state\":\"passed\"},{\"name\":\"should return method value\",\"start\":\"2019-12-05T17:54:41.696Z\",\"end\":\"2019-12-05T17:54:41.701Z\",\"duration\":5,\"state\":\"passed\"},{\"name\":\"should be performant\",\"start\":\"2019-12-05T17:54:41.701Z\",\"end\":\"2019-12-05T17:54:41.893Z\",\"duration\":192,\"state\":\"failed\",\"error\":\"AssertionError: false == true\",\"standardError\":\"error properties: Object({ generatedMessage: true, code: 'ERR_ASSERTION', actual: false, expected: true, operator: '==' })\\n    at <Jasmine>\\n    at UserContext.<anonymous> (/Users/chriskelsey/Sites/ck/built/tests/utils.get.test.js:856:9)\"}],\"hooks\":[]}],\"specs\":[\"/Users/chriskelsey/Sites/ck/built/tests/utils.get.test.js\"],\"state\":{\"passed\":3,\"failed\":2,\"skipped\":0}}\n2019-12-05T17:54:40.325Z INFO @wdio/local-runner: Run worker command: run\n2019-12-05T17:54:40.496Z INFO webdriverio: Initiate new session using the webdriver protocol\n2019-12-05T17:54:40.499Z INFO webdriver: [POST] http://localhost:8282/session\n2019-12-05T17:54:40.499Z INFO webdriver: DATA {\n  capabilities: {\n    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },\n    firstMatch: [ {} ]\n  },\n  desiredCapabilities: { browserName: 'chrome', 'goog:chromeOptions': { args: [Array] } }\n}\n2019-12-05T17:54:41.705Z INFO webdriver: COMMAND executeScript(<fn>, <object>)\n2019-12-05T17:54:41.705Z INFO webdriver: [POST] http://localhost:8282/session/180c80023aaa0f43a86e2d9ff278c22a/execute/sync\n2019-12-05T17:54:41.705Z INFO webdriver: DATA {\n  script: 'return (function () {\\n' +\n    '      return {\\n' +\n    '        memory: window.performance.memory,\\n' +\n    '        time: window.performance.now()\\n' +\n    '      };\\n' +\n    '    }).apply(null, arguments)',\n  args: []\n}\n2019-12-05T17:54:41.713Z INFO webdriver: RESULT {\n  memory: {\n    jsHeapSizeLimit: 2197815296,\n    totalJSHeapSize: 1359034,\n    usedJSHeapSize: 1347482\n  },\n  time: 934.5350000075996\n}\n2019-12-05T17:54:41.879Z INFO webdriver: COMMAND executeScript(<fn>, <object>)\n2019-12-05T17:54:41.879Z INFO webdriver: [POST] http://localhost:8282/session/180c80023aaa0f43a86e2d9ff278c22a/execute/sync\n2019-12-05T17:54:41.879Z INFO webdriver: DATA {\n  script: 'return (function () {\\n' +\n    '      return {\\n' +\n    '        memory: window.performance.memory,\\n' +\n    '        time: window.performance.now()\\n' +\n    '      };\\n' +\n    '    }).apply(null, arguments)',\n  args: []\n}\n2019-12-05T17:54:41.884Z INFO webdriver: RESULT {\n  memory: {\n    jsHeapSizeLimit: 2197815296,\n    totalJSHeapSize: 1392378,\n    usedJSHeapSize: 1380826\n  },\n  time: 1106.1650000046939\n}\n2019-12-05T17:54:41.897Z INFO webdriver: COMMAND getLogTypes()\n2019-12-05T17:54:41.897Z INFO webdriver: [GET] http://localhost:8282/session/180c80023aaa0f43a86e2d9ff278c22a/se/log/types\n2019-12-05T17:54:41.899Z INFO webdriver: RESULT [ 'browser', 'driver' ]\n2019-12-05T17:54:41.900Z INFO webdriver: COMMAND getLogs(\"browser\")\n2019-12-05T17:54:41.900Z INFO webdriver: [POST] http://localhost:8282/session/180c80023aaa0f43a86e2d9ff278c22a/se/log\n2019-12-05T17:54:41.900Z INFO webdriver: DATA { type: 'browser' }\n2019-12-05T17:54:41.901Z INFO webdriver: COMMAND getLogs(\"driver\")\n2019-12-05T17:54:41.901Z INFO webdriver: [POST] http://localhost:8282/session/180c80023aaa0f43a86e2d9ff278c22a/se/log\n2019-12-05T17:54:41.901Z INFO webdriver: DATA { type: 'driver' }\n2019-12-05T17:54:41.904Z INFO webdriver: RESULT []\n2019-12-05T17:54:41.906Z INFO webdriver: RESULT []\n2019-12-05T17:54:41.907Z INFO webdriver: COMMAND deleteSession()\n2019-12-05T17:54:41.907Z INFO webdriver: [DELETE] http://localhost:8282/session/180c80023aaa0f43a86e2d9ff278c22a\n\n{\"start\":\"2019-12-05T17:54:43.734Z\",\"end\":\"2019-12-05T17:54:44.249Z\",\"capabilities\":{\"acceptInsecureCerts\":false,\"browserName\":\"chrome\",\"browserVersion\":\"78.0.3904.108\",\"chrome\":{\"chromedriverVersion\":\"78.0.3904.70 (edb9c9f3de0247fd912a77b7f6cae7447f6d3ad5-refs/branch-heads/3904@{#800})\",\"userDataDir\":\"/var/folders/wp/4q5s01j938s93hlz0qp2cnyw0000gn/T/.com.google.Chrome.0165C0\"},\"goog:chromeOptions\":{\"debuggerAddress\":\"localhost:51373\"},\"networkConnectionEnabled\":false,\"pageLoadStrategy\":\"normal\",\"platformName\":\"mac os x\",\"proxy\":{},\"setWindowRect\":true,\"strictFileInteractability\":false,\"timeouts\":{\"implicit\":0,\"pageLoad\":300000,\"script\":30000},\"unhandledPromptBehavior\":\"dismiss and notify\"},\"host\":\"localhost\",\"port\":8282,\"framework\":\"jasmine\",\"mochaOpts\":{\"timeout\":10000},\"suites\":[{\"name\":\"Pipe\",\"duration\":29,\"start\":\"2019-12-05T17:54:44.153Z\",\"end\":\"2019-12-05T17:54:44.182Z\",\"sessionId\":\"190cdc1004c9067616fce91c0701459f\",\"tests\":[{\"name\":\"should run all functions\",\"start\":\"2019-12-05T17:54:44.154Z\",\"end\":\"2019-12-05T17:54:44.175Z\",\"duration\":21,\"state\":\"passed\"},{\"name\":\"should skip over invalid functions\",\"start\":\"2019-12-05T17:54:44.175Z\",\"end\":\"2019-12-05T17:54:44.181Z\",\"duration\":6,\"state\":\"passed\"}],\"hooks\":[]}],\"specs\":[\"/Users/chriskelsey/Sites/ck/built/tests/utils.pipe.test.js\"],\"state\":{\"passed\":2,\"failed\":0,\"skipped\":0}}\n2019-12-05T17:54:43.070Z INFO @wdio/local-runner: Run worker command: run\n2019-12-05T17:54:43.250Z INFO webdriverio: Initiate new session using the webdriver protocol\n2019-12-05T17:54:43.253Z INFO webdriver: [POST] http://localhost:8282/session\n2019-12-05T17:54:43.253Z INFO webdriver: DATA {\n  capabilities: {\n    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },\n    firstMatch: [ {} ]\n  },\n  desiredCapabilities: { browserName: 'chrome', 'goog:chromeOptions': { args: [Array] } }\n}\n2019-12-05T17:54:44.186Z INFO webdriver: COMMAND getLogTypes()\n2019-12-05T17:54:44.186Z INFO webdriver: [GET] http://localhost:8282/session/190cdc1004c9067616fce91c0701459f/se/log/types\n2019-12-05T17:54:44.188Z INFO webdriver: RESULT [ 'browser', 'driver' ]\n2019-12-05T17:54:44.189Z INFO webdriver: COMMAND getLogs(\"browser\")\n2019-12-05T17:54:44.190Z INFO webdriver: [POST] http://localhost:8282/session/190cdc1004c9067616fce91c0701459f/se/log\n2019-12-05T17:54:44.190Z INFO webdriver: DATA { type: 'browser' }\n2019-12-05T17:54:44.190Z INFO webdriver: COMMAND getLogs(\"driver\")\n2019-12-05T17:54:44.190Z INFO webdriver: [POST] http://localhost:8282/session/190cdc1004c9067616fce91c0701459f/se/log\n2019-12-05T17:54:44.190Z INFO webdriver: DATA { type: 'driver' }\n2019-12-05T17:54:44.194Z INFO webdriver: RESULT []\n2019-12-05T17:54:44.194Z INFO webdriver: RESULT []\n2019-12-05T17:54:44.195Z INFO webdriver: COMMAND deleteSession()\n2019-12-05T17:54:44.195Z INFO webdriver: [DELETE] http://localhost:8282/session/190cdc1004c9067616fce91c0701459f\n"
+}

@@ -1,0 +1,7 @@
+2019-12-05T17:54:33.757Z INFO @wdio/cli:launcher: Run onPrepare hook
+2019-12-05T17:54:34.153Z INFO @wdio/local-runner: Start worker 0-0 with arg: run,/Users/chriskelsey/Sites/ck/built/equipt-testing/webdriver.config.js
+2019-12-05T17:54:39.109Z INFO @wdio/local-runner: Start worker 0-1 with arg: run,/Users/chriskelsey/Sites/ck/built/equipt-testing/webdriver.config.js
+2019-12-05T17:54:42.086Z INFO @wdio/local-runner: Start worker 0-2 with arg: run,/Users/chriskelsey/Sites/ck/built/equipt-testing/webdriver.config.js
+2019-12-05T17:54:44.371Z INFO @wdio/cli:launcher: Run onComplete hook
+2019-12-05T17:54:44.372Z INFO @wdio/local-runner: Shutting down spawned worker
+2019-12-05T17:54:44.625Z INFO @wdio/local-runner: Waiting for 0 to shut down gracefully

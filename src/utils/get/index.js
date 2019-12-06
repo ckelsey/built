@@ -48,7 +48,10 @@ export function Get(obj, path, emptyVal, modifyFn = v => v) {
         if (currentValue.indexOf(`.`) === -1 && currentValue.indexOf(`(`) > -1) {
             const reg = /\((.*?)\)/g.exec(currentValue)
             const argsString = reg[1]
-            const args = argsString.split(`,`).map(arg => !isNaN(arg) ? parseFloat(arg) : arg.trim())
+            const args = argsString.split(`,`).map(arg =>
+                !isNaN(arg) ? parseFloat(arg) : arg.trim()
+                // if has quotes -> string, no? -> number, obj, whatever
+            )
             const functionName = currentValue.split(`(`)[0]
 
             if (typeof accumulator[functionName] === `function`) {
