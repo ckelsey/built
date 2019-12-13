@@ -30,6 +30,7 @@ function Observer(initialValue, noInit = false, onSubscribe = () => { }) {
     const loop = (key, val, valuesObj = {}) => {
         Object.keys(values.subscriptions).forEach(subscriptionId => {
             const subscriptionFn = values.subscriptions[subscriptionId][key]
+            if (typeof subscriptionFn !== `function`) { return }
             subscriptionFn(val, valuesObj, subscriptionId)
         })
 

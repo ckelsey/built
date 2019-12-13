@@ -12,10 +12,14 @@ export function ObserveEvent(element, eventName, options = {}) {
         useCapture: true
     }, options)
 
+    // const asWindow = () => element && element.document && element.location && element.alert && element.setInterval ? element : undefined
+
     const startup = () => {
         if (!element || (!element.parentNode && !element.host) || isRunning) { return }
 
         isRunning = true
+
+        // const el = asWindow() || element
 
         element.addEventListener(eventName, eventHandler, options.useCapture)
     }
@@ -60,11 +64,13 @@ export function ObserveEvent(element, eventName, options = {}) {
 
     let max = 1000
     const tryIt = () => {
-        const parent = element.parentNode || element.host
+        // const win = asWindow()
+        const parent = element.parentNode || element.host // || win
         max = max - 1
 
         if (!max) { return dispose() }
         if (!parent) { return requestAnimationFrame(tryIt) }
+        // if (win) { return observeWindow(win) }
 
         mObserver.observe(parent, { childList: true })
         startup()

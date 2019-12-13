@@ -1,4 +1,7 @@
-import { WCConstructor, WCDefine, AppendStyleElement, ID, Pipe, SetStyleRules, ToString, IfInvalid, Get } from '../..'
+import {
+    WCConstructor, WCDefine, AppendStyleElement, ID, ToNumber,
+    Pipe, SetStyleRules, ToString, IfInvalid, Get, ToBool
+} from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
@@ -7,30 +10,26 @@ const template = require(`./index.html`)
 const componentName = `grid-layout`
 const componentRoot = `.${componentName}-container`
 
-const defaultWidth = `15em`
-const defaultGap = `1em`
+const defaultWidth = 240
+const defaultGap = 16
 
 const setStyles = (el, styles) => {
     if (!el) { return }
     SetStyleRules(el, styles)
 }
 
-const setDimensions = host => {
-    const canDoGrid = typeof host.style.grid === `string`
-    const gap = host.gap || defaultGap
-    const columnwidth = host.columnwidth || defaultWidth
+const setAllStyles = (host, string) => {
     const componentStyle = host.shadowRoot.querySelector(`style[name=""]`)
     const themeStyles = host.elements.themeStyles
     const injectedStyles = host.elements.injectedStyles
     let outerStyle = host.querySelector(`style[name="outer"]`)
 
-    const unsupportedCSS = canDoGrid ? `` : `.grid-layout-items{margin-left:-${gap};margin-right:-${gap};}.grid-layout-items .grid-layout-item{max-width:${columnwidth};margin:${gap};}`
 
     const styleString = [
         style,
         themeStyles ? themeStyles.innerHTML : ``,
         injectedStyles ? injectedStyles.innerHTML : ``,
-        `.grid-layout-items{grid-gap:${gap}; grid-template-columns:repeat(auto-fit, minmax(${columnwidth}, 0fr));}${unsupportedCSS}`
+        string
     ].join(``)
 
     if (!outerStyle) {
@@ -41,6 +40,42 @@ const setDimensions = host => {
 
     setStyles(componentStyle, styleString)
     setStyles(outerStyle, styleString)
+}
+
+const unsupportedCSS = (host, gap, columnwidth) => typeof host.style.grid === `string` ? `` : `.grid-layout-items{margin-left:-${gap}px;margin-right:-${gap}px;}.grid-layout-items .grid-layout-item{max-width:${columnwidth}px;margin:${gap}px;}`
+
+const setScale = host => {
+    if (!host.scaletofit) { return }
+
+    let gap = host.gap || defaultGap
+    let columnwidth = host.columnwidth || defaultWidth
+    const contentWidth = host.elements.root.offsetWidth + gap
+    let columnGapPercent = 100 / Math.round(contentWidth / (gap + columnwidth))
+    const ratio = 1 - (gap / columnwidth)
+
+    if (columnwidth === `100%`) {
+        columnwidth = 100
+        gap = 0
+    } else {
+        if (columnGapPercent > 50) {
+            columnGapPercent = 50
+        }
+
+        columnwidth = columnGapPercent * ratio
+
+        gap = (columnGapPercent - columnwidth) / 2
+    }
+
+    setAllStyles(host, `.grid-layout-items{display:flex; width:${100 + (gap * 2)}%;margin-left:-${gap}%;}.grid-layout-item{width:${columnwidth}%;padding:${gap === 0 ? 4 : gap / 2}% ${gap}%;}`)
+}
+
+const setDimensions = host => {
+    if (host.scaletofit) { return setScale(host) }
+
+    let gap = host.gap || defaultGap
+    let columnwidth = host.columnwidth || defaultWidth
+
+    setAllStyles(host, `.grid-layout-items{grid-gap:${gap}px; grid-template-columns:repeat(auto-fit, minmax(${columnwidth}px, 0fr));}${unsupportedCSS(host, gap, columnwidth)}`)
 }
 
 const elements = {
@@ -62,11 +97,11 @@ const elements = {
 
 const properties = {
     columnwidth: {
-        format: val => Pipe(ToString, IfInvalid(defaultWidth))(val).value,
+        format: val => val === `100%` ? val : Pipe(ToNumber, IfInvalid(defaultWidth))(val).value,
         onChange: (_val, host) => setDimensions(host)
     },
     gap: {
-        format: val => Pipe(ToString, IfInvalid(defaultGap))(val).value,
+        format: val => Pipe(ToNumber, IfInvalid(defaultGap))(val).value,
         onChange: (_val, host) => setDimensions(host)
     },
     styles: {
@@ -76,6 +111,9 @@ const properties = {
     theme: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,
         onChange: (val, host) => setStyles(host.elements.themeStyles, val)
+    },
+    scaletofit: {
+        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
     }
 }
 
@@ -99,14 +137,12 @@ export const GridLayout = WCConstructor({
     methods: { getComponentStyles },
     onConnected(host) {
         const itemsContainer = host.elements.itemsContainer
-        // const spanValue = span => !HasNonDigits(span).valid ? `span ${span}` : span === `full` ? `1 / -1` : span
-        // const setSpan = (el, span) => Set(el, `container.style.gridColumn`, spanValue(span))
+
         const wrapItem = el => {
             const id = ID()
             const slotWrapper = document.createElement(`div`)
             slotWrapper.className = `grid-layout-item`
             slotWrapper.id = id
-            // setSpan(el, Get(el, `span`, host.subsections))
             itemsContainer.appendChild(slotWrapper)
 
             const slot = document.createElement(`slot`)
@@ -121,25 +157,6 @@ export const GridLayout = WCConstructor({
         const observeEl = el => {
             if (el.nongrid) { return }
             wrapItem(el)
-
-            // const element = wrapItem(el)
-            // Set(
-            //     element,
-            //     `eventSubscriptions.span`,
-            //     new MutationObserver(mutationsList => {
-            //         const list = Array.from(mutationsList)
-
-            //         while (list.length) {
-            //             const mutation = list.shift()
-            //             if (mutation.type === `attributes` && mutation.attributeName === `span`) {
-            //                 // const span = element.getAttribute('span') || host.subsections
-            //                 // setSpan(element, span)
-            //             }
-            //         }
-            //     })
-            // )
-
-            // element.eventSubscriptions.span.observe(element, { attributes: true })
         }
 
         const disconnectEl = el => {
@@ -169,6 +186,7 @@ export const GridLayout = WCConstructor({
         })
 
         host.slotObserver.observe(host, { childList: true })
+        window.addEventListener(`resize`, () => setScale(host))
     }
 })
 

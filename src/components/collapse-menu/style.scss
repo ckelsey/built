@@ -1,22 +1,17 @@
-$gap:10%;
-$vpadding:0.75em;
-$hgap:0.75em;
-$hvpadding:0.33em;
-
 :host(collapse-menu) {
-    display: inline-block;
-    width: 100%;
+    display: block;
 }
 
 collapse-menu {
-    display: inline-block;
-    width: 100%;
+    display: block;
 }
 
 .collapse-menu-container {
     position: relative;
 
+    .toggle-arrow,
     .default-toggle-icon {
+        display: inline-block;
         cursor: pointer;
         pointer-events: none;
         opacity: 0;
@@ -26,18 +21,59 @@ collapse-menu {
         z-index: -1;
     }
 
+    .toggle-arrow {
+        position: relative;
+        margin-left: -0.5em;
+        margin-right: -0.5em;
+
+        svg {
+            fill: currentColor;
+        }
+    }
+
     .collapse-menu-items {
-        transform-origin: 0;
+        transition: transform 0.2s;
+
+        .collapse-menu-items-inner {
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+    }
+
+    &:not(.collapseonwrap) {
+        .collapse-menu-items {
+            .collapse-menu-items-inner {
+                flex-wrap: wrap;
+                white-space: normal;
+            }
+        }
+    }
+
+    .collapse-menu-items-bg {
+        position: absolute;
+        width: 100%;
         height: 100%;
+        opacity: 0;
+        transition: opacity 0s;
     }
 
     .collapse-menu-toggle {
-        opacity: 1;
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        height: 1.5em;
+        display: flex;
+        cursor: pointer;
         transition: opacity 0.2s;
     }
 
+    .collapse-menu-toggle-icon {
+        display: flex;
+        align-items: center;
+    }
+
     .collapse-menu-toggle-inner {
-        padding-left: 10%;
+        padding-left: 1em;
         position: relative;
         display: none;
         cursor: pointer;
@@ -54,13 +90,17 @@ collapse-menu {
 
     &[direction="horizontal"] {
         .collapse-menu-items {
-            display: inline-flex;
-            margin-left: -$hgap;
-            margin-right: -$hgap;
+            display: flex;
+
+            .collapse-menu-items-inner {
+                display: flex;
+            }
         }
     }
 
     &[expandable="true"] {
+
+        .toggle-arrow,
         .default-toggle-icon {
             opacity: 1;
             position: relative;
@@ -69,34 +109,35 @@ collapse-menu {
         }
 
         .collapse-menu-items {
-            transform: translateX(-105%);
-            position: fixed;
-            top: 0;
-            left: 0;
             opacity: 0;
-            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            position: fixed;
+            transform: translateX(-105%);
+        }
+
+        .collapse-menu-items-bg {
+            opacity: 1;
+            transition: opacity 0s linear 0.3s;
         }
 
         .collapse-menu-toggle-inner {
             display: block;
             margin: 1em 0;
-            height: 27px;
+            height: 1.5em;
             transition: margin 0.01s linear 0.4s, height 0.01s linear 0.4s;
+        }
+
+        .collapse-menu-toggle {
+            position: relative;
+            opacity: 1;
+            pointer-events: all;
         }
 
         &[align="right"] {
             .collapse-menu-items {
-                right: 0;
-                left: unset;
                 transform: translateX(105%);
             }
-
-            .collapse-menu-toggle-inner {
-                transform: rotate(180deg);
-                padding-left: 0;
-                padding-right: 7%;
-            }
-
         }
     }
 
@@ -112,72 +153,76 @@ collapse-menu {
             pointer-events: none;
         }
     }
-}
 
-.collapse-menu-container[expandable="true"][expanded="true"] {
-    .collapse-menu-items {
-        transform: translateX(0%);
-        opacity: 1;
-    }
+    &[expandable="true"][expanded="true"] {
+        .collapse-menu-items {
+            transform: translateX(0em);
+            opacity: 1;
+            z-index: unset;
+            flex-direction: column;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            align-items: flex-start;
+            pointer-events: all;
 
-    .collapse-menu-toggle {
-        opacity: 0;
-    }
-
-    /*
-    .collapse-menu-toggle-icon-inner {
-
-        &:after {
-            transform: rotate(45deg);
+            .collapse-menu-items-inner {
+                flex-direction: column;
+                height: calc(100vh - 3.5em);
+                overflow: auto;
+            }
         }
 
-        &:before {
-            transform: rotate(-45deg);
+        .collapse-menu-toggle {
+            opacity: 0;
+        }
+
+        .collapse-menu-toggle-inner {
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out 0.1s;
+        }
+
+        &[align="right"] {
+            .collapse-menu-items {
+                right: 0;
+                left: unset;
+            }
+
+            .collapse-menu-toggle-inner {
+                transform: rotate(180deg);
+                padding-left: 0;
+                padding-right: 7%;
+            }
         }
     }
-
-    .collapse-menu-toggle-icon-outer {
-        transform: scaleX(0);
-    }
-    */
-
-    .collapse-menu-toggle-inner {
-        opacity: 1;
-        transition: opacity 0.5s ease-in-out 0.1s;
-    }
 }
 
-.collapse-menu-sizer,
-.collapse-menu-wrap-sizer {
-    opacity: 0;
-    visibility: hidden;
-    position: absolute;
-    width: 100%;
-    height: 1px;
-    z-index: -1;
-    pointer-events: none;
-}
 
 collapse-menu>[slot="item"] {
-    padding: $vpadding;
+    padding-right: 1em;
     box-sizing: border-box;
-    /*transform: scaleX(2.25);*/
-    transform-origin: 0;
     opacity: 0;
+
+    &:last-of-type {
+        padding-right: 0;
+    }
 }
 
-collapse-menu[expandable="false"][direction="horizontal"]>[slot="item"],
-collapse-menu[expandable="false"]:not([direction])>[slot="item"] {
-    padding: $hvpadding $hgap;
-}
 
 collapse-menu[expandable="false"]>[slot="item"],
 collapse-menu:not([expandable])>[slot="item"],
 collapse-menu[expanded="true"]>[slot="item"] {
     opacity: 1;
-    /*transform: scaleX(1);*/
 }
 
-collapse-menu[expanded="true"]>[slot="item"] {
-    padding: $vpadding $gap;
+collapse-menu[expandable="false"]>[slot="item"],
+collapse-menu:not([expandable])>[slot="item"] {
+    &:last-of-type {
+        padding-right: 0;
+    }
+}
+
+collapse-menu[expandable="true"][expanded="true"]>[slot="item"] {
+    padding: 0.5em 1em;
+    position: relative;
 }

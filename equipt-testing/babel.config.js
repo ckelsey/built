@@ -1,1 +1,1 @@
-module.exports = {"presets":[["@babel/preset-env",{"useBuiltIns":"entry","corejs":3,"targets":{"browsers":["last 3 versions"],"node":true}}]],"plugins":["istanbul",["babel-plugin-module-resolver",{"root":["/Users/chriskelsey/Sites/ck/built"],"alias":"./"}]],"ignore":["node_modules"]}
+module.exports = {"presets":[["@babel/preset-env",{"useBuiltIns":"entry","corejs":3,"targets":{"browsers":["last 3 versions"],"node":true}}]],"plugins":[["istanbul",{"cache":false}],["babel-plugin-module-resolver",{"root":["./"],"alias":"./","cache":false}]],"ignore":["node_modules"]}

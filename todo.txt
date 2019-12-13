@@ -1,7 +1,11 @@
+- XHR Fetch API thing using our existing
+- Simpler animation api, that combines mine and Animation API if available
+- singleton NextFrame that batches all together, look up event loop to make the most efficient
+- newline delimeter JSON
+- iframe content loader
 - ObserveEvent to take multiple eventNames
 - ObserveEvents to essentially do what el.eventSubscriptions = {} does but as one subscription
 - icon-element change type attr to url, svg to markup
-- Check browsers (specifically safari) to see if content transition still shows correctly without display:inline-flex
 
 
 

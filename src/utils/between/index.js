@@ -6,10 +6,6 @@ export function Between(start, end, value) {
         const matches = []
 
         while ((match = regex.exec(value)) !== null) {
-            if (match.index === regex.lastIndex) {
-                regex.lastIndex = regex.lastIndex + 1
-            }
-
             matches.push(match[1])
         }
 
@@ -21,12 +17,7 @@ export function Between(start, end, value) {
             return getAll()
         },
         first() {
-            try {
-                return regex.exec(value)[1]
-            } catch (error) {
-                return
-            }
-
+            return regex.exec(value)[1]
         },
         last() {
             const results = getAll()

@@ -1,12 +1,3 @@
-const nonCollections = [
-    `string`,
-    `number`,
-    `null`,
-    `undefined`,
-    `function`,
-    `boolean`,
-]
-
 /**
  * Determines if a value is not a collection 
  * @function IsNonCollection
@@ -23,6 +14,6 @@ const nonCollections = [
  * IsNonCollection(true) // true
  */
 
-export function IsNonCollection(value) {
-    return nonCollections.indexOf(typeof value) > -1 || value === null
-}
+const nonCollections = [`string`, `number`, `null`, `undefined`, `function`, `boolean`, `date`]
+
+export function IsNonCollection(value) { return nonCollections.indexOf(typeof value) > -1 || value === null || value instanceof Date }

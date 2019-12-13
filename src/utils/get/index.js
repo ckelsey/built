@@ -1,30 +1,3 @@
-/**
- * Searches any type of item down a provided path, returning an emptyVal if provided. Also has the ability to perform a function on the end result
- * @function Get
- * 
- * @param {any} obj - The item to search. Can really be anything, as Get will call methods if provided
- * 
- * @param {string} path - The path chain to follow. Must be dot(.) seperated. Array indice should be dot as well. 
- * Can have methods, but arguments can only be strings, numbers, or booleans.
- * 
- * @param {any} emptyVal - If nothing resulted in the search, return this
- * 
- * @param {function()} modifyFn - A function that will be run to modify the returned result
- * 
- * @return {any} Either the found item or the emptyVal if provided
- * 
- * @example 
- * const obj = {
- *      a:{
- *          b:[
- *              `C`
- *          ]
- *      }
- * }
- * 
- * Get(obj, `a.b.0.toLowerCase()`) // `c`
- */
-
 export function Get(obj, path, emptyVal, modifyFn = v => v) {
     /** If nothing to search, return */
     if (!obj) { return emptyVal }

@@ -148,7 +148,14 @@ export const DropDown = WCConstructor({
                     return
                 }
 
-                if (WasClickedOn(host.elements.heading, e) || WasClickedOn(host.querySelector(`[slot="label"]`), e)) {
+                if (WasClickedOn(Array.from(host.querySelectorAll(`[slot="option"]`)), e)) {
+                    host.dispatchEvent(new CustomEvent(`optionclick`, { detail: { host, event: e } }))
+                }
+
+                if (WasClickedOn([host.elements.heading, host.querySelector(`[slot="label"]`)], e)) {
+
+                    host.dispatchEvent(new CustomEvent(`labelclick`, { detail: { host, event: e } }))
+
                     if (host.open) {
                         return requestAnimationFrame(() => openClose(false, host))
                     } else {

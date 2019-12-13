@@ -9,16 +9,19 @@ import handleRoute from './handle-route'
 import UpdateState from './update-state'
 
 export function Router(routes) {
-    let current = {}
-    let lastState = {}
     const _routes = Object.assign({}, routes)
     const getRouteByPath = GetRouteByPath(_routes)
 
-    current = Object.assign({}, {
+    // internal state
+    let lastState = {}
+    let current = Object.assign({}, {
         path: location.pathname,
         query: getQuery(location.search),
         base: `${location.protocol}//${location.host}${location.port ? `:${location.port}` : ``}`
     }, getRouteByPath(location.pathname))
+
+    const initialPath = `${location.pathname}${location.search}`
+    const initialRoute = Object.assign({}, getRoute(_routes, initialPath), current)
 
     const methods = {
         get current() {
@@ -31,6 +34,7 @@ export function Router(routes) {
                 })
         },
 
+        // TODO should not be accesible but handle-route needs it, refactor later
         set current(cur) { current = cur },
         get lastState() { return lastState },
         set lastState(l) { lastState = l },
@@ -42,8 +46,8 @@ export function Router(routes) {
         has: url => !!getRoute(_routes, url),
         route: (url, force = false) => handleRoute(methods, url, false, force),
         replaceRoute: (url, force = false) => handleRoute(methods, url, true, force),
-        route$: Observer(undefined),
-        query$: Observer(undefined),
+        route$: Observer(initialRoute),
+        query$: Observer(initialRoute.query),
 
         updateQuery(query) {
             if (!methods.current) { return }
@@ -84,8 +88,6 @@ export function Router(routes) {
             UpdateState(methods, true, true)
         },
     }
-
-    methods.route(`${location.pathname}${location.search}`)
 
     clickListener(methods)
     popStateListener(methods)

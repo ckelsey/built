@@ -21,6 +21,10 @@ export function Equals(value1, value2) {
         return false
     }
 
+    if (type === `object` && value1.constructor !== value2.constructor) {
+        return false
+    }
+
     if (type === `date`) {
         let d = value1 === value2
 
@@ -33,6 +37,8 @@ export function Equals(value1, value2) {
     if (type === `dom`) {
         return value1.isEqualNode(value2)
     }
+
+    // Start walking
 
     if (type === `array`) {
         let len = value1.length

@@ -1,23 +1,61 @@
-2019-12-05T17:54:43.070Z INFO @wdio/local-runner: Run worker command: run
-2019-12-05T17:54:43.250Z INFO webdriverio: Initiate new session using the webdriver protocol
-2019-12-05T17:54:43.253Z INFO webdriver: [POST] http://localhost:8282/session
-2019-12-05T17:54:43.253Z INFO webdriver: DATA {
+2019-12-08T06:38:15.450Z INFO @wdio/local-runner: Run worker command: run
+2019-12-08T06:38:15.598Z INFO webdriverio: Initiate new session using the webdriver protocol
+2019-12-08T06:38:15.603Z INFO webdriver: [POST] http://localhost:8282/session
+2019-12-08T06:38:15.603Z INFO webdriver: DATA {
   capabilities: {
     alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
     firstMatch: [ {} ]
   },
   desiredCapabilities: { browserName: 'chrome', 'goog:chromeOptions': { args: [Array] } }
 }
-2019-12-05T17:54:44.186Z INFO webdriver: COMMAND getLogTypes()
-2019-12-05T17:54:44.186Z INFO webdriver: [GET] http://localhost:8282/session/190cdc1004c9067616fce91c0701459f/se/log/types
-2019-12-05T17:54:44.188Z INFO webdriver: RESULT [ 'browser', 'driver' ]
-2019-12-05T17:54:44.189Z INFO webdriver: COMMAND getLogs("browser")
-2019-12-05T17:54:44.190Z INFO webdriver: [POST] http://localhost:8282/session/190cdc1004c9067616fce91c0701459f/se/log
-2019-12-05T17:54:44.190Z INFO webdriver: DATA { type: 'browser' }
-2019-12-05T17:54:44.190Z INFO webdriver: COMMAND getLogs("driver")
-2019-12-05T17:54:44.190Z INFO webdriver: [POST] http://localhost:8282/session/190cdc1004c9067616fce91c0701459f/se/log
-2019-12-05T17:54:44.190Z INFO webdriver: DATA { type: 'driver' }
-2019-12-05T17:54:44.194Z INFO webdriver: RESULT []
-2019-12-05T17:54:44.194Z INFO webdriver: RESULT []
-2019-12-05T17:54:44.195Z INFO webdriver: COMMAND deleteSession()
-2019-12-05T17:54:44.195Z INFO webdriver: [DELETE] http://localhost:8282/session/190cdc1004c9067616fce91c0701459f
+2019-12-08T06:38:16.882Z INFO webdriver: COMMAND executeScript(<fn>, <object>)
+2019-12-08T06:38:16.882Z INFO webdriver: [POST] http://localhost:8282/session/2a52fbb8b35fd6b4b1c8affe8ba9115b/execute/sync
+2019-12-08T06:38:16.882Z INFO webdriver: DATA {
+  script: 'return (function () {\n' +
+    '      return {\n' +
+    '        memory: window.performance.memory,\n' +
+    '        time: window.performance.now()\n' +
+    '      };\n' +
+    '    }).apply(null, arguments)',
+  args: []
+}
+2019-12-08T06:38:16.889Z INFO webdriver: RESULT {
+  memory: {
+    jsHeapSizeLimit: 2197815296,
+    totalJSHeapSize: 1359034,
+    usedJSHeapSize: 1347482
+  },
+  time: 1034.5600000000559
+}
+2019-12-08T06:38:16.914Z INFO webdriver: COMMAND executeScript(<fn>, <object>)
+2019-12-08T06:38:16.914Z INFO webdriver: [POST] http://localhost:8282/session/2a52fbb8b35fd6b4b1c8affe8ba9115b/execute/sync
+2019-12-08T06:38:16.914Z INFO webdriver: DATA {
+  script: 'return (function () {\n' +
+    '      return {\n' +
+    '        memory: window.performance.memory,\n' +
+    '        time: window.performance.now()\n' +
+    '      };\n' +
+    '    }).apply(null, arguments)',
+  args: []
+}
+2019-12-08T06:38:16.920Z INFO webdriver: RESULT {
+  memory: {
+    jsHeapSizeLimit: 2197815296,
+    totalJSHeapSize: 1392378,
+    usedJSHeapSize: 1380826
+  },
+  time: 1065.3400000010151
+}
+2019-12-08T06:38:16.936Z INFO webdriver: COMMAND getLogTypes()
+2019-12-08T06:38:16.937Z INFO webdriver: [GET] http://localhost:8282/session/2a52fbb8b35fd6b4b1c8affe8ba9115b/se/log/types
+2019-12-08T06:38:16.941Z INFO webdriver: RESULT [ 'browser', 'driver' ]
+2019-12-08T06:38:16.941Z INFO webdriver: COMMAND getLogs("browser")
+2019-12-08T06:38:16.942Z INFO webdriver: [POST] http://localhost:8282/session/2a52fbb8b35fd6b4b1c8affe8ba9115b/se/log
+2019-12-08T06:38:16.942Z INFO webdriver: DATA { type: 'browser' }
+2019-12-08T06:38:16.942Z INFO webdriver: COMMAND getLogs("driver")
+2019-12-08T06:38:16.942Z INFO webdriver: [POST] http://localhost:8282/session/2a52fbb8b35fd6b4b1c8affe8ba9115b/se/log
+2019-12-08T06:38:16.943Z INFO webdriver: DATA { type: 'driver' }
+2019-12-08T06:38:16.947Z INFO webdriver: RESULT []
+2019-12-08T06:38:16.953Z INFO webdriver: RESULT []
+2019-12-08T06:38:16.953Z INFO webdriver: COMMAND deleteSession()
+2019-12-08T06:38:16.953Z INFO webdriver: [DELETE] http://localhost:8282/session/2a52fbb8b35fd6b4b1c8affe8ba9115b

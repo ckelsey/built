@@ -36,6 +36,7 @@ const elementSelectors = {
     contentContainer: `.overlay-content-content-container`,
     contentInner: `.overlay-content-content-inner`,
     inner: `.overlay-content-container-inner`,
+    themeStyles: `style.themeStyles`,
     injectedStyles: `style.injectedStyles`
 }
 
@@ -67,6 +68,10 @@ const attributes = {
     class: ComponentClassObject,
     widthbasis: {
         format: val => Pipe(IndexOf(widths), IfInvalid(`content`))(val).value
+    },
+    theme: {
+        format: val => typeof val === `string` ? val : ``,
+        onChange: (val, host) => setStyles(host.elements.themeStyles, val)
     },
     styles: {
         format: val => typeof val === `string` ? val : ``,

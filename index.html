@@ -58,7 +58,20 @@
 
     <body>
 
-        <div>
+        <input-field label="test"></input-field>
+        <div style="display: flex;align-items: center;">
+            <span>Hi all, I'm having...Hmm</span>
+            <div>
+                <collapse-menu id="collapse" collapseonwrap="true" background="#fff" container="parentElement.parentElement">
+                    <div slot="item">Hi all, I'm having difficulties</div>
+                    <div slot="item">Yarn version</div>
+                    <div slot="item">I'm getting this error below</div>
+                </collapse-menu>
+            </div>
+        </div>
+
+
+        <!-- <div>
             <input-field label="Hey there"></input-field>
         </div>
         <div>
@@ -96,8 +109,18 @@
                     prog.value = vals
                 }
             })
-        </script>
+        </script> -->
         <script type="text/javascript" src="/dist/built.js"></script>
+        <script>
+            var collapse = document.getElementById('collapse')
+            if (collapse) {
+                var filterIcon = document.createElement('div')
+                filterIcon.slot = 'toggle-icon'
+                filterIcon.setAttribute('style', "display:flex;align-items:center;")
+                filterIcon.innerHTML = '<span>Categories</span>' + window.builtjs.iconTriangle
+                collapse.appendChild(filterIcon)
+            }
+        </script>
     </body>
 
 </html>

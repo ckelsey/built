@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import assert from 'assert'
-import { Get } from '../src/utils/get'
+import { Get } from '../src/utils'
 
 const object = {
     "time": 1575545198404,
@@ -820,16 +820,32 @@ describe(`Get`, () => {
         assert.strictEqual(44, Get(object, `coverage.0.lines.0.content.length`))
     })
 
-    it(`should find length value`, () => {
-        assert.strictEqual(238, Get(object, `tests.1.suites.0.tests.1.standardError.split('').length`))
-    })
-
     it(`should return method value`, () => {
         assert.strictEqual(`stuffcalled`, Get(object, `tests.2.suites.0.tests.1.calling(stuff)`))
     })
 
     it(`should return method value`, () => {
         assert.strictEqual(5, Get(object, `tests.2.suites.0.tests.1.number(2)`))
+    })
+
+    it(`should return a fallback value`, () => {
+        assert.strictEqual(100, Get(object, `tests.2.suites.0.tests.45.calling()`, 100))
+    })
+
+    it(`should return a fallback value if no source`, () => {
+        assert.strictEqual(`hi`, Get(undefined, undefined, `hi`))
+    })
+
+    it(`should return a source value if no path`, () => {
+        assert.strictEqual(JSON.stringify([`a`]), JSON.stringify(Get([`a`])))
+    })
+
+    it(`should return a modified value`, () => {
+        assert.strictEqual(66, Get(object, `tests.2.suites.0.tests.0.duration`, undefined, (v) => v * 2))
+    })
+
+    it(`should return correct value without modify function`, () => {
+        assert.strictEqual(33, Get(object, `tests.2.suites.0.tests.0.duration`, undefined, undefined))
     })
 
     it(`should be performant`, () => {
@@ -842,9 +858,10 @@ describe(`Get`, () => {
         while (i) {
             i = i - 1
             Get(object, `coverage.0.lines.0.content.length`)
-            Get(object, `tests.1.suites.0.tests.1.standardError.split('').length`)
-            Get(object, `tests.2.suites.0.tests.1.calling()`)
+            Get(object, `tests.2.suites.0.tests.1.calling(stuff)`)
             Get(object, `tests.2.suites.0.tests.45.calling()`)
+            Get(object, `tests.2.suites.0.tests.45.calling()`, 100)
+            Get(object, `tests.2.suites.0.tests.2.duration`, undefined, (v) => v * 2)
         }
 
         const end = browser.execute(() => {
@@ -853,7 +870,12 @@ describe(`Get`, () => {
 
         const time = end.time - start.time
 
-        assert(time < 110)
+        console.log(`===================`)
+        console.log(`Get`)
+        console.log(time)
+        console.log(`===================`)
+
+        assert.ok(time < 250) // ~200
     })
 
 })

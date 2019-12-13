@@ -17,19 +17,16 @@
 
 export function FunctionToPartial(...args) {
     const argArray = [...args]
-    const fn = argArray[0]
-
-    argArray.shift()
-    const initialArguments = argArray
+    const fn = argArray.shift()
 
     /** If no function passed in, return */
     if (!fn) { return }
 
     /** If the passed in arguments equal the original functions arity, just call the function */
-    if (initialArguments.length >= fn.length) {
-        return fn.apply(fn, initialArguments)
+    if (argArray.length >= fn.length) {
+        return fn.apply(fn, argArray)
     }
 
     /** return function that takes new arguments which then returns a new FunctionToPartial */
-    return (...newArgs) => FunctionToPartial(fn, ...(initialArguments.concat([...newArgs])))
+    return (...newArgs) => FunctionToPartial(fn, ...(argArray.concat([...newArgs])))
 }

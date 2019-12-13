@@ -1,5 +1,4 @@
 /* eslint-disable */
-const meddler = require('/Users/chriskelsey/Sites/ck/equipt/src/server/meddler').instance;
 const Service = {
     beforeSession: function() {
         require('@babel/register')({
@@ -14,32 +13,16 @@ const Service = {
                 }]
             ],
             plugins: ['istanbul', ['babel-plugin-module-resolver', {
-                root: ['/Users/chriskelsey/Sites/ck/built/equipt-testing'],
-                alias: './'
+                root: ['./'],
+                alias: './',
+                cache: false
             }]],
-            root: '/Users/chriskelsey/Sites/ck/built/equipt-testing/babel.config.js',
-            extends: '/Users/chriskelsey/Sites/ck/built/equipt-testing/babel.config.js',
-            ignore: ['node_modules']
+            root: './',
+            extends: './',
+            ignore: ['node_modules'],
+            cache: false
         });
         require('regenerator-runtime');
-    },
-    beforeTest: function(test) {
-        meddler.trigger('beforeTest', {
-            test,
-            type: 'beforeTest'
-        });
-    },
-    afterTest: function(test) {
-        meddler.trigger('afterTest', {
-            test,
-            type: 'afterTest'
-        });
-    },
-    onPrepare: function(config) {
-        meddler.trigger('onPrepare', {
-            config,
-            type: 'onPrepare'
-        });
     },
 };
 exports.config = {
@@ -65,11 +48,12 @@ exports.config = {
     waitforTimeout: 20000,
     connectionRetryTimeout: 20000,
     connectionRetryCount: 3,
-    reporters: ['json'],
+    reporters: ['spec', 'json'],
     reporterOptions: {
         combined: true
     },
     services: ['chromedriver', [Service]],
-    specs: ["/Users/chriskelsey/Sites/ck/built/tests/utils.between.test.js", "/Users/chriskelsey/Sites/ck/built/tests/utils.get.test.js", "/Users/chriskelsey/Sites/ck/built/tests/utils.pipe.test.js"],
-    outputDir: '/Users/chriskelsey/Sites/ck/built/equipt-testing/tmp'
+    specs: ["tests/utils.between.test.js", "tests/utils.get.test.js", "tests/utils.is-non-collection.test.js", "tests/utils.pipe.test.js"],
+    outputDir: './',
+    cache: false
 };

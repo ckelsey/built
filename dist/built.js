@@ -249,32 +249,6 @@ module.exports = _setPrototypeOf;
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Get; });
-/**
- * Searches any type of item down a provided path, returning an emptyVal if provided. Also has the ability to perform a function on the end result
- * @function Get
- * 
- * @param {any} obj - The item to search. Can really be anything, as Get will call methods if provided
- * 
- * @param {string} path - The path chain to follow. Must be dot(.) seperated. Array indice should be dot as well. 
- * Can have methods, but arguments can only be strings, numbers, or booleans.
- * 
- * @param {any} emptyVal - If nothing resulted in the search, return this
- * 
- * @param {function()} modifyFn - A function that will be run to modify the returned result
- * 
- * @return {any} Either the found item or the emptyVal if provided
- * 
- * @example 
- * const obj = {
- *      a:{
- *          b:[
- *              `C`
- *          ]
- *      }
- * }
- * 
- * Get(obj, `a.b.0.toLowerCase()`) // `c`
- */
 function Get(obj, path, emptyVal) {
   var modifyFn = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : function (v) {
     return v;
@@ -306,24 +280,12 @@ function Get(obj, path, emptyVal) {
       var reg = /\((.*?)\)/g.exec(currentValue);
       var argsString = reg[1];
       var args = argsString.split(",").map(function (arg) {
-        arg = arg.trim();
-
-        if (["\"", "'", "`"].indexOf(arg.charAt(0))) {
-          console.log("yesah");
-          return arg;
-        }
-
-        try {
-          return JSON.parse(arg);
-        } catch (error) {
-          console.log(error);
-          return arg;
-        }
-      });
+        return !isNaN(arg) ? parseFloat(arg) : arg.trim();
+      } // if has quotes -> string, no? -> number, obj, whatever
+      );
       var functionName = currentValue.split("(")[0];
 
       if (typeof accumulator[functionName] === "function") {
-        console.log(args);
         return accumulator[functionName].apply(accumulator, args);
       }
     }
@@ -558,17 +520,33 @@ function SetStyleRules(styleElement, ruleString) {
   }
 }
 // CONCATENATED MODULE: ./src/utils/pipe/index.js
+/*
+TODO - def has room for improvement. takes a little over 2.5x as long to run
+*/
+function PipeInnerFunctionReducer(result, currentFunction) {
+  return typeof currentFunction !== "function" ? result : currentFunction(result);
+}
+
 function Pipe() {
   for (var _len = arguments.length, functions = new Array(_len), _key = 0; _key < _len; _key++) {
     functions[_key] = arguments[_key];
   }
 
   return function PipeInnerFunction(value) {
-    return functions.reduce(function PipeInnerFunctionReducer(result, currentFunction) {
-      return typeof currentFunction !== "function" ? result : currentFunction(result);
-    }, value);
+    return functions.reduce(PipeInnerFunctionReducer, value);
   };
-}
+} // export function Pipe(...functions) {
+//     return function PipeInnerFunction(value) {
+//         return functions.reduce(
+//             function PipeInnerFunctionReducer(result, currentFunction) {
+//                 return typeof currentFunction !== `function` ?
+//                     result :
+//                     currentFunction(result)
+//             },
+//             value
+//         )
+//     }
+// }
 // EXTERNAL MODULE: ./src/utils/get/index.js
 var utils_get = __webpack_require__(4);
 
@@ -628,7 +606,7 @@ function ReduceFilter(predicateFunction) {
 }
 // CONCATENATED MODULE: ./src/utils/is-non-collection/index.js
 
-var nonCollections = ["string", "number", "null", "undefined", "function", "boolean"];
+
 /**
  * Determines if a value is not a collection 
  * @function IsNonCollection
@@ -644,9 +622,9 @@ var nonCollections = ["string", "number", "null", "undefined", "function", "bool
  * IsNonCollection(()=>{}) // true
  * IsNonCollection(true) // true
  */
-
+var nonCollections = ["string", "number", "null", "undefined", "function", "boolean", "date"];
 function IsNonCollection(value) {
-  return nonCollections.indexOf(typeof_default()(value)) > -1 || value === null;
+  return nonCollections.indexOf(typeof_default()(value)) > -1 || value === null || value instanceof Date;
 }
 // CONCATENATED MODULE: ./src/utils/is-dom/index.js
 /**
@@ -1284,6 +1262,10 @@ function Equals(value1, value2) {
     return false;
   }
 
+  if (type === "object" && value1.constructor !== value2.constructor) {
+    return false;
+  }
+
   if (type === "date") {
     var d = value1 === value2;
 
@@ -1296,7 +1278,8 @@ function Equals(value1, value2) {
 
   if (type === "dom") {
     return value1.isEqualNode(value2);
-  }
+  } // Start walking
+
 
   if (type === "array") {
     var len = value1.length;
@@ -1449,6 +1432,11 @@ function Observer(initialValue) {
     var valuesObj = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     Object.keys(values.subscriptions).forEach(function (subscriptionId) {
       var subscriptionFn = values.subscriptions[subscriptionId][key];
+
+      if (typeof subscriptionFn !== "function") {
+        return;
+      }
+
       subscriptionFn(val, valuesObj, subscriptionId);
     });
 
@@ -2296,6 +2284,231 @@ var ButtonElement = WCConstructor({
   }
 });
 WCDefine(button_element_componentName, ButtonElement);
+// CONCATENATED MODULE: ./src/utils/throttle/index.js
+function Throttle(fn) {
+  var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 33;
+  var timer = null;
+  var start = null;
+  return function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    cancelAnimationFrame(timer);
+    start = new Date().getTime();
+
+    var _this = this;
+
+    var test = function test() {
+      var now = new Date().getTime();
+
+      if (now - start >= wait) {
+        fn.apply(_this, args);
+        cancelAnimationFrame(timer);
+        start = null;
+        timer = null;
+        return;
+      }
+
+      timer = requestAnimationFrame(test);
+    };
+
+    test();
+  };
+}
+// CONCATENATED MODULE: ./src/utils/to-number/index.js
+
+function ToNumber(value) {
+  var result = TMonad(value);
+
+  if (result.stop) {
+    return result;
+  }
+
+  if (result.type === "string" && !IsEmpty(result.value)) {
+    result.value = parseFloat(result.value);
+  }
+
+  result.type = Type(result.value);
+  result.valid = !isNaN(result.value);
+  return result;
+}
+// CONCATENATED MODULE: ./src/utils/index-of/index.js
+
+function IndexOf(array) {
+  return function (value) {
+    var result = TMonad(value);
+
+    if (result.stop) {
+      return result;
+    }
+
+    var arr = ToArray(array);
+
+    if (!arr.valid) {
+      result.valid = false;
+      return result;
+    }
+
+    result.valid = arr.value.indexOf(result.value) > -1;
+    return result;
+  };
+}
+// CONCATENATED MODULE: ./src/utils/observe-event/index.js
+
+function ObserveEvent(element, eventName) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  if (!element || !eventName) {
+    return;
+  }
+
+  var isRunning = false;
+  var mObserver = {
+    disconnect: function disconnect() {}
+  };
+  options = Object.assign({}, {
+    preventDefault: false,
+    stopPropagation: false,
+    useCapture: true
+  }, options); // const asWindow = () => element && element.document && element.location && element.alert && element.setInterval ? element : undefined
+
+  var startup = function startup() {
+    if (!element || !element.parentNode && !element.host || isRunning) {
+      return;
+    }
+
+    isRunning = true; // const el = asWindow() || element
+
+    element.addEventListener(eventName, eventHandler, options.useCapture);
+  };
+
+  var observer = Observer(undefined, undefined, startup);
+
+  var eventHandler = function eventHandler(event) {
+    if (!observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0) {
+      return shutDown();
+    }
+
+    if (options.preventDefault) {
+      event.preventDefault();
+    }
+
+    if (options.stopPropagation) {
+      event.stopPropagation();
+    }
+
+    observer.next(event);
+  };
+
+  var shutDown = function shutDown() {
+    element.removeEventListener(eventName, eventHandler, options.useCapture);
+    isRunning = false;
+  };
+
+  var dispose = function dispose() {
+    shutDown();
+    observer.complete();
+    mObserver.disconnect();
+  };
+
+  mObserver = new MutationObserver(function (e) {
+    var elementIsRemoved = false;
+    var ii = e.length;
+
+    while (!elementIsRemoved && ii) {
+      ii = ii - 1;
+      var i = e[ii].removedNodes.length;
+
+      while (!elementIsRemoved && i) {
+        i = i - 1;
+        elementIsRemoved = e[ii].removedNodes[i] === element;
+      }
+    }
+
+    if (elementIsRemoved) {
+      dispose();
+    }
+  });
+  var max = 1000;
+
+  var tryIt = function tryIt() {
+    // const win = asWindow()
+    var parent = element.parentNode || element.host; // || win
+
+    max = max - 1;
+
+    if (!max) {
+      return dispose();
+    }
+
+    if (!parent) {
+      return requestAnimationFrame(tryIt);
+    } // if (win) { return observeWindow(win) }
+
+
+    mObserver.observe(parent, {
+      childList: true
+    });
+    startup();
+  };
+
+  tryIt();
+  return observer;
+}
+// CONCATENATED MODULE: ./src/utils/was-clicked-on/index.js
+function WasClickedOn(element, event) {
+  if (!element) {
+    return false;
+  }
+
+  var isArray = Array.isArray(element);
+
+  var isIt = function isIt(el, par) {
+    var isEqual = el === par;
+    var isContained = par instanceof Node && el.contains(par);
+
+    if (isEqual || isContained) {
+      return true;
+    }
+
+    return false;
+  };
+
+  var target = Array.isArray(event.path) ? event.path[0] : event.composedPath && typeof event.composedPath === "function" && event.composedPath()[0] ? event.composedPath()[0] : event.originalTarget ? event.originalTarget : event.explicitOriginalTarget ? event.explicitOriginalTarget : event.target;
+
+  var cycleUp = function cycleUp(parent) {
+    while (parent && parent !== document.body) {
+      if (isArray) {
+        if (element.length == 1) {
+          if (isIt(element[0], parent)) {
+            return true;
+          }
+        } else {
+          var len = element.length;
+
+          while (len) {
+            len = len - 1;
+
+            if (isIt(element[len], parent)) {
+              return true;
+            }
+          }
+        }
+      } else {
+        if (isIt(element, parent)) {
+          return true;
+        }
+      }
+
+      parent = parent.parentNode || parent.host;
+    }
+
+    return false;
+  };
+
+  return cycleUp(target);
+}
 // CONCATENATED MODULE: ./src/utils/reduce-map/index.js
 /**
  * Takes a mapping function and returns a reducer
@@ -2355,142 +2568,6 @@ function ObserverUnsubscribe(subscription) {
     Object.keys(subscription).reduce(callArrayOfSubscriptions, []);
   }
 }
-// CONCATENATED MODULE: ./src/utils/observe-event/index.js
-
-function ObserveEvent(element, eventName) {
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-  if (!element || !eventName) {
-    return;
-  }
-
-  var isRunning = false;
-  var mObserver = {
-    disconnect: function disconnect() {}
-  };
-  options = Object.assign({}, {
-    preventDefault: false,
-    stopPropagation: false,
-    useCapture: true
-  }, options);
-
-  var startup = function startup() {
-    if (!element || !element.parentNode && !element.host || isRunning) {
-      return;
-    }
-
-    isRunning = true;
-    element.addEventListener(eventName, eventHandler, options.useCapture);
-  };
-
-  var observer = Observer(undefined, undefined, startup);
-
-  var eventHandler = function eventHandler(event) {
-    if (!observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0) {
-      return shutDown();
-    }
-
-    if (options.preventDefault) {
-      event.preventDefault();
-    }
-
-    if (options.stopPropagation) {
-      event.stopPropagation();
-    }
-
-    observer.next(event);
-  };
-
-  var shutDown = function shutDown() {
-    element.removeEventListener(eventName, eventHandler, options.useCapture);
-    isRunning = false;
-  };
-
-  var dispose = function dispose() {
-    shutDown();
-    observer.complete();
-    mObserver.disconnect();
-  };
-
-  mObserver = new MutationObserver(function (e) {
-    var elementIsRemoved = false;
-    var ii = e.length;
-
-    while (!elementIsRemoved && ii) {
-      ii = ii - 1;
-      var i = e[ii].removedNodes.length;
-
-      while (!elementIsRemoved && i) {
-        i = i - 1;
-        elementIsRemoved = e[ii].removedNodes[i] === element;
-      }
-    }
-
-    if (elementIsRemoved) {
-      dispose();
-    }
-  });
-  var max = 1000;
-
-  var tryIt = function tryIt() {
-    var parent = element.parentNode || element.host;
-    max = max - 1;
-
-    if (!max) {
-      return dispose();
-    }
-
-    if (!parent) {
-      return requestAnimationFrame(tryIt);
-    }
-
-    mObserver.observe(parent, {
-      childList: true
-    });
-    startup();
-  };
-
-  tryIt();
-  return observer;
-}
-// CONCATENATED MODULE: ./src/utils/to-number/index.js
-
-function ToNumber(value) {
-  var result = TMonad(value);
-
-  if (result.stop) {
-    return result;
-  }
-
-  if (result.type === "string" && !IsEmpty(result.value)) {
-    result.value = parseFloat(result.value);
-  }
-
-  result.type = Type(result.value);
-  result.valid = !isNaN(result.value);
-  return result;
-}
-// CONCATENATED MODULE: ./src/utils/index-of/index.js
-
-function IndexOf(array) {
-  return function (value) {
-    var result = TMonad(value);
-
-    if (result.stop) {
-      return result;
-    }
-
-    var arr = ToArray(array);
-
-    if (!arr.valid) {
-      result.valid = false;
-      return result;
-    }
-
-    result.valid = arr.value.indexOf(result.value) > -1;
-    return result;
-  };
-}
 // CONCATENATED MODULE: ./src/components/collapse-menu/index.js
 /**
  * add ripple and bounce to toggle container
@@ -2529,118 +2606,121 @@ var collapse_menu_setStyleElement = function setStyleElement(host) {
   collapse_menu_setStyles(outerStyle, styleString);
 };
 
-var waitForElement = function waitForElement(host, key) {
-  return new Promise(function (resolve, reject) {
-    var max = 1000;
+var removeSizer = function removeSizer(el) {
+  (el.parentElement || el.parentNode.host).removeChild(el);
+};
 
-    var here = function here() {
-      max = max - 1;
+var createSizer = function createSizer() {
+  var iframe = document.createElement("iframe");
+  iframe.style.opacity = "0";
+  iframe.style.position = "absolute";
+  iframe.style.width = "100%";
+  iframe.style.height = "100%";
+  iframe.style.top = "0%";
+  iframe.style.left = "0%";
+  iframe.style.zIndex = "-1";
+  iframe.style.pointerEvents = "none";
+  iframe.style.border = "none";
+  return iframe;
+};
 
-      if (!max) {
-        return reject();
-      }
+var collapse_menu_handleCollapse = function handleCollapse(container, host) {
+  Throttle(function () {
+    if (!host.collapseonwrap || host.expanded) {
+      return;
+    }
 
-      var el = host.elements[key];
+    var scrollWidth = container.scrollWidth;
+    var width = container.offsetWidth;
+    var itemsWidth = host.elements.items.scrollWidth;
+    var hostWidth = host.scrollWidth;
+    var siblingsWidth = Array.from(container.children).reduce(function (total, current) {
+      return total + current.scrollWidth;
+    }, -(hostWidth + host.sizer.scrollWidth));
 
-      if (el) {
-        return resolve(el);
-      }
+    if (scrollWidth > width && !host.expandable) {
+      host.expandable = true;
+    } else if (width >= itemsWidth + siblingsWidth) {
+      host.expandable = false;
+    }
+  }, host.throttle || 0)();
+};
 
-      requestAnimationFrame(here);
-    };
+var setContainer = function setContainer(container, host) {
+  if (host.sizer) {
+    removeSizer(host.sizer);
+  }
 
-    here();
+  if (!container || !host.collapseonwrap) {
+    return;
+  }
+
+  host.sizer = createSizer();
+  container.appendChild(host.sizer);
+  host.sizer.contentWindow.addEventListener("resize", function () {
+    return collapse_menu_handleCollapse(container, host);
+  });
+  requestAnimationFrame(function () {
+    return collapse_menu_handleCollapse(container, host);
   });
 };
 
-var resetExpandable = function resetExpandable(host) {
-  if (!host.collapseonwrap && !host.minwidth && !host.minpagewidth && host.expandable) {
+var handleMinWidth = function handleMinWidth(host) {
+  if (!host.minwidth) {
+    return;
+  }
+
+  if (host.minWidthSizer.scrollWidth < host.minwidth) {
+    host.expandable = true;
+  } else {
     host.expandable = false;
   }
 };
 
-var collapse_menu_observeSize = function observeSize(on, host) {
-  var run = function run(sizer) {
-    ObserverUnsubscribe(sizer);
-
-    if (!on) {
-      return resetExpandable(host);
-    }
-
-    var handleSizeChange = function handleSizeChange() {
-      return host.expandable = host.offsetWidth < host.minwidth;
-    };
-
-    handleSizeChange();
-    sizer.eventSubscriptions = {
-      resize: ObserveEvent(sizer.contentWindow, "resize").subscribe(handleSizeChange)
-    };
-  };
-
-  waitForElement(host, "sizer").then(run)["catch"](function () {});
-};
-
-var collapse_menu_observeWrapSize = function observeWrapSize(on, host) {
-  var run = function run(sizer) {
-    ObserverUnsubscribe(sizer);
-
-    if (!on) {
-      return resetExpandable(host);
-    }
-
-    var handleSizeChange = function handleSizeChange() {
-      var width = Array.from(host.querySelectorAll("[slot=\"item\"]")).reduce(function (totalWidth, el) {
-        totalWidth = el.offsetWidth + totalWidth;
-        return totalWidth;
-      }, 0);
-      host.expandable = host.offsetWidth < width;
-    };
-
-    handleSizeChange();
-    sizer.eventSubscriptions = {
-      resize: ObserveEvent(sizer.contentWindow, "resize").subscribe(handleSizeChange)
-    };
-  };
-
-  waitForElement(host, "wrapSizer").then(run)["catch"](function () {});
-};
-
-var collapse_menu_observeWindowSize = function observeWindowSize(on, host) {
-  var run = function run(root) {
-    ObserverUnsubscribe(root);
-
-    if (!on) {
-      return resetExpandable(host);
-    }
-
-    var handleWindowSize = function handleWindowSize() {
-      return host.expandable = window.innerWidth < host.minpagewidth;
-    };
-
-    handleWindowSize();
-    root.eventSubscriptions = {
-      resize: ObserveEvent(window, "resize").subscribe(handleWindowSize)
-    };
-  };
-
-  waitForElement(host, "root").then(run)["catch"](function () {});
-};
-
-var updateStyles = function updateStyles(host) {
-  var items = host.elements.items;
-  items.removeAttribute("style");
-
-  if (host.expandable) {
-    items.style.display = "none";
-    requestAnimationFrame(function () {
-      items.style.background = host.background;
-      requestAnimationFrame(function () {
-        var transitionString = "transform ".concat(host.speed, "ms, opacity ").concat(host.speed * 0.62, "ms");
-        items.style.transition = host.expandable ? transitionString : "none";
-        items.style.removeProperty("display");
-      });
-    });
+var setMinWidth = function setMinWidth(minWidth, host) {
+  if (!minWidth && host.minWidthSizer) {
+    return removeSizer(host.minWidthSizer);
   }
+
+  if (!minWidth) {
+    return;
+  }
+
+  var root = host.elements.root;
+  host.minWidthSizer = createSizer();
+  root.appendChild(host.minWidthSizer);
+  host.minWidthSizer.contentWindow.addEventListener("resize", function () {
+    return handleMinWidth(host);
+  });
+  requestAnimationFrame(function () {
+    return handleMinWidth(host);
+  });
+};
+
+var collapse_menu_setMinPageWidth = function setMinPageWidth(minWidth, host) {
+  if (!minWidth) {
+    return;
+  }
+
+  var handlePageWidth = Throttle(function (host) {
+    if (!host.minpagewidth) {
+      return;
+    }
+
+    if (window.innerWidth < host.minpagewidth) {
+      host.expandable = true;
+    } else {
+      host.expandable = false;
+    }
+  }, 333);
+  window.addEventListener("resize", function () {
+    return handlePageWidth(host);
+  });
+  handlePageWidth(host);
+};
+
+var setBackground = function setBackground(color, el) {
+  return !el ? undefined : el.style.backgroundColor = color;
 };
 
 var collapse_menu_properties = {
@@ -2652,24 +2732,6 @@ var collapse_menu_properties = {
     onChange: function onChange(val, host) {
       setAttr(host.elements.root, "expanded", val);
       setAttr(host, "expanded", val);
-      clearTimeout(host.horizontalItemsChange);
-      var items = host.elements.items;
-
-      if (!items || host.direction === "vertical") {
-        return;
-      }
-
-      if (val) {
-        items.style.flexDirection = "column";
-        items.style.margin = "0px";
-        items.style.minWidth = "200px";
-      } else {
-        host.horizontalItemsChange = setTimeout(function () {
-          items.style.removeProperty("flex-direction");
-          items.style.removeProperty("margin");
-          items.style.removeProperty("min-width");
-        }, host.speed * 1.1);
-      }
     }
   },
   expandable: {
@@ -2679,26 +2741,42 @@ var collapse_menu_properties = {
     onChange: function onChange(val, host) {
       setAttr(host.elements.root, "expandable", val);
       setAttr(host, "expandable", val);
-      updateStyles(host);
+
+      if (!val) {
+        host.expanded = false;
+      }
+    }
+  },
+  throttle: {
+    format: function format(val) {
+      return Pipe(ToNumber, IfInvalid(0))(val).value;
     }
   },
   minwidth: {
     format: function format(val) {
       return Pipe(ToNumber, IfInvalid(null))(val).value;
     },
-    onChange: collapse_menu_observeSize
+    onChange: setMinWidth
   },
   minpagewidth: {
     format: function format(val) {
       return Pipe(ToNumber, IfInvalid(null))(val).value;
     },
-    onChange: collapse_menu_observeWindowSize
+    onChange: collapse_menu_setMinPageWidth
   },
   collapseonwrap: {
     format: function format(val) {
       return Pipe(ToBool, IfInvalid(false))(val).value;
     },
-    onChange: collapse_menu_observeWrapSize
+    onChange: function onChange(val, host) {
+      var root = host.elements.root;
+
+      if (!root) {
+        return;
+      }
+
+      root.classList[val ? "add" : "remove"]("collapseonwrap");
+    }
   },
   direction: {
     format: function format(val) {
@@ -2716,26 +2794,19 @@ var collapse_menu_properties = {
       return setAttr(host.elements.root, "align", val);
     }
   },
-  container: {
-    format: function format(val) {
-      return Pipe(ToString, IfInvalid(""))(val).value;
-    }
-  },
-  speed: {
-    format: function format(val) {
-      return Pipe(ToNumber, IfInvalid(333))(val).value;
-    },
-    onChange: function onChange(_val, host) {
-      updateStyles(host);
-    }
-  },
   background: {
     format: function format(val) {
       return Pipe(ToString, IfInvalid("none"))(val).value;
     },
-    onChange: function onChange(_val, host) {
-      updateStyles(host);
+    onChange: function onChange(val, host) {
+      setBackground(val, host.elements.background);
     }
+  },
+  container: {
+    format: function format(val, host) {
+      return Object(utils_get["a" /* Get */])(host, val, host);
+    },
+    onChange: setContainer
   },
   styles: {
     format: function format(val) {
@@ -2757,16 +2828,20 @@ var collapse_menu_properties = {
 var collapse_menu_observedAttributes = Object.keys(collapse_menu_properties);
 var collapse_menu_elements = {
   root: {
-    selector: collapse_menu_componentRoot
+    selector: collapse_menu_componentRoot,
+    onChange: function onChange(el, host) {
+      setAttr(host.elements.root, "direction", host.direction);
+      el.classList[host.collapseonwrap ? "add" : "remove"]("collapseonwrap");
+    }
   },
   items: {
     selector: ".collapse-menu-items"
   },
-  sizer: {
-    selector: ".collapse-menu-sizer"
-  },
-  wrapSizer: {
-    selector: ".collapse-menu-wrap-sizer"
+  background: {
+    selector: ".collapse-menu-items-bg",
+    onChange: function onChange(el, host) {
+      setBackground(host.background, el);
+    }
   },
   internalStyles: {
     selector: "style.internalStyles"
@@ -2802,38 +2877,15 @@ var CollapseMenu = WCConstructor({
   elements: collapse_menu_elements,
   onConnected: function onConnected(host) {
     collapse_menu_setStyleElement(host);
-
-    var targetIsInHost = function targetIsInHost(parent) {
-      var isInHost = false;
-
-      try {
-        while (!isInHost && parent && parent !== document.body) {
-          if (host.contains(parent) || parent === host) {
-            isInHost = true;
-          }
-
-          parent = parent.parentElement;
-        }
-      } catch (error) {}
-
-      return isInHost;
-    };
-
     requestAnimationFrame(function () {
+      collapse_menu_setStyleElement(host);
       host.eventSubscriptions = {
         click: ObserveEvent(window, "click").subscribe(function (e) {
           if (!host.expanded) {
             return;
           }
 
-          var target = e.target;
-          var root = host.elements.root;
-
-          if (!root) {
-            return;
-          }
-
-          if (target !== host && !host.contains(target) && !root.contains(target) && !targetIsInHost(target)) {
+          if (WasClickedOn(host.elements.root, e)) {
             host.expanded = false;
           }
         })
@@ -2848,6 +2900,8 @@ WCDefine(collapse_menu_componentName, CollapseMenu);
 // CONCATENATED MODULE: ./src/services/icons.js
 var iconArrow = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z\"/></svg>";
 var iconChevron = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z\"/></svg>";
+var iconDelete = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z\"/></svg>";
+var iconFilter = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M15.96 10.29l-2.75 3.54-1.96-2.36L8.5 15h11l-3.54-4.71zM3 5H1v16c0 1.1.9 2 2 2h16v-2H3V5zm18-4H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 16H7V3h14v14z\"/></svg>";
 var iconGear = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z\"/></svg>";
 var iconPencil = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z\"/></svg>";
 var iconPlay = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M8 5v14l11-7z\"/></svg>";
@@ -2855,6 +2909,8 @@ var iconTriangle = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" heigh
 var Icons = {
   arrow: iconArrow,
   chevron: iconChevron,
+  "delete": iconDelete,
+  filter: iconFilter,
   gear: iconGear,
   pencil: iconPencil,
   play: iconPlay,
@@ -4296,31 +4352,6 @@ function ObserveSlots(element, mustHaveSlotAttribute) {
   tryIt();
   return observer;
 }
-// CONCATENATED MODULE: ./src/utils/was-clicked-on/index.js
-function WasClickedOn(element, event) {
-  if (!element) {
-    return false;
-  }
-
-  var target = Array.isArray(event.path) ? event.path[0] : event.composedPath && typeof event.composedPath === "function" && event.composedPath()[0] ? event.composedPath()[0] : event.originalTarget ? event.originalTarget : event.explicitOriginalTarget ? event.explicitOriginalTarget : event.target;
-
-  var cycleUp = function cycleUp(parent) {
-    while (parent && parent !== document.body) {
-      var isEqual = element === parent;
-      var isContained = parent instanceof Node && element.contains(parent);
-
-      if (isEqual || isContained) {
-        return true;
-      }
-
-      parent = parent.parentNode || parent.host;
-    }
-
-    return false;
-  };
-
-  return cycleUp(target);
-}
 // CONCATENATED MODULE: ./src/components/drop-down/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
@@ -4493,7 +4524,23 @@ var DropDown = WCConstructor({
           return;
         }
 
-        if (WasClickedOn(host.elements.heading, e) || WasClickedOn(host.querySelector("[slot=\"label\"]"), e)) {
+        if (WasClickedOn(Array.from(host.querySelectorAll("[slot=\"option\"]")), e)) {
+          host.dispatchEvent(new CustomEvent("optionclick", {
+            detail: {
+              host: host,
+              event: e
+            }
+          }));
+        }
+
+        if (WasClickedOn([host.elements.heading, host.querySelector("[slot=\"label\"]")], e)) {
+          host.dispatchEvent(new CustomEvent("labelclick", {
+            detail: {
+              host: host,
+              event: e
+            }
+          }));
+
           if (host.open) {
             return requestAnimationFrame(function () {
               return openClose(false, host);
@@ -7160,8 +7207,8 @@ var grid_layout_template = __webpack_require__(48);
 
 var grid_layout_componentName = "grid-layout";
 var grid_layout_componentRoot = ".".concat(grid_layout_componentName, "-container");
-var defaultWidth = "15em";
-var defaultGap = "1em";
+var defaultWidth = 240;
+var defaultGap = 16;
 
 var grid_layout_setStyles = function setStyles(el, styles) {
   if (!el) {
@@ -7171,16 +7218,12 @@ var grid_layout_setStyles = function setStyles(el, styles) {
   SetStyleRules(el, styles);
 };
 
-var grid_layout_setDimensions = function setDimensions(host) {
-  var canDoGrid = typeof host.style.grid === "string";
-  var gap = host.gap || defaultGap;
-  var columnwidth = host.columnwidth || defaultWidth;
+var grid_layout_setAllStyles = function setAllStyles(host, string) {
   var componentStyle = host.shadowRoot.querySelector("style[name=\"\"]");
   var themeStyles = host.elements.themeStyles;
   var injectedStyles = host.elements.injectedStyles;
   var outerStyle = host.querySelector("style[name=\"outer\"]");
-  var unsupportedCSS = canDoGrid ? "" : ".grid-layout-items{margin-left:-".concat(gap, ";margin-right:-").concat(gap, ";}.grid-layout-items .grid-layout-item{max-width:").concat(columnwidth, ";margin:").concat(gap, ";}");
-  var styleString = [grid_layout_style, themeStyles ? themeStyles.innerHTML : "", injectedStyles ? injectedStyles.innerHTML : "", ".grid-layout-items{grid-gap:".concat(gap, "; grid-template-columns:repeat(auto-fit, minmax(").concat(columnwidth, ", 0fr));}").concat(unsupportedCSS)].join("");
+  var styleString = [grid_layout_style, themeStyles ? themeStyles.innerHTML : "", injectedStyles ? injectedStyles.innerHTML : "", string].join("");
 
   if (!outerStyle) {
     AppendStyleElement(styleString, host, "outer");
@@ -7190,6 +7233,46 @@ var grid_layout_setDimensions = function setDimensions(host) {
 
   grid_layout_setStyles(componentStyle, styleString);
   grid_layout_setStyles(outerStyle, styleString);
+};
+
+var unsupportedCSS = function unsupportedCSS(host, gap, columnwidth) {
+  return typeof host.style.grid === "string" ? "" : ".grid-layout-items{margin-left:-".concat(gap, "px;margin-right:-").concat(gap, "px;}.grid-layout-items .grid-layout-item{max-width:").concat(columnwidth, "px;margin:").concat(gap, "px;}");
+};
+
+var setScale = function setScale(host) {
+  if (!host.scaletofit) {
+    return;
+  }
+
+  var gap = host.gap || defaultGap;
+  var columnwidth = host.columnwidth || defaultWidth;
+  var contentWidth = host.elements.root.offsetWidth + gap;
+  var columnGapPercent = 100 / Math.round(contentWidth / (gap + columnwidth));
+  var ratio = 1 - gap / columnwidth;
+
+  if (columnwidth === "100%") {
+    columnwidth = 100;
+    gap = 0;
+  } else {
+    if (columnGapPercent > 50) {
+      columnGapPercent = 50;
+    }
+
+    columnwidth = columnGapPercent * ratio;
+    gap = (columnGapPercent - columnwidth) / 2;
+  }
+
+  grid_layout_setAllStyles(host, ".grid-layout-items{display:flex; width:".concat(100 + gap * 2, "%;margin-left:-").concat(gap, "%;}.grid-layout-item{width:").concat(columnwidth, "%;padding:").concat(gap === 0 ? 4 : gap / 2, "% ").concat(gap, "%;}"));
+};
+
+var setDimensions = function setDimensions(host) {
+  if (host.scaletofit) {
+    return setScale(host);
+  }
+
+  var gap = host.gap || defaultGap;
+  var columnwidth = host.columnwidth || defaultWidth;
+  grid_layout_setAllStyles(host, ".grid-layout-items{grid-gap:".concat(gap, "px; grid-template-columns:repeat(auto-fit, minmax(").concat(columnwidth, "px, 0fr));}").concat(unsupportedCSS(host, gap, columnwidth)));
 };
 
 var grid_layout_elements = {
@@ -7215,18 +7298,18 @@ var grid_layout_elements = {
 var grid_layout_properties = {
   columnwidth: {
     format: function format(val) {
-      return Pipe(ToString, IfInvalid(defaultWidth))(val).value;
+      return val === "100%" ? val : Pipe(ToNumber, IfInvalid(defaultWidth))(val).value;
     },
     onChange: function onChange(_val, host) {
-      return grid_layout_setDimensions(host);
+      return setDimensions(host);
     }
   },
   gap: {
     format: function format(val) {
-      return Pipe(ToString, IfInvalid(defaultGap))(val).value;
+      return Pipe(ToNumber, IfInvalid(defaultGap))(val).value;
     },
     onChange: function onChange(_val, host) {
-      return grid_layout_setDimensions(host);
+      return setDimensions(host);
     }
   },
   styles: {
@@ -7243,6 +7326,11 @@ var grid_layout_properties = {
     },
     onChange: function onChange(val, host) {
       return grid_layout_setStyles(host.elements.themeStyles, val);
+    }
+  },
+  scaletofit: {
+    format: function format(val) {
+      return Pipe(ToBool, IfInvalid(false))(val).value;
     }
   }
 };
@@ -7276,15 +7364,13 @@ var GridLayout = WCConstructor({
     getComponentStyles: grid_layout_getComponentStyles
   },
   onConnected: function onConnected(host) {
-    var itemsContainer = host.elements.itemsContainer; // const spanValue = span => !HasNonDigits(span).valid ? `span ${span}` : span === `full` ? `1 / -1` : span
-    // const setSpan = (el, span) => Set(el, `container.style.gridColumn`, spanValue(span))
+    var itemsContainer = host.elements.itemsContainer;
 
     var wrapItem = function wrapItem(el) {
       var id = ID();
       var slotWrapper = document.createElement("div");
       slotWrapper.className = "grid-layout-item";
-      slotWrapper.id = id; // setSpan(el, Get(el, `span`, host.subsections))
-
+      slotWrapper.id = id;
       itemsContainer.appendChild(slotWrapper);
       var slot = document.createElement("slot");
       slot.name = id;
@@ -7299,22 +7385,7 @@ var GridLayout = WCConstructor({
         return;
       }
 
-      wrapItem(el); // const element = wrapItem(el)
-      // Set(
-      //     element,
-      //     `eventSubscriptions.span`,
-      //     new MutationObserver(mutationsList => {
-      //         const list = Array.from(mutationsList)
-      //         while (list.length) {
-      //             const mutation = list.shift()
-      //             if (mutation.type === `attributes` && mutation.attributeName === `span`) {
-      //                 // const span = element.getAttribute('span') || host.subsections
-      //                 // setSpan(element, span)
-      //             }
-      //         }
-      //     })
-      // )
-      // element.eventSubscriptions.span.observe(element, { attributes: true })
+      wrapItem(el);
     };
 
     var disconnectEl = function disconnectEl(el) {
@@ -7341,6 +7412,9 @@ var GridLayout = WCConstructor({
     });
     host.slotObserver.observe(host, {
       childList: true
+    });
+    window.addEventListener("resize", function () {
+      return setScale(host);
     });
   }
 });
@@ -11223,6 +11297,7 @@ var overlay_content_elementSelectors = {
   contentContainer: ".overlay-content-content-container",
   contentInner: ".overlay-content-content-inner",
   inner: ".overlay-content-container-inner",
+  themeStyles: "style.themeStyles",
   injectedStyles: "style.injectedStyles"
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
@@ -11260,6 +11335,14 @@ var overlay_content_attributes = {
   widthbasis: {
     format: function format(val) {
       return Pipe(IndexOf(overlay_content_widths), IfInvalid("content"))(val).value;
+    }
+  },
+  theme: {
+    format: function format(val) {
+      return typeof val === "string" ? val : "";
+    },
+    onChange: function onChange(val, host) {
+      return overlay_content_setStyles(host.elements.themeStyles, val);
     }
   },
   styles: {
@@ -12847,17 +12930,18 @@ var handle_route_handleRoute = function handleRoute(methods, url) {
 
 
 function Router(routes) {
-  var current = {};
-  var lastState = {};
-
   var _routes = Object.assign({}, routes);
 
-  var getRouteByPath = get_route_by_path(_routes);
-  current = Object.assign({}, {
+  var getRouteByPath = get_route_by_path(_routes); // internal state
+
+  var lastState = {};
+  var current = Object.assign({}, {
     path: location.pathname,
     query: get_query(location.search),
     base: "".concat(location.protocol, "//").concat(location.host).concat(location.port ? ":".concat(location.port) : "")
   }, getRouteByPath(location.pathname));
+  var initialPath = "".concat(location.pathname).concat(location.search);
+  var initialRoute = Object.assign({}, get_route(_routes, initialPath), current);
   var methods = {
     get current() {
       return Object.assign({}, current || {}, {
@@ -12866,6 +12950,7 @@ function Router(routes) {
       });
     },
 
+    // TODO should not be accesible but handle-route needs it, refactor later
     set current(cur) {
       current = cur;
     },
@@ -12893,8 +12978,8 @@ function Router(routes) {
       var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       return handle_route(methods, url, true, force);
     },
-    route$: Observer(undefined),
-    query$: Observer(undefined),
+    route$: Observer(initialRoute),
+    query$: Observer(initialRoute.query),
     updateQuery: function updateQuery(query) {
       if (!methods.current) {
         return;
@@ -12946,7 +13031,6 @@ function Router(routes) {
       update_state(methods, true, true);
     }
   };
-  methods.route("".concat(location.pathname).concat(location.search));
   click_listener(methods);
   pop_state_listener(methods);
   return methods;
@@ -13317,10 +13401,6 @@ function Between(start, end, value) {
     var matches = [];
 
     while ((match = regex.exec(value)) !== null) {
-      if (match.index === regex.lastIndex) {
-        regex.lastIndex = regex.lastIndex + 1;
-      }
-
       matches.push(match[1]);
     }
 
@@ -13332,11 +13412,7 @@ function Between(start, end, value) {
       return getAll();
     },
     first: function first() {
-      try {
-        return regex.exec(value)[1];
-      } catch (error) {
-        return;
-      }
+      return regex.exec(value)[1];
     },
     last: function last() {
       var results = getAll();
@@ -13551,9 +13627,7 @@ function FunctionToPartial() {
   }
 
   var argArray = [].concat(args);
-  var fn = argArray[0];
-  argArray.shift();
-  var initialArguments = argArray;
+  var fn = argArray.shift();
   /** If no function passed in, return */
 
   if (!fn) {
@@ -13562,8 +13636,8 @@ function FunctionToPartial() {
   /** If the passed in arguments equal the original functions arity, just call the function */
 
 
-  if (initialArguments.length >= fn.length) {
-    return fn.apply(fn, initialArguments);
+  if (argArray.length >= fn.length) {
+    return fn.apply(fn, argArray);
   }
   /** return function that takes new arguments which then returns a new FunctionToPartial */
 
@@ -13573,7 +13647,7 @@ function FunctionToPartial() {
       newArgs[_key2] = arguments[_key2];
     }
 
-    return FunctionToPartial.apply(void 0, [fn].concat(toConsumableArray_default()(initialArguments.concat([].concat(newArgs)))));
+    return FunctionToPartial.apply(void 0, [fn].concat(toConsumableArray_default()(argArray.concat([].concat(newArgs)))));
   };
 }
 // CONCATENATED MODULE: ./src/utils/has-keys/index.js
@@ -13645,6 +13719,69 @@ function Map(mapFunction, collection) {
 }
 
 
+// CONCATENATED MODULE: ./src/utils/match/index.js
+
+var match_Match = function Match(toSearchFor, toSearchIn) {
+  var doSearch = function doSearch(search) {
+    return search.match(ToRegex(toSearchFor).value);
+  };
+
+  if (toSearchIn === undefined) {
+    return function (toSearchIn) {
+      return doSearch(toSearchIn);
+    };
+  }
+
+  return doSearch(toSearchIn);
+};
+// CONCATENATED MODULE: ./src/utils/memoize/index.js
+var cache = new WeakMap();
+function Memoize(fn) {
+  return function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    var obj = {
+      fn: fn,
+      args: [].concat(args)
+    };
+    var cached = cache.get(obj);
+    console.log(cached, obj);
+
+    if (cached) {
+      return cached;
+    }
+
+    var result = fn.apply(fn, obj.args);
+    cache.set(obj, result);
+    return result; // const argArray = [...args]
+    // const id = JSON.stringify(argArray)
+    // const isCached = id in cache
+    // function newOne() {
+    //     cache.add = fn.apply(fn, argArray)
+    //     return cache[id]
+    // }
+    // console.log(isCached, id)
+    // return isCached ?
+    //     cache[id] :
+    //     newOne()
+  };
+} // export function Memoize() {
+//     const cache = {}
+//     function cacheHandler(fn) {
+//         return function () {
+//             const id = JSON.stringify(arguments)
+//             if (cache[id]) { return cache[id] }
+//             cache[id] = fn.apply(this, arguments)
+//             return cache[id]
+//         }
+//     }
+//     return {
+//         go(fn) { return cacheHandler(fn) },
+//         get cached() { return cache }
+//     }
+// }
 // CONCATENATED MODULE: ./src/utils/merge/index.js
 
 
@@ -14071,25 +14208,6 @@ function SuperFunction(fn) {
 }
 
 
-// CONCATENATED MODULE: ./src/utils/throttle/index.js
-function Throttle(fn) {
-  var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 33;
-  var timer = null;
-  return function () {
-    var _this = this;
-
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    if (timer === null) {
-      timer = setTimeout(function () {
-        fn.apply(_this, args);
-        timer = null;
-      }, wait);
-    }
-  };
-}
 // CONCATENATED MODULE: ./src/utils/to-entities/index.js
 
 function ToEntities(value) {
@@ -14206,6 +14324,8 @@ function WCRenderMarkup(templateStr, values) {
 /* concated harmony reexport UploadService */__webpack_require__.d(__webpack_exports__, "UploadService", function() { return UploadService; });
 /* concated harmony reexport iconArrow */__webpack_require__.d(__webpack_exports__, "iconArrow", function() { return iconArrow; });
 /* concated harmony reexport iconChevron */__webpack_require__.d(__webpack_exports__, "iconChevron", function() { return iconChevron; });
+/* concated harmony reexport iconDelete */__webpack_require__.d(__webpack_exports__, "iconDelete", function() { return iconDelete; });
+/* concated harmony reexport iconFilter */__webpack_require__.d(__webpack_exports__, "iconFilter", function() { return iconFilter; });
 /* concated harmony reexport iconGear */__webpack_require__.d(__webpack_exports__, "iconGear", function() { return iconGear; });
 /* concated harmony reexport iconPencil */__webpack_require__.d(__webpack_exports__, "iconPencil", function() { return iconPencil; });
 /* concated harmony reexport iconPlay */__webpack_require__.d(__webpack_exports__, "iconPlay", function() { return iconPlay; });
@@ -14260,6 +14380,8 @@ function WCRenderMarkup(templateStr, values) {
 /* concated harmony reexport IsTMonad */__webpack_require__.d(__webpack_exports__, "IsTMonad", function() { return IsTMonad; });
 /* concated harmony reexport LastOfMonth */__webpack_require__.d(__webpack_exports__, "LastOfMonth", function() { return last_of_month_LastOfMonth; });
 /* concated harmony reexport Map */__webpack_require__.d(__webpack_exports__, "Map", function() { return Map; });
+/* concated harmony reexport Match */__webpack_require__.d(__webpack_exports__, "Match", function() { return match_Match; });
+/* concated harmony reexport Memoize */__webpack_require__.d(__webpack_exports__, "Memoize", function() { return Memoize; });
 /* concated harmony reexport Merge */__webpack_require__.d(__webpack_exports__, "Merge", function() { return Merge; });
 /* concated harmony reexport MonthData */__webpack_require__.d(__webpack_exports__, "MonthData", function() { return month_data_MonthData; });
 /* concated harmony reexport ObserveEvent */__webpack_require__.d(__webpack_exports__, "ObserveEvent", function() { return ObserveEvent; });
@@ -14381,6 +14503,8 @@ function WCRenderMarkup(templateStr, values) {
 
 
 /** UTILS */
+
+
 
 
 
@@ -15482,14 +15606,14 @@ module.exports = g;
 
 exports = module.exports = __webpack_require__(0)(false);
 // Module
-exports.push([module.i, ":host(collapse-menu){display:inline-block;width:100%}collapse-menu{display:inline-block;width:100%}.collapse-menu-container{position:relative}.collapse-menu-container .default-toggle-icon{cursor:pointer;pointer-events:none;opacity:0;position:absolute;top:0;left:0;z-index:-1}.collapse-menu-container .collapse-menu-items{-webkit-transform-origin:0;transform-origin:0;height:100%}.collapse-menu-container .collapse-menu-toggle{opacity:1;-webkit-transition:opacity 0.2s;transition:opacity 0.2s}.collapse-menu-container .collapse-menu-toggle-inner{padding-left:10%;position:relative;display:none;cursor:pointer;margin:0;opacity:0;height:0}.collapse-menu-container .collapse-menu-toggle-inner .default-toggle-inner-icon{position:relative;left:-0.33em;pointer-events:none}.collapse-menu-container[direction=\"horizontal\"] .collapse-menu-items{display:-webkit-inline-box;display:inline-flex;margin-left:-.75em;margin-right:-.75em}.collapse-menu-container[expandable=\"true\"] .default-toggle-icon{opacity:1;position:relative;pointer-events:all;z-index:unset}.collapse-menu-container[expandable=\"true\"] .collapse-menu-items{-webkit-transform:translateX(-105%);transform:translateX(-105%);position:fixed;top:0;left:0;opacity:0;height:100vh}.collapse-menu-container[expandable=\"true\"] .collapse-menu-toggle-inner{display:block;margin:1em 0;height:27px;-webkit-transition:margin 0.01s linear 0.4s, height 0.01s linear 0.4s;transition:margin 0.01s linear 0.4s, height 0.01s linear 0.4s}.collapse-menu-container[expandable=\"true\"][align=\"right\"] .collapse-menu-items{right:0;left:unset;-webkit-transform:translateX(105%);transform:translateX(105%)}.collapse-menu-container[expandable=\"true\"][align=\"right\"] .collapse-menu-toggle-inner{-webkit-transform:rotate(180deg);transform:rotate(180deg);padding-left:0;padding-right:7%}.collapse-menu-container[expandable=\"false\"] .collapse-menu-items{position:relative;-webkit-transform:translateX(0%);transform:translateX(0%)}.collapse-menu-container[expandable=\"false\"] .collapse-menu-toggle-inner{opacity:0;z-index:-1;pointer-events:none}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-items{-webkit-transform:translateX(0%);transform:translateX(0%);opacity:1}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-toggle{opacity:0}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-toggle-inner{opacity:1;-webkit-transition:opacity 0.5s ease-in-out 0.1s;transition:opacity 0.5s ease-in-out 0.1s}.collapse-menu-sizer,.collapse-menu-wrap-sizer{opacity:0;visibility:hidden;position:absolute;width:100%;height:1px;z-index:-1;pointer-events:none}collapse-menu>[slot=\"item\"]{padding:.75em;box-sizing:border-box;-webkit-transform-origin:0;transform-origin:0;opacity:0}collapse-menu[expandable=\"false\"][direction=\"horizontal\"]>[slot=\"item\"],collapse-menu[expandable=\"false\"]:not([direction])>[slot=\"item\"]{padding:.33em .75em}collapse-menu[expandable=\"false\"]>[slot=\"item\"],collapse-menu:not([expandable])>[slot=\"item\"],collapse-menu[expanded=\"true\"]>[slot=\"item\"]{opacity:1}collapse-menu[expanded=\"true\"]>[slot=\"item\"]{padding:.75em 10%}\n", ""]);
+exports.push([module.i, ":host(collapse-menu){display:block}collapse-menu{display:block}.collapse-menu-container{position:relative}.collapse-menu-container .toggle-arrow,.collapse-menu-container .default-toggle-icon{display:inline-block;cursor:pointer;pointer-events:none;opacity:0;position:absolute;top:0;left:0;z-index:-1}.collapse-menu-container .toggle-arrow{position:relative;margin-left:-0.5em;margin-right:-0.5em}.collapse-menu-container .toggle-arrow svg{fill:currentColor}.collapse-menu-container .collapse-menu-items{-webkit-transition:-webkit-transform 0.2s;transition:-webkit-transform 0.2s;transition:transform 0.2s;transition:transform 0.2s, -webkit-transform 0.2s}.collapse-menu-container .collapse-menu-items .collapse-menu-items-inner{flex-wrap:nowrap;white-space:nowrap}.collapse-menu-container:not(.collapseonwrap) .collapse-menu-items .collapse-menu-items-inner{flex-wrap:wrap;white-space:normal}.collapse-menu-container .collapse-menu-items-bg{position:absolute;width:100%;height:100%;opacity:0;-webkit-transition:opacity 0s;transition:opacity 0s}.collapse-menu-container .collapse-menu-toggle{position:absolute;opacity:0;pointer-events:none;height:1.5em;display:-webkit-box;display:flex;cursor:pointer;-webkit-transition:opacity 0.2s;transition:opacity 0.2s}.collapse-menu-container .collapse-menu-toggle-icon{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center}.collapse-menu-container .collapse-menu-toggle-inner{padding-left:1em;position:relative;display:none;cursor:pointer;margin:0;opacity:0;height:0}.collapse-menu-container .collapse-menu-toggle-inner .default-toggle-inner-icon{position:relative;left:-0.33em;pointer-events:none}.collapse-menu-container[direction=\"horizontal\"] .collapse-menu-items{display:-webkit-box;display:flex}.collapse-menu-container[direction=\"horizontal\"] .collapse-menu-items .collapse-menu-items-inner{display:-webkit-box;display:flex}.collapse-menu-container[expandable=\"true\"] .toggle-arrow,.collapse-menu-container[expandable=\"true\"] .default-toggle-icon{opacity:1;position:relative;pointer-events:all;z-index:unset}.collapse-menu-container[expandable=\"true\"] .collapse-menu-items{opacity:0;pointer-events:none;z-index:-1;position:fixed;-webkit-transform:translateX(-105%);transform:translateX(-105%)}.collapse-menu-container[expandable=\"true\"] .collapse-menu-items-bg{opacity:1;-webkit-transition:opacity 0s linear 0.3s;transition:opacity 0s linear 0.3s}.collapse-menu-container[expandable=\"true\"] .collapse-menu-toggle-inner{display:block;margin:1em 0;height:1.5em;-webkit-transition:margin 0.01s linear 0.4s, height 0.01s linear 0.4s;transition:margin 0.01s linear 0.4s, height 0.01s linear 0.4s}.collapse-menu-container[expandable=\"true\"] .collapse-menu-toggle{position:relative;opacity:1;pointer-events:all}.collapse-menu-container[expandable=\"true\"][align=\"right\"] .collapse-menu-items{-webkit-transform:translateX(105%);transform:translateX(105%)}.collapse-menu-container[expandable=\"false\"] .collapse-menu-items{position:relative;-webkit-transform:translateX(0%);transform:translateX(0%)}.collapse-menu-container[expandable=\"false\"] .collapse-menu-toggle-inner{opacity:0;z-index:-1;pointer-events:none}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-items{-webkit-transform:translateX(0em);transform:translateX(0em);opacity:1;z-index:unset;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;top:0;left:0;height:100vh;-webkit-box-align:start;align-items:flex-start;pointer-events:all}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-items .collapse-menu-items-inner{-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;height:calc(100vh - 3.5em);overflow:auto}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-toggle{opacity:0}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-toggle-inner{opacity:1;-webkit-transition:opacity 0.5s ease-in-out 0.1s;transition:opacity 0.5s ease-in-out 0.1s}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"][align=\"right\"] .collapse-menu-items{right:0;left:unset}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"][align=\"right\"] .collapse-menu-toggle-inner{-webkit-transform:rotate(180deg);transform:rotate(180deg);padding-left:0;padding-right:7%}collapse-menu>[slot=\"item\"]{padding-right:1em;box-sizing:border-box;opacity:0}collapse-menu>[slot=\"item\"]:last-of-type{padding-right:0}collapse-menu[expandable=\"false\"]>[slot=\"item\"],collapse-menu:not([expandable])>[slot=\"item\"],collapse-menu[expanded=\"true\"]>[slot=\"item\"]{opacity:1}collapse-menu[expandable=\"false\"]>[slot=\"item\"]:last-of-type,collapse-menu:not([expandable])>[slot=\"item\"]:last-of-type{padding-right:0}collapse-menu[expandable=\"true\"][expanded=\"true\"]>[slot=\"item\"]{padding:0.5em 1em;position:relative}\n", ""]);
 
 
 /***/ }),
 /* 27 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=collapse-menu-container expanded=false expandable=false> <iframe class=collapse-menu-sizer></iframe> <iframe class=collapse-menu-wrap-sizer></iframe> <div class=collapse-menu-toggle> <slot name=toggle> <icon-element class=default-toggle-icon size=1.5em svg='<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z\"/></svg>'></icon-element> </slot> </div> <div class=collapse-menu-items> <div class=collapse-menu-toggle-inner> <slot name=toggle> <icon-element class=default-toggle-inner-icon size=1.5em svg='<svg class=\"default-inner-toggle-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\" /></svg>'></icon-element> </slot> </div> <slot name=item></slot> </div> <style type=text/css rel=stylesheet style=display:none class=internalStyles></style> </div> ";
+module.exports = "<div class=collapse-menu-container expanded=false expandable=false> <div class=collapse-menu-toggle> <div class=collapse-menu-toggle-icon> <slot name=toggle-icon> <icon-element style=height:1.5em class=default-toggle-icon size=1.5em svg='<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z\"/></svg>'></icon-element> <div class=toggle-arrow style=height:1.5em;margin-top:-.3em> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> </slot> </div> </div> <div class=collapse-menu-items> <div class=collapse-menu-items-bg></div> <div class=collapse-menu-toggle-inner> <icon-element class=default-toggle-inner-icon size=1.5em svg='<svg class=\"default-inner-toggle-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\" /></svg>'></icon-element> </div> <div class=collapse-menu-items-inner> <slot name=item></slot> </div> </div> <style type=text/css rel=stylesheet style=display:none class=internalStyles></style> </div> ";
 
 /***/ }),
 /* 28 */
@@ -15695,7 +15819,7 @@ module.exports = "<div class=\"image-loader-container notready\" style=opacity:0
 
 exports = module.exports = __webpack_require__(0)(false);
 // Module
-exports.push([module.i, ":host(input-field){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}:host(input-field)[focused=\"true\"]{z-index:3}input-field{display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}input-field[focused=\"true\"]{z-index:3}.input-field-container{display:inline-block;width:100%;max-width:100%;vertical-align:top;opacity:1;pointer-events:all;position:relative}.input-field-container *{box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.input-field-container label{padding:0.1em;font-weight:bold;min-height:1.6em;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;outline:none !important;opacity:1;cursor:pointer;-webkit-transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}.input-field-container label.input-field-left-label{padding-right:1em}.input-field-container label.input-field-right-label{padding-left:1em}.input-field-container label.input-field-inside-label{position:relative;pointer-events:none;padding:0;font-weight:normal;opacity:0.5;z-index:2;font-size:85%;-webkit-transform:scale(1.1) translateY(2.5em) translateX(1em);transform:scale(1.1) translateY(2.5em) translateX(1em);-webkit-transform-origin:left center;transform-origin:left center;min-height:1.6em;max-width:calc(100% - 4em)}.input-field-container .input-field-container-inner{position:relative;padding:1em 0em;min-height:1em;opacity:0;pointer-events:none;max-width:100%;-webkit-transition:opacity 0.2s ease-in-out 0.01s;transition:opacity 0.2s ease-in-out 0.01s}.input-field-container .input-field-container-inner.ready{opacity:1;pointer-events:all}.input-field-container .input-field-container-inner[label-position=\"inside\"]{padding:0 0 1.3em}.input-field-container .input-field-container-inner[label-position=\"left\"] .input-field-bottom-content{-webkit-box-pack:end;justify-content:flex-end;text-align:right}.input-field-container .input-field-container-inner[label-position=\"right\"] .input-field-bottom-content{-webkit-box-pack:start;justify-content:flex-start}.input-field-container .input-field-container-inner.invalid[label-position=\"inside\"]{padding:0}.input-field-container .input-field-container-inner.invalid .input-field-message-help{opacity:0;font-size:0%;-webkit-transform:scale(0);transform:scale(0)}.input-field-container .input-field-container-inner.invalid .input-field-message-error{opacity:1;font-size:90%;-webkit-transform:scale(1);transform:scale(1)}.input-field-container .input-field-container-inner.invalid .input-field-border{box-shadow:inset 0px 0px 0px 1px #a10005}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"],.input-field-container .input-field-container-inner[input-kind=\"radio\"]{min-height:5.25em;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-box-pack:center;justify-content:center}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] label.input-field-left-label,.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] label.input-field-right-label,.input-field-container .input-field-container-inner[input-kind=\"radio\"] label.input-field-left-label,.input-field-container .input-field-container-inner[input-kind=\"radio\"] label.input-field-right-label{margin-top:-0.2em}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input-container-inner,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input-container-inner{width:1.7em;height:1.7em;left:-.25em;top:-.25em;position:relative;margin-right:-0.5em;margin-bottom:-0.25em;cursor:pointer;pointer-events:all}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-border,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-border{box-shadow:none}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input{width:100%;height:100%;padding:0;position:relative;opacity:0;pointer-events:none}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::-webkit-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::-webkit-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input:-webkit-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input:-webkit-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input:-ms-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input:-ms-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::-webkit-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::-webkit-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::-moz-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::-moz-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::-ms-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::-ms-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] effect-underline,.input-field-container .input-field-container-inner[input-kind=\"radio\"] effect-underline{display:none}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-middle-section,.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input-section,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-middle-section,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input-section{width:auto;-webkit-box-flex:0;flex-grow:0}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-middle-section,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-middle-section{-webkit-box-align:start;align-items:flex-start}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input-container-inner:after{content:\"\";display:block;position:absolute;top:0.24em;left:0.24em;width:1.2em;height:1.2em;pointer-events:none;background:rgba(255,255,255,0.4);box-shadow:inset 0px 0px 0px 1px;-webkit-transition:background-color .4s, box-shadow .4s;transition:background-color .4s, box-shadow .4s}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"].checked .input-field-input-container-inner:after{background:currentColor}.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input-overlay{border-radius:50%}.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input-container-inner:before{content:\"\";display:block;position:absolute;top:0.235em;left:0.235em;width:1.2em;height:1.2em;pointer-events:none;background:rgba(255,255,255,0.4);border-radius:50%;box-shadow:inset 0px 0px 0px 1px;-webkit-transition:background-color .4s, box-shadow .4s;transition:background-color .4s, box-shadow .4s}.input-field-container .input-field-container-inner[input-kind=\"radio\"].checked .input-field-input-container-inner:before{background:currentColor}.input-field-container .input-field-container-inner[input-kind=\"radio\"].checked .input-field-input-container-inner:after{content:\"\\00b7\";color:#fff;display:-webkit-box;display:flex;position:absolute;pointer-events:none;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;font-size:2.3em;top:0;left:0;width:100%;height:100%;line-height:2.3em}.input-field-container .input-field-container-inner[input-kind=\"textarea\"] .input-field-input-overlay{padding-top:0.85em;-webkit-box-align:start;align-items:flex-start}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] input,.input-field-container .input-field-container-inner[input-kind=\"radio\"] input{cursor:pointer}.input-field-container .input-field-container-inner.notempty label.input-field-inside-label,.input-field-container .input-field-container-inner.focused label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.notempty[icon-align=\"left\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.notempty[icon-align=\"right\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.focused[icon-align=\"left\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.focused[icon-align=\"right\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.clearbutton.notempty label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.clearbutton.focused label.input-field-inside-label{pointer-events:all;padding:0;font-weight:bold;opacity:1;font-size:85%;z-index:unset;-webkit-transform:scale(1) translateY(0em) translateX(0em);transform:scale(1) translateY(0em) translateX(0em);max-width:100%}.input-field-container .input-field-container-inner.icon .input-field-icon{pointer-events:all;cursor:pointer}.input-field-container .input-field-container-inner.notempty.checked[input-kind=\"checkbox\"] .input-field-checkbox-overlay{opacity:1}.input-field-container .input-field-container-inner.focused .input-field-input-container{z-index:3}.input-field-container .input-field-container-inner[resize=\"auto\"] .input-field-input,.input-field-container .input-field-container-inner[resize=\"none\"] .input-field-input{resize:none}.input-field-container .input-field-container-inner[resize=\"horizontal\"] .input-field-input{resize:horizontal}.input-field-container .input-field-container-inner[resize=\"vertical\"] .input-field-input{resize:vertical}.input-field-container .input-field-container-inner[input-kind=\"file\"] .input-field-input-container-inner{background:rgba(255,255,255,0.4);position:relative;cursor:pointer;border-radius:2px}.input-field-container .input-field-container-inner[input-kind=\"file\"] .input-field-input-container-inner:after{content:attr(title) \"\";position:absolute;width:100%;height:100%;top:0;left:0;padding:1em;box-sizing:border-box;pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.input-field-container .input-field-container-inner[input-kind=\"file\"] .input-field-input{opacity:0;font-weight:normal;padding:0.929em 1em;cursor:pointer}.input-field-container .input-field-container-inner.max .input-field-character-count-max-divider,.input-field-container .input-field-container-inner.max .input-field-character-count-max,.input-field-container .input-field-container-inner.maxlength .input-field-character-count-max-divider,.input-field-container .input-field-container-inner.maxlength .input-field-character-count-max{display:block}.input-field-container .input-field-container-inner.showcount .input-field-character-count-container{display:block}.input-field-container .input-field-container-inner.clearbutton .input-field-clear{opacity:1;pointer-events:all;cursor:pointer;display:-webkit-box;display:flex}.input-field-container .input-field-container-inner.icon[icon-align=\"right\"] .input-field-input,.input-field-container .input-field-container-inner.clearbutton .input-field-input{padding-right:2.2em}.input-field-container .input-field-container-inner.icon[icon-align=\"left\"] .input-field-input{padding-left:2.2em}.input-field-container .input-field-container-inner.icon[icon-align=\"left\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.clearbutton label.input-field-inside-label{padding-left:1.2em}.input-field-container .input-field-container-inner.icon.clearbutton .input-field-input{padding-left:2.2em;padding-right:2.2em}.input-field-container .input-field-container-inner.icon[icon-align=\"right\"] .input-field-input-overlay{-webkit-box-pack:end;justify-content:flex-end}.input-field-container .input-field-container-inner.icon.clearbutton[icon-align=\"right\"] .input-field-input-overlay{-webkit-box-pack:justify;justify-content:space-between}.input-field-container .input-field-bottom-content{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:justify;justify-content:space-between;font-size:90%;padding:0.1em}.input-field-container .input-field-message-help{opacity:0.6;line-height:1.6em;font-size:90%;-webkit-transform:scale(1);transform:scale(1);-webkit-transition:opacity 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out, transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out, transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}.input-field-container .input-field-message-error{opacity:0;line-height:1.6em;-webkit-transform:scale(0);transform:scale(0);font-size:0%;color:#a10005;-webkit-transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}.input-field-container .input-field-character-count-inner{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:end;justify-content:flex-end;opacity:0.6;padding:0em 0em 0em 1em}.input-field-container .input-field-character-count-container,.input-field-container .input-field-character-count-max-divider,.input-field-container .input-field-character-count-max{display:none}.input-field-container icon-element{-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;display:-webkit-box;display:flex}.input-field-container .input-field-clear{display:none}.input-field-container .input-field-middle-section{display:-webkit-box;display:flex;flex-wrap:nowrap;width:100%;-webkit-box-align:center;align-items:center;position:relative}.input-field-container .input-field-input-section{width:100%;max-width:100%;position:relative;-webkit-box-flex:1;flex-grow:1;flex-basis:0}.input-field-container .input-field-input-container{position:relative}.input-field-container .input-field-input,.input-field-container .input-field-input.multi-input input{background:rgba(255,255,255,0.4);position:relative;border:none;border-radius:2px;display:block;margin:0em;width:100%;padding:1em;opacity:1;font:inherit;color:inherit;outline:none !important;-webkit-appearance:none;-moz-appearance:none;appearance:none;box-sizing:border-box;text-overflow:ellipsis;-webkit-hyphens:auto;-ms-hyphens:auto;hyphens:auto;box-shadow:none;-webkit-transition:color 0.4s, background-color 0.4s, opacity 0.2s, box-shadow 0.3s;transition:color 0.4s, background-color 0.4s, opacity 0.2s, box-shadow 0.3s}.input-field-container .input-field-input[disabled],.input-field-container .input-field-input.multi-input input[disabled]{pointer-events:none;cursor:not-allowed;opacity:0.6;background:rgba(200,200,200,0.6)}.input-field-container .input-field-input[readonly],.input-field-container .input-field-input.multi-input input[readonly]{cursor:not-allowed;pointer-events:none}.input-field-container .input-field-input.intl-phone-input,.input-field-container .input-field-input.multi-input input.intl-phone-input{padding:0;display:-webkit-box;display:flex;flex-wrap:nowrap;-webkit-box-align:center;align-items:center}.input-field-container .input-field-input.intl-phone-input input,.input-field-container .input-field-input.multi-input input.intl-phone-input input{-webkit-box-flex:1;flex-grow:1;width:100%;padding:1em 1em 1em 0.25em;margin:0;border:none;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:transparent;outline:none !important;font:inherit;line-height:inherit}.input-field-container .input-field-input.multi-input,.input-field-container .input-field-input.multi-input input.multi-input{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;padding:0}.input-field-container .input-field-input.multi-input>input,.input-field-container .input-field-input.multi-input input.multi-input>input{background:transparent}.input-field-container input,.input-field-container textarea{cursor:text}.input-field-container input::-ms-clear{display:none}@supports (-webkit-overflow-scrolling: touch){.input-field-container input.input-field-input:focus,.input-field-container textarea.input-field-input:focus{font-size:16px !important}}.input-field-container .input-field-border{position:absolute;width:100%;height:100%;top:0;left:0;border-radius:2px;pointer-events:none;box-shadow:inset 0px 0px 0px 1px;color:inherit;-webkit-transition:box-shadow 0.4s;transition:box-shadow 0.4s}.input-field-container .input-field-input-effects{position:absolute;width:100%;height:100%;top:0px;left:0px;pointer-events:none;padding:0em;overflow:hidden;border-radius:2px}.input-field-container .input-field-input-overlay{position:absolute;width:100%;height:100%;top:0px;left:0px;pointer-events:none;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:justify;justify-content:space-between;padding:0em 0.5em}.input-field-container .input-field-checkbox-overlay{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;position:absolute;width:1.2em;height:1.2em;top:0px;left:0px;pointer-events:none;color:#fff;opacity:0;margin-left:0.009em;-webkit-transition:opacity 0.2s ease-in-out;transition:opacity 0.2s ease-in-out}.input-field-file-path-overlay{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;background:transparent;border:none;display:block;margin:0em;padding:1em;opacity:1;font:inherit;color:inherit;outline:none !important;-webkit-appearance:none;-moz-appearance:none;appearance:none;box-sizing:border-box;text-overflow:ellipsis;-webkit-hyphens:auto;-ms-hyphens:auto;hyphens:auto;box-shadow:none}\n", ""]);
+exports.push([module.i, ":host(input-field){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}input-field{display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}.input-field-container{display:inline-block;width:100%;max-width:100%;vertical-align:top;opacity:1;pointer-events:all;position:relative}.input-field-container *{box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.input-field-container label{padding:0.1em;font-weight:bold;min-height:1.6em;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;outline:none !important;opacity:1;cursor:pointer;-webkit-transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}.input-field-container label.input-field-left-label{padding-right:1em}.input-field-container label.input-field-right-label{padding-left:1em}.input-field-container label.input-field-inside-label{position:relative;pointer-events:none;padding:0;font-weight:normal;opacity:0.5;font-size:85%;-webkit-transform:scale(1.1) translateY(2.5em) translateX(1em);transform:scale(1.1) translateY(2.5em) translateX(1em);-webkit-transform-origin:left center;transform-origin:left center;min-height:1.6em;max-width:calc(100% - 4em)}.input-field-container .input-field-container-inner{position:relative;padding:1em 0em;min-height:1em;opacity:0;pointer-events:none;max-width:100%;-webkit-transition:opacity 0.2s ease-in-out 0.01s;transition:opacity 0.2s ease-in-out 0.01s}.input-field-container .input-field-container-inner.ready{opacity:1;pointer-events:all}.input-field-container .input-field-container-inner[label-position=\"inside\"]{padding:0 0 1.3em}.input-field-container .input-field-container-inner[label-position=\"left\"] .input-field-bottom-content{-webkit-box-pack:end;justify-content:flex-end;text-align:right}.input-field-container .input-field-container-inner[label-position=\"right\"] .input-field-bottom-content{-webkit-box-pack:start;justify-content:flex-start}.input-field-container .input-field-container-inner.invalid[label-position=\"inside\"]{padding:0}.input-field-container .input-field-container-inner.invalid .input-field-message-help{opacity:0;font-size:0%;-webkit-transform:scale(0);transform:scale(0)}.input-field-container .input-field-container-inner.invalid .input-field-message-error{opacity:1;font-size:90%;-webkit-transform:scale(1);transform:scale(1)}.input-field-container .input-field-container-inner.invalid .input-field-border{box-shadow:inset 0px 0px 0px 1px #a10005}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"],.input-field-container .input-field-container-inner[input-kind=\"radio\"]{min-height:5.25em;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-box-pack:center;justify-content:center}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] label.input-field-left-label,.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] label.input-field-right-label,.input-field-container .input-field-container-inner[input-kind=\"radio\"] label.input-field-left-label,.input-field-container .input-field-container-inner[input-kind=\"radio\"] label.input-field-right-label{margin-top:-0.2em}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input-container-inner,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input-container-inner{width:1.7em;height:1.7em;left:-.25em;top:-.25em;position:relative;margin-right:-0.5em;margin-bottom:-0.25em;cursor:pointer;pointer-events:all}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-border,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-border{box-shadow:none}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input{width:100%;height:100%;padding:0;position:relative;opacity:0;pointer-events:none}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::-webkit-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::-webkit-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input:-webkit-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input:-webkit-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input:-ms-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input:-ms-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::-webkit-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::-webkit-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::-moz-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::-moz-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::-ms-input-placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::-ms-input-placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input::placeholder,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input::placeholder{color:currentColor;opacity:0.62}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] effect-underline,.input-field-container .input-field-container-inner[input-kind=\"radio\"] effect-underline{display:none}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-middle-section,.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input-section,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-middle-section,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input-section{width:auto;-webkit-box-flex:0;flex-grow:0}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-middle-section,.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-middle-section{-webkit-box-align:start;align-items:flex-start}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] .input-field-input-container-inner:after{content:\"\";display:block;position:absolute;top:0.24em;left:0.24em;width:1.2em;height:1.2em;pointer-events:none;background:rgba(255,255,255,0.4);box-shadow:inset 0px 0px 0px 1px;-webkit-transition:background-color .4s, box-shadow .4s;transition:background-color .4s, box-shadow .4s}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"].checked .input-field-input-container-inner:after{background:currentColor}.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input-overlay{border-radius:50%}.input-field-container .input-field-container-inner[input-kind=\"radio\"] .input-field-input-container-inner:before{content:\"\";display:block;position:absolute;top:0.235em;left:0.235em;width:1.2em;height:1.2em;pointer-events:none;background:rgba(255,255,255,0.4);border-radius:50%;box-shadow:inset 0px 0px 0px 1px;-webkit-transition:background-color .4s, box-shadow .4s;transition:background-color .4s, box-shadow .4s}.input-field-container .input-field-container-inner[input-kind=\"radio\"].checked .input-field-input-container-inner:before{background:currentColor}.input-field-container .input-field-container-inner[input-kind=\"radio\"].checked .input-field-input-container-inner:after{content:\"\\00b7\";color:#fff;display:-webkit-box;display:flex;position:absolute;pointer-events:none;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;font-size:2.3em;top:0;left:0;width:100%;height:100%;line-height:2.3em}.input-field-container .input-field-container-inner[input-kind=\"textarea\"] .input-field-input-overlay{padding-top:0.85em;-webkit-box-align:start;align-items:flex-start}.input-field-container .input-field-container-inner[input-kind=\"checkbox\"] input,.input-field-container .input-field-container-inner[input-kind=\"radio\"] input{cursor:pointer}.input-field-container .input-field-container-inner.notempty label.input-field-inside-label,.input-field-container .input-field-container-inner.focused label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.notempty[icon-align=\"left\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.notempty[icon-align=\"right\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.focused[icon-align=\"left\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.focused[icon-align=\"right\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.clearbutton.notempty label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.clearbutton.focused label.input-field-inside-label{pointer-events:all;padding:0;font-weight:bold;opacity:1;font-size:85%;-webkit-transform:scale(1) translateY(0em) translateX(0em);transform:scale(1) translateY(0em) translateX(0em);max-width:100%}.input-field-container .input-field-container-inner.icon .input-field-icon{pointer-events:all;cursor:pointer}.input-field-container .input-field-container-inner.notempty.checked[input-kind=\"checkbox\"] .input-field-checkbox-overlay{opacity:1}.input-field-container .input-field-container-inner:not(.focused){-webkit-transform-style:preserve-3d;transform-style:preserve-3d}.input-field-container .input-field-container-inner:not(.focused) .input-field-label-inside{-webkit-transform:translate3d(0, 0, 1px);transform:translate3d(0, 0, 1px)}.input-field-container .input-field-container-inner[resize=\"auto\"] .input-field-input,.input-field-container .input-field-container-inner[resize=\"none\"] .input-field-input{resize:none}.input-field-container .input-field-container-inner[resize=\"horizontal\"] .input-field-input{resize:horizontal}.input-field-container .input-field-container-inner[resize=\"vertical\"] .input-field-input{resize:vertical}.input-field-container .input-field-container-inner[input-kind=\"file\"] .input-field-input-container-inner{background:rgba(255,255,255,0.4);position:relative;cursor:pointer;border-radius:2px}.input-field-container .input-field-container-inner[input-kind=\"file\"] .input-field-input-container-inner:after{content:attr(title) \"\";position:absolute;width:100%;height:100%;top:0;left:0;padding:1em;box-sizing:border-box;pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.input-field-container .input-field-container-inner[input-kind=\"file\"] .input-field-input{opacity:0;font-weight:normal;padding:0.929em 1em;cursor:pointer}.input-field-container .input-field-container-inner.max .input-field-character-count-max-divider,.input-field-container .input-field-container-inner.max .input-field-character-count-max,.input-field-container .input-field-container-inner.maxlength .input-field-character-count-max-divider,.input-field-container .input-field-container-inner.maxlength .input-field-character-count-max{display:block}.input-field-container .input-field-container-inner.showcount .input-field-character-count-container{display:block}.input-field-container .input-field-container-inner.clearbutton .input-field-clear{opacity:1;pointer-events:all;cursor:pointer;display:-webkit-box;display:flex}.input-field-container .input-field-container-inner.icon[icon-align=\"right\"] .input-field-input,.input-field-container .input-field-container-inner.clearbutton .input-field-input{padding-right:2.2em}.input-field-container .input-field-container-inner.icon[icon-align=\"left\"] .input-field-input{padding-left:2.2em}.input-field-container .input-field-container-inner.icon[icon-align=\"left\"] label.input-field-inside-label,.input-field-container .input-field-container-inner.icon.clearbutton label.input-field-inside-label{padding-left:1.2em}.input-field-container .input-field-container-inner.icon.clearbutton .input-field-input{padding-left:2.2em;padding-right:2.2em}.input-field-container .input-field-container-inner.icon[icon-align=\"right\"] .input-field-input-overlay{-webkit-box-pack:end;justify-content:flex-end}.input-field-container .input-field-container-inner.icon.clearbutton[icon-align=\"right\"] .input-field-input-overlay{-webkit-box-pack:justify;justify-content:space-between}.input-field-container .input-field-bottom-content{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:justify;justify-content:space-between;font-size:90%;padding:0.1em}.input-field-container .input-field-message-help{opacity:0.6;line-height:1.6em;font-size:90%;-webkit-transform:scale(1);transform:scale(1);-webkit-transition:opacity 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out, transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out, transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}.input-field-container .input-field-message-error{opacity:0;line-height:1.6em;-webkit-transform:scale(0);transform:scale(0);font-size:0%;color:#a10005;-webkit-transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}.input-field-container .input-field-character-count-inner{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:end;justify-content:flex-end;opacity:0.6;padding:0em 0em 0em 1em}.input-field-container .input-field-character-count-container,.input-field-container .input-field-character-count-max-divider,.input-field-container .input-field-character-count-max{display:none}.input-field-container icon-element{-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;display:-webkit-box;display:flex}.input-field-container .input-field-clear{display:none}.input-field-container .input-field-middle-section{display:-webkit-box;display:flex;flex-wrap:nowrap;width:100%;-webkit-box-align:center;align-items:center;position:relative}.input-field-container .input-field-input-section{width:100%;max-width:100%;position:relative;-webkit-box-flex:1;flex-grow:1;flex-basis:0}.input-field-container .input-field-input-container{position:relative}.input-field-container .input-field-input,.input-field-container .input-field-input.multi-input input{background:rgba(255,255,255,0.4);position:relative;border:none;border-radius:2px;display:block;margin:0em;width:100%;padding:1em;opacity:1;font:inherit;color:inherit;outline:none !important;-webkit-appearance:none;-moz-appearance:none;appearance:none;box-sizing:border-box;text-overflow:ellipsis;-webkit-hyphens:auto;-ms-hyphens:auto;hyphens:auto;box-shadow:none;-webkit-transition:color 0.4s, background-color 0.4s, opacity 0.2s, box-shadow 0.3s;transition:color 0.4s, background-color 0.4s, opacity 0.2s, box-shadow 0.3s}.input-field-container .input-field-input[disabled],.input-field-container .input-field-input.multi-input input[disabled]{pointer-events:none;cursor:not-allowed;opacity:0.6;background:rgba(200,200,200,0.6)}.input-field-container .input-field-input[readonly],.input-field-container .input-field-input.multi-input input[readonly]{cursor:not-allowed;pointer-events:none}.input-field-container .input-field-input.intl-phone-input,.input-field-container .input-field-input.multi-input input.intl-phone-input{padding:0;display:-webkit-box;display:flex;flex-wrap:nowrap;-webkit-box-align:center;align-items:center}.input-field-container .input-field-input.intl-phone-input input,.input-field-container .input-field-input.multi-input input.intl-phone-input input{-webkit-box-flex:1;flex-grow:1;width:100%;padding:1em 1em 1em 0.25em;margin:0;border:none;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:transparent;outline:none !important;font:inherit;line-height:inherit}.input-field-container .input-field-input.multi-input,.input-field-container .input-field-input.multi-input input.multi-input{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;padding:0}.input-field-container .input-field-input.multi-input>input,.input-field-container .input-field-input.multi-input input.multi-input>input{background:transparent}.input-field-container input,.input-field-container textarea{cursor:text}.input-field-container input::-ms-clear{display:none}@supports (-webkit-overflow-scrolling: touch){.input-field-container input.input-field-input:focus,.input-field-container textarea.input-field-input:focus{font-size:16px !important}}.input-field-container .input-field-border{position:absolute;width:100%;height:100%;top:0;left:0;border-radius:2px;pointer-events:none;box-shadow:inset 0px 0px 0px 1px;color:inherit;-webkit-transition:box-shadow 0.4s;transition:box-shadow 0.4s}.input-field-container .input-field-input-effects{position:absolute;width:100%;height:100%;top:0px;left:0px;pointer-events:none;padding:0em;overflow:hidden;border-radius:2px}.input-field-container .input-field-input-overlay{position:absolute;width:100%;height:100%;top:0px;left:0px;pointer-events:none;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:justify;justify-content:space-between;padding:0em 0.5em}.input-field-container .input-field-checkbox-overlay{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;position:absolute;width:1.2em;height:1.2em;top:0px;left:0px;pointer-events:none;color:#fff;opacity:0;margin-left:0.009em;-webkit-transition:opacity 0.2s ease-in-out;transition:opacity 0.2s ease-in-out}.input-field-file-path-overlay{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;background:transparent;border:none;display:block;margin:0em;padding:1em;opacity:1;font:inherit;color:inherit;outline:none !important;-webkit-appearance:none;-moz-appearance:none;appearance:none;box-sizing:border-box;text-overflow:ellipsis;-webkit-hyphens:auto;-ms-hyphens:auto;hyphens:auto;box-shadow:none}\n", ""]);
 
 
 /***/ }),
@@ -15710,14 +15834,14 @@ module.exports = "<div class=input-field-container> <div class=input-field-conta
 
 exports = module.exports = __webpack_require__(0)(false);
 // Module
-exports.push([module.i, ":host(overlay-content){display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}overlay-content{display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}.overlay-content-container{display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}.overlay-content-container .overlay-content-container-inner{position:fixed;width:100%;height:100%;top:0px;left:0px;pointer-events:none;overflow:hidden;display:none}.overlay-content-container .overlay-content-content-container{max-height:80vh;max-width:80vw;overflow:auto;position:relative;width:100%;-webkit-transform-origin:center center;transform-origin:center center;-webkit-transform:scale(1, 0);transform:scale(1, 0);pointer-events:none;opacity:0;display:-webkit-inline-box;display:inline-flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-transition:opacity 0.2s ease-in-out;transition:opacity 0.2s ease-in-out}.overlay-content-container.active .overlay-content-container-inner{display:block}.overlay-content-container.active .overlay-content-content-container{pointer-events:all;opacity:1}.overlay-content-container.activating .overlay-content-container-inner{display:block}.overlay-content-container .overlay-content-content-inner{display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-box-pack:end;justify-content:flex-end;min-height:0}.overlay-content-container .overlay-content-content-inner.bottom{-webkit-box-pack:start;justify-content:flex-start}\n", ""]);
+exports.push([module.i, ":host(overlay-content){display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}overlay-content{display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}.overlay-content-container{display:block;position:absolute;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}.overlay-content-container .overlay-content-container-inner{position:absolute;width:100%;height:100%;top:0px;left:0px;pointer-events:none;overflow:hidden;display:none}.overlay-content-container .overlay-content-content-container{max-height:80vh;max-width:80vw;overflow:auto;position:absolute;width:100%;-webkit-transform-origin:center center;transform-origin:center center;-webkit-transform:scale(1, 0);transform:scale(1, 0);pointer-events:none;opacity:0;display:-webkit-inline-box;display:inline-flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-transition:opacity 0.2s ease-in-out;transition:opacity 0.2s ease-in-out}.overlay-content-container.active .overlay-content-container-inner{display:block}.overlay-content-container.active .overlay-content-content-container{pointer-events:all;opacity:1}.overlay-content-container.activating .overlay-content-container-inner{display:block}.overlay-content-container .overlay-content-content-inner{display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-box-pack:end;justify-content:flex-end;min-height:0}.overlay-content-container .overlay-content-content-inner.bottom{-webkit-box-pack:start;justify-content:flex-start}\n", ""]);
 
 
 /***/ }),
 /* 58 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=overlay-content-container> <div class=overlay-content-container-inner> <div class=overlay-content-content-container> <div class=overlay-content-content-inner> <slot></slot> </div> </div> </div> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
+module.exports = "<div class=overlay-content-container> <div class=overlay-content-container-inner> <div class=overlay-content-content-container> <div class=overlay-content-content-inner> <slot></slot> </div> </div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
 /* 59 */

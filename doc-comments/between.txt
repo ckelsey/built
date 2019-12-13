@@ -1,0 +1,20 @@
+/**
+ * Finds a string between 2 strings
+ * @function Between
+ *
+ * @param {string} start - The starting string
+ *
+ * @param {string} end - The ending string
+ *
+ * @param {any} value - The string to search
+ *
+ * @return {object} An object with the following methods:
+ * - first() - Returns the first match
+ * - last() - Returns the last match
+ * - all() - Returns all matches
+ * - at() - Returns a match at a given index
+ * - get() - Returns an .exec() object
+ *
+ * @example
+ * Between('{{', '}}', '{{a}}{{b}}').all() //-> ['a','b']
+ */

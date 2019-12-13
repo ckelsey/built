@@ -59,7 +59,9 @@
         "web components"
     ],
     "dependencies": {
-        "@webcomponents/webcomponentsjs": "^2.4.0"
+        "@webcomponents/webcomponentsjs": "^2.4.0",
+        "lodash.memoize": "^4.1.2",
+        "memoize-state": "^2.0.13"
     },
     "sideEffects": [
         "src/utils/id/index.js"
