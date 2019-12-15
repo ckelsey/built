@@ -1,6 +1,7 @@
 import { Type } from '../..'
 
-export const CreateElement = obj => {
+export const CreateElement = (obj, options = {}) => {
+    const { fragment = true } = options
     const el = document.createElement(obj.tagName || `div`)
 
     Object.keys(obj).forEach(key => {
@@ -17,5 +18,11 @@ export const CreateElement = obj => {
         }
     })
 
-    return el
+    if (!fragment) {
+        return el
+    }
+
+    const _fragment = document.createDocumentFragment()
+    _fragment.appendChild(el)
+    return _fragment
 }

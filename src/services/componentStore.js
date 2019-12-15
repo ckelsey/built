@@ -31,9 +31,7 @@ if (!hasComponentStore) {
         removeComponent: element => {
             const tag = getTag(element)
 
-            if (tag === ``) { return }
-
-            if (!global[ComponentStoreKey].components[tag]) { return }
+            if (tag === `` || !global[ComponentStoreKey].components[tag]) { return }
 
             const index = global[ComponentStoreKey].components[tag].indexOf(element)
 

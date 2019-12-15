@@ -1,27 +1,35 @@
-import { Observer, ObserverUnsubscribe } from '../..'
+import { Observer, ObserverUnsubscribe, Get } from '../..'
 
 const removeOld = el => {
-    if (!el || !el.parentNode) { return }
-
-    el.parentNode.removeChild(el)
+    const parent = Get(el, `parentNode`, Get(el, `host`))
+    if (!parent) { return }
+    parent.removeChild(el)
 }
 
 export function WCElements(host, elements) {
     const elStates = {}
     const state = {}
+    const elCache = {}
 
     const getEl = key => {
-        const els = host.shadowRoot.querySelectorAll(elements[key].selector)
+        const get = () => {
+            const els = host.shadowRoot.querySelectorAll(elements[key].selector)
+            let result = els.length > 1 ? Array.from(els) : els[0]
+            state[key] = result
 
-        if (els.length > 1) {
-            const e = Array.from(els)
-            return e
+            return result
         }
 
-        return els[0]
+        if (elCache[key]) {
+            // timer TODO
+            requestAnimationFrame(() => setTimeout(get, 0))
+            return elCache[key]
+        }
+
+        return get()
     }
 
-    Object.keys(elements).sort().forEach(key => {
+    Object.keys(elements).forEach(key => {
         elStates[key] = Observer(getEl(key))
 
         Object.defineProperty(state, key, {

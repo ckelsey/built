@@ -59,68 +59,23 @@
     <body>
 
         <input-field label="test"></input-field>
-        <div style="display: flex;align-items: center;">
-            <span>Hi all, I'm having...Hmm</span>
-            <div>
-                <collapse-menu id="collapse" collapseonwrap="true" background="#fff" container="parentElement.parentElement">
-                    <div slot="item">Hi all, I'm having difficulties</div>
-                    <div slot="item">Yarn version</div>
-                    <div slot="item">I'm getting this error below</div>
-                </collapse-menu>
-            </div>
-        </div>
 
-
-        <!-- <div>
-            <input-field label="Hey there"></input-field>
-        </div>
         <div>
-            <drop-down>
-                <div slot="label">Label</div>
-                <div slot="option">One</div>
-                <div slot="option">Two</div>
-            </drop-down>
+            <spinner-element visible="true"></spinner-element>
         </div>
 
-        <div style="color: #aaa;">
-            <progress-bar visible="true" color="#328eb9" header="Here is a header" text="Have some texteroos" cancel="Start"></progress-bar>
+        <div>
+            <progress-bar visible="true" button="Cancel" text="Doing it" header="Progress bar" percentage="true" overlay="false" animation="indeterminate"></progress-bar>
         </div>
 
-        <script>
-            var prog = document.querySelector('progress-bar')
-            var vals = [0, 0]
-            var interval
+        <div>
+            <snack-bar shown="true" type="success">
+                <div slot="body">Heyoo feel like a snack?</div>
+            </snack-bar>
+        </div>
 
-            prog.addEventListener(`canceled`, function (e) {
-                if (vals[0] === 0) {
-                    prog.cancel = 'Stop'
-                    interval = setInterval(function () {
-                        prog.text = Math.round(Math.random() * 10000)
-                        prog.value = vals
-                        vals = [vals[0] + 2, vals[1] + 5]
-                        if (vals[0] > 100) {
-                            clearInterval(interval)
-                        }
-                    }, 1000)
-                } else {
-                    clearInterval(interval)
-                    prog.cancel = 'Start'
-                    vals = [0, 0]
-                    prog.value = vals
-                }
-            })
-        </script> -->
-        <script type="text/javascript" src="/dist/built.js"></script>
-        <script>
-            var collapse = document.getElementById('collapse')
-            if (collapse) {
-                var filterIcon = document.createElement('div')
-                filterIcon.slot = 'toggle-icon'
-                filterIcon.setAttribute('style', "display:flex;align-items:center;")
-                filterIcon.innerHTML = '<span>Categories</span>' + window.builtjs.iconTriangle
-                collapse.appendChild(filterIcon)
-            }
-        </script>
+        <!-- <script type="text/javascript" src="/dist/built.js"></script> -->
+
     </body>
 
 </html>

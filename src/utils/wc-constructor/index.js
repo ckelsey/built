@@ -1,20 +1,12 @@
 import {
-    AppendStyleElement, ComponentStore, Equals, ToFunction, Get, Pipe,
+    ComponentStore, Equals, Pipe,
     IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot,
-    ObserverUnsubscribe
+    ObserverUnsubscribe, OnNextFrame
 } from '../..'
 
-const unsub = (el, elementProperty, eventKey) => Pipe(ToFunction, IfInvalid(() => { }))(Get(el, `${elementProperty}.${eventKey}`)).value()
+/** Does not actually mutate anything, tho itself gets mutated across setting styles, properties, etc */
 
-const unsubscribeEvents = (el, elementProperty = `eventSubscriptions`) => {
-    if (!el || !el[elementProperty]) { return }
-    Object.keys(el[elementProperty]).forEach(eventKey => unsub(el, elementProperty, eventKey))
-}
-
-const unsubscribeEvent = (el, eventKey, elementProperty = `eventSubscriptions`) => {
-    if (!el || !el[elementProperty]) { return }
-    unsub(el, elementProperty, eventKey)
-}
+let Total = 0
 
 const setProperty = (host, key, formatter, getter, setter) => {
     try {
@@ -45,73 +37,70 @@ const setProperty = (host, key, formatter, getter, setter) => {
 }
 
 const setStateProperty = (host, key, formatter, onChange, getter, setter) => {
-    if (typeof formatter !== `function`) { return }
+    OnNextFrame(() => {
+        if (typeof formatter !== `function`) { return }
 
-    host.state[key] = Observer(formatter(host[key], host))
+        host.state[key] = Observer(formatter(host[key], host))
 
-    setProperty(host, key, formatter, getter, setter)
+        setProperty(host, key, formatter, getter, setter)
 
-    if (typeof onChange !== `function`) { return }
+        if (typeof onChange !== `function`) { return }
 
-    host.state[key].subscribe(val => onChange(val, host))
+        host.state[key].subscribe(val => onChange(val, host))
+    })
 }
 
 export function WCConstructor(options) {
-    const componentName = options.componentName
-    const observedAttributes = options.observedAttributes || []
-    const template = options.template || `<slot></slot>`
-    const style = options.style || ``
-    const properties = options.properties || {}
-    const elements = options.elements || {}
-    const methods = options.methods
-    const computed = options.computed
-    const getters = options.getters || {}
-    const setters = options.setters || {}
-    const onConnected = options.onConnected
-    const onDisconnected = options.onDisconnected
-    const onReady = options.onReady
+    const genesis = performance.now()
+
+    const {
+        componentName,
+        computed = {},
+        elements = {},
+        getters = {},
+        methods = {},
+        observedAttributes = [],
+        onConnected = () => { },
+        onDisconnected = () => { },
+        onReady = () => { },
+        properties = {},
+        setters = {},
+        style = ``,
+        template = `<slot></slot>`,
+    } = options
 
     if (!componentName) { return }
 
     const ConnectedFn = element => {
+        OnNextFrame(() => {
+            element.wcID = ID()
 
-        if (options.appendStylesToParent) {
-            AppendStyleElement(style, element.parentElement, componentName)
-        }
+            element.unsubscribeEvents = () => ObserverUnsubscribe(element)
 
-        element.wcID = ID()
-        element.unsubscribeEvent = unsubscribeEvent
-        element.unsubscribeEvents = unsubscribeEvents
-
-        if (computed) {
             Object.keys(computed).forEach(key => {
                 // eslint-disable-next-line no-empty
                 try { Object.defineProperty(element, key, computed[key](element)) } catch (error) { }
             })
-        }
 
-        if (methods) {
             Object.keys(methods).forEach(key => element[key] = methods[key](element))
-        }
 
-        if (elements) {
-            const ElementData = WCElements(element, elements)
-            element.elements = ElementData.state
-            element.disconnectElements = ElementData.disconnect
-        }
+            if (elements) {
+                const ElementData = WCElements(element, elements)
+                element.elements = ElementData.state
+                element.disconnectElements = ElementData.disconnect
+            }
 
-        if (properties && !properties.ready) {
-            setStateProperty(
-                element,
-                `ready`,
-                val => Pipe(ToBool, IfInvalid(false))(val).value,
-                () => { },
-                getters.ready,
-                setters.ready
-            )
-        }
+            if (!properties.ready) {
+                setStateProperty(
+                    element,
+                    `ready`,
+                    val => Pipe(ToBool, IfInvalid(false))(val).value,
+                    () => { },
+                    getters.ready,
+                    setters.ready
+                )
+            }
 
-        if (properties) {
             Object.keys(properties).forEach(key => setStateProperty(
                 element,
                 key,
@@ -120,23 +109,16 @@ export function WCConstructor(options) {
                 getters[key],
                 setters[key]
             ))
-        }
 
-        if (onConnected) {
-            onConnected(element)
-        }
+            OnNextFrame(() => {
+                element[`ready`] = true
+                onReady(element)
+                onConnected(element)
 
-        if (element.state[`ready`]) {
-            element.state[`ready`].subscribe(() => element.dispatchEvent(new CustomEvent(`ready`, { detail: element })))
-        }
-
-        element[`ready`] = true
-
-        if (onReady) {
-            onReady(element)
-        }
-
-        element.dispatchEvent(new CustomEvent(`ready`, { detail: element }))
+                // check - when should events go off?
+                element.dispatchEvent(new CustomEvent(`ready`, { detail: element }))
+            })
+        })
     }
 
     class componentClass extends HTMLElement {
@@ -149,7 +131,7 @@ export function WCConstructor(options) {
             this.state = {}
             this.elements = {}
             this.disconnectElements = () => { }
-            SetShadowRoot(componentName, this, template, style, false, options.appendStylesToHead)
+            SetShadowRoot({ componentName, template, style, element: this })
         }
 
         attributeChangedCallback(attrName, oldValue, newValue) { if (newValue !== oldValue) { this[attrName] = newValue } }
@@ -184,25 +166,21 @@ export function WCConstructor(options) {
             element.state = {}
             element.elements = {}
             element.disconnectElements = () => { }
-
-            element.attributeChangedCallback = () => {
-
-            }
-
-            element.disconnectedCallback = () => {
-
-            }
-
+            element.attributeChangedCallback = () => { }
+            element.disconnectedCallback = () => { }
             SetShadowRoot(componentName, element, template, style, true, options.appendStylesToHead)
-
             ConnectedFn(element)
-
             return element
         }
     }
 
+    /** TODO - to provide support for old ass browsers eventually */
+    const object = newComponentObject()
+
+    console.log(`${componentName} - ${Total = Total + performance.now() - genesis}`)
+
     return {
-        object: newComponentObject(),
+        object,
         component: componentClass
     }
 }

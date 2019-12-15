@@ -1,4 +1,4 @@
-import { SetStyleRules } from '../../index'
+import { SetStyleRules, CreateElement } from '../../index'
 
 /**
  * Appends a style element with the provided rules to a provided element
@@ -10,14 +10,18 @@ import { SetStyleRules } from '../../index'
  * AppendStyleElement(`.selector { color: black;}`, document.head, `dark-text-n-stuff`)
  */
 
-export function AppendStyleElement(rulesString, parent, name = ``) {
+
+export function AppendStyleElement(rulesString, parent, name) {
     if (!parent || !rulesString) { return }
 
     /** First create and add the style element */
-    var style = document.createElement(`style`)
-    style.setAttribute(`type`, `text/css`)
-    style.setAttribute(`name`, name)
-    style.style.display = `none`
+    const style = CreateElement({
+        tagName: `style`,
+        type: `text/css`,
+        style: `display:none;`,
+        name
+    }, { fragment: false })
+
     parent.appendChild(style)
 
     /** Then set the rules */

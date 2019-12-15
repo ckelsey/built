@@ -8,36 +8,26 @@ import { /* tree-shaking no-side-effects-when-called */ IsDom, IsObject } from '
  */
 
 export function ObserverUnsubscribe(subscription) {
+    if (!subscription) { return }
 
     if (typeof subscription === `function`) {
         return subscription()
     }
 
     if (Array.isArray(subscription)) {
-        return subscription.reduce((result, current) => typeof current === `function` ? current() : undefined, [])
+        return subscription.forEach(current => typeof current === `function` ? current() : undefined)
     }
 
     if (IsDom(subscription)) {
-        let key
+        const key = subscription.eventSubscriptions ? `eventSubscriptions` : `subscriptions`
 
-        if (subscription.subscriptions) {
-            key = `subscriptions`
-        }
-
-        if (subscription.eventSubscriptions) {
-            key = `eventSubscriptions`
-        }
-
-        if (!key) { return }
+        if (!subscription[key]) { return }
 
         return Object.keys(subscription[key])
-            .reduce((result, current) => {
-                typeof subscription[key][current] === `function` ? subscription[key][current]() : undefined
-                return false
-            }, [])
+            .forEach(current => typeof subscription[key][current] === `function` ? subscription[key][current]() : undefined)
     }
 
     if (IsObject(subscription)) {
-        Object.keys(subscription).reduce((result, current) => typeof subscription[current] === `function` ? subscription[current]() : undefined, [])
+        Object.keys(subscription).forEach(current => typeof subscription[current] === `function` ? subscription[current]() : undefined)
     }
 }

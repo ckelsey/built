@@ -3,6 +3,8 @@ import {
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
     ObserveEvent, IndexOf, IfEmpty, EventName
 } from '../..'
+import { OnNextFrame } from '../../services/on-next-frame'
+import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
@@ -58,11 +60,14 @@ const setType = host => {
 }
 
 const setIcon = (host, key) => {
-    const icon = host.elements[key]
+    WCwhenPropertyReady(host, key)
+        .then(() => {
+            const icon = host.elements[key]
 
-    if (!icon) { return }
+            if (!icon) { return }
 
-    icon[host[key][0] === `<` ? `svg` : `type`] = host[key]
+            icon[host[key][0] === `<` ? `svg` : `type`] = host[key]
+        })
 }
 
 const showHideClose = (el, show) => {
@@ -74,43 +79,43 @@ const properties = {
     class: ComponentClassObject,
     shown: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (_val, host) => setShown(host)
+        onChange: (_val, host) => OnNextFrame(() => setShown(host))
     },
     align: {
         format: val => Pipe(ToString, IndexOf([`top`, `bottom`, `none`]), IfInvalid(`bottom`))(val).value,
-        onChange: (_val, host) => setAlign(host)
+        onChange: (_val, host) => OnNextFrame(() => setAlign(host))
     },
     type: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (_val, host) => setType(host)
+        onChange: (_val, host) => OnNextFrame(() => setType(host))
     },
     infoicon: {
         format: val => Pipe(ToString, IfInvalid(infoiconSvg), IfEmpty(infoiconSvg))(val).value,
-        onChange: (_val, host) => setIcon(host, `infoicon`)
+        onChange: (_val, host) => OnNextFrame(() => setIcon(host, `infoicon`))
     },
     successicon: {
         format: val => Pipe(ToString, IfInvalid(successiconSvg), IfEmpty(successiconSvg))(val).value,
-        onChange: (_val, host) => setIcon(host, `successicon`)
+        onChange: (_val, host) => OnNextFrame(() => setIcon(host, `successicon`))
     },
     erroricon: {
         format: val => Pipe(ToString, IfInvalid(erroriconSvg), IfEmpty(erroriconSvg))(val).value,
-        onChange: (_val, host) => setIcon(host, `erroricon`)
+        onChange: (_val, host) => OnNextFrame(() => setIcon(host, `erroricon`))
     },
     warningicon: {
         format: val => Pipe(ToString, IfInvalid(warningiconSvg), IfEmpty(warningiconSvg))(val).value,
-        onChange: (_val, host) => setIcon(host, `warningicon`)
+        onChange: (_val, host) => OnNextFrame(() => setIcon(host, `warningicon`))
     },
     hideclose: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (val, host) => showHideClose(host.elements.root, !val)
+        onChange: (val, host) => OnNextFrame(() => showHideClose(host.elements.root, !val))
     },
     styles: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
+        onChange: (val, host) => OnNextFrame(() => setStyles(host.elements.injectedStyles, val))
     },
     theme: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => setStyles(host.elements.themeStyles, val)
+        onChange: (val, host) => OnNextFrame(() => setStyles(host.elements.themeStyles, val))
     }
 }
 
@@ -119,20 +124,20 @@ const observedAttributes = Object.keys(properties)
 const elements = {
     root: {
         selector: componentRoot,
-        onChange: (_el, host) => {
+        onChange: (_el, host) => OnNextFrame(() => {
             setAlign(host)
             setShown(host)
-        }
+        })
     },
     button: {
         selector: `.snack-bar-close`,
-        onChange: (el, host) => {
+        onChange: (el, host) => OnNextFrame(() => {
             el.eventListeners = {
                 click: ObserveEvent(el, `click`).subscribe(() => host.shown = false)
             }
 
             showHideClose(host.elements.root, !host.hideclose)
-        }
+        })
     },
     injectedStyles: {
         selector: `style.injectedStyles`,
@@ -144,19 +149,19 @@ const elements = {
     },
     infoicon: {
         selector: `.infoicon`,
-        onChange: (_el, host) => setIcon(host, `infoicon`)
+        onChange: (_el, host) => OnNextFrame(() => setIcon(host, `infoicon`))
     },
     successicon: {
         selector: `.successicon`,
-        onChange: (_el, host) => setIcon(host, `successicon`)
+        onChange: (_el, host) => OnNextFrame(() => setIcon(host, `successicon`))
     },
     erroricon: {
         selector: `.erroricon`,
-        onChange: (_el, host) => setIcon(host, `erroricon`)
+        onChange: (_el, host) => OnNextFrame(() => setIcon(host, `erroricon`))
     },
     warningicon: {
         selector: `.warningicon`,
-        onChange: (_el, host) => setIcon(host, `warningicon`)
+        onChange: (_el, host) => OnNextFrame(() => setIcon(host, `warningicon`))
     },
 }
 

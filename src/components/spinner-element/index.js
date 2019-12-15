@@ -1,17 +1,21 @@
-import { Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, ComponentClassObject, SetStyleRules } from '../..'
+import { Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, OnNextFrame } from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
 
 const setStyles = (el, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles)
+    OnNextFrame(() => {
+        if (!el) { return }
+        SetStyleRules(el, styles)
+    })
 }
 
 const setTheme = (value, host) => {
-    const themeElement = host.elements.theme
-    if (!themeElement || value === undefined) { return }
-    SetStyleRules(themeElement, value)
+    OnNextFrame(() => {
+        const themeElement = host.elements.theme
+        if (!themeElement || value === undefined) { return }
+        SetStyleRules(themeElement, value)
+    })
 }
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -33,46 +37,54 @@ const doAllTheThings = host => {
 }
 
 const setRootClass = (host, condition, clss) => {
-    const root = host.elements.root
+    OnNextFrame(() => {
+        const root = host.elements.root
 
-    if (!root) { return }
+        if (!root) { return }
 
-    root.classList[condition ? `add` : `remove`](clss)
+        root.classList[condition ? `add` : `remove`](clss)
+    })
 }
 
 const setType = host => {
-    const root = host.elements.root
-    if (!root) { return }
-    root.setAttribute(`type`, host.type)
+    OnNextFrame(() => {
+        const root = host.elements.root
+        if (!root) { return }
+        root.setAttribute(`type`, host.type)
+    })
 }
 
 const setBlur = host => {
-    const scrim = host.elements.scrim
-    if (!scrim) { return }
-    scrim.style.backdropFilter = `blur(${host.blur}px)`
+    OnNextFrame(() => {
+        const scrim = host.elements.scrim
+        if (!scrim) { return }
+        scrim.style.backdropFilter = `blur(${host.blur}px)`
+    })
 }
 
 const setScrimColor = host => {
-    const scrim = host.elements.scrim
-    if (!scrim) { return }
-    scrim.style.background = host.scrimcolor
+    OnNextFrame(() => {
+        const scrim = host.elements.scrim
+        if (!scrim) { return }
+        scrim.style.background = host.scrimcolor
+    })
 }
 
 const setScrimOpacity = host => {
-    const scrim = host.elements.scrim
+    OnNextFrame(() => {
+        const scrim = host.elements.scrim
 
-    if (!scrim) { return }
+        if (!scrim) { return }
 
-    if (host.scrim) {
-        return scrim.style.opacity = host.scrimopacity
-    }
+        if (host.scrim) {
+            return scrim.style.opacity = host.scrimopacity
+        }
 
-    scrim.style.opacity = 0
+        scrim.style.opacity = 0
+    })
 }
 
-const toggleVisibility = host => {
-    host.elements.root.classList[host.visible ? `add` : `remove`](`shown`)
-}
+const toggleVisibility = host => OnNextFrame(() => host.elements.root.classList[host.visible ? `add` : `remove`](`shown`))
 
 const elements = {
     root: {
@@ -127,7 +139,6 @@ const properties = {
         onChange: setTheme
     }
 }
-
 
 export const SpinnerElement = WCConstructor({
     componentName,
