@@ -1,4 +1,4 @@
-import { Observer } from '../..'
+import { Observer, ObserverUnsubscribe } from '../..'
 
 const removeOld = el => {
     if (!el || !el.parentNode) { return }
@@ -6,29 +6,18 @@ const removeOld = el => {
     el.parentNode.removeChild(el)
 }
 
-
 export function WCElements(host, elements) {
     const elStates = {}
     const state = {}
-    // let currentEl
-
-    // const currentElExists = () => !!currentEl && (
-    //     (Array.isArray(currentEl) && currentEl.filter(el => !!el && !!el.parentElement).length) ||
-    //     !!currentEl.parentNode
-    // )
 
     const getEl = key => {
-        // if (currentElExists()) { return currentEl }
-
         const els = host.shadowRoot.querySelectorAll(elements[key].selector)
 
         if (els.length > 1) {
-            // currentEl = Array.from(els)
             const e = Array.from(els)
             return e
         }
 
-        // currentEl = els[0]
         return els[0]
     }
 
@@ -57,7 +46,9 @@ export function WCElements(host, elements) {
     return {
         state,
         disconnect: () => Object.keys(elStates).forEach(key => {
+            const el = host.elements[key]
             elStates[key].complete()
+            if (el) { ObserverUnsubscribe(el) }
         })
     }
 }

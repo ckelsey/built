@@ -1549,6 +1549,53 @@ function AppendStyleElement(rulesString, parent) {
   SetStyleRules(style, rulesString);
   return style;
 }
+// CONCATENATED MODULE: ./src/utils/observer-unsubscribe/index.js
+
+/**
+ * Looks for subscriptions in an object, DOM element or a subscription itself and unsubscribes.
+ * @function ObserverUnsubscribe
+ * @param {Object|HTMLElement|function()} subscription - An element that has or is a observer subscription. If is a DOM element, must be under `subscriptions` or `eventSubscriptions` properties
+ * @return {void}
+ */
+
+function ObserverUnsubscribe(subscription) {
+  if (typeof subscription === "function") {
+    return subscription();
+  }
+
+  if (Array.isArray(subscription)) {
+    return subscription.reduce(function (result, current) {
+      return typeof current === "function" ? current() : undefined;
+    }, []);
+  }
+
+  if (IsDom(subscription)) {
+    var key;
+
+    if (subscription.subscriptions) {
+      key = "subscriptions";
+    }
+
+    if (subscription.eventSubscriptions) {
+      key = "eventSubscriptions";
+    }
+
+    if (!key) {
+      return;
+    }
+
+    return Object.keys(subscription[key]).reduce(function (result, current) {
+      typeof subscription[key][current] === "function" ? subscription[key][current]() : undefined;
+      return false;
+    }, []);
+  }
+
+  if (IsObject(subscription)) {
+    Object.keys(subscription).reduce(function (result, current) {
+      return typeof subscription[current] === "function" ? subscription[current]() : undefined;
+    }, []);
+  }
+}
 // CONCATENATED MODULE: ./src/utils/wc-elements/index.js
 
 
@@ -1562,22 +1609,15 @@ var removeOld = function removeOld(el) {
 
 function WCElements(host, elements) {
   var elStates = {};
-  var state = {}; // let currentEl
-  // const currentElExists = () => !!currentEl && (
-  //     (Array.isArray(currentEl) && currentEl.filter(el => !!el && !!el.parentElement).length) ||
-  //     !!currentEl.parentNode
-  // )
+  var state = {};
 
   var getEl = function getEl(key) {
-    // if (currentElExists()) { return currentEl }
     var els = host.shadowRoot.querySelectorAll(elements[key].selector);
 
     if (els.length > 1) {
-      // currentEl = Array.from(els)
       var e = Array.from(els);
       return e;
-    } // currentEl = els[0]
-
+    }
 
     return els[0];
   };
@@ -1607,7 +1647,12 @@ function WCElements(host, elements) {
     state: state,
     disconnect: function disconnect() {
       return Object.keys(elStates).forEach(function (key) {
+        var el = host.elements[key];
         elStates[key].complete();
+
+        if (el) {
+          ObserverUnsubscribe(el);
+        }
       });
     }
   };
@@ -1864,6 +1909,7 @@ function WCConstructor(options) {
         }
 
         this.disconnectElements();
+        ObserverUnsubscribe(this);
 
         if (onDisconnected) {
           onDisconnected(this);
@@ -2371,15 +2417,22 @@ function ObserveEvent(element, eventName) {
     preventDefault: false,
     stopPropagation: false,
     useCapture: true
-  }, options); // const asWindow = () => element && element.document && element.location && element.alert && element.setInterval ? element : undefined
+  }, options);
+
+  var isWindow = function isWindow() {
+    return element && element.document && element.location && element.alert && element.setInterval;
+  };
+
+  var getParent = function getParent() {
+    return element ? element.parentNode ? element.parentNode : element.host ? element.host : undefined : undefined;
+  };
 
   var startup = function startup() {
     if (!element || !element.parentNode && !element.host || isRunning) {
       return;
     }
 
-    isRunning = true; // const el = asWindow() || element
-
+    isRunning = true;
     element.addEventListener(eventName, eventHandler, options.useCapture);
   };
 
@@ -2388,6 +2441,10 @@ function ObserveEvent(element, eventName) {
   var eventHandler = function eventHandler(event) {
     if (!observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0) {
       return shutDown();
+    }
+
+    if (!isWindow() && !getParent()) {
+      return dispose();
     }
 
     if (options.preventDefault) {
@@ -2432,10 +2489,8 @@ function ObserveEvent(element, eventName) {
   });
   var max = 1000;
 
-  var tryIt = function tryIt() {
-    // const win = asWindow()
-    var parent = element.parentNode || element.host; // || win
-
+  var tryToObserveIt = function tryToObserveIt() {
+    var parent = getParent();
     max = max - 1;
 
     if (!max) {
@@ -2443,9 +2498,8 @@ function ObserveEvent(element, eventName) {
     }
 
     if (!parent) {
-      return requestAnimationFrame(tryIt);
-    } // if (win) { return observeWindow(win) }
-
+      return requestAnimationFrame(tryToObserveIt);
+    }
 
     mObserver.observe(parent, {
       childList: true
@@ -2453,7 +2507,12 @@ function ObserveEvent(element, eventName) {
     startup();
   };
 
-  tryIt();
+  if (isWindow()) {
+    startup();
+  } else {
+    tryToObserveIt();
+  }
+
   return observer;
 }
 // CONCATENATED MODULE: ./src/utils/was-clicked-on/index.js
@@ -2508,65 +2567,6 @@ function WasClickedOn(element, event) {
   };
 
   return cycleUp(target);
-}
-// CONCATENATED MODULE: ./src/utils/reduce-map/index.js
-/**
- * Takes a mapping function and returns a reducer
- * @function ReduceMap
- * @param {function( item:any ) :any } mapFunction - The function to be called on every element, performs the mapping operation
- * @return {function( accumulator:[], current:any ):[] } ReduceMapResult - The reducer function
- * @example 
- * [`A`, `B`].reduce(ReduceMap(mapFunction), []) // [`a`, `b`,]
- */
-function ReduceMap(mapFunction) {
-  return function ReduceMapResult(result, current) {
-    return result.concat([mapFunction(current)]);
-  };
-}
-// CONCATENATED MODULE: ./src/utils/observer-unsubscribe/index.js
-
-/**
- * Looks for subscriptions in an object, DOM element or a subscription itself and unsubscribes.
- * @function ObserverUnsubscribe
- * @param {Object|HTMLElement|function()} subscription - An element that has or is a observer subscription. If is a DOM element, must be under `subscriptions` or `eventSubscriptions` properties
- * @return {void}
- */
-
-function ObserverUnsubscribe(subscription) {
-  // todo add filter for check
-  var callArrayOfSubscriptions = ReduceMap(function (val) {
-    return typeof val === "function" ? val() : undefined;
-  });
-
-  if (typeof subscription === "function") {
-    return subscription();
-  }
-
-  if (Array.isArray(subscription)) {
-    return subscription.reduce(callArrayOfSubscriptions, []);
-  }
-
-  if (IsDom(subscription)) {
-    var key;
-
-    if (subscription.subscriptions) {
-      key = "subscriptions";
-    }
-
-    if (subscription.eventSubscriptions) {
-      key = "eventSubscriptions";
-    }
-
-    if (!key) {
-      return;
-    }
-
-    return Object.keys(subscription[key]).reduce(callArrayOfSubscriptions, []);
-  }
-
-  if (IsObject(subscription)) {
-    Object.keys(subscription).reduce(callArrayOfSubscriptions, []);
-  }
 }
 // CONCATENATED MODULE: ./src/components/collapse-menu/index.js
 /**
@@ -2832,6 +2832,22 @@ var collapse_menu_elements = {
     onChange: function onChange(el, host) {
       setAttr(host.elements.root, "direction", host.direction);
       el.classList[host.collapseonwrap ? "add" : "remove"]("collapseonwrap");
+      el.eventSubscriptions = {
+        click: ObserveEvent(el, "click").subscribe(function (e) {
+          var items = Array.from(host.querySelectorAll("[slot=\"item\"]"));
+          var len = items.length;
+
+          while (len) {
+            len = len - 1;
+
+            if (WasClickedOn(items[len], e)) {
+              return host.dispatchEvent(new CustomEvent("itemclick", {
+                detail: e
+              }));
+            }
+          }
+        })
+      };
     }
   },
   items: {
@@ -13701,6 +13717,20 @@ var last_of_month_LastOfMonth = function LastOfMonth(value) {
   result.value = DateToObject(new Date(result.value.getFullYear(), result.value.getMonth() + 1, 0)).value;
   return result;
 };
+// CONCATENATED MODULE: ./src/utils/reduce-map/index.js
+/**
+ * Takes a mapping function and returns a reducer
+ * @function ReduceMap
+ * @param {function( item:any ) :any } mapFunction - The function to be called on every element, performs the mapping operation
+ * @return {function( accumulator:[], current:any ):[] } ReduceMapResult - The reducer function
+ * @example 
+ * [`A`, `B`].reduce(ReduceMap(mapFunction), []) // [`a`, `b`,]
+ */
+function ReduceMap(mapFunction) {
+  return function ReduceMapResult(result, current) {
+    return result.concat([mapFunction(current)]);
+  };
+}
 // CONCATENATED MODULE: ./src/utils/map/index.js
 
 /**

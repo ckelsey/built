@@ -200,6 +200,21 @@ const elements = {
         onChange(el, host) {
             setAttr(host.elements.root, `direction`, host.direction)
             el.classList[host.collapseonwrap ? `add` : `remove`](`collapseonwrap`)
+
+            el.eventSubscriptions = {
+                click: ObserveEvent(el, `click`).subscribe(e => {
+                    const items = Array.from(host.querySelectorAll(`[slot="item"]`))
+                    let len = items.length
+
+                    while (len) {
+                        len = len - 1
+
+                        if (WasClickedOn(items[len], e)) {
+                            return host.dispatchEvent(new CustomEvent(`itemclick`, { detail: e }))
+                        }
+                    }
+                })
+            }
         }
     },
     items: { selector: `.collapse-menu-items` },
@@ -243,9 +258,7 @@ export const CollapseMenu = WCConstructor({
                 click: ObserveEvent(window, `click`).subscribe(e => {
                     if (!host.expanded) { return }
 
-                    if (WasClickedOn(host.elements.root, e)) {
-                        host.expanded = false
-                    }
+                    if (WasClickedOn(host.elements.root, e)) { host.expanded = false }
                 }),
             }
         })

@@ -1,6 +1,7 @@
 import {
     AppendStyleElement, ComponentStore, Equals, ToFunction, Get, Pipe,
-    IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot
+    IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot,
+    ObserverUnsubscribe
 } from '../..'
 
 const unsub = (el, elementProperty, eventKey) => Pipe(ToFunction, IfInvalid(() => { }))(Get(el, `${elementProperty}.${eventKey}`)).value()
@@ -168,6 +169,8 @@ export function WCConstructor(options) {
             }
 
             this.disconnectElements()
+
+            ObserverUnsubscribe(this)
 
             if (onDisconnected) {
                 onDisconnected(this)

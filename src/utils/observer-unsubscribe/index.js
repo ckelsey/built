@@ -1,4 +1,4 @@
-import { /* tree-shaking no-side-effects-when-called */ ReduceMap, IsDom, IsObject } from '../../index'
+import { /* tree-shaking no-side-effects-when-called */ IsDom, IsObject } from '../../index'
 
 /**
  * Looks for subscriptions in an object, DOM element or a subscription itself and unsubscribes.
@@ -8,15 +8,13 @@ import { /* tree-shaking no-side-effects-when-called */ ReduceMap, IsDom, IsObje
  */
 
 export function ObserverUnsubscribe(subscription) {
-    // todo add filter for check
-    const callArrayOfSubscriptions = ReduceMap(val => typeof val === `function` ? val() : undefined)
 
     if (typeof subscription === `function`) {
         return subscription()
     }
 
     if (Array.isArray(subscription)) {
-        return subscription.reduce(callArrayOfSubscriptions, [])
+        return subscription.reduce((result, current) => typeof current === `function` ? current() : undefined, [])
     }
 
     if (IsDom(subscription)) {
@@ -32,10 +30,14 @@ export function ObserverUnsubscribe(subscription) {
 
         if (!key) { return }
 
-        return Object.keys(subscription[key]).reduce(callArrayOfSubscriptions, [])
+        return Object.keys(subscription[key])
+            .reduce((result, current) => {
+                typeof subscription[key][current] === `function` ? subscription[key][current]() : undefined
+                return false
+            }, [])
     }
 
     if (IsObject(subscription)) {
-        Object.keys(subscription).reduce(callArrayOfSubscriptions, [])
+        Object.keys(subscription).reduce((result, current) => typeof subscription[current] === `function` ? subscription[current]() : undefined, [])
     }
 }
