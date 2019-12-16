@@ -56,9 +56,7 @@
     </head>
 
     <body>
-        <a href="https://localhost:8443/help" target="_blank">Conduco</a>
-        <a href="https://screenerpassport.com/help" target="_blank">Prod</a>
-        <content-collapse>
+        <content-collapse id="collapse1">
             <div slot="content-collapse-toggler">Howdy</div>
             <div slot="content-collapse-content">
                 <div>Or hi?</div>
@@ -66,11 +64,76 @@
             </div>
         </content-collapse>
 
-        <content-collapse>
+        <content-collapse id="collapse2">
             <div slot="content-collapse-toggler">Hola</div>
             <div slot="content-collapse-content">Or hi?</div>
         </content-collapse>
+
+        <input-field label="test" id="input1"></input-field>
+
+        <div>
+            <spinner-element visible="true" id="spinner1"></spinner-element>
+        </div>
+
+        <div>
+            <progress-bar id="progress1" visible="true" button="Cancel" text="Doing it" header="Progress bar" percentage="true" overlay="false" animation="indeterminate"></progress-bar id="collapse1">
+        </div>
+
+        <div>
+            <snack-bar id="snack1" shown="true" type="success">
+                <div slot="body">Heyoo feel like a snack?</div>
+            </snack-bar>
+        </div>
+
+        <overlay-message id="overlayMessage"></overlay-message>
+
         <script type="text/javascript" src="dist/built.js"></script>
+
+        <script>
+            var collapse1 = document.getElementById('collapse1')
+            var collapse2 = document.getElementById('collapse2')
+            var input1 = document.getElementById('input1')
+            var spinner1 = document.getElementById('spinner1')
+            var progress1 = document.getElementById('progress1')
+            var snack1 = document.getElementById('snack1')
+
+            var now = performance.now()
+
+            let cycles = 20000
+
+            function test() {
+                collapse1.expandable = true
+                collapse2.expandable = true
+                collapse1.expanded = true
+                collapse2.expanded = true
+                collapse2.expandable = false
+                collapse1.expanded = false
+                collapse2.expanded = true
+
+                input1.label = 'labels yeah'
+                input1.labelposition = 'top'
+                input1.labelposition = 'bottom'
+                input1.labelposition = 'outerspace'
+                input1.labelposition = 'inside'
+
+                overlayMessage.shown = true
+                overlayMessage.colortheme = `light`
+
+                // overlayMessage.innerHTML = `<span slot="header">Heads</span><span slot="body">Body - ${cycles}</span>`
+                // overlayMessage.styles = `.overlay-message{color:black;}`
+                // overlayMessage.colortheme = `dark`
+                // overlayMessage.innerHTML = ``
+                // overlayMessage.styles = ``
+            }
+
+            do {
+                cycles = cycles - 1
+                test()
+            } while (cycles)
+
+            console.log(performance.now() - now)
+
+        </script>
     </body>
 
 </html>

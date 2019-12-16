@@ -11,11 +11,13 @@ function RunOnNextFrame() {
     isRunning = true
 
     const runTasks = startTime => {
+        let ran = 0
         do {
+            ran = ran + 1
             OnNextFrameQueue.shift()()
         } while (performance.now() - startTime < 3 && OnNextFrameQueue.length)
 
-
+        // console.log(`Ran`, ran, performance.now() - startTime)
         if (OnNextFrameQueue.length) {
             return requestAnimationFrame(() => setTimeout(() => {
                 runTasks(performance.now())
@@ -30,6 +32,7 @@ function RunOnNextFrame() {
 
 if (!hasOnNextFrame) {
     global[OnNextFrameKey] = task => {
+        // task()
         OnNextFrameQueue.push(task)
         RunOnNextFrame()
     }

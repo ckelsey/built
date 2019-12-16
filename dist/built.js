@@ -210,9 +210,13 @@ function RunOnNextFrame() {
   isRunning = true;
 
   var runTasks = function runTasks(startTime) {
+    var ran = 0;
+
     do {
+      ran = ran + 1;
       OnNextFrameQueue.shift()();
-    } while (performance.now() - startTime < 3 && OnNextFrameQueue.length);
+    } while (performance.now() - startTime < 3 && OnNextFrameQueue.length); // console.log(`Ran`, ran, performance.now() - startTime)
+
 
     if (OnNextFrameQueue.length) {
       return requestAnimationFrame(function () {
@@ -230,6 +234,7 @@ function RunOnNextFrame() {
 
 if (!hasOnNextFrame) {
   global[OnNextFrameKey] = function (task) {
+    // task()
     OnNextFrameQueue.push(task);
     RunOnNextFrame();
   };
@@ -1622,7 +1627,7 @@ function ObserverUnsubscribe(subscription) {
     });
   }
 }
-// CONCATENATED MODULE: ./src/utils/wc-elements/index.js
+// CONCATENATED MODULE: ./src/utils/wc-elements.js
 
 
 var wc_elements_removeOld = function removeOld(el) {
@@ -1784,7 +1789,7 @@ function SetShadowRoot(options) {
 // EXTERNAL MODULE: ./src/services/componentStore.js
 var componentStore = __webpack_require__(11);
 
-// CONCATENATED MODULE: ./src/utils/wc-constructor/index.js
+// CONCATENATED MODULE: ./src/utils/wc-constructor.js
 
 
 
@@ -2076,13 +2081,17 @@ var timer_loop = function loop() {
 
   subscriptionKeys.forEach(function (key) {
     var subscription = timer_subscriptions[key];
-    var currentFrame = new Date().getTime() - subscription.started;
+    requestAnimationFrame(function () {
+      return setTimeout(function () {
+        var currentFrame = new Date().getTime() - subscription.started;
 
-    if (!!subscription.duration && typeof subscription.frames[currentFrame] === "undefined") {
-      return timer_subscriptions[key].cancel();
-    }
+        if (!!subscription.duration && typeof subscription.frames[currentFrame] === "undefined") {
+          return subscription.cancel();
+        }
 
-    subscription.fn(subscription.frames[currentFrame]);
+        subscription.fn(subscription.frames[currentFrame]);
+      }, 0);
+    });
   });
   requestAnimationFrame(loop);
 };
@@ -2100,13 +2109,17 @@ function Timer(duration, stepFn) {
     id: id,
     duration: duration,
     complete: typeof completeFn !== "function" ? function () {} : completeFn,
-    fn: typeof stepFn !== "function" ? function () {} : stepFn,
-    frames: frameValues ? frameValues.slice() : duration ? Array(duration).fill(0) : [],
     cancel: function cancel() {
+      if (!timer_subscriptions[id]) {
+        return;
+      }
+
       timer_subscriptions[id].complete();
       timer_subscriptions[id] = null;
       delete timer_subscriptions[id];
     },
+    fn: typeof stepFn !== "function" ? function () {} : stepFn,
+    frames: frameValues ? frameValues.slice() : duration ? Array(duration).fill(0) : [],
     started: new Date().getTime()
   };
 
@@ -2177,7 +2190,7 @@ function PolyFillWC(w, componentName, componentClass) {
   setBUIltComponentsListener(w);
   w.bUIltComponents[componentName] = componentClass;
 }
-// CONCATENATED MODULE: ./src/utils/wc-define/index.js
+// CONCATENATED MODULE: ./src/utils/wc-define.js
 
 function WCDefine(componentName, componentClass) {
   var wc = window.WebComponents;
@@ -2597,7 +2610,7 @@ function ObserveEvent(element, eventName) {
 
   return observer;
 }
-// CONCATENATED MODULE: ./src/utils/was-clicked-on/index.js
+// CONCATENATED MODULE: ./src/utils/was-clicked-on.js
 function WasClickedOn(element, event) {
   if (!element) {
     return false;
@@ -8905,7 +8918,7 @@ function ValidateEmail(str) {
 
   return ValidateHtml(val);
 }
-// CONCATENATED MODULE: ./src/utils/validate-us-phone/index.js
+// CONCATENATED MODULE: ./src/utils/validate-us-phone.js
 
 function ValidateUsPhone(val) {
   var original = val;
@@ -9070,7 +9083,7 @@ function ToUsZip(value) {
   result.valid = typeof result.value === "string" && (result.value.length === 5 || result.value.length === 10);
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/validate-us-zip/index.js
+// CONCATENATED MODULE: ./src/utils/validate-us-zip.js
 
 function ValidateUsZip(val) {
   var original = val;
@@ -9094,7 +9107,7 @@ function ValidateUsZip(val) {
     reason: reason
   };
 }
-// CONCATENATED MODULE: ./src/utils/validate-url/index.js
+// CONCATENATED MODULE: ./src/utils/validate-url.js
 
 function ValidateUrl(str) {
   var original = str;
@@ -9130,7 +9143,7 @@ function ValidateUrl(str) {
   };
 }
 /* harmony default export */ var validate_url = (ValidateUrl);
-// CONCATENATED MODULE: ./src/utils/validate-text/index.js
+// CONCATENATED MODULE: ./src/utils/validate-text.js
 
 function ValidateText(str) {
   var original = str;
@@ -11732,38 +11745,39 @@ var OverlayContent = WCConstructor({
   elements: overlay_content_elements
 });
 WCDefine(overlay_content_componentName, OverlayContent);
-// CONCATENATED MODULE: ./src/utils/event-name/index.js
-var events = {
-  transitionend: {
-    transition: "transitionend",
-    OTransition: "oTransitionEnd",
-    MozTransition: "transitionend",
-    WebkitTransition: "webkitTransitionEnd",
-    msTransition: "msTransitionEnd"
-  },
-  transitionstart: {
-    transition: "transitionstart",
-    OTransition: "oTransitionStart",
-    MozTransition: "transitionstart",
-    WebkitTransition: "webkitTransitionStart",
-    msTransition: "msTransitionStart"
-  }
-};
-var event_name_el = document.createElement("fake-element");
-function EventName(key) {
-  if (!events[key]) {
-    return "";
+// CONCATENATED MODULE: ./src/utils/animator.js
+
+function Animator(_ref) {
+  var _ref$duration = _ref.duration,
+      duration = _ref$duration === void 0 ? 0 : _ref$duration,
+      _ref$stepFn = _ref.stepFn,
+      stepFn = _ref$stepFn === void 0 ? function () {} : _ref$stepFn,
+      _ref$frameValues = _ref.frameValues,
+      frameValues = _ref$frameValues === void 0 ? [] : _ref$frameValues,
+      _ref$completeFn = _ref.completeFn,
+      completeFn = _ref$completeFn === void 0 ? function () {} : _ref$completeFn;
+
+  if (!duration || isNaN(duration) || !Array.isArray(frameValues) || !frameValues.length) {
+    return;
   }
 
-  var e;
+  var startTime = Date.now();
 
-  for (e in events[key]) {
-    if (event_name_el.style[e] !== undefined) {
-      return events[key][e];
+  var run = function run() {
+    var currentTime = Date.now();
+    var currentFrame = frameValues[currentTime - startTime];
+
+    if (currentTime - startTime > duration || currentFrame === undefined) {
+      return completeFn();
     }
-  }
 
-  return "";
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      return stepFn(currentFrame);
+    });
+    Object(on_next_frame["a" /* OnNextFrame */])(run);
+  };
+
+  run();
 }
 // CONCATENATED MODULE: ./src/components/overlay-message/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -11791,34 +11805,42 @@ var overlay_message_setShown = function setShown(host) {
     return;
   }
 
-  var endEventName = EventName("transitionend");
+  var startEnd = host.shown ? [0, 1] : [1, 0]; // Timer(
+  //     333,
+  //     opacityStep => root.style.opacity = opacityStep,
+  //     EaseInOut(startEnd, 200)
+  // )
 
-  var dispatch = function dispatch() {
-    return host.dispatchEvent(new CustomEvent(host.shown ? "opened" : "closed", {
-      detail: host
-    }));
-  };
-
-  if (endEventName) {
-    root.addEventListener(endEventName, function startEvent() {
-      root.removeEventListener(endEventName, startEvent);
-      requestAnimationFrame(dispatch);
-    });
-  } else {
-    requestAnimationFrame(dispatch);
-  }
-
-  root.classList[host.shown ? "add" : "remove"]("shown");
+  Animator({
+    duration: 333,
+    frameValues: EaseInOut(startEnd, 200),
+    stepFn: function stepFn(opacityStep) {
+      return root.style.opacity = opacityStep;
+    }
+  }); // const animator = () => new Promise(resolve => {
+  //     Timer(
+  //         333,
+  //         opacityStep => root.style.opacity = opacityStep,
+  //         EaseInOut(startEnd, 333),
+  //         resolve
+  //     )
+  // })
+  // const animateHeight = (from, to, el, speed) => animator(from, to, speed, heightStep => el.style.height = `${heightStep}px`)
+  // const endEventName = EventName(`transitionend`)
+  // const dispatch = () => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host }))
+  // if (endEventName) {
+  //     root.addEventListener(endEventName, function startEvent() {
+  //         root.removeEventListener(endEventName, startEvent)
+  //         requestAnimationFrame(dispatch)
+  //     })
+  // } else {
+  //     requestAnimationFrame(dispatch)
+  // }
+  // root.classList[host.shown ? `add` : `remove`](`shown`)
 };
 
-var setColorTheme = function setColorTheme(host) {
-  var root = host.elements.root;
-
-  if (!root) {
-    return;
-  }
-
-  root.setAttribute("colortheme", host.colortheme);
+var setColorTheme = function setColorTheme(color, root) {
+  return root.setAttribute("colortheme", color);
 };
 
 var overlay_message_setCloseButton = function setCloseButton(host) {
@@ -11846,15 +11868,19 @@ var overlay_message_properties = {
       return Pipe(ToBool, IfInvalid(false))(val).value;
     },
     onChange: function onChange(_val, host) {
-      return overlay_message_setShown(host);
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return overlay_message_setShown(host);
+      });
     }
   },
   colortheme: {
     format: function format(val) {
       return Pipe(IndexOf(["dark", "light", "transparent"]), IfInvalid("light"))(val).value;
     },
-    onChange: function onChange(_val, host) {
-      return setColorTheme(host);
+    onChange: function onChange(val, host) {
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return setColorTheme(val, host.elements.root);
+      });
     }
   },
   closeselector: {
@@ -11862,7 +11888,9 @@ var overlay_message_properties = {
       return Pipe(ToString, IfInvalid("[overlay-message-close]"))(val).value;
     },
     onChange: function onChange(_val, host) {
-      return overlay_message_setCloseButton(host);
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return overlay_message_setCloseButton(host);
+      });
     }
   },
   styles: {
@@ -11870,7 +11898,9 @@ var overlay_message_properties = {
       return Pipe(ToString, IfInvalid(""))(val).value;
     },
     onChange: function onChange(val, host) {
-      return overlay_message_setStyles(host.elements.injectedStyles, val);
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return overlay_message_setStyles(host.elements.injectedStyles, val);
+      });
     }
   },
   theme: {
@@ -11878,29 +11908,31 @@ var overlay_message_properties = {
       return Pipe(ToString, IfInvalid(""))(val).value;
     },
     onChange: function onChange(val, host) {
-      return overlay_message_setStyles(host.elements.themeStyles, val);
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return overlay_message_setStyles(host.elements.themeStyles, val);
+      });
     }
   }
 };
 var overlay_message_observedAttributes = Object.keys(overlay_message_properties);
 var overlay_message_elements = {
   root: {
-    selector: overlay_message_componentRoot,
-    onChange: function onChange(_el, host) {
-      setColorTheme(host);
-      overlay_message_setShown(host);
-    }
+    selector: overlay_message_componentRoot
   },
   injectedStyles: {
     selector: "style.injectedStyles",
     onChange: function onChange(el, host) {
-      return overlay_message_setStyles(el, host.styles);
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return overlay_message_setStyles(el, host.styles);
+      });
     }
   },
   themeStyles: {
     selector: "style.themeStyles",
     onChange: function onChange(el, host) {
-      return overlay_message_setStyles(el, host.theme);
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return overlay_message_setStyles(el, host.theme);
+      });
     }
   }
 };
@@ -11918,7 +11950,9 @@ var OverlayMessage = WCConstructor({
   onConnected: function onConnected(host) {
     host.subscriptions = {
       slots: ObserveSlots(host, true).subscribe(function () {
-        return overlay_message_setCloseButton(host);
+        return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+          return overlay_message_setCloseButton(host);
+        });
       })
     };
   }
@@ -12247,7 +12281,40 @@ var ProgressBar = WCConstructor({
   elements: progress_bar_elements
 });
 WCDefine(progress_bar_componentName, ProgressBar);
-// CONCATENATED MODULE: ./src/utils/wc-when-property-ready/index.js
+// CONCATENATED MODULE: ./src/utils/event-name/index.js
+var events = {
+  transitionend: {
+    transition: "transitionend",
+    OTransition: "oTransitionEnd",
+    MozTransition: "transitionend",
+    WebkitTransition: "webkitTransitionEnd",
+    msTransition: "msTransitionEnd"
+  },
+  transitionstart: {
+    transition: "transitionstart",
+    OTransition: "oTransitionStart",
+    MozTransition: "transitionstart",
+    WebkitTransition: "webkitTransitionStart",
+    msTransition: "msTransitionStart"
+  }
+};
+var event_name_el = document.createElement("fake-element");
+function EventName(key) {
+  if (!events[key]) {
+    return "";
+  }
+
+  var e;
+
+  for (e in events[key]) {
+    if (event_name_el.style[e] !== undefined) {
+      return events[key][e];
+    }
+  }
+
+  return "";
+}
+// CONCATENATED MODULE: ./src/utils/wc-when-property-ready.js
 
 
 function WCwhenPropertyReady(host, path) {
@@ -12352,7 +12419,7 @@ var snack_bar_setIcon = function setIcon(host, key) {
     }
 
     icon[host[key][0] === "<" ? "svg" : "type"] = host[key];
-  });
+  })["catch"](console.log);
 };
 
 var showHideClose = function showHideClose(el, show) {
@@ -14471,6 +14538,7 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport DragDropService */__webpack_require__.d(__webpack_exports__, "DragDropService", function() { return DragDropService; });
 /* concated harmony reexport OnNextFrame */__webpack_require__.d(__webpack_exports__, "OnNextFrame", function() { return on_next_frame["a" /* OnNextFrame */]; });
 /* concated harmony reexport Request */__webpack_require__.d(__webpack_exports__, "Request", function() { return Request; });
+/* concated harmony reexport Animator */__webpack_require__.d(__webpack_exports__, "Animator", function() { return Animator; });
 /* concated harmony reexport Timer */__webpack_require__.d(__webpack_exports__, "Timer", function() { return Timer; });
 /* concated harmony reexport WCSupportClass */__webpack_require__.d(__webpack_exports__, "WCSupportClass", function() { return WCSupportClass; });
 /* concated harmony reexport UploadService */__webpack_require__.d(__webpack_exports__, "UploadService", function() { return UploadService; });
@@ -14643,6 +14711,7 @@ function TransduceMap(conversionFunction) {
 
 
 /** SERVICES */
+
 
 
 
@@ -15972,7 +16041,7 @@ module.exports = "<div class=overlay-content-container> <div class=overlay-conte
 
 exports = module.exports = __webpack_require__(0)(false);
 // Module
-exports.push([module.i, ".overlay-message-container{position:fixed;width:100%;height:100%;top:0;left:0;opacity:0;pointer-events:none;-webkit-transition:opacity 0.3s;transition:opacity 0.3s}.overlay-message-container .overlay-message-scrim{position:absolute;width:100%;height:100%;background:rgba(31,31,31,0.9);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}.overlay-message-container .overlay-message-content-container{position:relative;top:50%;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;width:80%;max-width:600px;max-height:90vh;overflow:auto;margin:auto;border-radius:5px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.25),0 2px 22px rgba(0,0,0,0.62);-webkit-transform:translateY(-50%);transform:translateY(-50%)}.overlay-message-container .overlay-message-content{padding:0.62em}.overlay-message-container .overlay-message-header{font-size:162%;text-transform:capitalize;font-weight:bold;padding:0.125em 0;box-sizing:border-box;position:relative;white-space:nowrap;-webkit-box-flex:1;flex-grow:1}.overlay-message-container .overlay-message-header:after{content:\"\";display:block;width:100%;box-shadow:0 1px 0 0;height:1px;opacity:0.25;margin-top:0.25em;margin-bottom:0.75em}.overlay-message-container .overlay-message-header:empty{display:none}.overlay-message-container .overlay-message-body{opacity:0.62}.overlay-message-container .overlay-message-buttons{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:end;justify-content:flex-end;width:calc(100% + 0.5em);margin-left:-0.25em;padding:1.5em 0 0;box-sizing:border-box;white-space:nowrap;-webkit-box-flex:1;flex-grow:1}.overlay-message-container .overlay-message-buttons ::slotted(*){margin:0 0.25em}.overlay-message-container.shown{opacity:1;pointer-events:all;z-index:99999999999999999}.overlay-message-container[colortheme=\"light\"] .overlay-message-content-container,.overlay-message-container[colortheme=\"dark\"] .overlay-message-content-container{text-shadow:none;padding:1.5em;box-sizing:border-box;box-shadow:0 10px 10px -5px rgba(0,0,0,0.38)}.overlay-message-container[colortheme=\"light\"] .overlay-message-content-container{background:#fafafa;color:#333}.overlay-message-container[colortheme=\"dark\"] .overlay-message-content-container{background:#1f1f1f;color:#e2e2e2}\n", ""]);
+exports.push([module.i, ".overlay-message-container{position:fixed;width:100%;height:100%;top:0;left:0;opacity:0;pointer-events:none;-webkit-transition:opacity 0.3s;transition:opacity 0.3s}.overlay-message-container .overlay-message-scrim{position:absolute;width:100%;height:100%;background:rgba(31,31,31,0.9);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}.overlay-message-container .overlay-message-content-container{position:relative;top:50%;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;width:80%;max-width:600px;max-height:90vh;overflow:auto;margin:auto;border-radius:5px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.25),0 2px 22px rgba(0,0,0,0.62);-webkit-transform:translateY(-50%);transform:translateY(-50%)}.overlay-message-container .overlay-message-content{padding:0.62em}.overlay-message-container .overlay-message-header{font-size:162%;text-transform:capitalize;font-weight:bold;padding:0.125em 0;box-sizing:border-box;position:relative;white-space:nowrap;-webkit-box-flex:1;flex-grow:1}.overlay-message-container .overlay-message-header:after{content:\"\";display:block;width:100%;box-shadow:0 1px 0 0;height:1px;opacity:0.25;margin-top:0.25em;margin-bottom:0.75em}.overlay-message-container .overlay-message-header:empty{display:none}.overlay-message-container .overlay-message-body{opacity:0.62}.overlay-message-container .overlay-message-buttons{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:end;justify-content:flex-end;width:calc(100% + 0.5em);margin-left:-0.25em;padding:1.5em 0 0;box-sizing:border-box;white-space:nowrap;-webkit-box-flex:1;flex-grow:1}.overlay-message-container .overlay-message-buttons ::slotted(*){margin:0 0.25em}.overlay-message-container.shown{pointer-events:all;z-index:99999999999999999}.overlay-message-container[colortheme=\"light\"] .overlay-message-content-container,.overlay-message-container[colortheme=\"dark\"] .overlay-message-content-container{text-shadow:none;padding:1.5em;box-sizing:border-box;box-shadow:0 10px 10px -5px rgba(0,0,0,0.38)}.overlay-message-container[colortheme=\"light\"] .overlay-message-content-container{background:#fafafa;color:#333}.overlay-message-container[colortheme=\"dark\"] .overlay-message-content-container{background:#1f1f1f;color:#e2e2e2}\n", ""]);
 
 
 /***/ }),

@@ -1,8 +1,8 @@
 import {
     // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool,
-    IfInvalid, ToString, IndexOf, Get, Set, ObserveEvent, EventName,
-    ObserverUnsubscribe, ObserveSlots
+    IfInvalid, ToString, IndexOf, Get, Set, ObserveEvent, EaseInOut,
+    ObserverUnsubscribe, ObserveSlots, OnNextFrame, Animator
 } from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -22,28 +22,44 @@ const setShown = host => {
 
     if (!root) { return }
 
-    const endEventName = EventName(`transitionend`)
-    const dispatch = () => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host }))
+    const startEnd = host.shown ? [0, 1] : [1, 0]
+    // Timer(
+    //     333,
+    //     opacityStep => root.style.opacity = opacityStep,
+    //     EaseInOut(startEnd, 200)
+    // )
 
-    if (endEventName) {
-        root.addEventListener(endEventName, function startEvent() {
-            root.removeEventListener(endEventName, startEvent)
-            requestAnimationFrame(dispatch)
-        })
-    } else {
-        requestAnimationFrame(dispatch)
-    }
+    Animator({ duration: 333, frameValues: EaseInOut(startEnd, 200), stepFn: opacityStep => root.style.opacity = opacityStep })
 
-    root.classList[host.shown ? `add` : `remove`](`shown`)
+
+
+    // const animator = () => new Promise(resolve => {
+    //     Timer(
+    //         333,
+    //         opacityStep => root.style.opacity = opacityStep,
+    //         EaseInOut(startEnd, 333),
+    //         resolve
+    //     )
+    // })
+
+    // const animateHeight = (from, to, el, speed) => animator(from, to, speed, heightStep => el.style.height = `${heightStep}px`)
+
+    // const endEventName = EventName(`transitionend`)
+    // const dispatch = () => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host }))
+
+    // if (endEventName) {
+    //     root.addEventListener(endEventName, function startEvent() {
+    //         root.removeEventListener(endEventName, startEvent)
+    //         requestAnimationFrame(dispatch)
+    //     })
+    // } else {
+    //     requestAnimationFrame(dispatch)
+    // }
+
+    // root.classList[host.shown ? `add` : `remove`](`shown`)
 }
 
-const setColorTheme = host => {
-    const root = host.elements.root
-
-    if (!root) { return }
-
-    root.setAttribute(`colortheme`, host.colortheme)
-}
+const setColorTheme = (color, root) => root.setAttribute(`colortheme`, color)
 
 const setCloseButton = host => {
     Array.from(host.querySelectorAll(`*`))
@@ -63,43 +79,37 @@ const properties = {
     class: ComponentClassObject,
     shown: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (_val, host) => setShown(host)
+        onChange: (_val, host) => OnNextFrame(() => setShown(host))
     },
     colortheme: {
         format: val => Pipe(IndexOf([`dark`, `light`, `transparent`]), IfInvalid(`light`))(val).value,
-        onChange: (_val, host) => setColorTheme(host)
+        onChange: (val, host) => OnNextFrame(() => setColorTheme(val, host.elements.root))
     },
     closeselector: {
         format: val => Pipe(ToString, IfInvalid(`[overlay-message-close]`))(val).value,
-        onChange: (_val, host) => setCloseButton(host)
+        onChange: (_val, host) => OnNextFrame(() => setCloseButton(host))
     },
     styles: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
+        onChange: (val, host) => OnNextFrame(() => setStyles(host.elements.injectedStyles, val))
     },
     theme: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => setStyles(host.elements.themeStyles, val)
+        onChange: (val, host) => OnNextFrame(() => setStyles(host.elements.themeStyles, val))
     }
 }
 
 const observedAttributes = Object.keys(properties)
 
 const elements = {
-    root: {
-        selector: componentRoot,
-        onChange: (_el, host) => {
-            setColorTheme(host)
-            setShown(host)
-        }
-    },
+    root: { selector: componentRoot },
     injectedStyles: {
         selector: `style.injectedStyles`,
-        onChange: (el, host) => setStyles(el, host.styles)
+        onChange: (el, host) => OnNextFrame(() => setStyles(el, host.styles))
     },
     themeStyles: {
         selector: `style.themeStyles`,
-        onChange: (el, host) => setStyles(el, host.theme)
+        onChange: (el, host) => OnNextFrame(() => setStyles(el, host.theme))
     }
 }
 
@@ -114,7 +124,7 @@ export const OverlayMessage = WCConstructor({
     onDisconnected(host) { ObserverUnsubscribe(host) },
     onConnected(host) {
         host.subscriptions = {
-            slots: ObserveSlots(host, true).subscribe(() => setCloseButton(host))
+            slots: ObserveSlots(host, true).subscribe(() => OnNextFrame(() => setCloseButton(host)))
         }
     }
 })

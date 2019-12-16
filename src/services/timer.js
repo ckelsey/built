@@ -14,13 +14,16 @@ const loop = () => {
 
     subscriptionKeys.forEach(key => {
         const subscription = subscriptions[key]
-        const currentFrame = new Date().getTime() - subscription.started
 
-        if (!!subscription.duration && typeof subscription.frames[currentFrame] === `undefined`) {
-            return subscriptions[key].cancel()
-        }
+        requestAnimationFrame(() => setTimeout(() => {
+            const currentFrame = new Date().getTime() - subscription.started
 
-        subscription.fn(subscription.frames[currentFrame])
+            if (!!subscription.duration && typeof subscription.frames[currentFrame] === `undefined`) {
+                return subscription.cancel()
+            }
+
+            subscription.fn(subscription.frames[currentFrame])
+        }, 0))
     })
 
     requestAnimationFrame(loop)
@@ -35,13 +38,15 @@ export function Timer(duration, stepFn, frameValues = undefined, completeFn = ()
         id,
         duration,
         complete: typeof completeFn !== `function` ? () => { } : completeFn,
-        fn: typeof stepFn !== `function` ? () => { } : stepFn,
-        frames: frameValues ? frameValues.slice() : duration ? Array(duration).fill(0) : [],
         cancel: () => {
+            if (!subscriptions[id]) { return }
+
             subscriptions[id].complete()
             subscriptions[id] = null
             delete subscriptions[id]
         },
+        fn: typeof stepFn !== `function` ? () => { } : stepFn,
+        frames: frameValues ? frameValues.slice() : duration ? Array(duration).fill(0) : [],
         started: new Date().getTime()
     }
 
