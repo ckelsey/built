@@ -45,9 +45,11 @@
                 width: 100%;
             }
 
-            spinner-element {
-                position: relative;
-                z-index: 999999999;
+            #ripple-box {
+                width: 2em;
+                height: 2em;
+                background: #fff;
+                margin: 2em;
             }
 
         </style>
@@ -71,12 +73,12 @@
 
         <input-field label="test" id="input1"></input-field>
 
-        <div>
+        <div style="position: relative;">
             <spinner-element visible="true" id="spinner1"></spinner-element>
         </div>
 
         <div>
-            <progress-bar id="progress1" visible="true" button="Cancel" text="Doing it" header="Progress bar" percentage="true" overlay="false" animation="indeterminate"></progress-bar id="collapse1">
+            <progress-bar id="progress1" visible="true" button="Cancel" text="Doing it" header="Progress bar" percentage="true" overlay="false" animation="indeterminate"></progress-bar>
         </div>
 
         <div>
@@ -87,51 +89,66 @@
 
         <overlay-message id="overlayMessage"></overlay-message>
 
+        <div id="ripple-box">
+            <effect-ripple targets='["#ripple-box"]'></effect-ripple>
+        </div>
+
         <script type="text/javascript" src="dist/built.js"></script>
 
         <script>
-            var collapse1 = document.getElementById('collapse1')
-            var collapse2 = document.getElementById('collapse2')
-            var input1 = document.getElementById('input1')
-            var spinner1 = document.getElementById('spinner1')
-            var progress1 = document.getElementById('progress1')
-            var snack1 = document.getElementById('snack1')
+            // var collapse1 = document.getElementById('collapse1')
+            // var collapse2 = document.getElementById('collapse2')
+            // var input1 = document.getElementById('input1')
+            // var spinner1 = document.getElementById('spinner1')
+            // var progress1 = document.getElementById('progress1')
+            // var snack1 = document.getElementById('snack1')
 
-            var now = performance.now()
+            // var now = performance.now()
 
-            let cycles = 20000
+            // let cycles = 20000
 
-            function test() {
-                collapse1.expandable = true
-                collapse2.expandable = true
-                collapse1.expanded = true
-                collapse2.expanded = true
-                collapse2.expandable = false
-                collapse1.expanded = false
-                collapse2.expanded = true
+            // function test() {
+            //     collapse1.expandable = true
+            //     collapse2.expandable = true
+            //     collapse1.expanded = true
+            //     collapse2.expanded = true
+            //     collapse2.expandable = false
+            //     collapse1.expanded = false
+            //     collapse2.expanded = true
 
-                input1.label = 'labels yeah'
-                input1.labelposition = 'top'
-                input1.labelposition = 'bottom'
-                input1.labelposition = 'outerspace'
-                input1.labelposition = 'inside'
+            //     input1.label = 'labels yeah'
+            //     input1.labelposition = 'top'
+            //     input1.labelposition = 'bottom'
+            //     input1.labelposition = 'outerspace'
+            //     input1.labelposition = 'inside'
 
-                overlayMessage.shown = true
-                overlayMessage.colortheme = `light`
+            //     overlayMessage.shown = true
+            //     overlayMessage.colortheme = `light`
 
-                // overlayMessage.innerHTML = `<span slot="header">Heads</span><span slot="body">Body - ${cycles}</span>`
-                // overlayMessage.styles = `.overlay-message{color:black;}`
-                // overlayMessage.colortheme = `dark`
-                // overlayMessage.innerHTML = ``
-                // overlayMessage.styles = ``
-            }
+            //     builtjs.AppendChildren(builtjs.ClearHTML(overlayMessage), [
+            //         builtjs.CreateElement({
+            //             tagName: 'span',
+            //             slot: 'header',
+            //             textContent: 'Heads'
+            //         }),
+            //         builtjs.CreateElement({
+            //             tagName: 'span',
+            //             slot: 'body',
+            //             textContent: `Body - ${cycles}`
+            //         })
+            //     ])
 
-            do {
-                cycles = cycles - 1
-                test()
-            } while (cycles)
+            //     overlayMessage.styles = `.overlay-message{color:black;}`
+            //     overlayMessage.colortheme = `dark`
+            //     overlayMessage.styles = ``
+            // }
 
-            console.log(performance.now() - now)
+            // do {
+            //     cycles = cycles - 1
+            //     test()
+            // } while (cycles)
+
+            // console.log(performance.now() - now)
 
         </script>
     </body>

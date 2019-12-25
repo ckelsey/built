@@ -1,4 +1,4 @@
-import { ObserveEvent, GetCurve, Timer } from '../..'
+import { ObserveEvent, GetCurve, Timer, Get } from '../..'
 
 const signalEnd = host => runEnd(host)
 
@@ -39,8 +39,8 @@ const setOrigin = host => {
 
     if (nonAutoOrigin) { return underlineStyle.transformOrigin = nonAutoOrigin }
 
-    const eventX = host.downEvent.x
-    const targetBox = host.downEvent.target.getBoundingClientRect()
+    const eventX = Get(host, `downEvent.x`, 0)
+    const targetBox = Get(host, `downEvent.target.getBoundingClientRect()`, { left: 0, width: 0 })
     const left = Math.round(((eventX - targetBox.left) / targetBox.width) * 100)
     underlineStyle.transformOrigin = `${left}% center`
 }
@@ -56,6 +56,8 @@ export const unloadTargets = host => {
 }
 
 export const loadTargets = host => {
+    if (!Array.isArray(host.targets$)) { host.targets$ = [] }
+
     if (!host.canLoadTargets) { return }
 
     unloadTargets(host)

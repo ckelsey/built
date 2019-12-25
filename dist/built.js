@@ -196,6 +196,11 @@ function toComment(sourceMap) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return OnNextFrame; });
+/**
+ * TODO
+ * - memoize
+ * - return promise
+ */
 var OnNextFrameKey = Symbol["for"]("builtjs.OnNextFrameKey");
 var globalSymbols = Object.getOwnPropertySymbols(global);
 var hasOnNextFrame = globalSymbols.indexOf(OnNextFrameKey) > -1;
@@ -215,8 +220,7 @@ function RunOnNextFrame() {
     do {
       ran = ran + 1;
       OnNextFrameQueue.shift()();
-    } while (performance.now() - startTime < 3 && OnNextFrameQueue.length); // console.log(`Ran`, ran, performance.now() - startTime)
-
+    } while (performance.now() - startTime < 6 && OnNextFrameQueue.length);
 
     if (OnNextFrameQueue.length) {
       return requestAnimationFrame(function () {
@@ -578,7 +582,7 @@ exports.push([module.i, ":host(grid-layout){display:block}grid-layout{display:bl
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// CONCATENATED MODULE: ./src/utils/set-style-rules/index.js
+// CONCATENATED MODULE: ./src/utils/set-style-rules.js
 function SetStyleRules(styleElement, ruleString) {
   if (!styleElement || !ruleString || ruleString === "undefined" || ruleString === "null") {
     return;
@@ -594,7 +598,7 @@ function SetStyleRules(styleElement, ruleString) {
     styleElement.appendChild(tt1);
   }
 }
-// CONCATENATED MODULE: ./src/utils/pipe/index.js
+// CONCATENATED MODULE: ./src/utils/pipe.js
 /*
 TODO - def has room for improvement. takes a little over 2.5x as long to run
 */
@@ -622,14 +626,14 @@ function Pipe() {
 //         )
 //     }
 // }
-// EXTERNAL MODULE: ./src/utils/get/index.js
+// EXTERNAL MODULE: ./src/utils/get.js
 var utils_get = __webpack_require__(4);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/typeof.js
 var helpers_typeof = __webpack_require__(2);
 var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
 
-// CONCATENATED MODULE: ./src/utils/is-empty/index.js
+// CONCATENATED MODULE: ./src/utils/is-empty.js
 
 
 /**
@@ -652,7 +656,7 @@ var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
 function IsEmpty(value) {
   return value === undefined || value === null || value === "" || Array.isArray(value) && value.length === 0 || typeof_default()(value).indexOf("object") > -1 && Object.keys(value).length === 0 || value === false || value === "false" || value === "undefined" || value === "null";
 }
-// CONCATENATED MODULE: ./src/utils/is-object/index.js
+// CONCATENATED MODULE: ./src/utils/is-object.js
 
 
 /**
@@ -673,13 +677,13 @@ function IsEmpty(value) {
 function IsObject(value) {
   return typeof_default()(value).indexOf("object") > -1 && value !== null && !Array.isArray(value) && !(value instanceof Date);
 }
-// CONCATENATED MODULE: ./src/utils/reduce-filter/index.js
+// CONCATENATED MODULE: ./src/utils/reduce-filter.js
 function ReduceFilter(predicateFunction) {
   return function ReduceFilterResult(result, current) {
     return predicateFunction(current) ? result.concat([current]) : result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/is-non-collection/index.js
+// CONCATENATED MODULE: ./src/utils/is-non-collection.js
 
 
 /**
@@ -701,7 +705,7 @@ var nonCollections = ["string", "number", "null", "undefined", "function", "bool
 function IsNonCollection(value) {
   return nonCollections.indexOf(typeof_default()(value)) > -1 || value === null || value instanceof Date;
 }
-// CONCATENATED MODULE: ./src/utils/is-dom/index.js
+// CONCATENATED MODULE: ./src/utils/is-dom.js
 /**
  * Determines if a value is a valid DOM element
  * @function IsDom
@@ -715,7 +719,7 @@ function IsNonCollection(value) {
 function IsDom(value) {
   return value instanceof Element || value instanceof Node;
 }
-// CONCATENATED MODULE: ./src/utils/is-date/index.js
+// CONCATENATED MODULE: ./src/utils/is-date.js
 /**
  * Determines if a value is or can be a valid date
  * @function IsDate
@@ -729,13 +733,13 @@ function IsDate(value) {
   var tempValue = new Date(Date.parse(value));
   return tempValue !== "Invalid Date" && !isNaN(tempValue) && tempValue instanceof Date;
 }
-// CONCATENATED MODULE: ./src/utils/type/index.js
+// CONCATENATED MODULE: ./src/utils/type.js
 
 
 function Type(value) {
   return value === null ? "null" : IsNonCollection(value) ? typeof_default()(value) : IsDom(value) ? "dom" : Array.isArray(value) ? "array" : IsDate(value) ? "date" : IsObject(value) ? "object" : typeof thing === "undefined" ? "undefined" : typeof_default()(thing);
 }
-// CONCATENATED MODULE: ./src/utils/is-t-monad/index.js
+// CONCATENATED MODULE: ./src/utils/is-t-monad.js
 
 /**
  * Determines if a value is a TMonad
@@ -771,7 +775,7 @@ function IsTMonad(value) {
     return Object.prototype.hasOwnProperty.call(value, keyObj.key) && (!keyObj.type || Type(value[keyObj.key]) === keyObj.type);
   }), []).length === keysItShouldHave.length;
 }
-// CONCATENATED MODULE: ./src/utils/t-monad/index.js
+// CONCATENATED MODULE: ./src/utils/t-monad.js
 
 function TMonad(value) {
   if (IsTMonad(value)) {
@@ -790,7 +794,7 @@ function TMonad(value) {
 
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-string/index.js
+// CONCATENATED MODULE: ./src/utils/to-string.js
 
 function ToString(value) {
   var stop = Object(utils_get["a" /* Get */])(value, "stop", false);
@@ -816,7 +820,7 @@ function ToString(value) {
   result.type = Type(result.value);
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/if-invalid/index.js
+// CONCATENATED MODULE: ./src/utils/if-invalid.js
 
 /**
  * Returns a function that then takes a TMonad. If that value is invalid, it returns the replacement instead
@@ -849,7 +853,7 @@ function IfInvalid(replacement) {
 var toConsumableArray = __webpack_require__(3);
 var toConsumableArray_default = /*#__PURE__*/__webpack_require__.n(toConsumableArray);
 
-// CONCATENATED MODULE: ./src/utils/stop-if-invalid/index.js
+// CONCATENATED MODULE: ./src/utils/stop-if-invalid.js
 
 function StopIfInvalid(value) {
   var result = TMonad(value);
@@ -860,10 +864,9 @@ function StopIfInvalid(value) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/do-uri/index.js
+// CONCATENATED MODULE: ./src/utils/do-uri.js
 
-
-var do_uri_doURI = function doURI(value) {
+function DoURI(value) {
   var encode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   var component = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   var result = TMonad(value);
@@ -892,13 +895,13 @@ var do_uri_doURI = function doURI(value) {
 
   result.type = Type(result.value);
   return result;
-};
-// CONCATENATED MODULE: ./src/utils/from-uri-component/index.js
+}
+// CONCATENATED MODULE: ./src/utils/from-uri-component.js
 
 function FromURIComponent(value) {
-  return do_uri_doURI(value, false, true);
+  return DoURI(value, false, true);
 }
-// CONCATENATED MODULE: ./src/utils/from-entities/index.js
+// CONCATENATED MODULE: ./src/utils/from-entities.js
 
 function FromEntities(value) {
   var result = TMonad(value);
@@ -916,7 +919,7 @@ function FromEntities(value) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/t-monad-update/index.js
+// CONCATENATED MODULE: ./src/utils/t-monad-update.js
 
 function TMonadUpdate(tmonad, expectedType) {
   return Object.assign(tmonad, {
@@ -925,7 +928,7 @@ function TMonadUpdate(tmonad, expectedType) {
 
   });
 }
-// CONCATENATED MODULE: ./src/utils/to-plain-text/index.js
+// CONCATENATED MODULE: ./src/utils/to-plain-text.js
 
 function ToPlainText(value) {
   var result = TMonad(value);
@@ -942,7 +945,7 @@ function ToPlainText(value) {
 
   return TMonadUpdate(result, "string", "ToPlainText");
 }
-// CONCATENATED MODULE: ./src/utils/to-regex/index.js
+// CONCATENATED MODULE: ./src/utils/to-regex.js
 
 function ToRegex(string) {
   var result = TMonad(string);
@@ -978,7 +981,7 @@ function ToRegex(string) {
   result.type = "object";
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-split-meta/index.js
+// CONCATENATED MODULE: ./src/utils/to-split-meta.js
 
 function ToSplitMeta(string) {
   var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
@@ -1030,7 +1033,7 @@ function ToSplitMeta(string) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-split/index.js
+// CONCATENATED MODULE: ./src/utils/to-split.js
 
 function ToSplit(delimeter) {
   return function ToSplitInner(value) {
@@ -1056,7 +1059,7 @@ function ToSplit(delimeter) {
     return TMonadUpdate(result, "array", "Split");
   };
 }
-// CONCATENATED MODULE: ./src/utils/from-json/index.js
+// CONCATENATED MODULE: ./src/utils/from-json.js
 
 function FromJSON(value) {
   var result = TMonad(value);
@@ -1081,7 +1084,7 @@ function FromJSON(value) {
   return result;
 }
 /* harmony default export */ var from_json = (FromJSON);
-// CONCATENATED MODULE: ./src/utils/to-array/index.js
+// CONCATENATED MODULE: ./src/utils/to-array.js
 
 function ToArray(value) {
   var temp = TMonad(value);
@@ -1095,7 +1098,7 @@ function ToArray(value) {
   result.valid = result.type === "array";
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-map/index.js
+// CONCATENATED MODULE: ./src/utils/to-map.js
 
 function ToMap(fn) {
   return function (value) {
@@ -1118,7 +1121,7 @@ function ToMap(fn) {
     return TMonadUpdate(Pipe(ToArray, StopIfInvalid, map)(result), "array", "Map");
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-trim/index.js
+// CONCATENATED MODULE: ./src/utils/to-trim.js
 
 function ToTrim(value) {
   var stop = Object(utils_get["a" /* Get */])(value, "stop", false);
@@ -1135,7 +1138,7 @@ function ToTrim(value) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/commas-to-array/index.js
+// CONCATENATED MODULE: ./src/utils/commas-to-array.js
 
 function CommasToArray(value) {
   var result = TMonad(value);
@@ -1158,7 +1161,7 @@ function CommasToArray(value) {
   }))(result);
   return piped;
 }
-// CONCATENATED MODULE: ./src/utils/to-filter/index.js
+// CONCATENATED MODULE: ./src/utils/to-filter.js
 
 function ToFilter(predicate) {
   return function (value) {
@@ -1176,7 +1179,7 @@ function ToFilter(predicate) {
     return TMonadUpdate(Pipe(ToArray, StopIfInvalid, filter)(result), "array", "Filter");
   };
 }
-// CONCATENATED MODULE: ./src/utils/component-class-object/index.js
+// CONCATENATED MODULE: ./src/utils/component-class-object.js
 
 
 
@@ -1236,7 +1239,7 @@ var ComponentClassObject = {
     return component_class_object_wcClass(host.elements.root, val, host.state["class"].previous);
   }
 };
-// CONCATENATED MODULE: ./src/utils/to-bool/index.js
+// CONCATENATED MODULE: ./src/utils/to-bool.js
 
 function ToBool(value) {
   var result = TMonad(value);
@@ -1301,7 +1304,7 @@ var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
 var wrapNativeSuper = __webpack_require__(18);
 var wrapNativeSuper_default = /*#__PURE__*/__webpack_require__.n(wrapNativeSuper);
 
-// CONCATENATED MODULE: ./src/utils/equals/index.js
+// CONCATENATED MODULE: ./src/utils/equals.js
 
 function Equals(value1, value2) {
   var type = Type(value1);
@@ -1375,7 +1378,7 @@ var on_next_frame = __webpack_require__(1);
 var regenerator = __webpack_require__(9);
 var regenerator_default = /*#__PURE__*/__webpack_require__.n(regenerator);
 
-// CONCATENATED MODULE: ./src/utils/id/index.js
+// CONCATENATED MODULE: ./src/utils/id.js
 
 
 var _marked =
@@ -1441,7 +1444,7 @@ function ID() {
 
   return idIterator.next().value;
 }
-// CONCATENATED MODULE: ./src/utils/observer/index.js
+// CONCATENATED MODULE: ./src/utils/observer.js
 
 
 function Observer(initialValue) {
@@ -1557,11 +1560,17 @@ function Observer(initialValue) {
     subscribe: function subscribe(next) {
       var error = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
       var complete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {};
+
+      var trace = function trace() {
+        return new Error().stack;
+      };
+
       var subscription = Object.assign({}, {
         next: next,
         error: error,
         complete: complete,
-        id: ID()
+        id: ID(),
+        trace: trace()
       });
       subscription.unsubscribe = _unsubscribe(subscription);
       values.subscriptions[subscription.id] = subscription;
@@ -1585,7 +1594,7 @@ function Observer(initialValue) {
 }
 
 
-// CONCATENATED MODULE: ./src/utils/observer-unsubscribe/index.js
+// CONCATENATED MODULE: ./src/utils/observer-unsubscribe.js
 
 /**
  * Looks for subscriptions in an object, DOM element or a subscription itself and unsubscribes.
@@ -1654,10 +1663,7 @@ function WCElements(host, elements) {
     };
 
     if (elCache[key]) {
-      // timer TODO
-      requestAnimationFrame(function () {
-        return setTimeout(get, 0);
-      });
+      Object(on_next_frame["a" /* OnNextFrame */])(get);
       return elCache[key];
     }
 
@@ -1677,7 +1683,7 @@ function WCElements(host, elements) {
       }
     });
     elStates[key].subscribe(function (newElement) {
-      host.unsubscribeEvents(elStates[key].previous);
+      ObserverUnsubscribe(elStates[key].previous);
       wc_elements_removeOld(elStates[key].previous);
 
       if (typeof elements[key].onChange === "function") {
@@ -1699,13 +1705,12 @@ function WCElements(host, elements) {
     }
   };
 }
-// CONCATENATED MODULE: ./src/utils/create-element/index.js
+// CONCATENATED MODULE: ./src/utils/create-element.js
 
-var create_element_CreateElement = function CreateElement(obj) {
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var _options$fragment = options.fragment,
-      fragment = _options$fragment === void 0 ? true : _options$fragment;
+var create_element_CreateElement = function CreateElement(obj, returnElement) {
   var el = document.createElement(obj.tagName || "div");
+  var fragment = document.createDocumentFragment();
+  fragment.appendChild(el);
   Object.keys(obj).forEach(function (key) {
     if (key === "tagName") {
       return;
@@ -1715,24 +1720,15 @@ var create_element_CreateElement = function CreateElement(obj) {
       return el[key] = obj[key];
     }
 
-    if (["string", "number", "boolean"].indexOf(Type(obj[key])) > -1) {
+    if (["string", "number", "boolean"].indexOf(typeof_default()(obj[key])) > -1) {
       el.setAttribute(key, obj[key]);
     } else {
       el[key] = obj[key];
     }
   });
-
-  if (!fragment) {
-    return el;
-  }
-
-  var _fragment = document.createDocumentFragment();
-
-  _fragment.appendChild(el);
-
-  return _fragment;
+  return returnElement ? el : fragment;
 };
-// CONCATENATED MODULE: ./src/utils/append-style-element/index.js
+// CONCATENATED MODULE: ./src/utils/append-style-element.js
 
 /**
  * Appends a style element with the provided rules to a provided element
@@ -1756,16 +1752,14 @@ function AppendStyleElement(rulesString, parent, name) {
     type: "text/css",
     style: "display:none;",
     name: name
-  }, {
-    fragment: false
-  });
+  }, true);
   parent.appendChild(style);
   /** Then set the rules */
 
   SetStyleRules(style, rulesString);
   return style;
 }
-// CONCATENATED MODULE: ./src/utils/set-shadow-root/index.js
+// CONCATENATED MODULE: ./src/utils/set-shadow-root.js
 
 /* un-pure - modifies component element */
 
@@ -1799,8 +1793,6 @@ var componentStore = __webpack_require__(11);
 
 
 /** Does not actually mutate anything, tho itself gets mutated across setting styles, properties, etc */
-
-var Total = 0;
 
 var wc_constructor_setProperty = function setProperty(host, key, formatter, getter, setter) {
   try {
@@ -2024,13 +2016,12 @@ function WCConstructor(options) {
 
 
   var object = newComponentObject();
-  console.log("".concat(componentName, " - ").concat(Total = Total + performance.now() - genesis));
   return {
     object: object,
     component: componentClass
   };
 }
-// CONCATENATED MODULE: ./src/utils/polyfill-object-assign/index.js
+// CONCATENATED MODULE: ./src/utils/polyfill-object-assign.js
 function PolyfillObjectAssign() {
   if (typeof Object.assign !== "function") {
     // Must be writable: true, enumerable: false, configurable: true
@@ -2129,7 +2120,7 @@ function Timer(duration, stepFn) {
 
   return timer_subscriptions[id];
 }
-// CONCATENATED MODULE: ./src/utils/polyfill-mutation-observer/index.js
+// CONCATENATED MODULE: ./src/utils/polyfill-mutation-observer.js
 
 function PolyfillMutationObserver(w) {
   (function () {
@@ -2160,7 +2151,7 @@ function PolyfillMutationObserver(w) {
     };
   }).call(this);
 }
-// CONCATENATED MODULE: ./src/utils/polyfill-wc/index.js
+// CONCATENATED MODULE: ./src/utils/polyfill-wc.js
 var setBUIltComponents = function setBUIltComponents(w) {
   return w.bUIltComponents ? undefined : w.bUIltComponents = {};
 };
@@ -2425,7 +2416,7 @@ var ButtonElement = WCConstructor({
   }
 });
 WCDefine(button_element_componentName, ButtonElement);
-// CONCATENATED MODULE: ./src/utils/throttle/index.js
+// CONCATENATED MODULE: ./src/utils/throttle.js
 function Throttle(fn) {
   var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 33;
   var timer = null;
@@ -2457,7 +2448,7 @@ function Throttle(fn) {
     test();
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-number/index.js
+// CONCATENATED MODULE: ./src/utils/to-number.js
 
 function ToNumber(value) {
   var result = TMonad(value);
@@ -2474,7 +2465,7 @@ function ToNumber(value) {
   result.valid = !isNaN(result.value);
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/index-of/index.js
+// CONCATENATED MODULE: ./src/utils/index-of.js
 
 function IndexOf(array) {
   return function (value) {
@@ -2495,7 +2486,7 @@ function IndexOf(array) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/observe-event/index.js
+// CONCATENATED MODULE: ./src/utils/observe-event.js
 
 function ObserveEvent(element, eventName) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -3010,22 +3001,32 @@ var CollapseMenu = WCConstructor({
 WCDefine(collapse_menu_componentName, CollapseMenu);
 // CONCATENATED MODULE: ./src/services/icons.js
 var iconArrow = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z\"/></svg>";
+var iconCheck = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z\"/></svg>";
 var iconChevron = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z\"/></svg>";
+var iconClose = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>";
 var iconDelete = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z\"/></svg>";
+var iconError = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z\"/></svg>";
 var iconFilter = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M15.96 10.29l-2.75 3.54-1.96-2.36L8.5 15h11l-3.54-4.71zM3 5H1v16c0 1.1.9 2 2 2h16v-2H3V5zm18-4H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 16H7V3h14v14z\"/></svg>";
 var iconGear = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z\"/></svg>";
+var iconInfo = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z\"/></svg>";
 var iconPencil = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z\"/></svg>";
 var iconPlay = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M8 5v14l11-7z\"/></svg>";
 var iconTriangle = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M7 10l5 5 5-5z\"/></svg>";
+var iconWarning = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z\"/></svg>";
 var Icons = {
   arrow: iconArrow,
+  check: iconCheck,
   chevron: iconChevron,
+  close: iconClose,
   "delete": iconDelete,
+  error: iconError,
   filter: iconFilter,
   gear: iconGear,
+  info: iconInfo,
   pencil: iconPencil,
   play: iconPlay,
-  triangle: iconTriangle
+  triangle: iconTriangle,
+  warning: iconWarning
 };
 // CONCATENATED MODULE: ./src/components/content-collapse/index.js
 /**
@@ -3147,7 +3148,7 @@ var ContentCollapse = WCConstructor({
   }
 });
 WCDefine(content_collapse_componentName, ContentCollapse);
-// CONCATENATED MODULE: ./src/utils/if-empty/index.js
+// CONCATENATED MODULE: ./src/utils/if-empty.js
 
 function IfEmpty(newValue) {
   return function (value) {
@@ -3781,7 +3782,7 @@ var content_transition_properties_properties = {
   }
 };
 var content_transition_properties_observedAttributes = Object.keys(content_transition_properties_properties);
-// CONCATENATED MODULE: ./src/utils/get-ease/index.js
+// CONCATENATED MODULE: ./src/utils/get-ease.js
 var distance = function distance(v) {
   return v[1] - v[0];
 };
@@ -3799,12 +3800,12 @@ function GetEase(values, duration, pow, powerFn) {
   results.push(values[1]);
   return results;
 }
-// CONCATENATED MODULE: ./src/utils/ease-power/index.js
+// CONCATENATED MODULE: ./src/utils/ease-power.js
 function EasePower(stepDecimal) {
   var pow = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 4;
   return 1 - Math.pow(1 - stepDecimal, pow);
 }
-// CONCATENATED MODULE: ./src/utils/ease-in-out/index.js
+// CONCATENATED MODULE: ./src/utils/ease-in-out.js
 
 function EaseInOut(values, duration) {
   var pow = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 4;
@@ -4363,7 +4364,7 @@ var CookieMessage = WCConstructor({
   }
 });
 WCDefine(cookie_message_componentName, CookieMessage);
-// CONCATENATED MODULE: ./src/utils/observe-slots/index.js
+// CONCATENATED MODULE: ./src/utils/observe-slots.js
 
 function ObserveSlots(element, mustHaveSlotAttribute) {
   if (!element) {
@@ -4676,7 +4677,7 @@ var DropDown = WCConstructor({
   }
 });
 WCDefine(drop_down_componentName, DropDown);
-// CONCATENATED MODULE: ./src/utils/if-is/index.js
+// CONCATENATED MODULE: ./src/utils/if-is.js
 
 function IfIs(compare, replace) {
   return function (value) {
@@ -4692,7 +4693,7 @@ function IfIs(compare, replace) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/if-not/index.js
+// CONCATENATED MODULE: ./src/utils/if-not.js
 
 function IfNot(compare, replace) {
   return function (value) {
@@ -4708,7 +4709,7 @@ function IfNot(compare, replace) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/set-attribute/index.js
+// CONCATENATED MODULE: ./src/utils/set-attribute.js
 function SetAttribute(element, name, value) {
   var asProperty = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
@@ -4734,7 +4735,7 @@ function SetAttribute(element, name, value) {
 
   return element;
 }
-// CONCATENATED MODULE: ./src/utils/add-remove-attribute/index.js
+// CONCATENATED MODULE: ./src/utils/add-remove-attribute.js
 
 function AddRemoveAttribute(el, attr, value) {
   if (!el) {
@@ -4754,9 +4755,9 @@ function AddRemoveAttribute(el, attr, value) {
   SetAttribute(el, attr, value);
   return el;
 }
-// CONCATENATED MODULE: ./src/utils/is-mobile/index.js
+// CONCATENATED MODULE: ./src/utils/is-mobile.js
 var IsMobile = typeof window.orientation !== "undefined" || window.navigator.userAgent.indexOf("IEMobile") !== -1;
-// CONCATENATED MODULE: ./src/utils/to-options/index.js
+// CONCATENATED MODULE: ./src/utils/to-options.js
 
 function ToOptions(value) {
   var result = TMonad(value);
@@ -4781,7 +4782,7 @@ function ToOptions(value) {
   });
   return TMonadUpdate(Pipe(CommasToArray, IfInvalid([]), mapper)(result), "array", "Options");
 }
-// CONCATENATED MODULE: ./src/utils/to-function/index.js
+// CONCATENATED MODULE: ./src/utils/to-function.js
 
 function ToFunction(value) {
   var result = TMonad(value);
@@ -4792,7 +4793,7 @@ function ToFunction(value) {
 
   return TMonadUpdate(result, "function", "ToFunction");
 }
-// CONCATENATED MODULE: ./src/utils/to-json/index.js
+// CONCATENATED MODULE: ./src/utils/to-json.js
 
 function ToJSON(value) {
   var result = FromJSON(value);
@@ -4811,7 +4812,7 @@ function ToJSON(value) {
   result.type = Type(result.value);
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/find-element-in/index.js
+// CONCATENATED MODULE: ./src/utils/find-element-in.js
 function FindElementIn(parent, selector) {
   var all = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   return !parent ? undefined : parent[all ? "querySelectorAll" : "querySelector"](selector);
@@ -4820,7 +4821,7 @@ function FindElementIn(parent, selector) {
 var svgTags = ["svg", "a", "altglyph", "altglyphdef", "altglyphitem", "animatecolor", "animatemotion", "animatetransform", "audio", "canvas", "circle", "clippath", "defs", "desc", "ellipse", "filter", "font", "g", "glyph", "glyphref", "hkern", "image", "line", "lineargradient", "marker", "mask", "metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialgradient", "rect", "stop", "style", "switch", "symbol", "text", "textpath", "title", "tref", "tspan", "video", "view", "vkern"];
 // CONCATENATED MODULE: ./src/utils/html-tags.js
 var htmlTags = ["a", "abbr", "acronym", "address", "area", "article", "aside", "audio", "b", "bdi", "bdo", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "content", "data", "datalist", "dd", "decorator", "del", "details", "dfn", "dir", "div", "dl", "dt", "element", "em", "fieldset", "figcaption", "figure", "font", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "img", "input", "ins", "kbd", "label", "legend", "li", "main", "map", "mark", "marquee", "menu", "menuitem", "meter", "nav", "nobr", "ol", "optgroup", "option", "output", "p", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "section", "select", "shadow", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "time", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"];
-// CONCATENATED MODULE: ./src/utils/validate-html/index.js
+// CONCATENATED MODULE: ./src/utils/validate-html.js
 
 function ValidateHtml(str, allowedHtmlTags, disallowedHtmlTags) {
   var original = str;
@@ -4902,7 +4903,7 @@ function ValidateHtml(str, allowedHtmlTags, disallowedHtmlTags) {
     reason: valid ? [] : ["".concat(diff, " element").concat(diff > 1 ? "s were" : " was", " removed")]
   };
 }
-// CONCATENATED MODULE: ./src/utils/replace-element-contents/index.js
+// CONCATENATED MODULE: ./src/utils/replace-element-contents.js
 function ReplaceElementContents(element, contents) {
   var respond = function respond() {
     return {
@@ -5670,12 +5671,12 @@ WCConstructor({
   }
 });
 WCDefine(dropdown_select_componentName, DropdownSelect);
-// CONCATENATED MODULE: ./src/utils/use-if/index.js
+// CONCATENATED MODULE: ./src/utils/use-if.js
 
 function UseIf(condition, ifNot, value) {
   return TMonad(condition(value) ? value : ifNot(value));
 }
-// CONCATENATED MODULE: ./src/utils/is-element/index.js
+// CONCATENATED MODULE: ./src/utils/is-element.js
 
 function IsElement(value) {
   var result = TMonad(value);
@@ -5687,7 +5688,7 @@ function IsElement(value) {
   result.valid = Object(utils_get["a" /* Get */])(result, "value.nodeType") === 1;
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/selector-to-element/index.js
+// CONCATENATED MODULE: ./src/utils/selector-to-element.js
 
 function SelectorToElement(parent, value) {
   var Value = TMonad(value);
@@ -5707,7 +5708,7 @@ function SelectorToElement(parent, value) {
   var result = IsElement(Value);
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/selector-array-to-elements/index.js
+// CONCATENATED MODULE: ./src/utils/selector-array-to-elements.js
 
 function SelectorArrayToElements(parent, value) {
   var Value = ToArray(value);
@@ -5738,7 +5739,7 @@ function SelectorArrayToElements(parent, value) {
   Value.valid = Value.value.length;
   return Value;
 }
-// CONCATENATED MODULE: ./src/utils/get-curve/index.js
+// CONCATENATED MODULE: ./src/utils/get-curve.js
 /** BORROWED HEAVILY FROM: https://stackoverflow.com/a/15528789 */
 function GetCurve(points) {
   var tension = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
@@ -5870,6 +5871,10 @@ var methods_unloadTargets = function unloadTargets(host) {
   host.targets$ = [];
 };
 var methods_loadTargets = function loadTargets(host) {
+  if (!Array.isArray(host.targets$)) {
+    host.targets$ = [];
+  }
+
   if (!host.targets || !host.start) {
     return;
   }
@@ -5936,14 +5941,7 @@ var effect_bounce_z_properties_attributes = {
     }
   }
 };
-var effect_bounce_z_properties_properties = Object.assign({
-  targets$: {
-    format: function format() {
-      return [];
-    },
-    onChange: properties_onChange
-  }
-}, effect_bounce_z_properties_attributes);
+var effect_bounce_z_properties_properties = effect_bounce_z_properties_attributes;
 var effect_bounce_z_properties_observedAttributes = Object.keys(effect_bounce_z_properties_attributes);
 // CONCATENATED MODULE: ./src/components/effect-bounce-z/index.js
 
@@ -6270,7 +6268,7 @@ var effect_ripple_methods_runStart = function runStart(host) {
   rippleInner.className = "ripple-inner";
   rippleInner.style.backgroundColor = host.color;
   host.elements.ripple.appendChild(rippleInner);
-  setOrigin(host, rippleInner);
+  methods_setOrigin(host, rippleInner);
   Timer(host.speed, function (scale) {
     var scaleAmount = Math.max(Math.min(maxScale, scale), 0);
     style.transform = "perspective(1px) translateZ(0) scaleX(".concat(scaleAmount, ") scaley(").concat(scaleAmount, ")");
@@ -6288,7 +6286,7 @@ var effect_ripple_methods_runStart = function runStart(host) {
   });
 };
 
-var setOrigin = function setOrigin(host, rippleInner) {
+var methods_setOrigin = function setOrigin(host, rippleInner) {
   if (!host.ready) {
     return;
   }
@@ -6328,6 +6326,10 @@ var effect_ripple_methods_unloadTargets = function unloadTargets(host) {
   host.targets$ = [];
 };
 var effect_ripple_methods_loadTargets = function loadTargets(host) {
+  if (!Array.isArray(host.targets$)) {
+    host.targets$ = [];
+  }
+
   if (!host.targets || !host.start) {
     return;
   }
@@ -6379,8 +6381,6 @@ var effect_ripple_properties_resetTargets = function resetTargets(host) {
   effect_ripple_methods_loadTargets(host);
 };
 
-var effect_ripple_properties_onChange = function onChange() {};
-
 var effect_ripple_properties_selectorsToDom = function selectorsToDom(val) {
   return SelectorArrayToElements(null, val).value;
 };
@@ -6390,20 +6390,17 @@ var effect_ripple_properties_attributes = {
   color: {
     format: function format(val) {
       return Pipe(ToString, IfInvalid("#59a2d8"))(val).value;
-    },
-    onChange: effect_ripple_properties_onChange
+    }
   },
   opacity: {
     format: function format(val) {
       return Math.min(1, Math.max(0, Pipe(ToNumber, IfInvalid(0.2))(val).value));
-    },
-    onChange: effect_ripple_properties_onChange
+    }
   },
   speed: {
     format: function format(val) {
       return Pipe(ToNumber, IfInvalid(600))(val).value;
-    },
-    onChange: effect_ripple_properties_onChange
+    }
   },
   start: {
     format: function format(val) {
@@ -6424,8 +6421,7 @@ var effect_ripple_properties_attributes = {
   direction: {
     format: function format(val) {
       return typeof val === "string" ? val : "auto";
-    },
-    onChange: function onChange() {}
+    }
   },
   targets: {
     format: effect_ripple_properties_selectorsToDom,
@@ -6435,20 +6431,7 @@ var effect_ripple_properties_attributes = {
   }
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_ripple_properties_properties = Object.assign({
-  downEvent: {
-    format: function format(val) {
-      return val;
-    },
-    onChange: effect_ripple_properties_onChange
-  },
-  targets$: {
-    format: function format() {
-      return [];
-    },
-    onChange: effect_ripple_properties_onChange
-  }
-}, effect_ripple_properties_attributes);
+var effect_ripple_properties_properties = effect_ripple_properties_attributes;
 var effect_ripple_properties_observedAttributes = Object.keys(effect_ripple_properties_attributes);
 var properties_hasTargets = function hasTargets(host) {
   return {
@@ -6478,7 +6461,7 @@ var properties_canStart = function canStart(host) {
     }
   };
 };
-var nonAutoOrigin = function nonAutoOrigin(host) {
+var properties_nonAutoOrigin = function nonAutoOrigin(host) {
   return {
     get: function get() {
       return host.downEvent === undefined || host.downEvent && !host.downEvent.target || host.direction !== undefined && host.direction !== "auto" ? host.direction === "to left" ? "100% center" : ["center", "auto"].indexOf(host.direction) > -1 ? "center center" : "0% center" : false;
@@ -6524,14 +6507,14 @@ WCConstructor({
     hasStart: properties_hasStart,
     canLoadTargets: canLoadTargets,
     canStart: properties_canStart,
-    nonAutoOrigin: nonAutoOrigin
+    nonAutoOrigin: properties_nonAutoOrigin
   },
   onDisconnected: function onDisconnected(host) {
     return effect_ripple_methods_unloadTargets(host);
   }
 });
 WCDefine(effect_ripple_componentName, EffectRipple);
-// CONCATENATED MODULE: ./src/utils/selector-to-elements/index.js
+// CONCATENATED MODULE: ./src/utils/selector-to-elements.js
 
 function SelectorToElements(parent, value) {
   var result = TMonad(value);
@@ -6557,7 +6540,7 @@ function SelectorToElements(parent, value) {
   }).length;
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/selector-array-to-all-elements/index.js
+// CONCATENATED MODULE: ./src/utils/selector-array-to-all-elements.js
 
 function SelectorArrayToAllElements(parent, value) {
   var Value = ToArray(value);
@@ -6704,7 +6687,7 @@ var methods_run = function run(scaled, host) {
 
   loop();
 };
-var methods_setOrigin = function setOrigin(val, host) {
+var effect_scale_methods_setOrigin = function setOrigin(val, host) {
   if (!host.hasTargets) {
     return;
   }
@@ -6749,8 +6732,12 @@ var methods_loadElements = function loadElements(host, key) {
     return methods_run(host.scaled, host);
   }
 
-  if (!host.hasTriggers || !host.start || !host.triggers$) {
+  if (!host.hasTriggers || !host.start) {
     return;
+  }
+
+  if (!Array.isArray(host.triggers$)) {
+    host.triggers$ = [];
   }
 
   var toggle = !host.end;
@@ -6800,7 +6787,7 @@ var properties_reset = function reset(host) {
   methods_unloadTriggers(host);
   effect_scale_methods_loadTargets(host);
   effect_scale_methods_loadTriggers(host);
-  methods_setOrigin(host.startfrom, host);
+  effect_scale_methods_setOrigin(host.startfrom, host);
 };
 
 var effect_scale_properties_directions = ["center", "center top", "center bottom", "left top", "left center", "left bottom", "right top", "right center", "right bottom"];
@@ -6859,7 +6846,7 @@ var effect_scale_properties_attributes = {
     format: function format(val) {
       return Pipe(IndexOf(effect_scale_properties_directions), IfInvalid("center"))(val).value;
     },
-    onChange: methods_setOrigin
+    onChange: effect_scale_methods_setOrigin
   },
   targets: {
     format: effect_scale_properties_selectorsToDom,
@@ -6887,32 +6874,7 @@ var effect_scale_properties_attributes = {
   }
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_scale_properties_properties = Object.assign({
-  targets$: {
-    format: function format() {
-      return [];
-    },
-    onChange: effect_scale_properties_onChange
-  },
-  triggers$: {
-    format: function format() {
-      return [];
-    },
-    onChange: effect_scale_properties_onChange
-  },
-  isScaling: {
-    format: function format(val) {
-      return val;
-    },
-    onChange: effect_scale_properties_onChange
-  },
-  isScaled: {
-    format: function format(val) {
-      return val;
-    },
-    onChange: effect_scale_properties_onChange
-  }
-}, effect_scale_properties_attributes);
+var effect_scale_properties_properties = effect_scale_properties_attributes;
 var effect_scale_properties_observedAttributes = Object.keys(effect_scale_properties_attributes);
 // CONCATENATED MODULE: ./src/components/effect-scale/elements.js
 var effect_scale_elements_elementSelectors = {
@@ -7036,8 +6998,11 @@ var effect_underline_methods_setOrigin = function setOrigin(host) {
     return underlineStyle.transformOrigin = nonAutoOrigin;
   }
 
-  var eventX = host.downEvent.x;
-  var targetBox = host.downEvent.target.getBoundingClientRect();
+  var eventX = Object(utils_get["a" /* Get */])(host, "downEvent.x", 0);
+  var targetBox = Object(utils_get["a" /* Get */])(host, "downEvent.target.getBoundingClientRect()", {
+    left: 0,
+    width: 0
+  });
   var left = Math.round((eventX - targetBox.left) / targetBox.width * 100);
   underlineStyle.transformOrigin = "".concat(left, "% center");
 };
@@ -7062,6 +7027,10 @@ var effect_underline_methods_unloadTargets = function unloadTargets(host) {
   host.targets$ = [];
 };
 var effect_underline_methods_loadTargets = function loadTargets(host) {
+  if (!Array.isArray(host.targets$)) {
+    host.targets$ = [];
+  }
+
   if (!host.canLoadTargets) {
     return;
   }
@@ -7191,26 +7160,7 @@ var effect_underline_properties_attributes = {
   "class": ComponentClassObject
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_underline_properties_properties = Object.assign({
-  downEvent: {
-    format: function format(val) {
-      return val;
-    },
-    onChange: effect_underline_properties_onChange
-  },
-  on: {
-    format: function format(val) {
-      return Pipe(ToBool, IfInvalid(false))(val).value;
-    },
-    onChange: effect_underline_properties_onChange
-  },
-  targets$: {
-    format: function format() {
-      return [];
-    },
-    onChange: effect_underline_properties_onChange
-  }
-}, effect_underline_properties_attributes);
+var effect_underline_properties_properties = effect_underline_properties_attributes;
 var effect_underline_properties_observedAttributes = Object.keys(effect_underline_properties_attributes);
 var effect_underline_properties_hasTargets = function hasTargets(host) {
   return {
@@ -7261,7 +7211,7 @@ var properties_canRunEnd = function canRunEnd(host) {
     }
   };
 };
-var properties_nonAutoOrigin = function nonAutoOrigin(host) {
+var effect_underline_properties_nonAutoOrigin = function nonAutoOrigin(host) {
   return {
     get: function get() {
       return host.downEvent === undefined || host.downEvent && !host.downEvent.target || host.direction !== undefined && host.direction !== "auto" ? host.direction === "to left" ? "100% center" : ["center", "auto"].indexOf(host.direction) > -1 ? "center center" : "0% center" : false;
@@ -7312,7 +7262,7 @@ WCConstructor({
     canEnd: properties_canEnd,
     canRunStart: properties_canRunStart,
     canRunEnd: properties_canRunEnd,
-    nonAutoOrigin: properties_nonAutoOrigin
+    nonAutoOrigin: effect_underline_properties_nonAutoOrigin
   },
   onDisconnected: function onDisconnected(host) {
     return effect_underline_methods_unloadTargets(host);
@@ -8105,7 +8055,7 @@ WCConstructor({
   }
 });
 WCDefine(horizontal_slider_componentName, HorizontalSlider);
-// CONCATENATED MODULE: ./src/utils/observe-worker/index.js
+// CONCATENATED MODULE: ./src/utils/observe-worker.js
 
 function ObserveWorker(func) {
   var value;
@@ -8776,12 +8726,7 @@ var ImageLoader = WCConstructor({
   }
 });
 WCDefine(image_loader_componentName, ImageLoader);
-// CONCATENATED MODULE: ./src/utils/to-object/index.js
-
-
-
-
-
+// CONCATENATED MODULE: ./src/utils/to-object.js
 
 var to_object_ToObject = function ToObject(value) {
   var result = TMonad(value);
@@ -8797,7 +8742,7 @@ var to_object_ToObject = function ToObject(value) {
   result.valid = Type(result.value) === "object";
   return result;
 };
-// CONCATENATED MODULE: ./src/utils/set/index.js
+// CONCATENATED MODULE: ./src/utils/set.js
 function Set(source, path, value) {
   if (path) {
     path = [source].concat(path.split("."));
@@ -8827,7 +8772,7 @@ function Set(source, path, value) {
   });
   return source;
 }
-// CONCATENATED MODULE: ./src/utils/validate-number/index.js
+// CONCATENATED MODULE: ./src/utils/validate-number.js
 
 function ValidateNumber(num) {
   var original = num;
@@ -8845,7 +8790,7 @@ function ValidateNumber(num) {
     reason: reasons
   };
 }
-// CONCATENATED MODULE: ./src/utils/validate-bool/index.js
+// CONCATENATED MODULE: ./src/utils/validate-bool.js
 function ValidateBool(val) {
   var original = val;
   var reasons = [];
@@ -8871,7 +8816,7 @@ function ValidateBool(val) {
     reason: reasons
   };
 }
-// CONCATENATED MODULE: ./src/utils/validate-email/index.js
+// CONCATENATED MODULE: ./src/utils/validate-email.js
 
 function ValidateEmail(str) {
   var original = str;
@@ -8937,7 +8882,7 @@ function ValidateUsPhone(val) {
     reason: reason
   };
 }
-// CONCATENATED MODULE: ./src/utils/validate-intl-phone/index.js
+// CONCATENATED MODULE: ./src/utils/validate-intl-phone.js
 
 function ValidateIntlPhone(val) {
   var original = val;
@@ -8956,7 +8901,7 @@ function ValidateIntlPhone(val) {
     reason: reason
   };
 }
-// CONCATENATED MODULE: ./src/utils/remove-meta/index.js
+// CONCATENATED MODULE: ./src/utils/remove-meta.js
 
 function RemoveMeta(string, search) {
   var match;
@@ -8983,7 +8928,7 @@ function RemoveMeta(string, search) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-digits/index.js
+// CONCATENATED MODULE: ./src/utils/to-digits.js
 
 function ToDigits(value) {
   var result = TMonad(value);
@@ -9008,7 +8953,7 @@ function ToDigits(value) {
   result.type = Type(result.value);
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-join-meta/index.js
+// CONCATENATED MODULE: ./src/utils/to-join-meta.js
 function ToJoinMeta(array, delimeter) {
   var result = {
     value: array,
@@ -9042,7 +8987,7 @@ function ToJoinMeta(array, delimeter) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-join/index.js
+// CONCATENATED MODULE: ./src/utils/to-join.js
 
 function ToJoin(delimeter) {
   return function (value) {
@@ -9059,7 +9004,7 @@ function ToJoin(delimeter) {
     return TMonadUpdate(result, "string", "Join");
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-us-zip/index.js
+// CONCATENATED MODULE: ./src/utils/to-us-zip.js
 
 function ToUsZip(value) {
   var result = TMonad(value);
@@ -9164,7 +9109,7 @@ function ValidateText(str) {
   htmlResults.reason = htmlResults.reason.concat(reasons);
   return htmlResults;
 }
-// CONCATENATED MODULE: ./src/utils/to-slice/index.js
+// CONCATENATED MODULE: ./src/utils/to-slice.js
 
 function ToSlice(start, end) {
   return function (value) {
@@ -9208,7 +9153,7 @@ function ToSlice(start, end) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-match-meta/index.js
+// CONCATENATED MODULE: ./src/utils/to-match-meta.js
 
 function ToMatchMeta(string, search) {
   var justOne = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
@@ -9275,7 +9220,7 @@ function ToMatchMeta(string, search) {
     stringChanges: changes
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-match/index.js
+// CONCATENATED MODULE: ./src/utils/to-match.js
 
 function ToMatch(search) {
   return function (value) {
@@ -9296,7 +9241,7 @@ function ToMatch(search) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-match-all/index.js
+// CONCATENATED MODULE: ./src/utils/to-match-all.js
 
 function ToMatchAll(search) {
   return function (value) {
@@ -9317,7 +9262,7 @@ function ToMatchAll(search) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-replacement-pattern/index.js
+// CONCATENATED MODULE: ./src/utils/to-replacement-pattern.js
 
 var to_replacement_pattern_ToReplacementPattern = function ToReplacementPattern(string) {
   if (!string) {
@@ -9348,7 +9293,7 @@ var to_replacement_pattern_ToReplacementPattern = function ToReplacementPattern(
   });
   return result;
 };
-// CONCATENATED MODULE: ./src/utils/to-replace-meta/index.js
+// CONCATENATED MODULE: ./src/utils/to-replace-meta.js
 
 function ToReplaceMeta(string, search, insert) {
   var replacements = to_replacement_pattern_ToReplacementPattern(insert);
@@ -9405,7 +9350,7 @@ function ToReplaceMeta(string, search, insert) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-replace/index.js
+// CONCATENATED MODULE: ./src/utils/to-replace.js
 
 function ToReplace(search, replace) {
   return function (value) {
@@ -9431,7 +9376,7 @@ function ToReplace(search, replace) {
     return TMonadUpdate(result, "string", "Replace");
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-upper-case/index.js
+// CONCATENATED MODULE: ./src/utils/to-upper-case.js
 
 function ToUpperCase(string) {
   var result = TMonad(string);
@@ -9444,7 +9389,7 @@ function ToUpperCase(string) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-lower-case/index.js
+// CONCATENATED MODULE: ./src/utils/to-lower-case.js
 
 function ToLowerCase(string) {
   var result = TMonad(string);
@@ -9457,7 +9402,7 @@ function ToLowerCase(string) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-capitalize/index.js
+// CONCATENATED MODULE: ./src/utils/to-capitalize.js
 
 function ToCapitalize(string) {
   var result = TMonad(string);
@@ -9470,7 +9415,7 @@ function ToCapitalize(string) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/after-every-nth/index.js
+// CONCATENATED MODULE: ./src/utils/after-every-nth.js
 
 function AfterEveryNth(nth, insert) {
   return function (value) {
@@ -9513,7 +9458,7 @@ function AfterEveryNth(nth, insert) {
     return r;
   };
 }
-// CONCATENATED MODULE: ./src/utils/before-every-nth/index.js
+// CONCATENATED MODULE: ./src/utils/before-every-nth.js
 
 function BeforeEveryNth(nth, insert) {
   return function (value) {
@@ -9556,7 +9501,7 @@ function BeforeEveryNth(nth, insert) {
     return r;
   };
 }
-// CONCATENATED MODULE: ./src/utils/to-phone/index.js
+// CONCATENATED MODULE: ./src/utils/to-phone.js
 
 function ToPhone(value) {
   var result = TMonad(value);
@@ -9635,7 +9580,7 @@ function ToPhone(value) {
   r.valid = typeof r.value === "string" && r.value.length === 14;
   return r;
 }
-// CONCATENATED MODULE: ./src/utils/to-intl-phone/index.js
+// CONCATENATED MODULE: ./src/utils/to-intl-phone.js
 
 function ToIntlPhone(value) {
   var result = TMonad(value);
@@ -9652,7 +9597,7 @@ function ToIntlPhone(value) {
   result.stringChanges = r.stringChanges;
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/is-autofilled/index.js
+// CONCATENATED MODULE: ./src/utils/is-autofilled.js
 function IsAutoFilled(input) {
   var nativeMatches = input.matches || input["msMatchesSelector"];
 
@@ -9678,7 +9623,7 @@ function IsAutoFilled(input) {
     }
   }
 }
-// CONCATENATED MODULE: ./src/utils/set-caret/index.js
+// CONCATENATED MODULE: ./src/utils/set-caret.js
 function SetCaret(input, position, doc) {
   if (!input || !doc || doc.activeElement !== input) {
     return;
@@ -10211,7 +10156,7 @@ var methods_value_processValue = function processValue(host) {
     return host.invalid = true;
   }
 };
-// CONCATENATED MODULE: ./src/utils/get-input-value/index.js
+// CONCATENATED MODULE: ./src/utils/get-input-value.js
 function GetInputValue(input) {
   var type = input.type;
 
@@ -11805,38 +11750,26 @@ var overlay_message_setShown = function setShown(host) {
     return;
   }
 
-  var startEnd = host.shown ? [0, 1] : [1, 0]; // Timer(
-  //     333,
-  //     opacityStep => root.style.opacity = opacityStep,
-  //     EaseInOut(startEnd, 200)
-  // )
+  var opacityNow = root.style.opacity;
+
+  if (!host.shown && (opacityNow === "" || opacityNow === "0")) {
+    return;
+  }
 
   Animator({
     duration: 333,
-    frameValues: EaseInOut(startEnd, 200),
+    frameValues: EaseInOut(host.shown ? [0, 1] : [1, 0], 200),
     stepFn: function stepFn(opacityStep) {
       return root.style.opacity = opacityStep;
+    },
+    completeFn: function completeFn() {
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return host.dispatchEvent(new CustomEvent(host.shown ? "opened" : "closed", {
+          detail: host
+        }));
+      });
     }
-  }); // const animator = () => new Promise(resolve => {
-  //     Timer(
-  //         333,
-  //         opacityStep => root.style.opacity = opacityStep,
-  //         EaseInOut(startEnd, 333),
-  //         resolve
-  //     )
-  // })
-  // const animateHeight = (from, to, el, speed) => animator(from, to, speed, heightStep => el.style.height = `${heightStep}px`)
-  // const endEventName = EventName(`transitionend`)
-  // const dispatch = () => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host }))
-  // if (endEventName) {
-  //     root.addEventListener(endEventName, function startEvent() {
-  //         root.removeEventListener(endEventName, startEvent)
-  //         requestAnimationFrame(dispatch)
-  //     })
-  // } else {
-  //     requestAnimationFrame(dispatch)
-  // }
-  // root.classList[host.shown ? `add` : `remove`](`shown`)
+  });
 };
 
 var setColorTheme = function setColorTheme(color, root) {
@@ -12281,7 +12214,7 @@ var ProgressBar = WCConstructor({
   elements: progress_bar_elements
 });
 WCDefine(progress_bar_componentName, ProgressBar);
-// CONCATENATED MODULE: ./src/utils/event-name/index.js
+// CONCATENATED MODULE: ./src/utils/event-name.js
 var events = {
   transitionend: {
     transition: "transitionend",
@@ -12341,6 +12274,7 @@ function WCwhenPropertyReady(host, path) {
 // CONCATENATED MODULE: ./src/components/snack-bar/index.js
 
 
+
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 var snack_bar_style = __webpack_require__(64).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -12350,10 +12284,6 @@ var snack_bar_template = __webpack_require__(65);
 
 var snack_bar_componentName = "snack-bar";
 var snack_bar_componentRoot = ".".concat(snack_bar_componentName, "-container");
-var infoiconSvg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z\"/></svg>";
-var successiconSvg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z\"/></svg>";
-var erroriconSvg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z\"/></svg>";
-var warningiconSvg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z\"/></svg>";
 
 var snack_bar_setStyles = function setStyles(el, styles) {
   if (!el) {
@@ -12464,7 +12394,7 @@ var snack_bar_properties = {
   },
   infoicon: {
     format: function format(val) {
-      return Pipe(ToString, IfInvalid(infoiconSvg), IfEmpty(infoiconSvg))(val).value;
+      return Pipe(ToString, IfInvalid(iconInfo), IfEmpty(iconInfo))(val).value;
     },
     onChange: function onChange(_val, host) {
       return Object(on_next_frame["a" /* OnNextFrame */])(function () {
@@ -12474,7 +12404,7 @@ var snack_bar_properties = {
   },
   successicon: {
     format: function format(val) {
-      return Pipe(ToString, IfInvalid(successiconSvg), IfEmpty(successiconSvg))(val).value;
+      return Pipe(ToString, IfInvalid(iconCheck), IfEmpty(iconCheck))(val).value;
     },
     onChange: function onChange(_val, host) {
       return Object(on_next_frame["a" /* OnNextFrame */])(function () {
@@ -12484,7 +12414,7 @@ var snack_bar_properties = {
   },
   erroricon: {
     format: function format(val) {
-      return Pipe(ToString, IfInvalid(erroriconSvg), IfEmpty(erroriconSvg))(val).value;
+      return Pipe(ToString, IfInvalid(iconError), IfEmpty(iconError))(val).value;
     },
     onChange: function onChange(_val, host) {
       return Object(on_next_frame["a" /* OnNextFrame */])(function () {
@@ -12494,7 +12424,7 @@ var snack_bar_properties = {
   },
   warningicon: {
     format: function format(val) {
-      return Pipe(ToString, IfInvalid(warningiconSvg), IfEmpty(warningiconSvg))(val).value;
+      return Pipe(ToString, IfInvalid(iconWarning), IfEmpty(iconWarning))(val).value;
     },
     onChange: function onChange(_val, host) {
       return Object(on_next_frame["a" /* OnNextFrame */])(function () {
@@ -12599,6 +12529,12 @@ var snack_bar_elements = {
       return Object(on_next_frame["a" /* OnNextFrame */])(function () {
         return snack_bar_setIcon(host, "warningicon");
       });
+    }
+  },
+  closeIcon: {
+    selector: ".".concat(snack_bar_componentName, "-close-icon"),
+    onChange: function onChange(el) {
+      return el.svg = iconClose;
     }
   }
 };
@@ -13656,7 +13592,18 @@ function UploadService(options, file) {
   return methods;
 }
 window.UploadService = UploadService;
-// CONCATENATED MODULE: ./src/utils/between/index.js
+// CONCATENATED MODULE: ./src/utils/append-children.js
+function AppendChildren(el, children) {
+  var i = children.length;
+
+  while (i) {
+    i = i - 1;
+    el.appendChild(children[i]);
+  }
+
+  return el;
+}
+// CONCATENATED MODULE: ./src/utils/between.js
 function Between(start, end, value) {
   var regex = new RegExp("".concat(start, "([^").concat(end, "]+)").concat(end), "gm");
 
@@ -13691,7 +13638,7 @@ function Between(start, end, value) {
     }
   };
 }
-// CONCATENATED MODULE: ./src/utils/browser-is/index.js
+// CONCATENATED MODULE: ./src/utils/browser-is.js
 var isChrome = navigator.userAgent.indexOf("Chrome") > -1;
 var isExplorer = navigator.userAgent.indexOf("MSIE") > -1;
 var isFirefox = navigator.userAgent.indexOf("Firefox") > -1;
@@ -13714,7 +13661,17 @@ var BrowserIs = {
   opera: isOpera,
   which: isSafari ? "safari" : isChrome ? "chrome" : isExplorer ? "ie" : isFirefox ? "firefox" : isOpera ? "opera" : undefined
 };
-// CONCATENATED MODULE: ./src/utils/to-date/index.js
+// CONCATENATED MODULE: ./src/utils/clear-html.js
+function ClearHTML(el) {
+  if (el) {
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  }
+
+  return el;
+}
+// CONCATENATED MODULE: ./src/utils/to-date.js
 
 function ToDate(value) {
   var result = TMonad(value);
@@ -13732,7 +13689,7 @@ function ToDate(value) {
   result.valid = result.type === "date";
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/date-to-object/index.js
+// CONCATENATED MODULE: ./src/utils/date-to-object.js
 
 function DateToObject(value) {
   var result = ToDate(value);
@@ -13780,11 +13737,11 @@ function DateToObject(value) {
     hourDouble: result.value.toLocaleTimeString(navigator.language, {
       hour: "2-digit",
       hour12: true
-    }).replace(/[^0-9\.]+/g, ""),
+    }).replace(/[^0-9.]+/g, ""),
     hourDouble24: result.value.toLocaleTimeString(navigator.language, {
       hour: "2-digit",
       hour12: false
-    }).replace(/[^0-9\.]+/g, ""),
+    }).replace(/[^0-9.]+/g, ""),
     minutes: parseInt(result.value.toLocaleTimeString(navigator.language, {
       minute: "numeric"
     })),
@@ -13803,7 +13760,7 @@ function DateToObject(value) {
   };
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/ease-bounce/index.js
+// CONCATENATED MODULE: ./src/utils/ease-bounce.js
 
 function EaseBounce(values, duration) {
   var pow = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 4;
@@ -13811,7 +13768,7 @@ function EaseBounce(values, duration) {
     return EasePower(1 - index / frames, pow);
   });
 }
-// CONCATENATED MODULE: ./src/utils/ease-in/index.js
+// CONCATENATED MODULE: ./src/utils/ease-in.js
 
 function EaseIn(values, duration) {
   var pow = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 4;
@@ -13820,7 +13777,7 @@ function EaseIn(values, duration) {
     return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
   });
 }
-// CONCATENATED MODULE: ./src/utils/ease-out/index.js
+// CONCATENATED MODULE: ./src/utils/ease-out.js
 
 function EaseOut(values, duration) {
   var pow = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 4;
@@ -13828,7 +13785,7 @@ function EaseOut(values, duration) {
     return EasePower(index / frames, pow);
   });
 }
-// CONCATENATED MODULE: ./src/utils/first-of-month/index.js
+// CONCATENATED MODULE: ./src/utils/first-of-month.js
 
 var first_of_month_FirstOfMonth = function FirstOfMonth(value) {
   var result = ToDate(value);
@@ -13840,12 +13797,12 @@ var first_of_month_FirstOfMonth = function FirstOfMonth(value) {
   result.value = DateToObject(new Date(result.value.getFullYear(), result.value.getMonth(), 1)).value;
   return result;
 };
-// CONCATENATED MODULE: ./src/utils/from-uri/index.js
+// CONCATENATED MODULE: ./src/utils/from-uri.js
 
 function FromURI(value) {
-  return do_uri_doURI(value);
+  return DoURI(value);
 }
-// CONCATENATED MODULE: ./src/utils/function-to-partial/index.js
+// CONCATENATED MODULE: ./src/utils/function-to-partial.js
 
 
 /**
@@ -13893,7 +13850,7 @@ function FunctionToPartial() {
     return FunctionToPartial.apply(void 0, [fn].concat(toConsumableArray_default()(argArray.concat([].concat(newArgs)))));
   };
 }
-// CONCATENATED MODULE: ./src/utils/has-keys/index.js
+// CONCATENATED MODULE: ./src/utils/has-keys.js
 
 function HasKeys(compare) {
   return function (value) {
@@ -13914,11 +13871,11 @@ function HasKeys(compare) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/has-method/index.js
+// CONCATENATED MODULE: ./src/utils/has-method.js
 function HasMethod(obj, method) {
   return !!obj && typeof obj[method] === "function";
 }
-// CONCATENATED MODULE: ./src/utils/is-element-type/index.js
+// CONCATENATED MODULE: ./src/utils/is-element-type.js
 
 function IsElementType(tag) {
   return function (value) {
@@ -13932,7 +13889,7 @@ function IsElementType(tag) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/last-of-month/index.js
+// CONCATENATED MODULE: ./src/utils/last-of-month.js
 
 var last_of_month_LastOfMonth = function LastOfMonth(value) {
   var result = ToDate(value);
@@ -13944,7 +13901,7 @@ var last_of_month_LastOfMonth = function LastOfMonth(value) {
   result.value = DateToObject(new Date(result.value.getFullYear(), result.value.getMonth() + 1, 0)).value;
   return result;
 };
-// CONCATENATED MODULE: ./src/utils/reduce-map/index.js
+// CONCATENATED MODULE: ./src/utils/reduce-map.js
 /**
  * Takes a mapping function and returns a reducer
  * @function ReduceMap
@@ -13958,7 +13915,7 @@ function ReduceMap(mapFunction) {
     return result.concat([mapFunction(current)]);
   };
 }
-// CONCATENATED MODULE: ./src/utils/map/index.js
+// CONCATENATED MODULE: ./src/utils/map.js
 
 /**
  * Performs a provided mapping operation to a provided collection. Intended to be used inconjunction with a transducer.
@@ -13976,7 +13933,7 @@ function Map(mapFunction, collection) {
 }
 
 
-// CONCATENATED MODULE: ./src/utils/match/index.js
+// CONCATENATED MODULE: ./src/utils/match.js
 
 var match_Match = function Match(toSearchFor, toSearchIn) {
   var doSearch = function doSearch(search) {
@@ -13991,7 +13948,7 @@ var match_Match = function Match(toSearchFor, toSearchIn) {
 
   return doSearch(toSearchIn);
 };
-// CONCATENATED MODULE: ./src/utils/memoize/index.js
+// CONCATENATED MODULE: ./src/utils/memoize.js
 var cache = new WeakMap();
 function Memoize(fn) {
   return function () {
@@ -14039,7 +13996,7 @@ function Memoize(fn) {
 //         get cached() { return cache }
 //     }
 // }
-// CONCATENATED MODULE: ./src/utils/merge/index.js
+// CONCATENATED MODULE: ./src/utils/merge.js
 
 
 var mergeArray = function mergeArray(arr1, arr2) {
@@ -14125,7 +14082,7 @@ var Merge = function Merge(obj1, obj2) {
   var mutate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   return !mutate ? merge_merge(obj1, obj2) : merge_mutateMerge(obj1, obj2);
 };
-// CONCATENATED MODULE: ./src/utils/month-data/index.js
+// CONCATENATED MODULE: ./src/utils/month-data.js
 
 var month_data_MonthData = function MonthData(value) {
   var result = ToDate(value);
@@ -14168,7 +14125,7 @@ var month_data_MonthData = function MonthData(value) {
   result.value = daysArray.concat(bufferEnd.slice());
   return result;
 };
-// CONCATENATED MODULE: ./src/utils/properties-are/index.js
+// CONCATENATED MODULE: ./src/utils/properties-are.js
 
 function PropertiesAre(compare) {
   return function (value) {
@@ -14189,7 +14146,7 @@ function PropertiesAre(compare) {
     return result;
   };
 }
-// CONCATENATED MODULE: ./src/utils/scroll-to/index.js
+// CONCATENATED MODULE: ./src/utils/scroll-to.js
 
 
 var scroll_to_animator = function animator(from, to, speed, stepFn) {
@@ -14231,8 +14188,7 @@ function ScrollTo(options) {
     return target.scrollTo(toX, y);
   });
 }
-// CONCATENATED MODULE: ./src/utils/super-function/index.js
-
+// CONCATENATED MODULE: ./src/utils/super-function.js
 
 
 /**
@@ -14465,7 +14421,7 @@ function SuperFunction(fn) {
 }
 
 
-// CONCATENATED MODULE: ./src/utils/to-entities/index.js
+// CONCATENATED MODULE: ./src/utils/to-entities.js
 
 function ToEntities(value) {
   var result = TMonad(value);
@@ -14475,7 +14431,7 @@ function ToEntities(value) {
   }
 
   if (result.type === "string" && !!result.value) {
-    result.value = result.value.replace(/\&/g, "&amp;").replace(/\>/g, "&gt;").replace(/\</g, "&lt;").replace(/"/g, "&quot;").replace(/`/g, "&apos;");
+    result.value = result.value.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;").replace(/`/g, "&apos;");
     result.valid = true;
   } else {
     result.valid = false;
@@ -14483,17 +14439,17 @@ function ToEntities(value) {
 
   return result;
 }
-// CONCATENATED MODULE: ./src/utils/to-uri/index.js
+// CONCATENATED MODULE: ./src/utils/to-uri.js
 
 function ToURI(value) {
-  return do_uri_doURI(value, true);
+  return DoURI(value, true);
 }
-// CONCATENATED MODULE: ./src/utils/to-uri-component/index.js
+// CONCATENATED MODULE: ./src/utils/to-uri-component.js
 
 function ToURIComponent(value) {
-  return do_uri_doURI(value, true, true);
+  return DoURI(value, true, true);
 }
-// CONCATENATED MODULE: ./src/utils/transduce-filter/index.js
+// CONCATENATED MODULE: ./src/utils/transduce-filter.js
 function TransduceFilter(predicateFunction) {
   return function (nextReducer) {
     return function (result, current) {
@@ -14501,7 +14457,7 @@ function TransduceFilter(predicateFunction) {
     };
   };
 }
-// CONCATENATED MODULE: ./src/utils/transduce-map/index.js
+// CONCATENATED MODULE: ./src/utils/transduce-map.js
 function TransduceMap(conversionFunction) {
   return function (nextReducer) {
     return function (result, current) {
@@ -14543,22 +14499,29 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport WCSupportClass */__webpack_require__.d(__webpack_exports__, "WCSupportClass", function() { return WCSupportClass; });
 /* concated harmony reexport UploadService */__webpack_require__.d(__webpack_exports__, "UploadService", function() { return UploadService; });
 /* concated harmony reexport iconArrow */__webpack_require__.d(__webpack_exports__, "iconArrow", function() { return iconArrow; });
+/* concated harmony reexport iconCheck */__webpack_require__.d(__webpack_exports__, "iconCheck", function() { return iconCheck; });
 /* concated harmony reexport iconChevron */__webpack_require__.d(__webpack_exports__, "iconChevron", function() { return iconChevron; });
+/* concated harmony reexport iconClose */__webpack_require__.d(__webpack_exports__, "iconClose", function() { return iconClose; });
 /* concated harmony reexport iconDelete */__webpack_require__.d(__webpack_exports__, "iconDelete", function() { return iconDelete; });
+/* concated harmony reexport iconError */__webpack_require__.d(__webpack_exports__, "iconError", function() { return iconError; });
 /* concated harmony reexport iconFilter */__webpack_require__.d(__webpack_exports__, "iconFilter", function() { return iconFilter; });
 /* concated harmony reexport iconGear */__webpack_require__.d(__webpack_exports__, "iconGear", function() { return iconGear; });
+/* concated harmony reexport iconInfo */__webpack_require__.d(__webpack_exports__, "iconInfo", function() { return iconInfo; });
 /* concated harmony reexport iconPencil */__webpack_require__.d(__webpack_exports__, "iconPencil", function() { return iconPencil; });
 /* concated harmony reexport iconPlay */__webpack_require__.d(__webpack_exports__, "iconPlay", function() { return iconPlay; });
 /* concated harmony reexport iconTriangle */__webpack_require__.d(__webpack_exports__, "iconTriangle", function() { return iconTriangle; });
+/* concated harmony reexport iconWarning */__webpack_require__.d(__webpack_exports__, "iconWarning", function() { return iconWarning; });
 /* concated harmony reexport Icons */__webpack_require__.d(__webpack_exports__, "Icons", function() { return Icons; });
 /* concated harmony reexport AddRemoveAttribute */__webpack_require__.d(__webpack_exports__, "AddRemoveAttribute", function() { return AddRemoveAttribute; });
 /* concated harmony reexport AfterEveryNth */__webpack_require__.d(__webpack_exports__, "AfterEveryNth", function() { return AfterEveryNth; });
+/* concated harmony reexport AppendChildren */__webpack_require__.d(__webpack_exports__, "AppendChildren", function() { return AppendChildren; });
 /* concated harmony reexport AppendStyleElement */__webpack_require__.d(__webpack_exports__, "AppendStyleElement", function() { return AppendStyleElement; });
 /* concated harmony reexport BeforeEveryNth */__webpack_require__.d(__webpack_exports__, "BeforeEveryNth", function() { return BeforeEveryNth; });
 /* concated harmony reexport Between */__webpack_require__.d(__webpack_exports__, "Between", function() { return Between; });
 /* concated harmony reexport BrowserIs */__webpack_require__.d(__webpack_exports__, "BrowserIs", function() { return BrowserIs; });
 /* concated harmony reexport CommasToArray */__webpack_require__.d(__webpack_exports__, "CommasToArray", function() { return CommasToArray; });
 /* concated harmony reexport ComponentClassObject */__webpack_require__.d(__webpack_exports__, "ComponentClassObject", function() { return ComponentClassObject; });
+/* concated harmony reexport ClearHTML */__webpack_require__.d(__webpack_exports__, "ClearHTML", function() { return ClearHTML; });
 /* concated harmony reexport CreateElement */__webpack_require__.d(__webpack_exports__, "CreateElement", function() { return create_element_CreateElement; });
 /* concated harmony reexport DateToObject */__webpack_require__.d(__webpack_exports__, "DateToObject", function() { return DateToObject; });
 /* concated harmony reexport EaseBounce */__webpack_require__.d(__webpack_exports__, "EaseBounce", function() { return EaseBounce; });
@@ -14723,6 +14686,8 @@ function TransduceMap(conversionFunction) {
 
 
 /** UTILS */
+
+
 
 
 
@@ -15813,7 +15778,7 @@ module.exports = "<div class=collapse-menu-container expanded=false expandable=f
 
 exports = module.exports = __webpack_require__(0)(false);
 // Module
-exports.push([module.i, ":host(content-collapse){display:block}.content-collapse-toggler{cursor:pointer;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;width:100%}.content-collapse-toggler .content-collapse-toggler-content{-webkit-box-flex:1;flex-grow:1}.content-collapse-toggler .content-collapse-toggler-icon{margin-left:-0.33em;-webkit-transform:rotate(-90deg);transform:rotate(-90deg);-webkit-transition:-webkit-transform 0.2s;transition:-webkit-transform 0.2s;transition:transform 0.2s;transition:transform 0.2s, -webkit-transform 0.2s}.content-collapse-toggler .content-collapse-toggler-icon[rotation=\"down\"]{-webkit-transform:rotate(0deg);transform:rotate(0deg)}\n", ""]);
+exports.push([module.i, ":host(content-collapse){display:block}.content-collapse-toggler{cursor:pointer;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;width:100%}.content-collapse-toggler .content-collapse-toggler-content{-webkit-box-flex:1;flex-grow:1}.content-collapse-toggler icon-element.content-collapse-toggler-icon{margin-left:-0.33em;-webkit-transform:rotate(-90deg);transform:rotate(-90deg);-webkit-transition:-webkit-transform 0.2s;transition:-webkit-transform 0.2s;transition:transform 0.2s;transition:transform 0.2s, -webkit-transform 0.2s}.content-collapse-toggler icon-element.content-collapse-toggler-icon[rotation=\"down\"]{-webkit-transform:rotate(0deg);transform:rotate(0deg)}\n", ""]);
 
 
 /***/ }),
@@ -16078,7 +16043,7 @@ exports.push([module.i, ".snack-bar-container{pointer-events:none;opacity:0;posi
 /* 65 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=snack-bar-container> <div class=snack-bar-inner> <div class=snack-bar-icon> <div class=snack-bar-icon-inner> <icon-element size=1.5em class=infoicon></icon-element> <icon-element size=1.5em class=successicon></icon-element> <icon-element size=1.5em class=erroricon></icon-element> <icon-element size=1.5em class=warningicon></icon-element> </div> </div> <div class=snack-bar-text> <div class=snack-bar-text-inner> <slot name=body></slot> </div> </div> <div class=snack-bar-close> <div class=snack-bar-close-inner> <button-element class=\"snack-bar-default-button nomargin slim\" styles=\".button-element.snack-bar-default-button button,.button-element.snack-bar-default-button button:hover{background-color:transparent;box-shadow:none;}\"> <icon-element size=1.5em svg='<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>'></icon-element> </button-element> </div> </div> <div class=snack-bar-type-bar></div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
+module.exports = "<div class=snack-bar-container> <div class=snack-bar-inner> <div class=snack-bar-icon> <div class=snack-bar-icon-inner> <icon-element size=1.5em class=infoicon></icon-element> <icon-element size=1.5em class=successicon></icon-element> <icon-element size=1.5em class=erroricon></icon-element> <icon-element size=1.5em class=warningicon></icon-element> </div> </div> <div class=snack-bar-text> <div class=snack-bar-text-inner> <slot name=body></slot> </div> </div> <div class=snack-bar-close> <div class=snack-bar-close-inner> <button-element class=\"snack-bar-default-button nomargin slim\" styles=\".button-element.snack-bar-default-button button,.button-element.snack-bar-default-button button:hover{background-color:transparent;box-shadow:none;}\"> <icon-element size=1.5em class=snack-bar-close-icon></icon-element> </button-element> </div> </div> <div class=snack-bar-type-bar></div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
 /* 66 */

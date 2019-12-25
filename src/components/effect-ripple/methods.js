@@ -78,6 +78,9 @@ export const unloadTargets = host => {
 }
 
 export const loadTargets = host => {
+    if (!Array.isArray(host.targets$)) {
+        host.targets$ = []
+    }
     if (!host.targets || !host.start) { return }
     if (!Array.isArray(host.targets)) { return }
 

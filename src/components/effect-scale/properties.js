@@ -85,29 +85,5 @@ const attributes = {
 }
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-export const properties = Object.assign(
-    {
-        targets$: {
-            format: () => [],
-            onChange,
-        },
-
-        triggers$: {
-            format: () => [],
-            onChange,
-        },
-
-        isScaling: {
-            format: val => val,
-            onChange,
-        },
-
-        isScaled: {
-            format: val => val,
-            onChange,
-        },
-    },
-    attributes
-)
-
+export const properties = attributes
 export const observedAttributes = Object.keys(attributes)

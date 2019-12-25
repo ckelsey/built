@@ -1,4 +1,4 @@
-import { ToBool, Pipe, IfInvalid, ToNumber, ToString, SelectorArrayToElements, ComponentClassObject } from '../..'
+import { Pipe, IfInvalid, ToNumber, ToString, SelectorArrayToElements, ComponentClassObject } from '../..'
 import { unloadTargets, loadTargets } from './methods'
 import { setStyles } from './elements'
 
@@ -51,22 +51,7 @@ const attributes = {
 }
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-export const properties = Object.assign({
-    downEvent: {
-        format: val => val,
-        onChange
-    },
-
-    on: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange
-    },
-
-    targets$: {
-        format: () => [],
-        onChange
-    }
-}, attributes)
+export const properties = attributes
 
 export const observedAttributes = Object.keys(attributes)
 

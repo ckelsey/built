@@ -22,41 +22,16 @@ const setShown = host => {
 
     if (!root) { return }
 
-    const startEnd = host.shown ? [0, 1] : [1, 0]
-    // Timer(
-    //     333,
-    //     opacityStep => root.style.opacity = opacityStep,
-    //     EaseInOut(startEnd, 200)
-    // )
+    const opacityNow = root.style.opacity
 
-    Animator({ duration: 333, frameValues: EaseInOut(startEnd, 200), stepFn: opacityStep => root.style.opacity = opacityStep })
+    if (!host.shown && (opacityNow === `` || opacityNow === `0`)) { return }
 
-
-
-    // const animator = () => new Promise(resolve => {
-    //     Timer(
-    //         333,
-    //         opacityStep => root.style.opacity = opacityStep,
-    //         EaseInOut(startEnd, 333),
-    //         resolve
-    //     )
-    // })
-
-    // const animateHeight = (from, to, el, speed) => animator(from, to, speed, heightStep => el.style.height = `${heightStep}px`)
-
-    // const endEventName = EventName(`transitionend`)
-    // const dispatch = () => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host }))
-
-    // if (endEventName) {
-    //     root.addEventListener(endEventName, function startEvent() {
-    //         root.removeEventListener(endEventName, startEvent)
-    //         requestAnimationFrame(dispatch)
-    //     })
-    // } else {
-    //     requestAnimationFrame(dispatch)
-    // }
-
-    // root.classList[host.shown ? `add` : `remove`](`shown`)
+    Animator({
+        duration: 333,
+        frameValues: EaseInOut(host.shown ? [0, 1] : [1, 0], 200),
+        stepFn: opacityStep => root.style.opacity = opacityStep,
+        completeFn: () => OnNextFrame(() => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host })))
+    })
 }
 
 const setColorTheme = (color, root) => root.setAttribute(`colortheme`, color)

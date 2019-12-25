@@ -7,26 +7,16 @@ const resetTargets = host => {
     loadTargets(host)
 }
 
-const onChange = () => { }
 const selectorsToDom = val => SelectorArrayToElements(null, val).value
 
 const attributes = {
     class: ComponentClassObject,
 
-    color: {
-        format: val => Pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
-        onChange
-    },
+    color: { format: val => Pipe(ToString, IfInvalid(`#59a2d8`))(val).value, },
 
-    opacity: {
-        format: val => Math.min(1, Math.max(0, Pipe(ToNumber, IfInvalid(0.2))(val).value)),
-        onChange
-    },
+    opacity: { format: val => Math.min(1, Math.max(0, Pipe(ToNumber, IfInvalid(0.2))(val).value)), },
 
-    speed: {
-        format: val => Pipe(ToNumber, IfInvalid(600))(val).value,
-        onChange
-    },
+    speed: { format: val => Pipe(ToNumber, IfInvalid(600))(val).value, },
 
     start: {
         format: val => Pipe(ToString, IfInvalid(`mousedown`))(val).value,
@@ -38,10 +28,7 @@ const attributes = {
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
 
-    direction: {
-        format: val => typeof val === `string` ? val : `auto`,
-        onChange: () => { }
-    },
+    direction: { format: val => typeof val === `string` ? val : `auto`, },
 
     targets: {
         format: selectorsToDom,
@@ -50,16 +37,7 @@ const attributes = {
 }
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-export const properties = Object.assign({
-    downEvent: {
-        format: val => val,
-        onChange
-    },
-    targets$: {
-        format: () => [],
-        onChange
-    }
-}, attributes)
+export const properties = attributes
 
 export const observedAttributes = Object.keys(attributes)
 

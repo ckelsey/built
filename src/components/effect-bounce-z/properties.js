@@ -33,11 +33,6 @@ const attributes = {
     }
 }
 
-export const properties = Object.assign({
-    targets$: {
-        format: () => [],
-        onChange
-    }
-}, attributes)
+export const properties = attributes
 
 export const observedAttributes = Object.keys(attributes)

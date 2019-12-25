@@ -1,3 +1,9 @@
+/**
+ * TODO
+ * - memoize
+ * - return promise
+ */
+
 const OnNextFrameKey = Symbol.for(`builtjs.OnNextFrameKey`)
 const globalSymbols = Object.getOwnPropertySymbols(global)
 const hasOnNextFrame = (globalSymbols.indexOf(OnNextFrameKey) > -1)
@@ -15,9 +21,8 @@ function RunOnNextFrame() {
         do {
             ran = ran + 1
             OnNextFrameQueue.shift()()
-        } while (performance.now() - startTime < 3 && OnNextFrameQueue.length)
+        } while (performance.now() - startTime < 6 && OnNextFrameQueue.length)
 
-        // console.log(`Ran`, ran, performance.now() - startTime)
         if (OnNextFrameQueue.length) {
             return requestAnimationFrame(() => setTimeout(() => {
                 runTasks(performance.now())

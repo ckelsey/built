@@ -138,7 +138,9 @@ const loadElements = (host, key) => {
         return run(host.scaled, host)
     }
 
-    if (!host.hasTriggers || !host.start || !host.triggers$) { return }
+    if (!host.hasTriggers || !host.start) { return }
+
+    if (!Array.isArray(host.triggers$)) { host.triggers$ = [] }
 
     const toggle = !host.end
 
