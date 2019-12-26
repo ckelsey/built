@@ -54,15 +54,24 @@ const cleanup = host => {
 
 const transitionStart = current => new Promise(resolve => {
     if (current) {
-        current.className = current.className.split(`content-transition-shown`).join(``).split(` `).filter(s => !!s.trim()).join(` `)
+        current.className = Get(current, `className`, ``)
+            .split(`content-transition-shown`)
+            .join(``)
+            .split(` `)
+            .filter(s => !!s.trim())
+            .join(` `)
     }
 
     requestAnimationFrame(resolve)
 })
 
-const transitionEnd = (next) => {
-    next.className = `content-transition-shown ${next.className.split(`content-transition-shown`).join(``).split(` `).filter(s => !!s.trim()).join(` `)}`
-}
+const transitionEnd = next => next.className = `content-transition-shown ${Get(next, `className`, ``)
+    .split(`content-transition-shown`)
+    .join(``)
+    .split(` `)
+    .filter(s => !!s.trim())
+    .join(` `)}`
+
 
 const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolve => {
     OnNextFrame(() => {

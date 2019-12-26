@@ -1,6 +1,19 @@
-export const CreateElement = (obj, returnElement) => {
+let iframe, doc, fragment
+
+export const CreateElement = obj => {
+    if (!iframe) {
+        iframe = document.createElement(`iframe`)
+    }
+
+    if (!doc) {
+        doc = iframe.contentWindow.document
+    }
+
+    if (!fragment) {
+        fragment = doc.createDocumentFragment()
+    }
+
     const el = document.createElement(obj.tagName || `div`)
-    const fragment = document.createDocumentFragment()
     fragment.appendChild(el)
 
     Object.keys(obj).forEach(key => {
@@ -17,5 +30,5 @@ export const CreateElement = (obj, returnElement) => {
         }
     })
 
-    return returnElement ? el : fragment
+    return el
 }

@@ -1449,9 +1449,21 @@ function WCElements(host, elements) {
 }
 // CONCATENATED MODULE: ./src/utils/create-element.js
 
-var create_element_CreateElement = function CreateElement(obj, returnElement) {
+var iframe, create_element_doc, fragment;
+var create_element_CreateElement = function CreateElement(obj) {
+  if (!iframe) {
+    iframe = document.createElement("iframe");
+  }
+
+  if (!create_element_doc) {
+    create_element_doc = iframe.contentWindow.document;
+  }
+
+  if (!fragment) {
+    fragment = create_element_doc.createDocumentFragment();
+  }
+
   var el = document.createElement(obj.tagName || "div");
-  var fragment = document.createDocumentFragment();
   fragment.appendChild(el);
   Object.keys(obj).forEach(function (key) {
     if (key === "tagName") {
@@ -1468,7 +1480,7 @@ var create_element_CreateElement = function CreateElement(obj, returnElement) {
       el[key] = obj[key];
     }
   });
-  return returnElement ? el : fragment;
+  return el;
 };
 // CONCATENATED MODULE: ./src/utils/append-style-element.js
 
@@ -3662,10 +3674,10 @@ var cleanup = function cleanup(host) {
   return host.current;
 };
 
-var transitionStart = function transitionStart(current) {
+var methods_transitionStart = function transitionStart(current) {
   return new Promise(function (resolve) {
     if (current) {
-      current.className = current.className.split("content-transition-shown").join("").split(" ").filter(function (s) {
+      current.className = Object(utils_get["a" /* Get */])(current, "className", "").split("content-transition-shown").join("").split(" ").filter(function (s) {
         return !!s.trim();
       }).join(" ");
     }
@@ -3674,8 +3686,8 @@ var transitionStart = function transitionStart(current) {
   });
 };
 
-var transitionEnd = function transitionEnd(next) {
-  next.className = "content-transition-shown ".concat(next.className.split("content-transition-shown").join("").split(" ").filter(function (s) {
+var methods_transitionEnd = function transitionEnd(next) {
+  return next.className = "content-transition-shown ".concat(Object(utils_get["a" /* Get */])(next, "className", "").split("content-transition-shown").join("").split(" ").filter(function (s) {
     return !!s.trim();
   }).join(" "));
 };
@@ -3703,12 +3715,12 @@ var methods_transitionSlide = function transitionSlide(host, index, speed, keepc
       }
 
       var endHeight = elements.child.offsetHeight;
-      transitionStart(elements.current).then(function () {
+      methods_transitionStart(elements.current).then(function () {
         if (startHeight !== endHeight) {
           animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed).then(function () {
             requestAnimationFrame(function () {
               elements.root.style.removeProperty("height");
-              transitionEnd(elements.child);
+              methods_transitionEnd(elements.child);
             });
           });
         }
@@ -3732,7 +3744,7 @@ var methods_transitionSlide = function transitionSlide(host, index, speed, keepc
           elements.currentContainer.removeAttribute("style");
           elements.nextContainer.removeAttribute("style");
           elements.root.classList.remove("sliding");
-          transitionEnd(elements.child);
+          methods_transitionEnd(elements.child);
           dispatchTransitioned(host, elements.current, elements.child);
 
           if (!keepchildren) {
@@ -3766,7 +3778,7 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
       }
 
       var endHeight = elements.child.offsetHeight;
-      transitionStart(elements.current).then(function () {
+      methods_transitionStart(elements.current).then(function () {
         var afterHeightSet = function afterHeightSet() {
           if (!keepchildren) {
             while (host.getChildren().length > 1) {
@@ -3787,7 +3799,7 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
           elements.nextContainer.style.removeProperty("opacity");
           requestAnimationFrame(function () {
             dispatchTransitioned(host, elements.current, elements.child);
-            transitionEnd(elements.child);
+            methods_transitionEnd(elements.child);
             cleanup(host);
             elements.root.style.removeProperty("height");
             return resolve(host.current);
@@ -3904,8 +3916,8 @@ var setCurrent = function setCurrent(host) {
       return Promise.resolve(end());
     }
 
-    return transitionStart(elements.current).then(function () {
-      transitionEnd(elements.child);
+    return methods_transitionStart(elements.current).then(function () {
+      methods_transitionEnd(elements.child);
       cleanup(host);
       return end();
     });
