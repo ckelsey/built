@@ -31,6 +31,9 @@ export const getChildren = host => () => Array.from(host.querySelectorAll(`[slot
 export const getCurrent = host => () => host.querySelector(`[slot="current"]`)
 
 const getTransitionElements = (host, indexOrChild) => {
+    console.log(`indexOrChild`, indexOrChild)
+
+
     const nextContainer = host.elements.nextContainer
     const currentContainer = host.elements.currentContainer
     const root = host.elements.root
@@ -46,9 +49,6 @@ const getTransitionElements = (host, indexOrChild) => {
 
 const cleanup = host => {
     const children = host.getChildren()
-    // TODO watch if this is needed. Causes issues with content-transition inside of content-transition being incorrectly changed
-    // children.forEach(child => child === host.current ? undefined : child.setAttribute(`slot`, `hidden`))
-
     const current = host.getCurrent()
     host.end = { current, index: children.indexOf(current) }
 
@@ -79,7 +79,11 @@ const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolv
         const startHeight = elements.root.offsetHeight
         elements.root.style.height = `${startHeight}px`
         elements.root.classList.add(`sliding`)
-        elements.child.setAttribute(`slot`, `next`)
+
+        if (elements.child) {
+            elements.child.setAttribute(`slot`, `next`)
+        }
+
         const endHeight = elements.child.offsetHeight
 
         transitionStart(elements.current)
@@ -112,8 +116,11 @@ const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolv
                             elements.current.setAttribute(`slot`, `hidden`)
                         }
 
+                        if (elements.child) {
+                            elements.child.setAttribute(`slot`, `current`)
+                        }
+
                         elements.currentContainer.removeAttribute(`style`)
-                        elements.child.setAttribute(`slot`, `current`)
                         elements.nextContainer.removeAttribute(`style`)
                         elements.root.classList.remove(`sliding`)
                         transitionEnd(elements.child)
@@ -137,7 +144,10 @@ const runHeight = (elements, speed, keepchildren, host) => new Promise(resolve =
 
         const startHeight = elements.root.offsetHeight
         elements.root.style.height = `${startHeight}px`
-        elements.child.setAttribute(`slot`, `next`)
+
+        if (elements.child) {
+            elements.child.setAttribute(`slot`, `next`)
+        }
 
         if (!host.contains(elements.child)) {
             host.appendChild(elements.child)
@@ -158,8 +168,11 @@ const runHeight = (elements, speed, keepchildren, host) => new Promise(resolve =
                         elements.current.setAttribute(`slot`, `hidden`)
                     }
 
-                    elements.child.setAttribute(`slot`, `current`)
-                    elements.child.style.removeProperty(`opacity`)
+                    if (elements.child) {
+                        elements.child.setAttribute(`slot`, `current`)
+                        elements.child.style.removeProperty(`opacity`)
+                    }
+
                     elements.currentContainer.style.removeProperty(`opacity`)
                     elements.nextContainer.style.removeProperty(`opacity`)
 

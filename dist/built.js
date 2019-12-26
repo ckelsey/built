@@ -2433,6 +2433,8 @@ var setAttr = function setAttr(el, attr, value) {
 var collapse_menu_setStyleElement = function setStyleElement(host) {
   var outerStyle = host.querySelector("style[name=\"outer\"]");
   var componentStyle = host.shadowRoot.querySelector("style[name=\"\"]");
+  var themeStyle = host.shadowRoot.querySelector("style.themeStyles");
+  var injectedStyle = host.shadowRoot.querySelector("style.injectedStyles");
   var styleString = [collapse_menu_style, host.theme, host.styles].join("");
 
   if (!outerStyle) {
@@ -2442,6 +2444,8 @@ var collapse_menu_setStyleElement = function setStyleElement(host) {
 
   collapse_menu_setStyles(componentStyle, styleString);
   collapse_menu_setStyles(outerStyle, styleString);
+  collapse_menu_setStyles(themeStyle, styleString);
+  collapse_menu_setStyles(injectedStyle, styleString);
 };
 
 var removeSizer = function removeSizer(el) {
@@ -2696,9 +2700,6 @@ var collapse_menu_elements = {
     onChange: function onChange(el, host) {
       setBackground(host.background, el);
     }
-  },
-  internalStyles: {
-    selector: "style.internalStyles"
   },
   toggle: {
     selector: ".collapse-menu-toggle",
@@ -3631,6 +3632,7 @@ var getCurrent = function getCurrent(host) {
 };
 
 var getTransitionElements = function getTransitionElements(host, indexOrChild) {
+  console.log("indexOrChild", indexOrChild);
   var nextContainer = host.elements.nextContainer;
   var currentContainer = host.elements.currentContainer;
   var root = host.elements.root;
@@ -3652,9 +3654,7 @@ var getTransitionElements = function getTransitionElements(host, indexOrChild) {
 };
 
 var cleanup = function cleanup(host) {
-  var children = host.getChildren(); // TODO watch if this is needed. Causes issues with content-transition inside of content-transition being incorrectly changed
-  // children.forEach(child => child === host.current ? undefined : child.setAttribute(`slot`, `hidden`))
-
+  var children = host.getChildren();
   var current = host.getCurrent();
   host.end = {
     current: current,
@@ -3698,7 +3698,11 @@ var methods_transitionSlide = function transitionSlide(host, index, speed, keepc
       var startHeight = elements.root.offsetHeight;
       elements.root.style.height = "".concat(startHeight, "px");
       elements.root.classList.add("sliding");
-      elements.child.setAttribute("slot", "next");
+
+      if (elements.child) {
+        elements.child.setAttribute("slot", "next");
+      }
+
       var endHeight = elements.child.offsetHeight;
       transitionStart(elements.current).then(function () {
         if (startHeight !== endHeight) {
@@ -3722,8 +3726,11 @@ var methods_transitionSlide = function transitionSlide(host, index, speed, keepc
             elements.current.setAttribute("slot", "hidden");
           }
 
+          if (elements.child) {
+            elements.child.setAttribute("slot", "current");
+          }
+
           elements.currentContainer.removeAttribute("style");
-          elements.child.setAttribute("slot", "current");
           elements.nextContainer.removeAttribute("style");
           elements.root.classList.remove("sliding");
           transitionEnd(elements.child);
@@ -3750,7 +3757,10 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
       };
       var startHeight = elements.root.offsetHeight;
       elements.root.style.height = "".concat(startHeight, "px");
-      elements.child.setAttribute("slot", "next");
+
+      if (elements.child) {
+        elements.child.setAttribute("slot", "next");
+      }
 
       if (!host.contains(elements.child)) {
         host.appendChild(elements.child);
@@ -3769,8 +3779,11 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
             elements.current.setAttribute("slot", "hidden");
           }
 
-          elements.child.setAttribute("slot", "current");
-          elements.child.style.removeProperty("opacity");
+          if (elements.child) {
+            elements.child.setAttribute("slot", "current");
+            elements.child.style.removeProperty("opacity");
+          }
+
           elements.currentContainer.style.removeProperty("opacity");
           elements.nextContainer.style.removeProperty("opacity");
           requestAnimationFrame(function () {
@@ -11263,7 +11276,8 @@ var overlay_message_setShown = function setShown(host) {
     },
     completeFn: function completeFn() {
       return Object(on_next_frame["a" /* OnNextFrame */])(function () {
-        return host.dispatchEvent(new CustomEvent(host.shown ? "opened" : "closed", {
+        root.classList[host.shown ? "add" : "remove"]("shown");
+        host.dispatchEvent(new CustomEvent(host.shown ? "opened" : "closed", {
           detail: host
         }));
       });
@@ -15731,7 +15745,7 @@ exports.push([module.i, ":host(collapse-menu){display:block}collapse-menu{displa
 /* 29 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=collapse-menu-container expanded=false expandable=false> <div class=collapse-menu-toggle> <div class=collapse-menu-toggle-icon> <slot name=toggle-icon> <icon-element style=height:1.5em class=default-toggle-icon size=1.5em svg='<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z\"/></svg>'></icon-element> <div class=toggle-arrow style=height:1.5em;margin-top:-.3em> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> </slot> </div> </div> <div class=collapse-menu-items> <div class=collapse-menu-items-bg></div> <div class=collapse-menu-toggle-inner> <icon-element class=default-toggle-inner-icon size=1.5em svg='<svg class=\"default-inner-toggle-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\" /></svg>'></icon-element> </div> <div class=collapse-menu-items-inner> <slot name=item></slot> </div> </div> <style type=text/css rel=stylesheet style=display:none class=internalStyles></style> </div> ";
+module.exports = "<div class=collapse-menu-container expanded=false expandable=false> <div class=collapse-menu-toggle> <div class=collapse-menu-toggle-icon> <slot name=toggle-icon> <icon-element style=height:1.5em class=default-toggle-icon size=1.5em svg='<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z\"/></svg>'></icon-element> <div class=toggle-arrow style=height:1.5em;margin-top:-.3em> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> </slot> </div> </div> <div class=collapse-menu-items> <div class=collapse-menu-items-bg></div> <div class=collapse-menu-toggle-inner> <icon-element class=default-toggle-inner-icon size=1.5em svg='<svg class=\"default-inner-toggle-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\" /></svg>'></icon-element> </div> <div class=collapse-menu-items-inner> <slot name=item></slot> </div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
 /* 30 */

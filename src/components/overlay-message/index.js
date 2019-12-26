@@ -30,7 +30,12 @@ const setShown = host => {
         duration: 333,
         frameValues: EaseInOut(host.shown ? [0, 1] : [1, 0], 200),
         stepFn: opacityStep => root.style.opacity = opacityStep,
-        completeFn: () => OnNextFrame(() => host.dispatchEvent(new CustomEvent(host.shown ? `opened` : `closed`, { detail: host })))
+        completeFn: () => OnNextFrame(() => {
+            root.classList[host.shown ? `add` : `remove`](`shown`)
+            host.dispatchEvent(
+                new CustomEvent(host.shown ? `opened` : `closed`, { detail: host })
+            )
+        })
     })
 }
 
