@@ -3632,7 +3632,6 @@ var getCurrent = function getCurrent(host) {
 };
 
 var getTransitionElements = function getTransitionElements(host, indexOrChild) {
-  console.log("indexOrChild", indexOrChild);
   var nextContainer = host.elements.nextContainer;
   var currentContainer = host.elements.currentContainer;
   var root = host.elements.root;
@@ -3699,7 +3698,7 @@ var methods_transitionSlide = function transitionSlide(host, index, speed, keepc
       elements.root.style.height = "".concat(startHeight, "px");
       elements.root.classList.add("sliding");
 
-      if (elements.child) {
+      if (typeof Object(utils_get["a" /* Get */])(elements, "child.setAttribute") === "function") {
         elements.child.setAttribute("slot", "next");
       }
 
@@ -3722,11 +3721,11 @@ var methods_transitionSlide = function transitionSlide(host, index, speed, keepc
         animateOpacity(1, 0, elements.currentContainer, speed * 0.8);
         animateLeft(0, 100, elements.currentContainer, speed * 0.8);
         animateLeft(-100, 0, elements.nextContainer, speed).then(function () {
-          if (elements.current) {
+          if (typeof Object(utils_get["a" /* Get */])(elements, "current.setAttribute") === "function") {
             elements.current.setAttribute("slot", "hidden");
           }
 
-          if (elements.child) {
+          if (typeof Object(utils_get["a" /* Get */])(elements, "child.setAttribute") === "function") {
             elements.child.setAttribute("slot", "current");
           }
 
@@ -3758,7 +3757,7 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
       var startHeight = elements.root.offsetHeight;
       elements.root.style.height = "".concat(startHeight, "px");
 
-      if (elements.child) {
+      if (typeof Object(utils_get["a" /* Get */])(elements, "child.setAttribute") === "function") {
         elements.child.setAttribute("slot", "next");
       }
 
@@ -3775,11 +3774,11 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
             }
           }
 
-          if (elements.current) {
+          if (typeof Object(utils_get["a" /* Get */])(elements, "current.setAttribute") === "function") {
             elements.current.setAttribute("slot", "hidden");
           }
 
-          if (elements.child) {
+          if (typeof Object(utils_get["a" /* Get */])(elements, "child.setAttribute") === "function") {
             elements.child.setAttribute("slot", "current");
             elements.child.style.removeProperty("opacity");
           }

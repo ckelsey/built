@@ -1,4 +1,4 @@
-import { EaseInOut, Timer, OnNextFrame } from '../..'
+import { EaseInOut, Timer, OnNextFrame, Get } from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
@@ -31,9 +31,6 @@ export const getChildren = host => () => Array.from(host.querySelectorAll(`[slot
 export const getCurrent = host => () => host.querySelector(`[slot="current"]`)
 
 const getTransitionElements = (host, indexOrChild) => {
-    console.log(`indexOrChild`, indexOrChild)
-
-
     const nextContainer = host.elements.nextContainer
     const currentContainer = host.elements.currentContainer
     const root = host.elements.root
@@ -80,7 +77,7 @@ const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolv
         elements.root.style.height = `${startHeight}px`
         elements.root.classList.add(`sliding`)
 
-        if (elements.child) {
+        if (typeof Get(elements, `child.setAttribute`) === `function`) {
             elements.child.setAttribute(`slot`, `next`)
         }
 
@@ -112,11 +109,11 @@ const transitionSlide = (host, index, speed, keepchildren) => new Promise(resolv
                 animateLeft(-100, 0, elements.nextContainer, speed)
                     .then(() => {
 
-                        if (elements.current) {
+                        if (typeof Get(elements, `current.setAttribute`) === `function`) {
                             elements.current.setAttribute(`slot`, `hidden`)
                         }
 
-                        if (elements.child) {
+                        if (typeof Get(elements, `child.setAttribute`) === `function`) {
                             elements.child.setAttribute(`slot`, `current`)
                         }
 
@@ -145,7 +142,7 @@ const runHeight = (elements, speed, keepchildren, host) => new Promise(resolve =
         const startHeight = elements.root.offsetHeight
         elements.root.style.height = `${startHeight}px`
 
-        if (elements.child) {
+        if (typeof Get(elements, `child.setAttribute`) === `function`) {
             elements.child.setAttribute(`slot`, `next`)
         }
 
@@ -164,11 +161,11 @@ const runHeight = (elements, speed, keepchildren, host) => new Promise(resolve =
                         }
                     }
 
-                    if (elements.current) {
+                    if (typeof Get(elements, `current.setAttribute`) === `function`) {
                         elements.current.setAttribute(`slot`, `hidden`)
                     }
 
-                    if (elements.child) {
+                    if (typeof Get(elements, `child.setAttribute`) === `function`) {
                         elements.child.setAttribute(`slot`, `current`)
                         elements.child.style.removeProperty(`opacity`)
                     }
