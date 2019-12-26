@@ -2254,7 +2254,7 @@ function ObserveEvent(element, eventName) {
   };
 
   var getParent = function getParent() {
-    return element ? element.parentNode ? element.parentNode : element.host ? element.host : undefined : undefined;
+    return !element ? undefined : Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")));
   };
 
   var startup = function startup() {
@@ -2324,6 +2324,7 @@ function ObserveEvent(element, eventName) {
 
   var tryToObserveIt = function tryToObserveIt() {
     var parent = getParent();
+    console.log(parent, element);
     max = max - 1;
 
     if (!max) {

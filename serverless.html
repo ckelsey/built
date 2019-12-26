@@ -129,7 +129,6 @@
             var icon = document.getElementById('icon')
             icon.svg = builtjs.iconArrow
             ripple.addEventListener('click', function () {
-                console.log('click', transition.getIndex())
                 transition.transitionTo(transition.getIndex() === 0 ? 1 : 0)
             })
         </script>
