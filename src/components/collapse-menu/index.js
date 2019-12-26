@@ -24,6 +24,8 @@ const setAttr = (el, attr, value) => el ? el.setAttribute(attr, value) : undefin
 export const setStyleElement = host => {
     let outerStyle = host.querySelector(`style[name="outer"]`)
     const componentStyle = host.shadowRoot.querySelector(`style[name=""]`)
+    const themeStyle = host.shadowRoot.querySelector(`style.themeStyles`)
+    const injectedStyle = host.shadowRoot.querySelector(`style.injectedStyles`)
     const styleString = [
         style,
         host.theme,
@@ -37,6 +39,8 @@ export const setStyleElement = host => {
 
     setStyles(componentStyle, styleString)
     setStyles(outerStyle, styleString)
+    setStyles(themeStyle, styleString)
+    setStyles(injectedStyle, styleString)
 }
 
 const removeSizer = el => {
@@ -222,7 +226,6 @@ const elements = {
         selector: `.collapse-menu-items-bg`,
         onChange(el, host) { setBackground(host.background, el) }
     },
-    internalStyles: { selector: `style.internalStyles` },
     toggle: {
         selector: `.collapse-menu-toggle`,
         onChange(el, host) {
