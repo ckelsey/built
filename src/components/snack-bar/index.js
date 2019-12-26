@@ -1,11 +1,9 @@
 import {
     // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
-    ObserveEvent, IndexOf, IfEmpty, EventName
+    ObserveEvent, IndexOf, IfEmpty, EventName, OnNextFrame, WCwhenPropertyReady, iconInfo, iconCheck,
+    iconError, iconWarning, iconClose
 } from '../..'
-import { OnNextFrame } from '../../services/on-next-frame'
-import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready'
-import { iconInfo, iconCheck, iconError, iconWarning, iconClose } from '../../services/icons'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
@@ -30,10 +28,10 @@ const setShown = host => {
     if (endEventName) {
         root.addEventListener(endEventName, function startEvent() {
             root.removeEventListener(endEventName, startEvent)
-            requestAnimationFrame(dispatch)
+            OnNextFrame(dispatch)
         })
     } else {
-        requestAnimationFrame(dispatch)
+        OnNextFrame(dispatch)
     }
 
     root.classList[host.shown ? `add` : `remove`](`shown`)

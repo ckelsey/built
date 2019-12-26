@@ -1,6 +1,15 @@
-import { ObserveEvent, GetCurve, Timer, Get } from '../..'
+import { ObserveEvent, EaseInOut, Timer, Get, OnNextFrame } from '../..'
 
 const signalEnd = host => runEnd(host)
+
+const animator = (points, speed, stepFn) => new Promise(resolve =>
+    Timer(
+        speed,
+        stepFn,
+        EaseInOut(points, speed),
+        resolve
+    )
+)
 
 const runAnimation = (host, isOn) => {
     const underlineStyle = host.elements.underline.style
@@ -10,12 +19,11 @@ const runAnimation = (host, isOn) => {
         setOrigin(host)
     }
 
-    Timer(
-        host.speed,
-        scale => underlineStyle.transform = `perspective(1px) translateZ(0) scaleX(${scale})`,
-        GetCurve(isOn ? [0, 1] : [1, 0], isOn ? host.spring : 0.5, false, host.speed),
-        () => underlineStyle.transform = `perspective(1px) translateZ(0) scaleX(${isOn ? 1 : 0})`
-    )
+    animator(
+        isOn ? [0, 1] : [1, 0],
+        host.speed / 2,
+        scale => underlineStyle.transform = `perspective(1px) translateZ(0) scaleX(${scale})`
+    ).then(() => underlineStyle.transform = `perspective(1px) translateZ(0) scaleX(${isOn ? 1 : 0})`)
 }
 
 const runEnd = host => () => {
@@ -34,15 +42,17 @@ const runStart = host => () => {
 const setOrigin = host => {
     if (!host.ready) { return }
 
-    const nonAutoOrigin = host.nonAutoOrigin
-    const underlineStyle = host.elements.underline.style
+    OnNextFrame(() => {
+        const nonAutoOrigin = host.nonAutoOrigin
+        const underlineStyle = host.elements.underline.style
 
-    if (nonAutoOrigin) { return underlineStyle.transformOrigin = nonAutoOrigin }
+        if (nonAutoOrigin) { return underlineStyle.transformOrigin = nonAutoOrigin }
 
-    const eventX = Get(host, `downEvent.x`, 0)
-    const targetBox = Get(host, `downEvent.target.getBoundingClientRect()`, { left: 0, width: 0 })
-    const left = Math.round(((eventX - targetBox.left) / targetBox.width) * 100)
-    underlineStyle.transformOrigin = `${left}% center`
+        const eventX = Get(host, `downEvent.x`, 0)
+        const targetBox = Get(host, `downEvent.target.getBoundingClientRect()`, { left: 0, width: 0 })
+        const left = Math.round(((eventX - targetBox.left) / targetBox.width) * 100)
+        underlineStyle.transformOrigin = `${left}% center`
+    })
 }
 
 export const toggle = host => host.on ? runEnd(host) : runStart(host)

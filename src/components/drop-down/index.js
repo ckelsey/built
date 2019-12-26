@@ -2,7 +2,7 @@ import {
     // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     WCDefine, WCConstructor, ObserveEvent, ToBool, IfInvalid, ComponentClassObject,
     SetStyleRules, AppendStyleElement, Pipe, WasClickedOn, ObserverUnsubscribe,
-    ObserveSlots
+    ObserveSlots, OnNextFrame
 } from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -22,13 +22,15 @@ const toggleOptions = (show, host) => {
 
     try { overlay[show ? `show` : `hide`]() } catch (error) { }
 
-    if (!show) {
-        root.classList.remove(`opened`)
-    } else {
-        root.classList.add(`opened`)
-    }
+    OnNextFrame(() => {
+        if (!show) {
+            root.classList.remove(`opened`)
+        } else {
+            root.classList.add(`opened`)
+        }
 
-    host.dispatchEvent(new CustomEvent(show ? `selectopen` : `selectclose`, { detail: host }))
+        host.dispatchEvent(new CustomEvent(show ? `selectopen` : `selectclose`, { detail: host }))
+    })
 }
 
 const properties = {
@@ -72,11 +74,12 @@ const openClose = (open, host) => {
 
         Array.from(host.children).forEach(c => c.blur())
     }
+
     if (open) {
         return change()
     }
 
-    setTimeout(change, 333)
+    OnNextFrame(change)
 }
 
 const elements = {
@@ -157,14 +160,14 @@ export const DropDown = WCConstructor({
                     host.dispatchEvent(new CustomEvent(`labelclick`, { detail: { host, event: e } }))
 
                     if (host.open) {
-                        return requestAnimationFrame(() => openClose(false, host))
+                        return OnNextFrame(() => openClose(false, host))
                     } else {
                         return openClose(true, host)
                     }
                 }
 
                 if (host.closeonclick && host.open) {
-                    return requestAnimationFrame(() => openClose(false, host))
+                    return OnNextFrame(() => openClose(false, host))
                 }
             })
         }

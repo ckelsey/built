@@ -14,7 +14,7 @@
                 font-size: 14px;
                 color: #333;
                 margin: 0px 0px 0px 0px;
-                padding: 10rem 2rem;
+                padding: 2rem;
                 box-sizing: border-box;
                 min-height: 100%;
                 background: #ccc;
@@ -89,67 +89,49 @@
 
         <overlay-message id="overlayMessage"></overlay-message>
 
+        <overlay-content id="overlayContnt">
+            <p>Content!</p>
+        </overlay-content>
+
+        <drop-down>
+            <span slot="label">Drop down</span>
+            <span slot="option">Option 1</span>
+            <span slot="option">Option 2</span>
+        </drop-down>
+
         <div id="ripple-box">
             <effect-ripple targets='["#ripple-box"]'></effect-ripple>
         </div>
 
+        <content-transition id="content-transition" keepchildren="true">
+            <div slot="current">
+                <icon-element id="icon"></icon-element>
+            </div>
+
+            <grid-layout columnwidth="100" gap="20" scaletofit="true" slot="hidden">
+                <img slot="item" src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500">
+                <img slot="item" src="https://s.ftcdn.net/v2013/pics/all/curated/RKyaEDwp8J7JKeZWQPuOVWvkUjGQfpCx_cover_580.jpg?r=1a0fc22192d0c808b8bb2b9bcfbf4a45b1793687">
+                <img slot="item" src="https://cdn.pixabay.com/photo/2013/07/21/13/00/rose-165819__340.jpg">
+                <img slot="item" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Blue_rose-artificially_coloured.jpg/1200px-Blue_rose-artificially_coloured.jpg">
+                <img slot="item" src="https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500">
+                <img slot="item" src="https://images.unsplash.com/photo-1541233349642-6e425fe6190e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80">
+                <img slot="item" src="https://images.unsplash.com/photo-1535498730771-e735b998cd64?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80">
+                <img slot="item" src="https://media3.s-nbcnews.com/j/newscms/2019_41/3047866/191010-japan-stalker-mc-1121_06b4c20bbf96a51dc8663f334404a899.fit-760w.JPG">
+                <img slot="item" src="https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500">
+            </grid-layout>
+        </content-transition>
+
         <script type="text/javascript" src="dist/built.js"></script>
 
         <script>
-            // var collapse1 = document.getElementById('collapse1')
-            // var collapse2 = document.getElementById('collapse2')
-            // var input1 = document.getElementById('input1')
-            // var spinner1 = document.getElementById('spinner1')
-            // var progress1 = document.getElementById('progress1')
-            // var snack1 = document.getElementById('snack1')
-
-            // var now = performance.now()
-
-            // let cycles = 20000
-
-            // function test() {
-            //     collapse1.expandable = true
-            //     collapse2.expandable = true
-            //     collapse1.expanded = true
-            //     collapse2.expanded = true
-            //     collapse2.expandable = false
-            //     collapse1.expanded = false
-            //     collapse2.expanded = true
-
-            //     input1.label = 'labels yeah'
-            //     input1.labelposition = 'top'
-            //     input1.labelposition = 'bottom'
-            //     input1.labelposition = 'outerspace'
-            //     input1.labelposition = 'inside'
-
-            //     overlayMessage.shown = true
-            //     overlayMessage.colortheme = `light`
-
-            //     builtjs.AppendChildren(builtjs.ClearHTML(overlayMessage), [
-            //         builtjs.CreateElement({
-            //             tagName: 'span',
-            //             slot: 'header',
-            //             textContent: 'Heads'
-            //         }),
-            //         builtjs.CreateElement({
-            //             tagName: 'span',
-            //             slot: 'body',
-            //             textContent: `Body - ${cycles}`
-            //         })
-            //     ])
-
-            //     overlayMessage.styles = `.overlay-message{color:black;}`
-            //     overlayMessage.colortheme = `dark`
-            //     overlayMessage.styles = ``
-            // }
-
-            // do {
-            //     cycles = cycles - 1
-            //     test()
-            // } while (cycles)
-
-            // console.log(performance.now() - now)
-
+            var transition = document.getElementById('content-transition')
+            var ripple = document.getElementById('ripple-box')
+            var icon = document.getElementById('icon')
+            icon.svg = builtjs.iconArrow
+            ripple.addEventListener('click', function () {
+                console.log('click', transition.getIndex())
+                transition.transitionTo(transition.getIndex() === 0 ? 1 : 0)
+            })
         </script>
     </body>
 

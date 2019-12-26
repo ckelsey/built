@@ -1,6 +1,6 @@
 import {
     WCConstructor, WCDefine, AppendStyleElement, ID, ToNumber,
-    Pipe, SetStyleRules, ToString, IfInvalid, Get, ToBool
+    Pipe, SetStyleRules, ToString, IfInvalid, Get, ToBool, OnNextFrame
 } from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -19,11 +19,10 @@ const setStyles = (el, styles) => {
 }
 
 const setAllStyles = (host, string) => {
-    const componentStyle = host.shadowRoot.querySelector(`style[name=""]`)
+    const componentStyle = host.shadowRoot.querySelector(`style[name="grid-layout-innerstyles"]`)
     const themeStyles = host.elements.themeStyles
     const injectedStyles = host.elements.injectedStyles
     let outerStyle = host.querySelector(`style[name="outer"]`)
-
 
     const styleString = [
         style,
@@ -44,39 +43,40 @@ const setAllStyles = (host, string) => {
 
 const unsupportedCSS = (host, gap, columnwidth) => typeof host.style.grid === `string` ? `` : `.grid-layout-items{margin-left:-${gap}px;margin-right:-${gap}px;}.grid-layout-items .grid-layout-item{max-width:${columnwidth}px;margin:${gap}px;}`
 
-const setScale = host => {
-    if (!host.scaletofit) { return }
+const setScale = host =>
+    OnNextFrame(() => {
+        if (!host.scaletofit) { return }
 
-    let gap = host.gap || defaultGap
-    let columnwidth = host.columnwidth || defaultWidth
-    const contentWidth = host.elements.root.offsetWidth + gap
-    let columnGapPercent = 100 / Math.round(contentWidth / (gap + columnwidth))
-    const ratio = 1 - (gap / columnwidth)
+        let gap = host.gap || defaultGap
+        let columnwidth = host.columnwidth || defaultWidth
+        const contentWidth = host.elements.root.offsetWidth + gap
+        let columnGapPercent = 100 / Math.round(contentWidth / (gap + columnwidth))
+        const ratio = 1 - (gap / columnwidth)
 
-    if (columnwidth === `100%`) {
-        columnwidth = 100
-        gap = 0
-    } else {
-        if (columnGapPercent > 50) {
-            columnGapPercent = 50
+        if (columnwidth === `100%`) {
+            columnwidth = 100
+            gap = 0
+        } else {
+            if (columnGapPercent > 50) {
+                columnGapPercent = 50
+            }
+
+            columnwidth = columnGapPercent * ratio
+
+            gap = (columnGapPercent - columnwidth) / 2
         }
 
-        columnwidth = columnGapPercent * ratio
+        setAllStyles(host, `.grid-layout-items{display:flex; width:${100 + (gap * 2)}%;margin-left:-${gap}%;}.grid-layout-item{width:${columnwidth}%;padding:${gap === 0 ? 4 : gap / 2}% ${gap}%;}`)
+    })
 
-        gap = (columnGapPercent - columnwidth) / 2
-    }
-
-    setAllStyles(host, `.grid-layout-items{display:flex; width:${100 + (gap * 2)}%;margin-left:-${gap}%;}.grid-layout-item{width:${columnwidth}%;padding:${gap === 0 ? 4 : gap / 2}% ${gap}%;}`)
-}
-
-const setDimensions = host => {
+const setDimensions = host => OnNextFrame(() => {
     if (host.scaletofit) { return setScale(host) }
 
     let gap = host.gap || defaultGap
     let columnwidth = host.columnwidth || defaultWidth
 
     setAllStyles(host, `.grid-layout-items{grid-gap:${gap}px; grid-template-columns:repeat(auto-fit, minmax(${columnwidth}px, 0fr));}${unsupportedCSS(host, gap, columnwidth)}`)
-}
+})
 
 const elements = {
     root: {
@@ -136,57 +136,61 @@ export const GridLayout = WCConstructor({
     },
     methods: { getComponentStyles },
     onConnected(host) {
-        const itemsContainer = host.elements.itemsContainer
+        OnNextFrame(() => {
+            const itemsContainer = host.elements.itemsContainer
 
-        const wrapItem = el => {
-            const id = ID()
-            const slotWrapper = document.createElement(`div`)
-            slotWrapper.className = `grid-layout-item`
-            slotWrapper.id = id
-            itemsContainer.appendChild(slotWrapper)
+            const wrapItem = el => {
+                const id = ID()
+                const slotWrapper = document.createElement(`div`)
+                slotWrapper.className = `grid-layout-item`
+                slotWrapper.id = id
+                itemsContainer.appendChild(slotWrapper)
 
-            const slot = document.createElement(`slot`)
-            slot.name = id
-            slotWrapper.appendChild(slot)
-            el.slot = id
-            el.container = slotWrapper
+                const slot = document.createElement(`slot`)
+                slot.name = id
+                slotWrapper.appendChild(slot)
+                el.slot = id
+                el.container = slotWrapper
 
-            return el
-        }
-
-        const observeEl = el => {
-            if (el.nongrid) { return }
-            wrapItem(el)
-        }
-
-        const disconnectEl = el => {
-            const containerParent = Get(el, `container.parentElement`)
-
-            Get(el, `eventSubscriptions.span.disconnect()`)
-
-            if (containerParent) {
-                containerParent.removeChild(el.container)
+                return el
             }
-        }
 
-        Array
-            .from(host.children)
-            .forEach(observeEl)
+            const observeEl = el => {
+                if (el.nongrid) { return }
+                wrapItem(el)
+            }
 
-        host.slotObserver = new MutationObserver(mutationsList => {
-            const list = Array.from(mutationsList)
+            const disconnectEl = el => {
+                const containerParent = Get(el, `container.parentElement`)
 
-            while (list.length) {
-                const mutation = list.shift()
-                if (mutation.type === `childList`) {
-                    Array.from(mutation.addedNodes).forEach(observeEl)
-                    Array.from(mutation.removedNodes).forEach(disconnectEl)
+                Get(el, `eventSubscriptions.span.disconnect()`)
+
+                if (containerParent) {
+                    containerParent.removeChild(el.container)
                 }
             }
-        })
 
-        host.slotObserver.observe(host, { childList: true })
-        window.addEventListener(`resize`, () => setScale(host))
+            Array
+                .from(host.children)
+                .forEach(observeEl)
+
+            host.slotObserver = new MutationObserver(mutationsList => {
+                const list = Array.from(mutationsList)
+
+                while (list.length) {
+                    const mutation = list.shift()
+                    if (mutation.type === `childList`) {
+                        Array.from(mutation.addedNodes).forEach(observeEl)
+                        Array.from(mutation.removedNodes).forEach(disconnectEl)
+                    }
+                }
+            })
+
+            host.slotObserver.observe(host, { childList: true })
+            window.addEventListener(`resize`, () => setScale(host))
+
+            OnNextFrame(() => host.setAttribute(`viewable`, true))
+        })
     }
 })
 

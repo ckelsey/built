@@ -1,4 +1,4 @@
-import { ID } from '..'
+import { ID, OnNextFrame } from '..'
 
 const subscriptions = {}
 let isRunning = false
@@ -15,7 +15,7 @@ const loop = () => {
     subscriptionKeys.forEach(key => {
         const subscription = subscriptions[key]
 
-        requestAnimationFrame(() => setTimeout(() => {
+        OnNextFrame(() => {
             const currentFrame = new Date().getTime() - subscription.started
 
             if (!!subscription.duration && typeof subscription.frames[currentFrame] === `undefined`) {
@@ -23,10 +23,10 @@ const loop = () => {
             }
 
             subscription.fn(subscription.frames[currentFrame])
-        }, 0))
+        })
     })
 
-    requestAnimationFrame(loop)
+    OnNextFrame(loop)
 }
 
 export function Timer(duration, stepFn, frameValues = undefined, completeFn = () => { }) {

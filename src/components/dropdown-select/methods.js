@@ -63,17 +63,19 @@ export const scrollToSelectedOption = (overlay, option) => {
     if (!overlay || !option) { return }
 
     const optionBox = option.getBoundingClientRect()
-    const containerPosition = overlay.position
-    const optionTop = optionBox.top - containerPosition.top
-    const optionBottom = optionBox.height + optionTop
 
-    if (optionBottom > containerPosition.height) {
-        overlay.scrollContent(0, containerPosition.scrollTop + (optionBottom - containerPosition.height))
-    }
+    overlay.position().then(containerPosition => {
+        const optionTop = optionBox.top - containerPosition.top
+        const optionBottom = optionBox.height + optionTop
 
-    if (optionTop < 0) {
-        overlay.scrollContent(0, containerPosition.scrollTop + optionTop)
-    }
+        if (optionBottom > containerPosition.height) {
+            overlay.scrollContent(0, containerPosition.scrollTop + (optionBottom - containerPosition.height))
+        }
+
+        if (optionTop < 0) {
+            overlay.scrollContent(0, containerPosition.scrollTop + optionTop)
+        }
+    })
 }
 
 export const setSelectedOption = (host, option) => {

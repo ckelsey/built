@@ -54,7 +54,7 @@ overlay-content {
         opacity: 0;
         display: inline-flex;
         flex-direction: column;
-        transition: opacity 0.2s ease-in-out;
+        /* transition: opacity 0.2s ease-in-out; */
     }
 
     &.active {
@@ -64,7 +64,6 @@ overlay-content {
 
         .overlay-content-content-container {
             pointer-events: all;
-            opacity: 1;
         }
     }
 

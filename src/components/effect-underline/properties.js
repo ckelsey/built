@@ -7,7 +7,6 @@ const resetTargets = host => {
     loadTargets(host)
 }
 
-const onChange = () => { }
 const selectorsToDom = val => SelectorArrayToElements(null, val).value
 
 const attributes = {
@@ -15,22 +14,13 @@ const attributes = {
         format: val => Pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
         onChange: (val, host) => !val || !host.elements.underline ? undefined : host.elements.underline.style.backgroundColor = `${val}`
     },
-    direction: {
-        format: val => Pipe(ToString, IfInvalid(`auto`))(val).value,
-        onChange
-    },
+    direction: { format: val => Pipe(ToString, IfInvalid(`auto`))(val).value, },
     end: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
         onChange: (_val, host) => resetTargets(host)
     },
-    opacity: {
-        format: val => Math.min(1, Math.max(0, Pipe(ToNumber, IfInvalid(0.2))(val).value)),
-        onChange
-    },
-    speed: {
-        format: val => Pipe(ToNumber, IfInvalid(700))(val).value,
-        onChange
-    },
+    opacity: { format: val => Math.min(1, Math.max(0, Pipe(ToNumber, IfInvalid(0.2))(val).value)), },
+    speed: { format: val => Pipe(ToNumber, IfInvalid(700))(val).value, },
     start: {
         format: val => Pipe(ToString, IfInvalid(`mousedown`))(val).value,
         onChange: (_val, host) => resetTargets(host)
@@ -39,10 +29,7 @@ const attributes = {
         format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
     },
-    spring: {
-        format: val => Pipe(ToNumber, IfInvalid(4))(val).value,
-        onChange
-    },
+    spring: { format: val => Pipe(ToNumber, IfInvalid(4))(val).value, },
     targets: {
         format: selectorsToDom,
         onChange: (_val, host) => resetTargets(host)

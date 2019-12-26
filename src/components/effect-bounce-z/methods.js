@@ -1,11 +1,13 @@
-import { GetCurve, ObserveEvent, Timer, Get } from '../..'
+import { GetCurve, ObserveEvent, Timer, Get, OnNextFrame } from '../..'
 
-const getDimension = target => {
-    const max = Math.max(target.offsetWidth, target.offsetHeight)
-    const min = Math.min(target.offsetWidth, target.offsetHeight)
-
-    return (((max - min) / 2) + min)
-}
+const animator = (points, speed, stepFn) => new Promise(resolve =>
+    Timer(
+        speed,
+        stepFn,
+        GetCurve(points, 0.5, false, speed),
+        resolve
+    )
+)
 
 const runStart = host => () => {
     if (host.on || !host.targets || !host.ready) { return }
@@ -14,24 +16,25 @@ const runStart = host => () => {
 
     if (!Array.isArray(host.targets)) { return }
 
-    Timer(
+    animator(
+        [1, -host.amount, (-host.amount * 1.125), 1],
         host.speed,
         scale => {
-            const set = el => {
-                const dimension = getDimension(el)
-                const scaleFactor = (dimension - scale) / dimension
-                el.style.transform = `perspective(1px) translateZ(0) scaleX(${scaleFactor}) scaleY(${scaleFactor})`
-            }
+            const set = el => OnNextFrame(() => {
+                const max = Math.max(el.offsetWidth, el.offsetHeight)
+                const min = Math.min(el.offsetWidth, el.offsetHeight)
+                const dimension = (((max - min) / 2) + min)
+
+                el.style.transform = `perspective(1px) translateZ(0) scale(${(dimension - scale) / dimension})`
+            })
 
             Get(host, `targets`, []).forEach(target => Array.isArray(target) ? target.forEach(set) : set(target))
-        },
-        GetCurve([1, -host.amount, (-host.amount * 1.125), 1], 0.5, false, host.speed),
-        () => {
-            const set = el => el.style.removeProperty(`transform`)
-            Get(host, `targets`, []).forEach(target => Array.isArray(target) ? target.forEach(set) : set(target))
-            host.on = false
         }
-    )
+    ).then(() => {
+        const set = el => el.style.removeProperty(`transform`)
+        Get(host, `targets`, []).forEach(target => Array.isArray(target) ? target.forEach(set) : set(target))
+        host.on = false
+    })
 }
 
 export const trigger = host => runStart(host)

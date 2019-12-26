@@ -1,7 +1,7 @@
 import {
     // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
-    IndexOf, ToNumber, CommasToArray, ToMap, ValidateHtml
+    IndexOf, ToNumber, CommasToArray, ToMap, ValidateHtml, OnNextFrame
 } from '../..'
 import { ObserveEvent } from '../../utils/observe-event'
 
@@ -14,31 +14,36 @@ const componentRoot = `.${componentName}-container`
 const types = [`bar`, `circle`]
 const animations = [`indeterminate`, `linear`, `volley`]
 const setStyles = (el, styles) => el ? SetStyleRules(el, styles) : undefined
-const setVisible = (val, root) => root ? root.classList[val ? `add` : `remove`](`visible`) : undefined
-const setOverlay = (val, root) => root ? root.classList[val ? `add` : `remove`](`overlay`) : undefined
-const setPercentage = (val, root) => root ? root.classList[val ? `add` : `remove`](`percentage`) : undefined
-const setScrimColor = (val, root) => root ? val ? root.style.backgroundColor = val : root.style.removeProperty(`background-color`) : undefined
-const setTrack = (val, root) => root ? root.classList[val ? `add` : `remove`](`track`) : undefined
-const setScrimBlur = (val, root) => root ? root.style.backdropFilter = `blur(${val}px)` : undefined
-const setThickness = (val, el) => el ? el.style.height = val : undefined
+const setVisible = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`visible`) : undefined)
+const setOverlay = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`overlay`) : undefined)
+const setPercentage = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`percentage`) : undefined)
+const setScrimColor = (val, root) => OnNextFrame(() => root ? val ? root.style.backgroundColor = val : root.style.removeProperty(`background-color`) : undefined)
+const setTrack = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`track`) : undefined)
+const setScrimBlur = (val, root) => OnNextFrame(() => root ? root.style.backdropFilter = `blur(${val}px)` : undefined)
+const setThickness = (val, el) => OnNextFrame(() => el ? el.style.height = val : undefined)
 const setHeading = (val, el) => el ? el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized : undefined
 const setText = (val, el) => el ? el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized : undefined
-const setColor = (val, el) => el && val ? el.style.color = val : el ? el.style.removeProperty(`color`) : undefined
+const setColor = (val, el) => OnNextFrame(() => el && val ? el.style.color = val : el ? el.style.removeProperty(`color`) : undefined)
 const setAnimation = (val, root) => root ? root.setAttribute(`animation`, val) : undefined
 
 const setScrim = (val, root) => {
     if (!root) { return }
-    if (!val) { root.style.removeProperty(`background-color`) }
-    root.classList[val ? `add` : `remove`](`scrim`)
+
+    OnNextFrame(() => {
+        if (!val) { root.style.removeProperty(`background-color`) }
+        root.classList[val ? `add` : `remove`](`scrim`)
+    })
 }
 
 const setButton = (val, el) => {
-    if (val && el) {
-        el.classList.add(`show`)
-        el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized
-    } else if (el) {
-        el.classList.remove(`show`)
-    }
+    OnNextFrame(() => {
+        if (val && el) {
+            el.classList.add(`show`)
+            el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized
+        } else if (el) {
+            el.classList.remove(`show`)
+        }
+    })
 }
 
 const setValues = (vals, host) => {
@@ -50,9 +55,11 @@ const setValues = (vals, host) => {
 
     if (!top || !bottom) { return }
 
-    top.style.width = mainVal
-    bottom.style.width = secondaryVal
-    percentage.textContent = mainVal
+    OnNextFrame(() => {
+        top.style.width = mainVal
+        bottom.style.width = secondaryVal
+        percentage.textContent = mainVal
+    })
 }
 
 const properties = {

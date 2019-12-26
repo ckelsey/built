@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -192,63 +192,6 @@ function toComment(sourceMap) {
 
 /***/ }),
 /* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return OnNextFrame; });
-/**
- * TODO
- * - memoize
- * - return promise
- */
-var OnNextFrameKey = Symbol["for"]("builtjs.OnNextFrameKey");
-var globalSymbols = Object.getOwnPropertySymbols(global);
-var hasOnNextFrame = globalSymbols.indexOf(OnNextFrameKey) > -1;
-var OnNextFrameQueue = [];
-var isRunning = false;
-
-function RunOnNextFrame() {
-  if (isRunning) {
-    return;
-  }
-
-  isRunning = true;
-
-  var runTasks = function runTasks(startTime) {
-    var ran = 0;
-
-    do {
-      ran = ran + 1;
-      OnNextFrameQueue.shift()();
-    } while (performance.now() - startTime < 6 && OnNextFrameQueue.length);
-
-    if (OnNextFrameQueue.length) {
-      return requestAnimationFrame(function () {
-        return setTimeout(function () {
-          runTasks(performance.now());
-        });
-      });
-    } else {
-      isRunning = false;
-    }
-  };
-
-  runTasks(performance.now());
-}
-
-if (!hasOnNextFrame) {
-  global[OnNextFrameKey] = function (task) {
-    // task()
-    OnNextFrameQueue.push(task);
-    RunOnNextFrame();
-  };
-}
-
-var OnNextFrame = Object.freeze(global[OnNextFrameKey]);
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10)))
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports) {
 
 function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
@@ -270,14 +213,14 @@ function _typeof(obj) {
 module.exports = _typeof;
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayWithoutHoles = __webpack_require__(20);
+var arrayWithoutHoles = __webpack_require__(21);
 
-var iterableToArray = __webpack_require__(21);
+var iterableToArray = __webpack_require__(22);
 
-var nonIterableSpread = __webpack_require__(22);
+var nonIterableSpread = __webpack_require__(23);
 
 function _toConsumableArray(arr) {
   return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
@@ -286,7 +229,7 @@ function _toConsumableArray(arr) {
 module.exports = _toConsumableArray;
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -344,6 +287,93 @@ function Get(obj, path, emptyVal) {
 }
 
 /***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return OnNextFrame; });
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/**
+ * TODO
+ * - memoize
+ * - return promise
+ */
+
+var OnNextFrameKey = Symbol["for"]("builtjs.OnNextFrameKey");
+var globalSymbols = Object.getOwnPropertySymbols(global);
+var hasOnNextFrame = globalSymbols.indexOf(OnNextFrameKey) > -1;
+var OnNextFrameQueueObject = {};
+var OnNextFrameQueue = [];
+var isRunning = false;
+
+function RunOnNextFrame() {
+  if (isRunning) {
+    return;
+  }
+
+  isRunning = true;
+
+  var runTasks = function runTasks(startTime) {
+    var ids = [];
+
+    do {
+      var id = OnNextFrameQueue.shift();
+
+      if (OnNextFrameQueueObject[id]) {
+        OnNextFrameQueueObject[id].resolve(OnNextFrameQueueObject[id].task());
+      }
+    } while (performance.now() - startTime < 6 && OnNextFrameQueue.length);
+
+    requestAnimationFrame(function () {
+      return setTimeout(function () {
+        return ids.forEach(function (i) {
+          return delete OnNextFrameQueueObject[i];
+        });
+      });
+    });
+
+    if (OnNextFrameQueue.length) {
+      return requestAnimationFrame(function () {
+        return setTimeout(function () {
+          return runTasks(performance.now());
+        });
+      });
+    } else {
+      isRunning = false;
+    }
+  };
+
+  runTasks(performance.now());
+}
+
+if (!hasOnNextFrame) {
+  global[OnNextFrameKey] = function (task) {
+    var resolve, reject;
+    var promise = new Promise(function (res, rej) {
+      resolve = res;
+      reject = rej;
+    });
+    var id = Object(___WEBPACK_IMPORTED_MODULE_0__[/* ID */ "a"])();
+    OnNextFrameQueueObject[id] = {
+      task: task,
+      promise: promise,
+      resolve: resolve,
+      reject: reject,
+      id: id,
+      cancel: function cancel() {
+        return delete OnNextFrameQueueObject[id];
+      }
+    };
+    OnNextFrameQueue.push(id);
+    RunOnNextFrame();
+    return OnNextFrameQueueObject[id];
+  };
+}
+
+var OnNextFrame = Object.freeze(global[OnNextFrameKey]);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(12)))
+
+/***/ }),
 /* 5 */
 /***/ (function(module, exports) {
 
@@ -360,223 +390,6 @@ module.exports = _setPrototypeOf;
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports) {
-
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-module.exports = _assertThisInitialized;
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-function _getPrototypeOf(o) {
-  module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-
-module.exports = _getPrototypeOf;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-
-module.exports = _createClass;
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(26);
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ComponentStore; });
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
-/* eslint-disable tree-shaking/no-side-effects-in-initialization */
-
-var ComponentStoreKey = Symbol["for"]("builtjs.ComponentStore");
-var globalSymbols = Object.getOwnPropertySymbols(global);
-var hasComponentStore = globalSymbols.indexOf(ComponentStoreKey) > -1;
-
-var getTag = function getTag(element) {
-  return Object(___WEBPACK_IMPORTED_MODULE_0__[/* Get */ "a"])(element, "tagName", "").toLowerCase();
-};
-
-if (!hasComponentStore) {
-  global[ComponentStoreKey] = {
-    components: {},
-    themes: {},
-    theme: function theme(_theme, element) {
-      return Object.keys(_theme).forEach(function (property) {
-        return element[property] = _theme[property];
-      });
-    },
-    addComponent: function addComponent(element) {
-      var tag = getTag(element);
-
-      if (tag === "") {
-        return;
-      }
-
-      if (!global[ComponentStoreKey].components[tag]) {
-        global[ComponentStoreKey].components[tag] = [];
-      }
-
-      global[ComponentStoreKey].components[tag].push(element);
-      global[ComponentStoreKey].triggerTagSubscriptions(tag, element);
-
-      if (global[ComponentStoreKey].themes[tag]) {
-        Object.keys(global[ComponentStoreKey].themes[tag]).forEach(function (property) {
-          return element[property] = global[ComponentStoreKey].themes[tag][property];
-        });
-      }
-    },
-    removeComponent: function removeComponent(element) {
-      var tag = getTag(element);
-
-      if (tag === "" || !global[ComponentStoreKey].components[tag]) {
-        return;
-      }
-
-      var index = global[ComponentStoreKey].components[tag].indexOf(element);
-
-      if (index === -1) {
-        return;
-      }
-
-      global[ComponentStoreKey].components[tag].splice(index, 1);
-    },
-    addTheme: function addTheme(tag, theme) {
-      global[ComponentStoreKey].themes[tag] = theme;
-
-      if (!global[ComponentStoreKey].components[tag]) {
-        return;
-      }
-
-      global[ComponentStoreKey].components[tag].forEach(function (element) {
-        return global[ComponentStoreKey].theme(global[ComponentStoreKey].themes[tag], element);
-      });
-    },
-    tagSubscriptions: {},
-    triggerTagSubscriptions: function triggerTagSubscriptions(tag, data) {
-      if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
-        return;
-      }
-
-      global[ComponentStoreKey].tagSubscriptions[tag].forEach(function (sub) {
-        return sub(data);
-      });
-    },
-    watchForTag: function watchForTag(tag, cb) {
-      if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
-        global[ComponentStoreKey].tagSubscriptions[tag] = [];
-      }
-
-      global[ComponentStoreKey].tagSubscriptions[tag].push(cb);
-      return function () {
-        if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
-          return;
-        }
-
-        var indexToRemove;
-        var i = global[ComponentStoreKey].tagSubscriptions[tag].length;
-
-        while (indexToRemove === undefined && i) {
-          i = i - 1;
-
-          if (global[ComponentStoreKey].tagSubscriptions[tag][i] === cb) {
-            indexToRemove = i;
-          }
-        }
-
-        global[ComponentStoreKey].tagSubscriptions[tag].splice(indexToRemove, 1);
-      };
-    }
-  };
-}
-
-var ComponentStore = Object.freeze(global[ComponentStoreKey]); // Object.defineProperty(ComponentStore, "instance", {
-//     get: function () {
-//         return global[ComponentStoreKey];
-//     }
-// })
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10)))
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(0)(false);
-// Module
-exports.push([module.i, ":host(content-transition){display:block;width:100%;position:relative}:host(content-transition).flex-stretch{-webkit-box-flex:1;flex-grow:1;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}content-transition{display:block;width:100%;position:relative}content-transition.flex-stretch{-webkit-box-flex:1;flex-grow:1;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}.content-transition-container{position:relative}.content-transition-container .current-slot{opacity:1}.content-transition-container .next-slot{width:100%;height:100%;position:absolute;top:0;left:0;opacity:0}.content-transition-container .hidden-slot{width:100%;height:100%;overflow:hidden;opacity:0;pointer-events:none;position:absolute;top:0;left:0;z-index:-1;visibility:hidden;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.content-transition-container .hidden-slot .hidden-slot-inner{width:100%;height:100%;display:inline-block;position:absolute;top:0;left:0}.content-transition-container.keepchildren .next-slot{pointer-events:none;opacity:0;-webkit-transform:translateZ(0) translateX(-100%);transform:translateZ(0) translateX(-100%)}.content-transition-container.keepchildren[type=\"fade\"] .next-slot{-webkit-transform:translateZ(0) translateX(0);transform:translateZ(0) translateX(0)}.content-transition-container.sliding{overflow:hidden}.content-transition-container.flex-stretch{-webkit-box-flex:1;flex-grow:1;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}.content-transition-container.flex-stretch .content-transition-inner,.content-transition-container.flex-stretch .current-slot,.content-transition-container.flex-stretch .next-slot,.content-transition-container.flex-stretch .hidden-slot{-webkit-box-flex:1;flex-grow:1;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}\n", ""]);
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(0)(false);
-// Module
-exports.push([module.i, ":host(grid-layout){display:block}grid-layout{display:block}.grid-layout-items{display:-webkit-box;display:flex;display:grid;justify-items:center;grid-auto-flow:dense;width:100%;flex-wrap:wrap}.grid-layout-items>*,.grid-layout-items ::slotted(*){width:100%}\n", ""]);
-
-
-/***/ }),
-/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -627,10 +440,10 @@ function Pipe() {
 //     }
 // }
 // EXTERNAL MODULE: ./src/utils/get.js
-var utils_get = __webpack_require__(4);
+var utils_get = __webpack_require__(3);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/typeof.js
-var helpers_typeof = __webpack_require__(2);
+var helpers_typeof = __webpack_require__(1);
 var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
 
 // CONCATENATED MODULE: ./src/utils/is-empty.js
@@ -850,7 +663,7 @@ function IfInvalid(replacement) {
   };
 }
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/toConsumableArray.js
-var toConsumableArray = __webpack_require__(3);
+var toConsumableArray = __webpack_require__(2);
 var toConsumableArray_default = /*#__PURE__*/__webpack_require__.n(toConsumableArray);
 
 // CONCATENATED MODULE: ./src/utils/stop-if-invalid.js
@@ -1277,31 +1090,31 @@ function ToBool(value) {
   return result;
 }
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/classCallCheck.js
-var classCallCheck = __webpack_require__(15);
+var classCallCheck = __webpack_require__(16);
 var classCallCheck_default = /*#__PURE__*/__webpack_require__.n(classCallCheck);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js
-var possibleConstructorReturn = __webpack_require__(16);
+var possibleConstructorReturn = __webpack_require__(17);
 var possibleConstructorReturn_default = /*#__PURE__*/__webpack_require__.n(possibleConstructorReturn);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/getPrototypeOf.js
-var getPrototypeOf = __webpack_require__(7);
+var getPrototypeOf = __webpack_require__(8);
 var getPrototypeOf_default = /*#__PURE__*/__webpack_require__.n(getPrototypeOf);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/assertThisInitialized.js
-var assertThisInitialized = __webpack_require__(6);
+var assertThisInitialized = __webpack_require__(7);
 var assertThisInitialized_default = /*#__PURE__*/__webpack_require__.n(assertThisInitialized);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/createClass.js
-var createClass = __webpack_require__(8);
+var createClass = __webpack_require__(10);
 var createClass_default = /*#__PURE__*/__webpack_require__.n(createClass);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/inherits.js
-var inherits = __webpack_require__(17);
+var inherits = __webpack_require__(18);
 var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/wrapNativeSuper.js
-var wrapNativeSuper = __webpack_require__(18);
+var wrapNativeSuper = __webpack_require__(19);
 var wrapNativeSuper_default = /*#__PURE__*/__webpack_require__.n(wrapNativeSuper);
 
 // CONCATENATED MODULE: ./src/utils/equals.js
@@ -1372,78 +1185,11 @@ function Equals(value1, value2) {
   return true;
 }
 // EXTERNAL MODULE: ./src/services/on-next-frame.js
-var on_next_frame = __webpack_require__(1);
+var on_next_frame = __webpack_require__(4);
 
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/regenerator/index.js
-var regenerator = __webpack_require__(9);
-var regenerator_default = /*#__PURE__*/__webpack_require__.n(regenerator);
+// EXTERNAL MODULE: ./src/utils/id.js
+var utils_id = __webpack_require__(9);
 
-// CONCATENATED MODULE: ./src/utils/id.js
-
-
-var _marked =
-/*#__PURE__*/
-regenerator_default.a.mark(idGenerator);
-
-/**
- * Generates a runtime unique ID
- * @generator
- * @yields { string }
- */
-function idGenerator() {
-  var index, objectIds, doHash, doId, objectId;
-  return regenerator_default.a.wrap(function idGenerator$(_context) {
-    while (1) {
-      switch (_context.prev = _context.next) {
-        case 0:
-          index = 0;
-          objectIds = [];
-
-          doHash = function doHash() {
-            return "".concat((new Date().getTime() / 1000 | 0).toString(16), " xxxxxxxxxxxxxxxx").replace(/[x]/g, function () {
-              return (Math.random() * 16 | 0).toString(16);
-            });
-          };
-
-          doId = function doId(indx) {
-            return "".concat(indx, " ").concat(doHash().toLowerCase()).split(" ").join("");
-          };
-
-        case 4:
-          if (false) {}
-
-          index = index + 1;
-          objectId = doId(index);
-          objectIds.push(objectId);
-          _context.next = 10;
-          return objectId;
-
-        case 10:
-          _context.next = 4;
-          break;
-
-        case 12:
-        case "end":
-          return _context.stop();
-      }
-    }
-  }, _marked);
-}
-
-var idIterator;
-/**
- * Returns a runtime unique ID
- * @function ID
- * @return { string }
- */
-
-function ID() {
-  if (!idIterator) {
-    idIterator = idGenerator();
-  }
-
-  return idIterator.next().value;
-}
 // CONCATENATED MODULE: ./src/utils/observer.js
 
 
@@ -1569,7 +1315,7 @@ function Observer(initialValue) {
         next: next,
         error: error,
         complete: complete,
-        id: ID(),
+        id: Object(utils_id["a" /* ID */])(),
         trace: trace()
       });
       subscription.unsubscribe = _unsubscribe(subscription);
@@ -1781,7 +1527,7 @@ function SetShadowRoot(options) {
   }
 }
 // EXTERNAL MODULE: ./src/services/componentStore.js
-var componentStore = __webpack_require__(11);
+var componentStore = __webpack_require__(13);
 
 // CONCATENATED MODULE: ./src/utils/wc-constructor.js
 
@@ -1881,7 +1627,7 @@ function WCConstructor(options) {
 
   var ConnectedFn = function ConnectedFn(element) {
     Object(on_next_frame["a" /* OnNextFrame */])(function () {
-      element.wcID = ID();
+      element.wcID = Object(utils_id["a" /* ID */])();
 
       element.unsubscribeEvents = function () {
         return ObserverUnsubscribe(element);
@@ -2072,19 +1818,17 @@ var timer_loop = function loop() {
 
   subscriptionKeys.forEach(function (key) {
     var subscription = timer_subscriptions[key];
-    requestAnimationFrame(function () {
-      return setTimeout(function () {
-        var currentFrame = new Date().getTime() - subscription.started;
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      var currentFrame = new Date().getTime() - subscription.started;
 
-        if (!!subscription.duration && typeof subscription.frames[currentFrame] === "undefined") {
-          return subscription.cancel();
-        }
+      if (!!subscription.duration && typeof subscription.frames[currentFrame] === "undefined") {
+        return subscription.cancel();
+      }
 
-        subscription.fn(subscription.frames[currentFrame]);
-      }, 0);
+      subscription.fn(subscription.frames[currentFrame]);
     });
   });
-  requestAnimationFrame(loop);
+  Object(on_next_frame["a" /* OnNextFrame */])(loop);
 };
 
 function Timer(duration, stepFn) {
@@ -2095,7 +1839,7 @@ function Timer(duration, stepFn) {
     return;
   }
 
-  var id = ID();
+  var id = Object(utils_id["a" /* ID */])();
   timer_subscriptions[id] = {
     id: id,
     duration: duration,
@@ -2210,7 +1954,7 @@ function WCDefine(componentName, componentClass) {
 // CONCATENATED MODULE: ./src/components/button-element/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var button_element_style = __webpack_require__(19).toString();
+var button_element_style = __webpack_require__(20).toString();
 
 var button_element_setStyles = function setStyles(el, host, styles) {
   if (!el) {
@@ -2232,6 +1976,28 @@ var button_element_setTheme = function setTheme(value, host) {
 
 var setName = function setName(btn, name) {
   return btn ? btn.setAttribute("name", name) : undefined;
+};
+
+var setRipple = function setRipple(host) {
+  var ripple = host.elements.ripple;
+
+  if (!ripple) {
+    return;
+  }
+
+  ripple.color = host.accentcolor;
+  ripple.targets = host.ripple ? [host.elements.button] : [];
+};
+
+var setBounce = function setBounce(host) {
+  var bounce = host.elements.bounce;
+  var button = host.elements.button;
+
+  if (!bounce || !button) {
+    return;
+  }
+
+  bounce.targets = host.bounce ? [button] : [];
 };
 
 var button_element_properties = {
@@ -2343,29 +2109,7 @@ var button_element_elements = {
   }
 };
 
-var setRipple = function setRipple(host) {
-  var ripple = host.elements.ripple;
-
-  if (!ripple) {
-    return;
-  }
-
-  ripple.color = host.accentcolor;
-  ripple.targets = host.ripple ? [host.elements.button] : [];
-};
-
-var setBounce = function setBounce(host) {
-  var bounce = host.elements.bounce;
-  var button = host.elements.button;
-
-  if (!bounce || !button) {
-    return;
-  }
-
-  bounce.targets = host.bounce ? [button] : [];
-};
-
-var button_element_template = __webpack_require__(23);
+var button_element_template = __webpack_require__(24);
 
 var button_element_componentName = "button-element";
 var componentRoot = ".button-element";
@@ -2545,7 +2289,10 @@ function ObserveEvent(element, eventName) {
   };
 
   var shutDown = function shutDown() {
-    element.removeEventListener(eventName, eventHandler, options.useCapture);
+    try {
+      element.removeEventListener(eventName, eventHandler, options.useCapture);
+    } catch (error) {}
+
     isRunning = false;
   };
 
@@ -2660,10 +2407,10 @@ function WasClickedOn(element, event) {
  */
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var collapse_menu_style = __webpack_require__(27).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var collapse_menu_style = __webpack_require__(28).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var collapse_menu_template = __webpack_require__(28);
+var collapse_menu_template = __webpack_require__(29);
 
 var collapse_menu_componentName = "collapse-menu";
 var collapse_menu_componentRoot = ".".concat(collapse_menu_componentName, "-container");
@@ -3035,10 +2782,10 @@ var Icons = {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var content_collapse_style = __webpack_require__(29).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var content_collapse_style = __webpack_require__(30).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var content_collapse_template = __webpack_require__(30);
+var content_collapse_template = __webpack_require__(31);
 
 var content_collapse_componentName = "content-collapse";
 var content_collapse_componentRoot = ".".concat(content_collapse_componentName, "-container");
@@ -3622,10 +3369,10 @@ var canFade = function canFade(host) {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var content_drawer_style = __webpack_require__(31).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var content_drawer_style = __webpack_require__(32).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var content_drawer_template = __webpack_require__(32);
+var content_drawer_template = __webpack_require__(33);
 
 var content_drawer_componentName = "content-drawer";
 var content_drawer_componentRoot = ".content-drawer-container";
@@ -3816,7 +3563,7 @@ function EaseInOut(values, duration) {
 // CONCATENATED MODULE: ./src/components/content-transition/methods.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var methods_style = __webpack_require__(12).toString();
+var methods_style = __webpack_require__(14).toString();
 
 var dispatchTransition = function dispatchTransition(host, from, to) {
   host.dispatchEvent(new CustomEvent("transitioning", {
@@ -3930,109 +3677,113 @@ var transitionEnd = function transitionEnd(next) {
   }).join(" "));
 };
 
-var transitionSlide = function transitionSlide(host, index, speed, keepchildren) {
+var methods_transitionSlide = function transitionSlide(host, index, speed, keepchildren) {
   return new Promise(function (resolve) {
-    var elements = getTransitionElements(host, index);
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      var elements = getTransitionElements(host, index);
 
-    if (!elements) {
-      return resolve();
-    }
-
-    dispatchTransition(host, elements.current, elements.child);
-    host.start = {
-      from: elements.current,
-      to: elements.child
-    };
-    var startHeight = elements.root.offsetHeight;
-    elements.root.style.height = "".concat(startHeight, "px");
-    elements.root.classList.add("sliding");
-    elements.child.setAttribute("slot", "next");
-    var endHeight = elements.child.offsetHeight;
-    transitionStart(elements.current).then(function () {
-      if (startHeight !== endHeight) {
-        animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed).then(function () {
-          requestAnimationFrame(function () {
-            elements.root.style.removeProperty("height");
-            transitionEnd(elements.child);
-          });
-        });
+      if (!elements) {
+        return resolve();
       }
 
-      setTimeout(function () {
-        requestAnimationFrame(function () {
-          animateOpacity(0, 1, elements.nextContainer, speed * 0.25);
+      dispatchTransition(host, elements.current, elements.child);
+      host.start = {
+        from: elements.current,
+        to: elements.child
+      };
+      var startHeight = elements.root.offsetHeight;
+      elements.root.style.height = "".concat(startHeight, "px");
+      elements.root.classList.add("sliding");
+      elements.child.setAttribute("slot", "next");
+      var endHeight = elements.child.offsetHeight;
+      transitionStart(elements.current).then(function () {
+        if (startHeight !== endHeight) {
+          animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed).then(function () {
+            requestAnimationFrame(function () {
+              elements.root.style.removeProperty("height");
+              transitionEnd(elements.child);
+            });
+          });
+        }
+
+        setTimeout(function () {
+          requestAnimationFrame(function () {
+            animateOpacity(0, 1, elements.nextContainer, speed * 0.25);
+          });
+        }, speed * 0.1);
+        animateOpacity(1, 0, elements.currentContainer, speed * 0.8);
+        animateLeft(0, 100, elements.currentContainer, speed * 0.8);
+        animateLeft(-100, 0, elements.nextContainer, speed).then(function () {
+          if (elements.current) {
+            elements.current.setAttribute("slot", "hidden");
+          }
+
+          elements.currentContainer.removeAttribute("style");
+          elements.child.setAttribute("slot", "current");
+          elements.nextContainer.removeAttribute("style");
+          elements.root.classList.remove("sliding");
+          transitionEnd(elements.child);
+          dispatchTransitioned(host, elements.current, elements.child);
+
+          if (!keepchildren) {
+            removeElement(elements.current);
+          }
+
+          return resolve(cleanup(host));
         });
-      }, speed * 0.1);
-      animateOpacity(1, 0, elements.currentContainer, speed * 0.8);
-      animateLeft(0, 100, elements.currentContainer, speed * 0.8);
-      animateLeft(-100, 0, elements.nextContainer, speed).then(function () {
-        if (elements.current) {
-          elements.current.setAttribute("slot", "hidden");
-        }
-
-        elements.currentContainer.removeAttribute("style");
-        elements.child.setAttribute("slot", "current");
-        elements.nextContainer.removeAttribute("style");
-        elements.root.classList.remove("sliding");
-        transitionEnd(elements.child);
-        dispatchTransitioned(host, elements.current, elements.child);
-
-        if (!keepchildren) {
-          removeElement(elements.current);
-        }
-
-        return resolve(cleanup(host));
       });
     });
   });
 };
 
-var runHeight = function runHeight(elements, speed, keepchildren, host) {
+var methods_runHeight = function runHeight(elements, speed, keepchildren, host) {
   return new Promise(function (resolve) {
-    dispatchTransition(host, elements.current, elements.child);
-    host.start = {
-      from: elements.current,
-      to: elements.child
-    };
-    var startHeight = elements.root.offsetHeight;
-    elements.root.style.height = "".concat(startHeight, "px");
-    elements.child.setAttribute("slot", "next");
-
-    if (!host.contains(elements.child)) {
-      host.appendChild(elements.child);
-    }
-
-    var endHeight = elements.child.offsetHeight;
-    transitionStart(elements.current).then(function () {
-      var afterHeightSet = function afterHeightSet() {
-        if (!keepchildren) {
-          while (host.getChildren().length > 1) {
-            removeElement(host.getChildren()[0]);
-          }
-        }
-
-        if (elements.current) {
-          elements.current.setAttribute("slot", "hidden");
-        }
-
-        elements.child.setAttribute("slot", "current");
-        elements.child.style.removeProperty("opacity");
-        elements.currentContainer.style.removeProperty("opacity");
-        elements.nextContainer.style.removeProperty("opacity");
-        requestAnimationFrame(function () {
-          dispatchTransitioned(host, elements.current, elements.child);
-          transitionEnd(elements.child);
-          cleanup(host);
-          elements.root.style.removeProperty("height");
-          return resolve(host.current);
-        });
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      dispatchTransition(host, elements.current, elements.child);
+      host.start = {
+        from: elements.current,
+        to: elements.child
       };
+      var startHeight = elements.root.offsetHeight;
+      elements.root.style.height = "".concat(startHeight, "px");
+      elements.child.setAttribute("slot", "next");
 
-      if (endHeight === startHeight) {
-        return setTimeout(afterHeightSet, speed);
+      if (!host.contains(elements.child)) {
+        host.appendChild(elements.child);
       }
 
-      animateHeight(startHeight, endHeight, elements.root, speed).then(afterHeightSet);
+      var endHeight = elements.child.offsetHeight;
+      transitionStart(elements.current).then(function () {
+        var afterHeightSet = function afterHeightSet() {
+          if (!keepchildren) {
+            while (host.getChildren().length > 1) {
+              removeElement(host.getChildren()[0]);
+            }
+          }
+
+          if (elements.current) {
+            elements.current.setAttribute("slot", "hidden");
+          }
+
+          elements.child.setAttribute("slot", "current");
+          elements.child.style.removeProperty("opacity");
+          elements.currentContainer.style.removeProperty("opacity");
+          elements.nextContainer.style.removeProperty("opacity");
+          requestAnimationFrame(function () {
+            dispatchTransitioned(host, elements.current, elements.child);
+            transitionEnd(elements.child);
+            cleanup(host);
+            elements.root.style.removeProperty("height");
+            return resolve(host.current);
+          });
+        };
+
+        if (endHeight === startHeight) {
+          return setTimeout(afterHeightSet, speed);
+        }
+
+        animateHeight(startHeight, endHeight, elements.root, speed).then(afterHeightSet);
+      });
     });
   });
 };
@@ -4047,7 +3798,7 @@ var transitionFade = function transitionFade(host, child, speed, keepchildren) {
 
     animateOpacity(1, 0, elements.currentContainer, speed * 0.75);
     animateOpacity(0, 1, elements.nextContainer, speed);
-    return runHeight(elements, speed, keepchildren, host).then(resolve);
+    return methods_runHeight(elements, speed, keepchildren, host).then(resolve);
   });
 };
 
@@ -4059,7 +3810,7 @@ var transitionHeight = function transitionHeight(host, child, speed, keepchildre
       return resolve();
     }
 
-    return runHeight(elements, speed, keepchildren, host).then(resolve);
+    return methods_runHeight(elements, speed, keepchildren, host).then(resolve);
   });
 };
 
@@ -4068,7 +3819,7 @@ var transitionTo = function transitionTo(host) {
     return new Promise(function (resolve) {
       switch (host.type) {
         case "slide":
-          return transitionSlide(host, index, host.speed, host.keepchildren).then(resolve);
+          return methods_transitionSlide(host, index, host.speed, host.keepchildren).then(resolve);
 
         case "fade":
           return transitionFade(host, index, host.speed, host.keepchildren).then(resolve);
@@ -4084,7 +3835,7 @@ var transitionChild = function transitionChild(host) {
     return new Promise(function (resolve) {
       switch (host.type) {
         case "slide":
-          return transitionSlide(host, child, host.speed, host.keepchildren).then(resolve);
+          return methods_transitionSlide(host, child, host.speed, host.keepchildren).then(resolve);
 
         case "fade":
           return transitionFade(host, child, host.speed, host.keepchildren).then(resolve);
@@ -4150,10 +3901,10 @@ var setCurrent = function setCurrent(host) {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var content_transition_style = __webpack_require__(12).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var content_transition_style = __webpack_require__(14).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var content_transition_template = __webpack_require__(33);
+var content_transition_template = __webpack_require__(34);
 
 var content_transition_componentName = "content-transition";
 var content_transition_componentRoot = ".content-transition-container";
@@ -4197,10 +3948,10 @@ WCDefine(content_transition_componentName, ContentTransition);
 // CONCATENATED MODULE: ./src/components/cookie-message/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var cookie_message_style = __webpack_require__(34).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var cookie_message_style = __webpack_require__(35).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var cookie_message_template = __webpack_require__(35);
+var cookie_message_template = __webpack_require__(36);
 
 var cookie_message_componentName = "cookie-message";
 var cookie_message_componentRoot = ".cookie-message-container";
@@ -4467,7 +4218,7 @@ function ObserveSlots(element, mustHaveSlotAttribute) {
 // CONCATENATED MODULE: ./src/components/drop-down/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var drop_down_style = __webpack_require__(36).toString();
+var drop_down_style = __webpack_require__(37).toString();
 
 var drop_down_setStyles = function setStyles(el, styles) {
   if (!el) {
@@ -4493,15 +4244,17 @@ var drop_down_toggleOptions = function toggleOptions(show, host) {
     overlay[show ? "show" : "hide"]();
   } catch (error) {}
 
-  if (!show) {
-    root.classList.remove("opened");
-  } else {
-    root.classList.add("opened");
-  }
+  Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    if (!show) {
+      root.classList.remove("opened");
+    } else {
+      root.classList.add("opened");
+    }
 
-  host.dispatchEvent(new CustomEvent(show ? "selectopen" : "selectclose", {
-    detail: host
-  }));
+    host.dispatchEvent(new CustomEvent(show ? "selectopen" : "selectclose", {
+      detail: host
+    }));
+  });
 };
 
 var drop_down_properties = {
@@ -4535,12 +4288,12 @@ var drop_down_properties = {
   }
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var drop_down_template = __webpack_require__(37);
+var drop_down_template = __webpack_require__(38);
 
 var drop_down_componentName = "drop-down";
 var drop_down_componentRoot = ".".concat(drop_down_componentName, "-container");
 
-var openClose = function openClose(open, host) {
+var drop_down_openClose = function openClose(open, host) {
   var change = function change() {
     var needsFocusBlur = host.open !== open;
     host.open = open;
@@ -4562,7 +4315,7 @@ var openClose = function openClose(open, host) {
     return change();
   }
 
-  setTimeout(change, 333);
+  Object(on_next_frame["a" /* OnNextFrame */])(change);
 };
 
 var drop_down_elements = {
@@ -4630,7 +4383,7 @@ var DropDown = WCConstructor({
       docClick: ObserveEvent(document.body, "click").subscribe(function (e) {
         if (!WasClickedOn(host, e)) {
           if (host.open) {
-            return openClose(false, host);
+            return drop_down_openClose(false, host);
           }
 
           return;
@@ -4654,17 +4407,17 @@ var DropDown = WCConstructor({
           }));
 
           if (host.open) {
-            return requestAnimationFrame(function () {
-              return openClose(false, host);
+            return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+              return drop_down_openClose(false, host);
             });
           } else {
-            return openClose(true, host);
+            return drop_down_openClose(true, host);
           }
         }
 
         if (host.closeonclick && host.open) {
-          return requestAnimationFrame(function () {
-            return openClose(false, host);
+          return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+            return drop_down_openClose(false, host);
           });
         }
       })
@@ -5215,17 +4968,18 @@ var scrollToSelectedOption = function scrollToSelectedOption(overlay, option) {
   }
 
   var optionBox = option.getBoundingClientRect();
-  var containerPosition = overlay.position;
-  var optionTop = optionBox.top - containerPosition.top;
-  var optionBottom = optionBox.height + optionTop;
+  overlay.position().then(function (containerPosition) {
+    var optionTop = optionBox.top - containerPosition.top;
+    var optionBottom = optionBox.height + optionTop;
 
-  if (optionBottom > containerPosition.height) {
-    overlay.scrollContent(0, containerPosition.scrollTop + (optionBottom - containerPosition.height));
-  }
+    if (optionBottom > containerPosition.height) {
+      overlay.scrollContent(0, containerPosition.scrollTop + (optionBottom - containerPosition.height));
+    }
 
-  if (optionTop < 0) {
-    overlay.scrollContent(0, containerPosition.scrollTop + optionTop);
-  }
+    if (optionTop < 0) {
+      overlay.scrollContent(0, containerPosition.scrollTop + optionTop);
+    }
+  });
 };
 var setSelectedOption = function setSelectedOption(host, option) {
   option.classList.add("selected");
@@ -5611,7 +5365,7 @@ var properties_optionElements = function optionElements(host) {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var dropdown_select_style = __webpack_require__(38).toString();
+var dropdown_select_style = __webpack_require__(39).toString();
 
 var dropdown_select_formatter = function formatter(host, value, key) {
   if (value === undefined && typeof host.state[key].value === "function") {
@@ -5626,7 +5380,7 @@ var dropdown_select_formatter = function formatter(host, value, key) {
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var dropdown_select_template = __webpack_require__(39);
+var dropdown_select_template = __webpack_require__(40);
 
 var dropdown_select_componentName = "dropdown-select";
 var dropdown_select_componentRoot = ".".concat(dropdown_select_componentName, "-container");
@@ -5697,8 +5451,8 @@ function SelectorToElement(parent, value) {
     return Value;
   }
 
-  if (!parent) {
-    parent = document.firstElementChild;
+  if (!parent || typeof parent.querySelector !== "function") {
+    parent = document.firstElementChild || document.documentElement.body || document.documentElement.firstElementChild;
   }
 
   if (Value.type === "string") {
@@ -5816,10 +5570,10 @@ function GetCurve(points) {
 // CONCATENATED MODULE: ./src/components/effect-bounce-z/methods.js
 
 
-var getDimension = function getDimension(target) {
-  var max = Math.max(target.offsetWidth, target.offsetHeight);
-  var min = Math.min(target.offsetWidth, target.offsetHeight);
-  return (max - min) / 2 + min;
+var effect_bounce_z_methods_animator = function animator(points, speed, stepFn) {
+  return new Promise(function (resolve) {
+    return Timer(speed, stepFn, GetCurve(points, 0.5, false, speed), resolve);
+  });
 };
 
 var methods_runStart = function runStart(host) {
@@ -5834,17 +5588,20 @@ var methods_runStart = function runStart(host) {
       return;
     }
 
-    Timer(host.speed, function (scale) {
+    effect_bounce_z_methods_animator([1, -host.amount, -host.amount * 1.125, 1], host.speed, function (scale) {
       var set = function set(el) {
-        var dimension = getDimension(el);
-        var scaleFactor = (dimension - scale) / dimension;
-        el.style.transform = "perspective(1px) translateZ(0) scaleX(".concat(scaleFactor, ") scaleY(").concat(scaleFactor, ")");
+        return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+          var max = Math.max(el.offsetWidth, el.offsetHeight);
+          var min = Math.min(el.offsetWidth, el.offsetHeight);
+          var dimension = (max - min) / 2 + min;
+          el.style.transform = "perspective(1px) translateZ(0) scale(".concat((dimension - scale) / dimension, ")");
+        });
       };
 
       Object(utils_get["a" /* Get */])(host, "targets", []).forEach(function (target) {
         return Array.isArray(target) ? target.forEach(set) : set(target);
       });
-    }, GetCurve([1, -host.amount, -host.amount * 1.125, 1], 0.5, false, host.speed), function () {
+    }).then(function () {
       var set = function set(el) {
         return el.style.removeProperty("transform");
       };
@@ -5948,7 +5705,7 @@ var effect_bounce_z_properties_observedAttributes = Object.keys(effect_bounce_z_
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_bounce_z_template = __webpack_require__(40);
+var effect_bounce_z_template = __webpack_require__(41);
 
 var effect_bounce_z_componentName = "effect-bounce-z";
 var effect_bounce_z_componentRoot = ".effect-push-container";
@@ -6213,10 +5970,10 @@ Object.keys(elements_elementSelectors).forEach(function (key) {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_fade_style = __webpack_require__(41).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var effect_fade_style = __webpack_require__(42).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var effect_fade_template = __webpack_require__(42);
+var effect_fade_template = __webpack_require__(43);
 
 var effect_fade_componentName = "effect-fade";
 var effect_fade_componentRoot = ".effect-fade-container";
@@ -6257,31 +6014,33 @@ WCDefine(effect_fade_componentName, EffectFade);
 
 var maxScale = 1.3;
 
+var effect_ripple_methods_animator = function animator(points, speed, stepFn) {
+  return new Promise(function (resolve) {
+    return Timer(speed, stepFn, EaseInOut(points, speed), resolve);
+  });
+};
+
 var effect_ripple_methods_runStart = function runStart(host) {
   if (!host.ready || host.isRunning) {
     return;
   }
 
   host.isRunning = true;
+  var ripple = host.elements.ripple;
   var rippleInner = document.createElement("span");
-  var style = rippleInner.style;
   rippleInner.className = "ripple-inner";
   rippleInner.style.backgroundColor = host.color;
-  host.elements.ripple.appendChild(rippleInner);
+  ripple.appendChild(rippleInner);
   methods_setOrigin(host, rippleInner);
-  Timer(host.speed, function (scale) {
+  effect_ripple_methods_animator([0, maxScale], host.speed / 2, function (scale) {
     var scaleAmount = Math.max(Math.min(maxScale, scale), 0);
-    style.transform = "perspective(1px) translateZ(0) scaleX(".concat(scaleAmount, ") scaley(").concat(scaleAmount, ")");
-  }, GetCurve([0, maxScale], 0, false, host.speed));
-  Timer(host.speed, function (opacity) {
-    return style.opacity = "".concat(Math.max(Math.min(1, opacity), 0));
-  }, GetCurve([host.opacity * 0.5, host.opacity, host.opacity * 0.5, host.opacity * 0.125, host.opacity * 0.03, 0], 0, false, host.speed), function () {
-    requestAnimationFrame(function () {
-      if (host.elements.ripple) {
-        host.elements.ripple.removeChild(rippleInner);
-      }
-
-      host.isRunning = false;
+    rippleInner.style.transform = "perspective(1px) translateZ(0) scaleX(".concat(scaleAmount, ") scaley(").concat(scaleAmount, ")");
+  });
+  effect_ripple_methods_animator([host.opacity * 0.5, host.opacity, host.opacity * 0.5, host.opacity * 0.125, host.opacity * 0.03, 0], host.speed, function (opacity) {
+    return rippleInner.style.opacity = "".concat(Math.max(Math.min(1, opacity), 0));
+  }).then(function () {
+    return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      return ripple ? ripple.removeChild(rippleInner) : undefined;
     });
   });
 };
@@ -6291,23 +6050,25 @@ var methods_setOrigin = function setOrigin(host, rippleInner) {
     return;
   }
 
-  var nonAutoOrigin = host.nonAutoOrigin;
-  var rippleInnerStyle = rippleInner.style;
+  Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    var nonAutoOrigin = host.nonAutoOrigin;
+    var rippleInnerStyle = rippleInner.style;
 
-  if (nonAutoOrigin) {
-    return rippleInnerStyle.transformOrigin = nonAutoOrigin;
-  }
+    if (nonAutoOrigin) {
+      return rippleInnerStyle.transformOrigin = nonAutoOrigin;
+    }
 
-  if (!host.downEvent || !host.downEvent.target) {
-    return rippleInnerStyle.transformOrigin = "50% 50%";
-  }
+    if (!host.downEvent || !host.downEvent.target) {
+      return rippleInnerStyle.transformOrigin = "50% 50%";
+    }
 
-  var eventX = host.downEvent.x;
-  var eventY = host.downEvent.y;
-  var targetBox = host.downEvent.target.getBoundingClientRect();
-  var left = Math.round((eventX - targetBox.left) / targetBox.width * 100);
-  var top = Math.round((eventY - targetBox.top) / targetBox.height * 100);
-  rippleInnerStyle.transformOrigin = "".concat(left, "% ").concat(top, "%");
+    var eventX = host.downEvent.x;
+    var eventY = host.downEvent.y;
+    var targetBox = host.downEvent.target.getBoundingClientRect();
+    var left = Math.round((eventX - targetBox.left) / targetBox.width * 100);
+    var top = Math.round((eventY - targetBox.top) / targetBox.height * 100);
+    rippleInnerStyle.transformOrigin = "".concat(left, "% ").concat(top, "%");
+  });
 };
 
 var effect_ripple_methods_trigger = function trigger(host) {
@@ -6349,11 +6110,6 @@ var effect_ripple_methods_loadTargets = function loadTargets(host) {
 };
 // CONCATENATED MODULE: ./src/components/effect-ripple/elements.js
 
-var effect_ripple_elements_elementSelectors = {
-  root: ".effect-ripple-container",
-  ripple: ".ripple",
-  injectedStyles: "style.injectedStyles"
-};
 var effect_ripple_elements_setStyles = function setStyles(el, styles) {
   if (!el) {
     return;
@@ -6361,15 +6117,20 @@ var effect_ripple_elements_setStyles = function setStyles(el, styles) {
 
   SetStyleRules(el, styles);
 };
-var effect_ripple_elements_elements = {};
-Object.keys(effect_ripple_elements_elementSelectors).forEach(function (key) {
-  effect_ripple_elements_elements[key] = {
-    selector: effect_ripple_elements_elementSelectors[key],
-    onChange: key === "injectedStyles" ? function (el, host) {
+var effect_ripple_elements_elements = {
+  root: {
+    selector: ".effect-ripple-container"
+  },
+  ripple: {
+    selector: ".ripple"
+  },
+  injectedStyles: {
+    selector: "style.injectedStyles",
+    onChange: function onChange(el, host) {
       return effect_ripple_elements_setStyles(el, host.styles);
-    } : function () {}
-  };
-});
+    }
+  }
+};
 /* harmony default export */ var effect_ripple_elements = (effect_ripple_elements_elements);
 // CONCATENATED MODULE: ./src/components/effect-ripple/properties.js
 
@@ -6481,10 +6242,10 @@ var canLoadTargets = function canLoadTargets(host) {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_ripple_style = __webpack_require__(43).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var effect_ripple_style = __webpack_require__(44).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var effect_ripple_template = __webpack_require__(44);
+var effect_ripple_template = __webpack_require__(45);
 
 var effect_ripple_componentName = "effect-ripple";
 var effect_ripple_componentRoot = ".effect-ripple-container";
@@ -6877,17 +6638,11 @@ var effect_scale_properties_attributes = {
 var effect_scale_properties_properties = effect_scale_properties_attributes;
 var effect_scale_properties_observedAttributes = Object.keys(effect_scale_properties_attributes);
 // CONCATENATED MODULE: ./src/components/effect-scale/elements.js
-var effect_scale_elements_elementSelectors = {
-  root: ".effect-scale-container"
+var effect_scale_elements_elements = {
+  root: {
+    selector: ".effect-scale-container"
+  }
 };
-var effect_scale_elements_elements = {}; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-
-Object.keys(effect_scale_elements_elementSelectors).forEach(function (key) {
-  effect_scale_elements_elements[key] = {
-    selector: effect_scale_elements_elementSelectors[key],
-    onChange: function onChange() {}
-  };
-});
 /* harmony default export */ var effect_scale_elements = (effect_scale_elements_elements);
 // CONCATENATED MODULE: ./src/components/effect-scale/index.js
 
@@ -6895,10 +6650,10 @@ Object.keys(effect_scale_elements_elementSelectors).forEach(function (key) {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_scale_style = __webpack_require__(45).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var effect_scale_style = __webpack_require__(46).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var effect_scale_template = __webpack_require__(46);
+var effect_scale_template = __webpack_require__(47);
 
 var effect_scale_componentName = "effect-scale";
 var effect_scale_componentRoot = ".effect-scale-container";
@@ -6948,6 +6703,12 @@ var signalEnd = function signalEnd(host) {
   return methods_runEnd(host);
 };
 
+var effect_underline_methods_animator = function animator(points, speed, stepFn) {
+  return new Promise(function (resolve) {
+    return Timer(speed, stepFn, EaseInOut(points, speed), resolve);
+  });
+};
+
 var effect_underline_methods_runAnimation = function runAnimation(host, isOn) {
   var underlineStyle = host.elements.underline.style;
 
@@ -6956,9 +6717,9 @@ var effect_underline_methods_runAnimation = function runAnimation(host, isOn) {
     effect_underline_methods_setOrigin(host);
   }
 
-  Timer(host.speed, function (scale) {
+  effect_underline_methods_animator(isOn ? [0, 1] : [1, 0], host.speed / 2, function (scale) {
     return underlineStyle.transform = "perspective(1px) translateZ(0) scaleX(".concat(scale, ")");
-  }, GetCurve(isOn ? [0, 1] : [1, 0], isOn ? host.spring : 0.5, false, host.speed), function () {
+  }).then(function () {
     return underlineStyle.transform = "perspective(1px) translateZ(0) scaleX(".concat(isOn ? 1 : 0, ")");
   });
 };
@@ -6991,20 +6752,22 @@ var effect_underline_methods_setOrigin = function setOrigin(host) {
     return;
   }
 
-  var nonAutoOrigin = host.nonAutoOrigin;
-  var underlineStyle = host.elements.underline.style;
+  Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    var nonAutoOrigin = host.nonAutoOrigin;
+    var underlineStyle = host.elements.underline.style;
 
-  if (nonAutoOrigin) {
-    return underlineStyle.transformOrigin = nonAutoOrigin;
-  }
+    if (nonAutoOrigin) {
+      return underlineStyle.transformOrigin = nonAutoOrigin;
+    }
 
-  var eventX = Object(utils_get["a" /* Get */])(host, "downEvent.x", 0);
-  var targetBox = Object(utils_get["a" /* Get */])(host, "downEvent.target.getBoundingClientRect()", {
-    left: 0,
-    width: 0
+    var eventX = Object(utils_get["a" /* Get */])(host, "downEvent.x", 0);
+    var targetBox = Object(utils_get["a" /* Get */])(host, "downEvent.target.getBoundingClientRect()", {
+      left: 0,
+      width: 0
+    });
+    var left = Math.round((eventX - targetBox.left) / targetBox.width * 100);
+    underlineStyle.transformOrigin = "".concat(left, "% center");
   });
-  var left = Math.round((eventX - targetBox.left) / targetBox.width * 100);
-  underlineStyle.transformOrigin = "".concat(left, "% center");
 };
 
 var effect_underline_methods_toggle = function toggle(host) {
@@ -7056,11 +6819,6 @@ var effect_underline_methods_loadTargets = function loadTargets(host) {
 };
 // CONCATENATED MODULE: ./src/components/effect-underline/elements.js
 
-var effect_underline_elements_elementSelectors = {
-  root: ".effect-underline-container",
-  underline: ".underline",
-  injectedStyles: "style.injectedStyles"
-};
 var effect_underline_elements_setStyles = function setStyles(el, styles) {
   if (!el) {
     return;
@@ -7068,15 +6826,20 @@ var effect_underline_elements_setStyles = function setStyles(el, styles) {
 
   SetStyleRules(el, styles);
 };
-var effect_underline_elements_elements = {};
-Object.keys(effect_underline_elements_elementSelectors).forEach(function (key) {
-  effect_underline_elements_elements[key] = {
-    selector: effect_underline_elements_elementSelectors[key],
-    onChange: key === "injectedStyles" ? function (el, host) {
+var effect_underline_elements_elements = {
+  root: {
+    selector: ".effect-underline-container"
+  },
+  underline: {
+    selector: ".underline"
+  },
+  injectedStyles: {
+    selector: "style.injectedStyles",
+    onChange: function onChange(el, host) {
       return effect_underline_elements_setStyles(el, host.styles);
-    } : function () {}
-  };
-});
+    }
+  }
+};
 /* harmony default export */ var effect_underline_elements = (effect_underline_elements_elements);
 // CONCATENATED MODULE: ./src/components/effect-underline/properties.js
 
@@ -7087,8 +6850,6 @@ var effect_underline_properties_resetTargets = function resetTargets(host) {
   effect_underline_methods_unloadTargets(host);
   effect_underline_methods_loadTargets(host);
 };
-
-var effect_underline_properties_onChange = function onChange() {};
 
 var effect_underline_properties_selectorsToDom = function selectorsToDom(val) {
   return SelectorArrayToElements(null, val).value;
@@ -7106,8 +6867,7 @@ var effect_underline_properties_attributes = {
   direction: {
     format: function format(val) {
       return Pipe(ToString, IfInvalid("auto"))(val).value;
-    },
-    onChange: effect_underline_properties_onChange
+    }
   },
   end: {
     format: function format(val) {
@@ -7120,14 +6880,12 @@ var effect_underline_properties_attributes = {
   opacity: {
     format: function format(val) {
       return Math.min(1, Math.max(0, Pipe(ToNumber, IfInvalid(0.2))(val).value));
-    },
-    onChange: effect_underline_properties_onChange
+    }
   },
   speed: {
     format: function format(val) {
       return Pipe(ToNumber, IfInvalid(700))(val).value;
-    },
-    onChange: effect_underline_properties_onChange
+    }
   },
   start: {
     format: function format(val) {
@@ -7148,8 +6906,7 @@ var effect_underline_properties_attributes = {
   spring: {
     format: function format(val) {
       return Pipe(ToNumber, IfInvalid(4))(val).value;
-    },
-    onChange: effect_underline_properties_onChange
+    }
   },
   targets: {
     format: effect_underline_properties_selectorsToDom,
@@ -7231,10 +6988,10 @@ var properties_canLoadTargets = function canLoadTargets(host) {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_underline_style = __webpack_require__(47).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var effect_underline_style = __webpack_require__(48).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var effect_underline_template = __webpack_require__(48);
+var effect_underline_template = __webpack_require__(49);
 
 var effect_underline_componentName = "effect-underline";
 var effect_underline_componentRoot = ".effect-underline-container";
@@ -7272,10 +7029,10 @@ WCDefine(effect_underline_componentName, EffectUnderline);
 // CONCATENATED MODULE: ./src/components/grid-layout/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var grid_layout_style = __webpack_require__(13).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var grid_layout_style = __webpack_require__(15).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var grid_layout_template = __webpack_require__(49);
+var grid_layout_template = __webpack_require__(50);
 
 var grid_layout_componentName = "grid-layout";
 var grid_layout_componentRoot = ".".concat(grid_layout_componentName, "-container");
@@ -7291,7 +7048,7 @@ var grid_layout_setStyles = function setStyles(el, styles) {
 };
 
 var grid_layout_setAllStyles = function setAllStyles(host, string) {
-  var componentStyle = host.shadowRoot.querySelector("style[name=\"\"]");
+  var componentStyle = host.shadowRoot.querySelector("style[name=\"grid-layout-innerstyles\"]");
   var themeStyles = host.elements.themeStyles;
   var injectedStyles = host.elements.injectedStyles;
   var outerStyle = host.querySelector("style[name=\"outer\"]");
@@ -7311,40 +7068,44 @@ var unsupportedCSS = function unsupportedCSS(host, gap, columnwidth) {
   return typeof host.style.grid === "string" ? "" : ".grid-layout-items{margin-left:-".concat(gap, "px;margin-right:-").concat(gap, "px;}.grid-layout-items .grid-layout-item{max-width:").concat(columnwidth, "px;margin:").concat(gap, "px;}");
 };
 
-var setScale = function setScale(host) {
-  if (!host.scaletofit) {
-    return;
-  }
-
-  var gap = host.gap || defaultGap;
-  var columnwidth = host.columnwidth || defaultWidth;
-  var contentWidth = host.elements.root.offsetWidth + gap;
-  var columnGapPercent = 100 / Math.round(contentWidth / (gap + columnwidth));
-  var ratio = 1 - gap / columnwidth;
-
-  if (columnwidth === "100%") {
-    columnwidth = 100;
-    gap = 0;
-  } else {
-    if (columnGapPercent > 50) {
-      columnGapPercent = 50;
+var grid_layout_setScale = function setScale(host) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    if (!host.scaletofit) {
+      return;
     }
 
-    columnwidth = columnGapPercent * ratio;
-    gap = (columnGapPercent - columnwidth) / 2;
-  }
+    var gap = host.gap || defaultGap;
+    var columnwidth = host.columnwidth || defaultWidth;
+    var contentWidth = host.elements.root.offsetWidth + gap;
+    var columnGapPercent = 100 / Math.round(contentWidth / (gap + columnwidth));
+    var ratio = 1 - gap / columnwidth;
 
-  grid_layout_setAllStyles(host, ".grid-layout-items{display:flex; width:".concat(100 + gap * 2, "%;margin-left:-").concat(gap, "%;}.grid-layout-item{width:").concat(columnwidth, "%;padding:").concat(gap === 0 ? 4 : gap / 2, "% ").concat(gap, "%;}"));
+    if (columnwidth === "100%") {
+      columnwidth = 100;
+      gap = 0;
+    } else {
+      if (columnGapPercent > 50) {
+        columnGapPercent = 50;
+      }
+
+      columnwidth = columnGapPercent * ratio;
+      gap = (columnGapPercent - columnwidth) / 2;
+    }
+
+    grid_layout_setAllStyles(host, ".grid-layout-items{display:flex; width:".concat(100 + gap * 2, "%;margin-left:-").concat(gap, "%;}.grid-layout-item{width:").concat(columnwidth, "%;padding:").concat(gap === 0 ? 4 : gap / 2, "% ").concat(gap, "%;}"));
+  });
 };
 
-var setDimensions = function setDimensions(host) {
-  if (host.scaletofit) {
-    return setScale(host);
-  }
+var grid_layout_setDimensions = function setDimensions(host) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    if (host.scaletofit) {
+      return grid_layout_setScale(host);
+    }
 
-  var gap = host.gap || defaultGap;
-  var columnwidth = host.columnwidth || defaultWidth;
-  grid_layout_setAllStyles(host, ".grid-layout-items{grid-gap:".concat(gap, "px; grid-template-columns:repeat(auto-fit, minmax(").concat(columnwidth, "px, 0fr));}").concat(unsupportedCSS(host, gap, columnwidth)));
+    var gap = host.gap || defaultGap;
+    var columnwidth = host.columnwidth || defaultWidth;
+    grid_layout_setAllStyles(host, ".grid-layout-items{grid-gap:".concat(gap, "px; grid-template-columns:repeat(auto-fit, minmax(").concat(columnwidth, "px, 0fr));}").concat(unsupportedCSS(host, gap, columnwidth)));
+  });
 };
 
 var grid_layout_elements = {
@@ -7373,7 +7134,7 @@ var grid_layout_properties = {
       return val === "100%" ? val : Pipe(ToNumber, IfInvalid(defaultWidth))(val).value;
     },
     onChange: function onChange(_val, host) {
-      return setDimensions(host);
+      return grid_layout_setDimensions(host);
     }
   },
   gap: {
@@ -7381,7 +7142,7 @@ var grid_layout_properties = {
       return Pipe(ToNumber, IfInvalid(defaultGap))(val).value;
     },
     onChange: function onChange(_val, host) {
-      return setDimensions(host);
+      return grid_layout_setDimensions(host);
     }
   },
   styles: {
@@ -7409,7 +7170,7 @@ var grid_layout_properties = {
 
 var grid_layout_getComponentStyles = function getComponentStyles(host) {
   return function () {
-    return "".concat(__webpack_require__(13).toString()).concat(host.theme || "").concat(host.styles);
+    return "".concat(__webpack_require__(15).toString()).concat(host.theme || "").concat(host.styles);
   };
 };
 
@@ -7436,57 +7197,62 @@ var GridLayout = WCConstructor({
     getComponentStyles: grid_layout_getComponentStyles
   },
   onConnected: function onConnected(host) {
-    var itemsContainer = host.elements.itemsContainer;
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      var itemsContainer = host.elements.itemsContainer;
 
-    var wrapItem = function wrapItem(el) {
-      var id = ID();
-      var slotWrapper = document.createElement("div");
-      slotWrapper.className = "grid-layout-item";
-      slotWrapper.id = id;
-      itemsContainer.appendChild(slotWrapper);
-      var slot = document.createElement("slot");
-      slot.name = id;
-      slotWrapper.appendChild(slot);
-      el.slot = id;
-      el.container = slotWrapper;
-      return el;
-    };
+      var wrapItem = function wrapItem(el) {
+        var id = Object(utils_id["a" /* ID */])();
+        var slotWrapper = document.createElement("div");
+        slotWrapper.className = "grid-layout-item";
+        slotWrapper.id = id;
+        itemsContainer.appendChild(slotWrapper);
+        var slot = document.createElement("slot");
+        slot.name = id;
+        slotWrapper.appendChild(slot);
+        el.slot = id;
+        el.container = slotWrapper;
+        return el;
+      };
 
-    var observeEl = function observeEl(el) {
-      if (el.nongrid) {
-        return;
-      }
-
-      wrapItem(el);
-    };
-
-    var disconnectEl = function disconnectEl(el) {
-      var containerParent = Object(utils_get["a" /* Get */])(el, "container.parentElement");
-      Object(utils_get["a" /* Get */])(el, "eventSubscriptions.span.disconnect()");
-
-      if (containerParent) {
-        containerParent.removeChild(el.container);
-      }
-    };
-
-    Array.from(host.children).forEach(observeEl);
-    host.slotObserver = new MutationObserver(function (mutationsList) {
-      var list = Array.from(mutationsList);
-
-      while (list.length) {
-        var mutation = list.shift();
-
-        if (mutation.type === "childList") {
-          Array.from(mutation.addedNodes).forEach(observeEl);
-          Array.from(mutation.removedNodes).forEach(disconnectEl);
+      var observeEl = function observeEl(el) {
+        if (el.nongrid) {
+          return;
         }
-      }
-    });
-    host.slotObserver.observe(host, {
-      childList: true
-    });
-    window.addEventListener("resize", function () {
-      return setScale(host);
+
+        wrapItem(el);
+      };
+
+      var disconnectEl = function disconnectEl(el) {
+        var containerParent = Object(utils_get["a" /* Get */])(el, "container.parentElement");
+        Object(utils_get["a" /* Get */])(el, "eventSubscriptions.span.disconnect()");
+
+        if (containerParent) {
+          containerParent.removeChild(el.container);
+        }
+      };
+
+      Array.from(host.children).forEach(observeEl);
+      host.slotObserver = new MutationObserver(function (mutationsList) {
+        var list = Array.from(mutationsList);
+
+        while (list.length) {
+          var mutation = list.shift();
+
+          if (mutation.type === "childList") {
+            Array.from(mutation.addedNodes).forEach(observeEl);
+            Array.from(mutation.removedNodes).forEach(disconnectEl);
+          }
+        }
+      });
+      host.slotObserver.observe(host, {
+        childList: true
+      });
+      window.addEventListener("resize", function () {
+        return grid_layout_setScale(host);
+      });
+      Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return host.setAttribute("viewable", true);
+      });
     });
   }
 });
@@ -8024,10 +7790,10 @@ var horizontal_slider_properties_observedAttributes = Object.keys(horizontal_sli
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var horizontal_slider_style = __webpack_require__(50).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var horizontal_slider_style = __webpack_require__(51).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var horizontal_slider_template = __webpack_require__(51);
+var horizontal_slider_template = __webpack_require__(52);
 
 var horizontal_slider_componentName = "horizontal-slider";
 var horizontal_slider_componentRoot = ".horizontal-slider-container";
@@ -8055,160 +7821,10 @@ WCConstructor({
   }
 });
 WCDefine(horizontal_slider_componentName, HorizontalSlider);
-// CONCATENATED MODULE: ./src/utils/observe-worker.js
-
-function ObserveWorker(func) {
-  var value;
-  var previous;
-  var worker;
-  var functionString = ToString(func).value;
-  var subscriptions = {};
-  var firstBracket = functionString.indexOf("{");
-  var beginingSlice = functionString.slice(firstBracket);
-  var pendingSubscriptions = [];
-  functionString = "function webworker()".concat(beginingSlice, "webworker()");
-
-  var loop = function loop(method, data, subs) {
-    return Object.keys(subs).forEach(function (key) {
-      return Object(utils_get["a" /* Get */])(subs, "".concat(key, ".").concat(method), function () {})(data);
-    });
-  };
-
-  var shutDown = function shutDown() {
-    if (worker) {
-      worker.terminate();
-    }
-
-    worker = undefined;
-    return false;
-  };
-
-  var startUp = function startUp() {
-    if (worker) {
-      return;
-    }
-
-    var blob;
-
-    try {
-      blob = window.URL.createObjectURL(new Blob([functionString], {
-        type: "application/javascript"
-      }));
-    } catch (error) {}
-
-    if (!blob) {
-      return;
-    }
-
-    worker = new Worker(blob);
-
-    worker.onmessage = function (e) {
-      previous = value;
-      value = e.data;
-      return loop("next", value, subscriptions);
-    };
-
-    worker.onerror = function (e) {
-      return loop("error", e.message, subscriptions);
-    };
-
-    return worker;
-  };
-
-  var noShutdown = function noShutdown(subs) {
-    return Object.keys(subs).length === 0 ? shutDown() : true;
-  };
-
-  var unSubscribe = function unSubscribe(subscriberId) {
-    return function () {
-      subscriptions[subscriberId] = null;
-      delete subscriptions[subscriberId];
-      noShutdown(subscriptions);
-    };
-  };
-
-  var completeAll = function completeAll(subs) {
-    return Object.keys(subs).forEach(function (key) {
-      subs[key].complete();
-      unSubscribe(key);
-    });
-  };
-
-  var methods = {
-    get value() {
-      return value;
-    },
-
-    get previous() {
-      return previous;
-    },
-
-    get functionString() {
-      return functionString;
-    },
-
-    get subscriptions() {
-      return subscriptions;
-    },
-
-    get pending() {
-      return pendingSubscriptions;
-    },
-
-    dispose: function dispose() {
-      completeAll(subscriptions);
-    },
-    post: function post(msg) {
-      var index = pendingSubscriptions.length;
-      return new Promise(function (resolve, reject) {
-        var res = function res(e) {
-          pendingSubscriptions[index]();
-          return resolve(e);
-        };
-
-        var rej = function rej(e) {
-          pendingSubscriptions[index]();
-          return reject(e);
-        };
-
-        pendingSubscriptions.push(methods.subscribe(res, rej, rej));
-        worker.postMessage(ToJSON(msg).value);
-      });
-    },
-    subscribe: function subscribe(next) {
-      var error = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
-      var complete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {};
-
-      if (typeof next !== "function") {
-        return;
-      }
-
-      var subscriber = {
-        next: next,
-        error: error,
-        complete: complete,
-        id: ID()
-      };
-      subscriptions[subscriber.id] = subscriber;
-
-      if (typeof subscriptions[subscriber.id].error !== "function") {
-        subscriptions[subscriber.id].error = unSubscribe(subscriber.id);
-      }
-
-      if (typeof subscriptions[subscriber.id].complete !== "function") {
-        subscriptions[subscriber.id].complete = unSubscribe(subscriber.id);
-      }
-
-      startUp();
-      return unSubscribe(subscriber.id);
-    }
-  };
-  return methods;
-}
 // CONCATENATED MODULE: ./src/components/icon-element/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var icon_element_style = __webpack_require__(52).toString();
+var icon_element_style = __webpack_require__(53).toString();
 
 var icon_element_elementSelectors = {
   root: ".icon-element-container",
@@ -8234,97 +7850,7 @@ Object.keys(icon_element_elementSelectors).forEach(function (key) {
     } : function () {}
   };
 });
-var AvailableIcons = {};
-
-var icon_element_getIcon = function getIcon(path) {
-  if (!path) {
-    if (!AvailableIcons[path]) {
-      AvailableIcons[path] = Observer("");
-    }
-
-    AvailableIcons[path].next("");
-    return Promise.resolve(AvailableIcons[path]);
-  }
-
-  return new Promise(function (resolve) {
-    if (path.slice(0, 5) === "<svg") {
-      return resolve(Observer(path));
-    }
-
-    if (path.indexOf("https://") === -1 && path.indexOf("http://") === -1) {
-      path = "".concat(location.protocol, "//").concat(location.host).concat(path[0] === "/" ? path : "/".concat(path));
-    }
-
-    if (AvailableIcons[path]) {
-      return resolve(AvailableIcons[path]);
-    }
-
-    AvailableIcons[path] = Observer("");
-    resolve(AvailableIcons[path]);
-    var worker$ = ObserveWorker(function () {
-      self.onmessage = function (e) {
-        var xhr = new XMLHttpRequest();
-        var data = JSON.parse(e.data);
-        xhr.open(data.method, data.path, false);
-
-        xhr.onload = function () {
-          return postMessage({
-            status: xhr.status,
-            svg: xhr.responseText
-          });
-        };
-
-        xhr.send();
-      };
-    });
-    var workerSubscription = worker$.subscribe(function (e) {
-      workerSubscription();
-      AvailableIcons[path].next(e.svg);
-    }, function (e) {
-      workerSubscription();
-      AvailableIcons[path].error(e.status);
-    });
-    worker$.post({
-      path: path,
-      method: "GET"
-    });
-  });
-};
-
-var trySet = function trySet(host, icon) {
-  if (!host.elements.svgContainer) {
-    return requestAnimationFrame(function () {
-      return trySet(host, icon);
-    });
-  }
-
-  host.elements.svgContainer.innerHTML = icon;
-  host.dispatchEvent(new CustomEvent("iconloaded", {
-    detail: host
-  }));
-};
-
 var icon_element_attributes = {
-  type: {
-    format: function format(val) {
-      return typeof val === "string" ? val : null;
-    },
-    onChange: function onChange(value, host) {
-      if (!value) {
-        return;
-      }
-
-      if (host.subscription) {
-        host.subscription();
-      }
-
-      return icon_element_getIcon(value).then(function (subject) {
-        host.subscription = subject.subscribe(function (icon) {
-          trySet(host, icon);
-        });
-      });
-    }
-  },
   svg: {
     format: function format(val) {
       return typeof val === "string" ? val : null;
@@ -8338,10 +7864,12 @@ var icon_element_attributes = {
         host.subscription();
       }
 
-      host.elements.svgContainer.innerHTML = value;
-      host.dispatchEvent(new CustomEvent("iconloaded", {
-        detail: host
-      }));
+      Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        host.elements.svgContainer.innerHTML = value;
+        host.dispatchEvent(new CustomEvent("iconloaded", {
+          detail: host
+        }));
+      });
     }
   },
   color: {
@@ -8349,7 +7877,9 @@ var icon_element_attributes = {
       return typeof val === "string" ? val : null;
     },
     onChange: function onChange(value, host) {
-      return host.elements.svgContainer.style.color = value;
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return host.elements.svgContainer.style.color = value;
+      });
     }
   },
   size: {
@@ -8357,7 +7887,9 @@ var icon_element_attributes = {
       return typeof val === "string" ? val : "1.5em";
     },
     onChange: function onChange(value, host) {
-      return host.elements.svgContainer.style.height = host.elements.svgContainer.style.width = value;
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return host.elements.svgContainer.style.height = host.elements.svgContainer.style.width = value;
+      });
     }
   },
   "class": ComponentClassObject,
@@ -8379,7 +7911,7 @@ var icon_element_properties = Object.assign({}, {
   }
 }, icon_element_attributes); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var icon_element_template = __webpack_require__(53);
+var icon_element_template = __webpack_require__(54);
 
 var icon_element_componentName = "icon-element";
 var icon_element_componentRoot = ".icon-element-container";
@@ -8396,10 +7928,10 @@ WCDefine(icon_element_componentName, IconElement);
 // CONCATENATED MODULE: ./src/components/image-loader/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var image_loader_style = __webpack_require__(54).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var image_loader_style = __webpack_require__(55).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var image_loader_template = __webpack_require__(55);
+var image_loader_template = __webpack_require__(56);
 
 var image_loader_componentName = "image-loader";
 var image_loader_componentRoot = ".image-loader-container";
@@ -11302,10 +10834,10 @@ var computed_validationMessage = function validationMessage(host) {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var input_field_style = __webpack_require__(56).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var input_field_style = __webpack_require__(57).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var input_field_template = __webpack_require__(57);
+var input_field_template = __webpack_require__(58);
 
 var input_field_componentName = "input-field";
 var input_field_componentRoot = ".input-field-container";
@@ -11343,7 +10875,7 @@ var InputField = WCConstructor({
     }
   },
   onConnected: function onConnected(host) {
-    host.inputID = ID();
+    host.inputID = Object(utils_id["a" /* ID */])();
     methods_elements_setEffects(host);
     requestAnimationFrame(function () {
       host.elements.checkIcon.svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" style=\"stroke:currentColor;stroke-width:2px;\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z\"/></svg>";
@@ -11354,7 +10886,7 @@ WCDefine(input_field_componentName, InputField);
 // CONCATENATED MODULE: ./src/components/overlay-content/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var overlay_content_style = __webpack_require__(58).toString();
+var overlay_content_style = __webpack_require__(59).toString();
 
 var overlay_content_setStyles = function setStyles(el, styles) {
   if (!el) {
@@ -11365,7 +10897,7 @@ var overlay_content_setStyles = function setStyles(el, styles) {
 };
 var overlay_content_alignments = ["center", "left", "right", "top", "bottom", "center center", "center top", "center bottom", "left center", "left top", "left bottom", "right center", "right top", "right bottom"];
 
-var overlay_content_template = __webpack_require__(59);
+var overlay_content_template = __webpack_require__(60);
 
 var overlay_content_componentName = "overlay-content";
 var overlay_content_componentRoot = ".overlay-content-container";
@@ -11388,7 +10920,7 @@ Object.keys(overlay_content_elementSelectors).forEach(function (key) {
     } : function () {}
   };
 });
-var overlay_content_widths = ["content", "target"];
+var widths = ["content", "target"];
 var overlay_content_attributes = {
   target: {
     format: function format(val) {
@@ -11413,7 +10945,7 @@ var overlay_content_attributes = {
   "class": ComponentClassObject,
   widthbasis: {
     format: function format(val) {
-      return Pipe(IndexOf(overlay_content_widths), IfInvalid("content"))(val).value;
+      return Pipe(IndexOf(widths), IfInvalid("content"))(val).value;
     }
   },
   theme: {
@@ -11442,9 +10974,9 @@ var getWidth = function getWidth(host) {
   };
 };
 
-var setPositions = function setPositions(host) {
-  return function () {
-    cancelAnimationFrame(host.positionTimer);
+var overlay_content_setPositions = function setPositions(host) {
+  Object(utils_get["a" /* Get */])(host, "setPositionsTimer.cancel()");
+  host.setPositionsTimer = Object(on_next_frame["a" /* OnNextFrame */])(function () {
     var target = host.target;
 
     if (!host.showing || !target) {
@@ -11498,10 +11030,14 @@ var setPositions = function setPositions(host) {
       inner.classList.add("bottom");
     }
 
-    host.positionTimer = requestAnimationFrame(function () {
-      setPositions(host)();
-    });
-  };
+    setPositions(host);
+  });
+};
+
+var overlay_content_animator = function animator(points, speed, stepFn) {
+  return new Promise(function (resolve) {
+    return Timer(speed, stepFn, EaseInOut(points, speed), resolve);
+  });
 };
 
 var OverlayContent = WCConstructor({
@@ -11512,11 +11048,6 @@ var OverlayContent = WCConstructor({
   observedAttributes: Object.keys(overlay_content_attributes),
   // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
   properties: Object.assign({}, {
-    positionTimer: {
-      format: function format(val) {
-        return val;
-      }
-    },
     showing: {
       format: function format(val) {
         return ToBool(val).value;
@@ -11527,7 +11058,7 @@ var OverlayContent = WCConstructor({
         return val;
       },
       onChange: function onChange(_val, host) {
-        host.dispatchEvent(new CustomEvent("widthchange", {
+        return host.dispatchEvent(new CustomEvent("widthchange", {
           detail: host
         }));
       }
@@ -11565,36 +11096,38 @@ var OverlayContent = WCConstructor({
     position: function position(host) {
       return {
         get: function get() {
-          var container = host.elements.contentContainer;
+          return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+            var container = host.elements.contentContainer;
 
-          if (!container) {
+            if (!container) {
+              return {
+                top: 0,
+                y: 0,
+                bottom: 0,
+                left: 0,
+                x: 0,
+                right: 0,
+                width: 0,
+                height: 0,
+                scrollTop: 0,
+                scrollLeft: 0
+              };
+            }
+
+            var box = container.getBoundingClientRect();
             return {
-              top: 0,
-              y: 0,
-              bottom: 0,
-              left: 0,
-              x: 0,
-              right: 0,
-              width: 0,
-              height: 0,
-              scrollTop: 0,
-              scrollLeft: 0
+              top: box.top,
+              y: box.y,
+              bottom: box.bottom,
+              left: box.left,
+              x: box.x,
+              right: box.right,
+              width: box.width,
+              height: box.height,
+              scrollTop: container.scrollTop,
+              scrollLeft: container.scrollLeft
             };
-          }
-
-          var box = container.getBoundingClientRect();
-          return {
-            top: box.top,
-            y: box.y,
-            bottom: box.bottom,
-            left: box.left,
-            x: box.x,
-            right: box.right,
-            width: box.width,
-            height: box.height,
-            scrollTop: container.scrollTop,
-            scrollLeft: container.scrollLeft
-          };
+          }).promise;
         }
       };
     }
@@ -11614,38 +11147,20 @@ var OverlayContent = WCConstructor({
         }
 
         return new Promise(function (resolve) {
-          host.elements.root.classList.add("activating");
           host.showing = true;
-          setPositions(host)();
-          var scalePoints = GetCurve([0, 1.02, 0.99, 1]);
-          var timeout = GetCurve([0, host.speed / scalePoints.length]);
-          var widths = getWidth(host);
           var container = host.elements.contentContainer;
-          container.style.width = widths.width;
-          container.style.minWidth = widths.minWidth;
-
-          var loop = function loop() {
-            if (!host.showing) {
-              return Promise.resolve();
-            }
-
-            var scalePoint = scalePoints.shift();
-            var time = timeout[scalePoints.length];
+          var inner = host.elements.inner;
+          container.style.pointerEvents = "all";
+          inner.style.display = "block";
+          overlay_content_animator([0, 1.02, 0.99, 1], host.speed / 2, function (scalePoint) {
             container.style.transform = "scale(1, ".concat(scalePoint, ")");
-
-            if (scalePoints.length) {
-              setTimeout(function () {
-                return loop();
-              }, time);
-            } else {
-              host.elements.root.classList.add("active");
-              host.elements.root.classList.remove("activating");
-              resolve();
-              host.dispatchEvent(new CustomEvent("shown"));
-            }
-          };
-
-          loop();
+            container.style.opacity = scalePoint;
+          }).then(function () {
+            container.style.transform = "scale(1, 1)";
+            container.style.opacity = 1;
+            resolve(host.dispatchEvent(new CustomEvent("shown")));
+          });
+          overlay_content_setPositions(host);
         });
       };
     },
@@ -11656,33 +11171,13 @@ var OverlayContent = WCConstructor({
         }
 
         return new Promise(function (resolve) {
-          host.elements.root.classList.remove("activating");
           host.showing = false;
-          var scalePoints = GetCurve([1, 0]);
-          var timeout = GetCurve([0, host.speed / scalePoints.length]);
           var container = host.elements.contentContainer;
-
-          var loop = function loop() {
-            if (host.showing) {
-              return resolve();
-            }
-
-            var scalePoint = scalePoints.shift();
-            var time = timeout[scalePoint.length];
-            container.style.transform = "scale(1, ".concat(scalePoint, ")");
-
-            if (scalePoints.length) {
-              setTimeout(function () {
-                return loop();
-              }, time);
-            } else {
-              host.elements.root.classList.remove("active");
-              resolve();
-              host.dispatchEvent(new CustomEvent("hidden"));
-            }
-          };
-
-          loop();
+          var inner = host.elements.inner;
+          inner.style.display = container.style.pointerEvents = "none";
+          container.style.transform = "scale(1, 0)";
+          container.style.opacity = 0;
+          resolve(host.dispatchEvent(new CustomEvent("hidden")));
         });
       };
     }
@@ -11727,10 +11222,10 @@ function Animator(_ref) {
 // CONCATENATED MODULE: ./src/components/overlay-message/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var overlay_message_style = __webpack_require__(60).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var overlay_message_style = __webpack_require__(61).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var overlay_message_template = __webpack_require__(61);
+var overlay_message_template = __webpack_require__(62);
 
 var overlay_message_componentName = "overlay-message";
 var overlay_message_componentRoot = ".".concat(overlay_message_componentName, "-container");
@@ -11895,10 +11390,10 @@ WCDefine(overlay_message_componentName, OverlayMessage);
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var progress_bar_style = __webpack_require__(62).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var progress_bar_style = __webpack_require__(63).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var progress_bar_template = __webpack_require__(63);
+var progress_bar_template = __webpack_require__(64);
 
 var progress_bar_componentName = "progress-bar";
 var progress_bar_componentRoot = ".".concat(progress_bar_componentName, "-container");
@@ -11909,32 +11404,46 @@ var progress_bar_setStyles = function setStyles(el, styles) {
   return el ? SetStyleRules(el, styles) : undefined;
 };
 
-var setVisible = function setVisible(val, root) {
-  return root ? root.classList[val ? "add" : "remove"]("visible") : undefined;
+var progress_bar_setVisible = function setVisible(val, root) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return root ? root.classList[val ? "add" : "remove"]("visible") : undefined;
+  });
 };
 
-var setOverlay = function setOverlay(val, root) {
-  return root ? root.classList[val ? "add" : "remove"]("overlay") : undefined;
+var progress_bar_setOverlay = function setOverlay(val, root) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return root ? root.classList[val ? "add" : "remove"]("overlay") : undefined;
+  });
 };
 
-var setPercentage = function setPercentage(val, root) {
-  return root ? root.classList[val ? "add" : "remove"]("percentage") : undefined;
+var progress_bar_setPercentage = function setPercentage(val, root) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return root ? root.classList[val ? "add" : "remove"]("percentage") : undefined;
+  });
 };
 
 var progress_bar_setScrimColor = function setScrimColor(val, root) {
-  return root ? val ? root.style.backgroundColor = val : root.style.removeProperty("background-color") : undefined;
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return root ? val ? root.style.backgroundColor = val : root.style.removeProperty("background-color") : undefined;
+  });
 };
 
-var setTrack = function setTrack(val, root) {
-  return root ? root.classList[val ? "add" : "remove"]("track") : undefined;
+var progress_bar_setTrack = function setTrack(val, root) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return root ? root.classList[val ? "add" : "remove"]("track") : undefined;
+  });
 };
 
-var setScrimBlur = function setScrimBlur(val, root) {
-  return root ? root.style.backdropFilter = "blur(".concat(val, "px)") : undefined;
+var progress_bar_setScrimBlur = function setScrimBlur(val, root) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return root ? root.style.backdropFilter = "blur(".concat(val, "px)") : undefined;
+  });
 };
 
-var setThickness = function setThickness(val, el) {
-  return el ? el.style.height = val : undefined;
+var progress_bar_setThickness = function setThickness(val, el) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return el ? el.style.height = val : undefined;
+  });
 };
 
 var progress_bar_setHeading = function setHeading(val, el) {
@@ -11945,36 +11454,42 @@ var progress_bar_setText = function setText(val, el) {
   return el ? el.innerHTML = ValidateHtml(val, [], ["script"]).sanitized : undefined;
 };
 
-var setColor = function setColor(val, el) {
-  return el && val ? el.style.color = val : el ? el.style.removeProperty("color") : undefined;
+var progress_bar_setColor = function setColor(val, el) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return el && val ? el.style.color = val : el ? el.style.removeProperty("color") : undefined;
+  });
 };
 
 var setAnimation = function setAnimation(val, root) {
   return root ? root.setAttribute("animation", val) : undefined;
 };
 
-var setScrim = function setScrim(val, root) {
+var progress_bar_setScrim = function setScrim(val, root) {
   if (!root) {
     return;
   }
 
-  if (!val) {
-    root.style.removeProperty("background-color");
-  }
+  Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    if (!val) {
+      root.style.removeProperty("background-color");
+    }
 
-  root.classList[val ? "add" : "remove"]("scrim");
+    root.classList[val ? "add" : "remove"]("scrim");
+  });
 };
 
 var progress_bar_setButton = function setButton(val, el) {
-  if (val && el) {
-    el.classList.add("show");
-    el.innerHTML = ValidateHtml(val, [], ["script"]).sanitized;
-  } else if (el) {
-    el.classList.remove("show");
-  }
+  Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    if (val && el) {
+      el.classList.add("show");
+      el.innerHTML = ValidateHtml(val, [], ["script"]).sanitized;
+    } else if (el) {
+      el.classList.remove("show");
+    }
+  });
 };
 
-var setValues = function setValues(vals, host) {
+var progress_bar_setValues = function setValues(vals, host) {
   var top = host.elements.top;
   var bottom = host.elements.bottom;
   var percentage = host.elements.percentage;
@@ -11985,9 +11500,11 @@ var setValues = function setValues(vals, host) {
     return;
   }
 
-  top.style.width = mainVal;
-  bottom.style.width = secondaryVal;
-  percentage.textContent = mainVal;
+  Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    top.style.width = mainVal;
+    bottom.style.width = secondaryVal;
+    percentage.textContent = mainVal;
+  });
 };
 
 var progress_bar_properties = {
@@ -12015,7 +11532,7 @@ var progress_bar_properties = {
       }))(val).value;
     },
     onChange: function onChange(val, host) {
-      setValues(val, host);
+      progress_bar_setValues(val, host);
     }
   },
   color: {
@@ -12023,7 +11540,7 @@ var progress_bar_properties = {
       return Pipe(ToString, IfInvalid(null))(val).value;
     },
     onChange: function onChange(val, host) {
-      setColor(val, host.elements.trackInner);
+      progress_bar_setColor(val, host.elements.trackInner);
     }
   },
   button: {
@@ -12055,7 +11572,7 @@ var progress_bar_properties = {
       return Pipe(ToBool, IfInvalid(true))(val).value;
     },
     onChange: function onChange(val, host) {
-      setPercentage(val, host.elements.root);
+      progress_bar_setPercentage(val, host.elements.root);
     }
   },
   thickness: {
@@ -12063,7 +11580,7 @@ var progress_bar_properties = {
       return Pipe(ToString, IfInvalid("3px"))(val).value;
     },
     onChange: function onChange(val, host) {
-      setThickness(val, host.elements.container);
+      progress_bar_setThickness(val, host.elements.container);
     }
   },
   visible: {
@@ -12071,7 +11588,7 @@ var progress_bar_properties = {
       return Pipe(ToBool, IfInvalid(false))(val).value;
     },
     onChange: function onChange(val, host) {
-      setVisible(val, host.elements.root);
+      progress_bar_setVisible(val, host.elements.root);
     }
   },
   overlay: {
@@ -12079,7 +11596,7 @@ var progress_bar_properties = {
       return Pipe(ToBool, IfInvalid(true))(val).value;
     },
     onChange: function onChange(val, host) {
-      setOverlay(val, host.elements.root);
+      progress_bar_setOverlay(val, host.elements.root);
     }
   },
   scrim: {
@@ -12087,7 +11604,7 @@ var progress_bar_properties = {
       return Pipe(ToBool, IfInvalid(true))(val).value;
     },
     onChange: function onChange(val, host) {
-      setScrim(val, host.elements.root);
+      progress_bar_setScrim(val, host.elements.root);
     }
   },
   track: {
@@ -12095,7 +11612,7 @@ var progress_bar_properties = {
       return Pipe(ToBool, IfInvalid(true))(val).value;
     },
     onChange: function onChange(val, host) {
-      setTrack(val, host.elements.root);
+      progress_bar_setTrack(val, host.elements.root);
     }
   },
   scrimcolor: {
@@ -12111,7 +11628,7 @@ var progress_bar_properties = {
       return Pipe(ToNumber, IfInvalid(0))(val).value;
     },
     onChange: function onChange(val, host) {
-      setScrimBlur(val, host.elements.root);
+      progress_bar_setScrimBlur(val, host.elements.root);
     }
   },
   animation: {
@@ -12135,13 +11652,13 @@ var progress_bar_elements = {
   root: {
     selector: progress_bar_componentRoot,
     onChange: function onChange(el, host) {
-      setOverlay(host.overlay, el);
-      setScrim(host.scrim, el);
+      progress_bar_setOverlay(host.overlay, el);
+      progress_bar_setScrim(host.scrim, el);
       progress_bar_setScrimColor(host.scrimcolor, el);
-      setVisible(host.visible, el);
-      setTrack(host.visible, el);
-      setScrimBlur(host.scrimblur, el);
-      setPercentage(host.percentage, el);
+      progress_bar_setVisible(host.visible, el);
+      progress_bar_setTrack(host.visible, el);
+      progress_bar_setScrimBlur(host.scrimblur, el);
+      progress_bar_setPercentage(host.percentage, el);
       setAnimation(host.animation, el);
     }
   },
@@ -12160,13 +11677,13 @@ var progress_bar_elements = {
   container: {
     selector: ".progress-bar-inner",
     onChange: function onChange(el, host) {
-      setThickness(host.thickness, el);
+      progress_bar_setThickness(host.thickness, el);
     }
   },
   trackInner: {
     selector: ".progress-bar-track-inner",
     onChange: function onChange(el, host) {
-      setColor(host.color, el);
+      progress_bar_setColor(host.color, el);
     }
   },
   header: {
@@ -12272,15 +11789,12 @@ function WCwhenPropertyReady(host, path) {
   });
 }
 // CONCATENATED MODULE: ./src/components/snack-bar/index.js
-
-
-
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var snack_bar_style = __webpack_require__(64).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var snack_bar_style = __webpack_require__(65).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var snack_bar_template = __webpack_require__(65);
+var snack_bar_template = __webpack_require__(66);
 
 var snack_bar_componentName = "snack-bar";
 var snack_bar_componentRoot = ".".concat(snack_bar_componentName, "-container");
@@ -12311,10 +11825,10 @@ var snack_bar_setShown = function setShown(host) {
   if (endEventName) {
     root.addEventListener(endEventName, function startEvent() {
       root.removeEventListener(endEventName, startEvent);
-      requestAnimationFrame(dispatch);
+      Object(on_next_frame["a" /* OnNextFrame */])(dispatch);
     });
   } else {
-    requestAnimationFrame(dispatch);
+    Object(on_next_frame["a" /* OnNextFrame */])(dispatch);
   }
 
   root.classList[host.shown ? "add" : "remove"]("shown");
@@ -12551,7 +12065,7 @@ WCDefine(snack_bar_componentName, SnackBar);
 // CONCATENATED MODULE: ./src/components/spinner-element/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var spinner_element_style = __webpack_require__(66).toString();
+var spinner_element_style = __webpack_require__(67).toString();
 
 var spinner_element_setStyles = function setStyles(el, styles) {
   Object(on_next_frame["a" /* OnNextFrame */])(function () {
@@ -12576,7 +12090,7 @@ var spinner_element_setTheme = function setTheme(value, host) {
 }; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var spinner_element_template = __webpack_require__(67);
+var spinner_element_template = __webpack_require__(68);
 
 var spinner_element_componentName = "spinner-element";
 var spinner_element_componentRoot = ".".concat(spinner_element_componentName, "-container");
@@ -13233,6 +12747,156 @@ function Router(routes) {
   };
   click_listener(methods);
   pop_state_listener(methods);
+  return methods;
+}
+// CONCATENATED MODULE: ./src/utils/observe-worker.js
+
+function ObserveWorker(func) {
+  var value;
+  var previous;
+  var worker;
+  var functionString = ToString(func).value;
+  var subscriptions = {};
+  var firstBracket = functionString.indexOf("{");
+  var beginingSlice = functionString.slice(firstBracket);
+  var pendingSubscriptions = [];
+  functionString = "function webworker()".concat(beginingSlice, "webworker()");
+
+  var loop = function loop(method, data, subs) {
+    return Object.keys(subs).forEach(function (key) {
+      return Object(utils_get["a" /* Get */])(subs, "".concat(key, ".").concat(method), function () {})(data);
+    });
+  };
+
+  var shutDown = function shutDown() {
+    if (worker) {
+      worker.terminate();
+    }
+
+    worker = undefined;
+    return false;
+  };
+
+  var startUp = function startUp() {
+    if (worker) {
+      return;
+    }
+
+    var blob;
+
+    try {
+      blob = window.URL.createObjectURL(new Blob([functionString], {
+        type: "application/javascript"
+      }));
+    } catch (error) {}
+
+    if (!blob) {
+      return;
+    }
+
+    worker = new Worker(blob);
+
+    worker.onmessage = function (e) {
+      previous = value;
+      value = e.data;
+      return loop("next", value, subscriptions);
+    };
+
+    worker.onerror = function (e) {
+      return loop("error", e.message, subscriptions);
+    };
+
+    return worker;
+  };
+
+  var noShutdown = function noShutdown(subs) {
+    return Object.keys(subs).length === 0 ? shutDown() : true;
+  };
+
+  var unSubscribe = function unSubscribe(subscriberId) {
+    return function () {
+      subscriptions[subscriberId] = null;
+      delete subscriptions[subscriberId];
+      noShutdown(subscriptions);
+    };
+  };
+
+  var completeAll = function completeAll(subs) {
+    return Object.keys(subs).forEach(function (key) {
+      subs[key].complete();
+      unSubscribe(key);
+    });
+  };
+
+  var methods = {
+    get value() {
+      return value;
+    },
+
+    get previous() {
+      return previous;
+    },
+
+    get functionString() {
+      return functionString;
+    },
+
+    get subscriptions() {
+      return subscriptions;
+    },
+
+    get pending() {
+      return pendingSubscriptions;
+    },
+
+    dispose: function dispose() {
+      completeAll(subscriptions);
+    },
+    post: function post(msg) {
+      var index = pendingSubscriptions.length;
+      return new Promise(function (resolve, reject) {
+        var res = function res(e) {
+          pendingSubscriptions[index]();
+          return resolve(e);
+        };
+
+        var rej = function rej(e) {
+          pendingSubscriptions[index]();
+          return reject(e);
+        };
+
+        pendingSubscriptions.push(methods.subscribe(res, rej, rej));
+        worker.postMessage(ToJSON(msg).value);
+      });
+    },
+    subscribe: function subscribe(next) {
+      var error = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
+      var complete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {};
+
+      if (typeof next !== "function") {
+        return;
+      }
+
+      var subscriber = {
+        next: next,
+        error: error,
+        complete: complete,
+        id: Object(utils_id["a" /* ID */])()
+      };
+      subscriptions[subscriber.id] = subscriber;
+
+      if (typeof subscriptions[subscriber.id].error !== "function") {
+        subscriptions[subscriber.id].error = unSubscribe(subscriber.id);
+      }
+
+      if (typeof subscriptions[subscriber.id].complete !== "function") {
+        subscriptions[subscriber.id].complete = unSubscribe(subscriber.id);
+      }
+
+      startUp();
+      return unSubscribe(subscriber.id);
+    }
+  };
   return methods;
 }
 // CONCATENATED MODULE: ./src/services/request.js
@@ -14545,7 +14209,7 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport HasKeys */__webpack_require__.d(__webpack_exports__, "HasKeys", function() { return HasKeys; });
 /* concated harmony reexport HasMethod */__webpack_require__.d(__webpack_exports__, "HasMethod", function() { return HasMethod; });
 /* concated harmony reexport htmlTags */__webpack_require__.d(__webpack_exports__, "htmlTags", function() { return htmlTags; });
-/* concated harmony reexport ID */__webpack_require__.d(__webpack_exports__, "ID", function() { return ID; });
+/* concated harmony reexport ID */__webpack_require__.d(__webpack_exports__, "ID", function() { return utils_id["a" /* ID */]; });
 /* concated harmony reexport IfEmpty */__webpack_require__.d(__webpack_exports__, "IfEmpty", function() { return IfEmpty; });
 /* concated harmony reexport IfInvalid */__webpack_require__.d(__webpack_exports__, "IfInvalid", function() { return IfInvalid; });
 /* concated harmony reexport IfIs */__webpack_require__.d(__webpack_exports__, "IfIs", function() { return IfIs; });
@@ -14649,6 +14313,7 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport WCConstructor */__webpack_require__.d(__webpack_exports__, "WCConstructor", function() { return WCConstructor; });
 /* concated harmony reexport WCDefine */__webpack_require__.d(__webpack_exports__, "WCDefine", function() { return WCDefine; });
 /* concated harmony reexport WCElements */__webpack_require__.d(__webpack_exports__, "WCElements", function() { return WCElements; });
+/* concated harmony reexport WCwhenPropertyReady */__webpack_require__.d(__webpack_exports__, "WCwhenPropertyReady", function() { return WCwhenPropertyReady; });
 /** COMPONENTS */
 
 
@@ -14825,8 +14490,300 @@ function TransduceMap(conversionFunction) {
 
 
 
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+module.exports = _assertThisInitialized;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+function _getPrototypeOf(o) {
+  module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+
+module.exports = _getPrototypeOf;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ID; });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(11);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+
+
+var _marked =
+/*#__PURE__*/
+_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(idGenerator);
+
+/**
+ * Generates a runtime unique ID
+ * @generator
+ * @yields { string }
+ */
+function idGenerator() {
+  var index, objectIds, doHash, doId, objectId;
+  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function idGenerator$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          index = 0;
+          objectIds = [];
+
+          doHash = function doHash() {
+            return "".concat((new Date().getTime() / 1000 | 0).toString(16), " xxxxxxxxxxxxxxxx").replace(/[x]/g, function () {
+              return (Math.random() * 16 | 0).toString(16);
+            });
+          };
+
+          doId = function doId(indx) {
+            return "".concat(indx, " ").concat(doHash().toLowerCase()).split(" ").join("");
+          };
+
+        case 4:
+          if (false) {}
+
+          index = index + 1;
+          objectId = doId(index);
+          objectIds.push(objectId);
+          _context.next = 10;
+          return objectId;
+
+        case 10:
+          _context.next = 4;
+          break;
+
+        case 12:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, _marked);
+}
+
+var idIterator;
+/**
+ * Returns a runtime unique ID
+ * @function ID
+ * @return { string }
+ */
+
+function ID() {
+  if (!idIterator) {
+    idIterator = idGenerator();
+  }
+
+  return idIterator.next().value;
+}
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+module.exports = _createClass;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(27);
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ComponentStore; });
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* eslint-disable tree-shaking/no-side-effects-in-initialization */
+
+var ComponentStoreKey = Symbol["for"]("builtjs.ComponentStore");
+var globalSymbols = Object.getOwnPropertySymbols(global);
+var hasComponentStore = globalSymbols.indexOf(ComponentStoreKey) > -1;
+
+var getTag = function getTag(element) {
+  return Object(___WEBPACK_IMPORTED_MODULE_0__[/* Get */ "a"])(element, "tagName", "").toLowerCase();
+};
+
+if (!hasComponentStore) {
+  global[ComponentStoreKey] = {
+    components: {},
+    themes: {},
+    theme: function theme(_theme, element) {
+      return Object.keys(_theme).forEach(function (property) {
+        return element[property] = _theme[property];
+      });
+    },
+    addComponent: function addComponent(element) {
+      var tag = getTag(element);
+
+      if (tag === "") {
+        return;
+      }
+
+      if (!global[ComponentStoreKey].components[tag]) {
+        global[ComponentStoreKey].components[tag] = [];
+      }
+
+      global[ComponentStoreKey].components[tag].push(element);
+      global[ComponentStoreKey].triggerTagSubscriptions(tag, element);
+
+      if (global[ComponentStoreKey].themes[tag]) {
+        Object.keys(global[ComponentStoreKey].themes[tag]).forEach(function (property) {
+          return element[property] = global[ComponentStoreKey].themes[tag][property];
+        });
+      }
+    },
+    removeComponent: function removeComponent(element) {
+      var tag = getTag(element);
+
+      if (tag === "" || !global[ComponentStoreKey].components[tag]) {
+        return;
+      }
+
+      var index = global[ComponentStoreKey].components[tag].indexOf(element);
+
+      if (index === -1) {
+        return;
+      }
+
+      global[ComponentStoreKey].components[tag].splice(index, 1);
+    },
+    addTheme: function addTheme(tag, theme) {
+      global[ComponentStoreKey].themes[tag] = theme;
+
+      if (!global[ComponentStoreKey].components[tag]) {
+        return;
+      }
+
+      global[ComponentStoreKey].components[tag].forEach(function (element) {
+        return global[ComponentStoreKey].theme(global[ComponentStoreKey].themes[tag], element);
+      });
+    },
+    tagSubscriptions: {},
+    triggerTagSubscriptions: function triggerTagSubscriptions(tag, data) {
+      if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
+        return;
+      }
+
+      global[ComponentStoreKey].tagSubscriptions[tag].forEach(function (sub) {
+        return sub(data);
+      });
+    },
+    watchForTag: function watchForTag(tag, cb) {
+      if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
+        global[ComponentStoreKey].tagSubscriptions[tag] = [];
+      }
+
+      global[ComponentStoreKey].tagSubscriptions[tag].push(cb);
+      return function () {
+        if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
+          return;
+        }
+
+        var indexToRemove;
+        var i = global[ComponentStoreKey].tagSubscriptions[tag].length;
+
+        while (indexToRemove === undefined && i) {
+          i = i - 1;
+
+          if (global[ComponentStoreKey].tagSubscriptions[tag][i] === cb) {
+            indexToRemove = i;
+          }
+        }
+
+        global[ComponentStoreKey].tagSubscriptions[tag].splice(indexToRemove, 1);
+      };
+    }
+  };
+}
+
+var ComponentStore = Object.freeze(global[ComponentStoreKey]); // Object.defineProperty(ComponentStore, "instance", {
+//     get: function () {
+//         return global[ComponentStoreKey];
+//     }
+// })
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(12)))
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(false);
+// Module
+exports.push([module.i, ":host(content-transition){display:block;width:100%;position:relative}:host(content-transition).flex-stretch{-webkit-box-flex:1;flex-grow:1;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}content-transition{display:block;width:100%;position:relative}content-transition.flex-stretch{-webkit-box-flex:1;flex-grow:1;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}.content-transition-container{position:relative}.content-transition-container .current-slot{opacity:1}.content-transition-container .next-slot{width:100%;height:100%;position:absolute;top:0;left:0;opacity:0}.content-transition-container .hidden-slot{width:100%;height:100%;overflow:hidden;opacity:0;pointer-events:none;position:absolute;top:0;left:0;z-index:-1;visibility:hidden;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.content-transition-container .hidden-slot .hidden-slot-inner{width:100%;height:100%;display:inline-block;position:absolute;top:0;left:0}.content-transition-container.keepchildren .next-slot{pointer-events:none;opacity:0;-webkit-transform:translateZ(0) translateX(-100%);transform:translateZ(0) translateX(-100%)}.content-transition-container.keepchildren[type=\"fade\"] .next-slot{-webkit-transform:translateZ(0) translateX(0);transform:translateZ(0) translateX(0)}.content-transition-container.sliding{overflow:hidden}.content-transition-container.flex-stretch{-webkit-box-flex:1;flex-grow:1;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}.content-transition-container.flex-stretch .content-transition-inner,.content-transition-container.flex-stretch .current-slot,.content-transition-container.flex-stretch .next-slot,.content-transition-container.flex-stretch .hidden-slot{-webkit-box-flex:1;flex-grow:1;display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}\n", ""]);
+
+
 /***/ }),
 /* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(false);
+// Module
+exports.push([module.i, ":host(grid-layout){display:block;opacity:0}:host(grid-layout)[viewable=\"true\"]{opacity:1}grid-layout{display:block;opacity:0}grid-layout[viewable=\"true\"]{opacity:1}.grid-layout-items{display:-webkit-box;display:flex;display:grid;justify-items:center;grid-auto-flow:dense;width:100%;flex-wrap:wrap}.grid-layout-items>*,.grid-layout-items ::slotted(*){width:100%}\n", ""]);
+
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports) {
 
 function _classCallCheck(instance, Constructor) {
@@ -14838,12 +14795,12 @@ function _classCallCheck(instance, Constructor) {
 module.exports = _classCallCheck;
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _typeof = __webpack_require__(2);
+var _typeof = __webpack_require__(1);
 
-var assertThisInitialized = __webpack_require__(6);
+var assertThisInitialized = __webpack_require__(7);
 
 function _possibleConstructorReturn(self, call) {
   if (call && (_typeof(call) === "object" || typeof call === "function")) {
@@ -14856,7 +14813,7 @@ function _possibleConstructorReturn(self, call) {
 module.exports = _possibleConstructorReturn;
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var setPrototypeOf = __webpack_require__(5);
@@ -14879,16 +14836,16 @@ function _inherits(subClass, superClass) {
 module.exports = _inherits;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getPrototypeOf = __webpack_require__(7);
+var getPrototypeOf = __webpack_require__(8);
 
 var setPrototypeOf = __webpack_require__(5);
 
-var isNativeFunction = __webpack_require__(24);
+var isNativeFunction = __webpack_require__(25);
 
-var construct = __webpack_require__(25);
+var construct = __webpack_require__(26);
 
 function _wrapNativeSuper(Class) {
   var _cache = typeof Map === "function" ? new Map() : undefined;
@@ -14927,7 +14884,7 @@ function _wrapNativeSuper(Class) {
 module.exports = _wrapNativeSuper;
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14936,7 +14893,7 @@ exports.push([module.i, ":host(button-element){font:inherit;line-height:inherit;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 function _arrayWithoutHoles(arr) {
@@ -14952,7 +14909,7 @@ function _arrayWithoutHoles(arr) {
 module.exports = _arrayWithoutHoles;
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 function _iterableToArray(iter) {
@@ -14962,7 +14919,7 @@ function _iterableToArray(iter) {
 module.exports = _iterableToArray;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 function _nonIterableSpread() {
@@ -14972,13 +14929,13 @@ function _nonIterableSpread() {
 module.exports = _nonIterableSpread;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=button-element> <button> <effect-ripple start=mousedown end=mouseup speed=600 opacity=0.25 direction=auto></effect-ripple> <effect-bounce-z start=mousedown amount=-4 speed=300></effect-bounce-z> <slot></slot> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </button> </div> ";
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports) {
 
 function _isNativeFunction(fn) {
@@ -14988,7 +14945,7 @@ function _isNativeFunction(fn) {
 module.exports = _isNativeFunction;
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var setPrototypeOf = __webpack_require__(5);
@@ -15026,7 +14983,7 @@ function _construct(Parent, args, Class) {
 module.exports = _construct;
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -15758,7 +15715,7 @@ try {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15767,13 +15724,13 @@ exports.push([module.i, ":host(collapse-menu){display:block}collapse-menu{displa
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=collapse-menu-container expanded=false expandable=false> <div class=collapse-menu-toggle> <div class=collapse-menu-toggle-icon> <slot name=toggle-icon> <icon-element style=height:1.5em class=default-toggle-icon size=1.5em svg='<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z\"/></svg>'></icon-element> <div class=toggle-arrow style=height:1.5em;margin-top:-.3em> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> </slot> </div> </div> <div class=collapse-menu-items> <div class=collapse-menu-items-bg></div> <div class=collapse-menu-toggle-inner> <icon-element class=default-toggle-inner-icon size=1.5em svg='<svg class=\"default-inner-toggle-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\" /></svg>'></icon-element> </div> <div class=collapse-menu-items-inner> <slot name=item></slot> </div> </div> <style type=text/css rel=stylesheet style=display:none class=internalStyles></style> </div> ";
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15782,13 +15739,13 @@ exports.push([module.i, ":host(content-collapse){display:block}.content-collapse
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=content-collapse-container> <div class=content-collapse-toggler> <icon-element class=content-collapse-toggler-icon size=1.5em></icon-element> <div class=content-collapse-toggler-content> <slot name=content-collapse-toggler></slot> </div> </div> <div class=content-collapse-content> <content-transition class=content-collapse-transition keepchildren=true type=fade> <div class=content-collapse-empty slot=hidden></div> <div class=content-collapse-content-holder slot=hidden> <slot name=content-collapse-content></slot> </div> </content-transition> </div> <style type=text/css rel=stylesheet style=display:none class=themedStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15797,19 +15754,19 @@ exports.push([module.i, ":host(content-drawer){display:block;width:100%;position
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=content-drawer-container> <div class=content-drawer-header> <icon-element class=content-drawer-header-icon size=1.38em></icon-element> <slot name=header></slot> <effect-underline start=none opacity=1 speed=700></effect-underline> <effect-ripple start=none speed=600></effect-ripple> <effect-fade start=none speed=600 opacity=0,1></effect-fade> </div> <div class=content-drawer-content> <div class=content-drawer-content-inner> <div class=content-drawer-content-inner-inner> <slot name=content></slot> </div> </div> </div> <effect-scale start=click></effect-scale> <effect-bounce-z></effect-bounce-z> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=content-transition-container> <div class=content-transition-inner> <div class=next-slot> <slot name=next></slot> </div> <div class=current-slot> <slot current=true name=current></slot> </div> <div class=hidden-slot> <div class=hidden-slot-inner> <slot name=hidden></slot> </div> </div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15818,13 +15775,13 @@ exports.push([module.i, ":host(cookie-message){font:inherit;line-height:inherit;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=cookie-message-container> <div class=cookie-message-inner> <div class=cookie-message-text></div> <button-element class=cookie-message-button></button-element> </div> </div> ";
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15833,13 +15790,13 @@ exports.push([module.i, "drop-down{outline:none !important}.drop-down-container{
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=drop-down-container> <div class=drop-down-heading> <div class=drop-down-label> <slot name=label></slot> </div> <div class=drop-down-arrow> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> </div> <overlay-content align=\"center bottom\" class=drop-down-overlay> <slot name=option></slot> </overlay-content> <style type=text/css rel=stylesheet style=display:none class=themedStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> <slot name=nonitem></slot> </div> ";
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15848,19 +15805,19 @@ exports.push([module.i, ":host(dropdown-select){display:inline-block;max-width:1
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=dropdown-select-container> <div class=dropdown-select-input-container> <div class=dropdown-select-label-container> <div class=dropdown-select-label></div> </div> <input class=dropdown-select-filter> <select class=dropdown-select-input></select> </div> <div class=dropdown-select-arrow> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> <overlay-content align=\"center bottom\"></overlay-content> <slot name=effects></slot> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-push-container></div> ";
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15869,13 +15826,13 @@ exports.push([module.i, ":host(effect-fade){pointer-events:none;box-sizing:borde
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-fade-container></div> ";
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15884,13 +15841,13 @@ exports.push([module.i, ".effect-ripple-container,.effect-ripple-container *{poi
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-ripple-container> <span class=ripple></span> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15899,13 +15856,13 @@ exports.push([module.i, ":host(effect-scale){pointer-events:none;box-sizing:bord
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-scale-container></div> ";
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15914,19 +15871,19 @@ exports.push([module.i, ":host(effect-underline){pointer-events:none;box-sizing:
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-underline-container> <span class=underline></span> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=grid-layout-container> <div class=grid-layout-items></div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15935,13 +15892,13 @@ exports.push([module.i, ":host(horizontal-slider){display:-webkit-box;display:fl
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=horizontal-slider-container> <div class=horizontal-slider-chicklets></div> <div class=horizontal-slider-previous> <slot name=previous-button> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\" class=horizontal-slider-default-arrow> <path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\"/></svg> </slot> </div> <div class=horizontal-slider-inner> <div class=horizontal-slider-items> <slot></slot> </div> </div> <div class=horizontal-slider-next> <slot name=next-button> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\" class=horizontal-slider-default-arrow> <path d=\"M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z\"/></svg> </slot> </div> </div> ";
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15950,13 +15907,13 @@ exports.push([module.i, ":host(icon-element){display:-webkit-inline-box;display:
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=icon-element-container> <div class=svg-container></div> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15965,13 +15922,13 @@ exports.push([module.i, ":host(image-loader){display:inline-block}image-loader{d
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=\"image-loader-container notready\" style=opacity:0> <img class=image-loader-image> <div class=image-loader-text></div> <spinner-element scrim=true page=false type=circle visible=false style=opacity:0></spinner-element> <style type=text/css rel=stylesheet style=display:none class=internalStyles></style> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> </div> ";
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -15980,28 +15937,28 @@ exports.push([module.i, ":host(input-field){display:inline-block;width:300px;max
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=input-field-container> <div class=input-field-container-inner> <div class=input-field-top-section> <div class=input-field-label-top></div> </div> <div class=input-field-middle-section> <div class=input-field-label-left></div> <div class=input-field-input-section> <div class=input-field-label-inside></div> <div class=input-field-input-container> <div class=input-field-input-container-inner></div> <div class=input-field-input-effects> <effect-underline start=focus end=blur opacity=0.8 speed=700></effect-underline> <effect-ripple start=focus opacity=0.25 speed=600></effect-ripple> <effect-bounce-z amount=-4 speed=300></effect-bounce-z> </div> <div class=input-field-input-overlay> <icon-element class=input-field-icon size=1.25em></icon-element> <icon-element class=input-field-clear size=1.25em></icon-element> <input type=text class=input-field-file-path-overlay> <div class=input-field-checkbox-overlay> <icon-element class=input-field-checkbox-icon size=0.7em></icon-element> </div> </div> <div class=input-field-border></div> <input type=hidden class=input-field-hidden-input> </div> </div> <div class=input-field-label-right></div> </div> <div class=input-field-bottom-section> <div class=input-field-label-bottom></div> <div class=input-field-bottom-content> <div class=input-field-messages> <div class=input-field-message-help></div> <div class=input-field-message-error></div> </div> <div class=input-field-character-count-container> <div class=input-field-character-count-inner> <div class=input-field-character-count></div> <div class=input-field-character-count-max-divider>/</div> <div class=input-field-character-count-max></div> </div> </div> </div> </div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
 // Module
-exports.push([module.i, ":host(overlay-content){display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}overlay-content{display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}.overlay-content-container{display:block;position:absolute;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}.overlay-content-container .overlay-content-container-inner{position:absolute;width:100%;height:100%;top:0px;left:0px;pointer-events:none;overflow:hidden;display:none}.overlay-content-container .overlay-content-content-container{max-height:80vh;max-width:80vw;overflow:auto;position:absolute;width:100%;-webkit-transform-origin:center center;transform-origin:center center;-webkit-transform:scale(1, 0);transform:scale(1, 0);pointer-events:none;opacity:0;display:-webkit-inline-box;display:inline-flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-transition:opacity 0.2s ease-in-out;transition:opacity 0.2s ease-in-out}.overlay-content-container.active .overlay-content-container-inner{display:block}.overlay-content-container.active .overlay-content-content-container{pointer-events:all;opacity:1}.overlay-content-container.activating .overlay-content-container-inner{display:block}.overlay-content-container .overlay-content-content-inner{display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-box-pack:end;justify-content:flex-end;min-height:0}.overlay-content-container .overlay-content-content-inner.bottom{-webkit-box-pack:start;justify-content:flex-start}\n", ""]);
+exports.push([module.i, ":host(overlay-content){display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}overlay-content{display:block;position:fixed;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}.overlay-content-container{display:block;position:absolute;height:0px;width:0px;top:0px;left:0px;z-index:99999;overflow:visible;pointer-events:none}.overlay-content-container .overlay-content-container-inner{position:absolute;width:100%;height:100%;top:0px;left:0px;pointer-events:none;overflow:hidden;display:none}.overlay-content-container .overlay-content-content-container{max-height:80vh;max-width:80vw;overflow:auto;position:absolute;width:100%;-webkit-transform-origin:center center;transform-origin:center center;-webkit-transform:scale(1, 0);transform:scale(1, 0);pointer-events:none;opacity:0;display:-webkit-inline-box;display:inline-flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column}.overlay-content-container.active .overlay-content-container-inner{display:block}.overlay-content-container.active .overlay-content-content-container{pointer-events:all}.overlay-content-container.activating .overlay-content-container-inner{display:block}.overlay-content-container .overlay-content-content-inner{display:-webkit-box;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;-webkit-box-pack:end;justify-content:flex-end;min-height:0}.overlay-content-container .overlay-content-content-inner.bottom{-webkit-box-pack:start;justify-content:flex-start}\n", ""]);
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=overlay-content-container> <div class=overlay-content-container-inner> <div class=overlay-content-content-container> <div class=overlay-content-content-inner> <slot></slot> </div> </div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -16010,13 +15967,13 @@ exports.push([module.i, ".overlay-message-container{position:fixed;width:100%;he
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=overlay-message-container> <div class=overlay-message-scrim></div> <div class=overlay-message-content-container> <div class=overlay-message-header> <slot name=header></slot> </div> <div class=overlay-message-body> <slot name=body></slot> </div> <div class=overlay-message-buttons> <slot name=button></slot> </div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -16025,13 +15982,13 @@ exports.push([module.i, "@-webkit-keyframes indeterminate{0%{-webkit-transform-o
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=progress-bar-container> <div class=progress-bar-heading> <div class=progress-bar-header></div> <div class=progress-bar-percentage></div> </div> <div class=progress-bar-inner> <div class=progress-bar-track> <div class=progress-bar-track-inner> <div class=progress-bar-bottom></div> <div class=progress-bar-top></div> </div> </div> </div> <div class=progress-bar-bottom-container> <div class=progress-bar-text></div> <button-element class=progress-bar-button></button-element> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -16040,13 +15997,13 @@ exports.push([module.i, ".snack-bar-container{pointer-events:none;opacity:0;posi
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=snack-bar-container> <div class=snack-bar-inner> <div class=snack-bar-icon> <div class=snack-bar-icon-inner> <icon-element size=1.5em class=infoicon></icon-element> <icon-element size=1.5em class=successicon></icon-element> <icon-element size=1.5em class=erroricon></icon-element> <icon-element size=1.5em class=warningicon></icon-element> </div> </div> <div class=snack-bar-text> <div class=snack-bar-text-inner> <slot name=body></slot> </div> </div> <div class=snack-bar-close> <div class=snack-bar-close-inner> <button-element class=\"snack-bar-default-button nomargin slim\" styles=\".button-element.snack-bar-default-button button,.button-element.snack-bar-default-button button:hover{background-color:transparent;box-shadow:none;}\"> <icon-element size=1.5em class=snack-bar-close-icon></icon-element> </button-element> </div> </div> <div class=snack-bar-type-bar></div> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -16055,7 +16012,7 @@ exports.push([module.i, ":host(spinner-element){position:absolute;height:100%;wi
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=spinner-element-container> <div class=spinner-element-scrim></div> <div class=spinner-element-inner> <slot> <div class=spin></div> </slot> </div> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </div> ";

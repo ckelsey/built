@@ -48,7 +48,11 @@ export function ObserveEvent(element, eventName, options = {}) {
     }
 
     const shutDown = () => {
-        element.removeEventListener(eventName, eventHandler, options.useCapture)
+
+        try {
+            element.removeEventListener(eventName, eventHandler, options.useCapture)
+        } catch (error) { }
+
         isRunning = false
     }
 

@@ -7,8 +7,8 @@ export function SelectorToElement(parent, value) {
         return Value
     }
 
-    if (!parent) {
-        parent = document.firstElementChild
+    if (!parent || typeof parent.querySelector !== `function`) {
+        parent = document.firstElementChild || document.documentElement.body || document.documentElement.firstElementChild
     }
 
     if (Value.type === `string`) {

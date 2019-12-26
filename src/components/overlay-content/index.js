@@ -1,4 +1,7 @@
-import { Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, GetCurve, ComponentClassObject, SetStyleRules, IndexOf } from '../..'
+import {
+    Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, OnNextFrame,
+    ComponentClassObject, SetStyleRules, IndexOf, Timer, EaseInOut, Get
+} from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
@@ -87,70 +90,81 @@ const getWidth = host => {
     }
 }
 
-const setPositions = host => () => {
-    cancelAnimationFrame(host.positionTimer)
+const setPositions = host => {
+    Get(host, `setPositionsTimer.cancel()`)
 
-    const target = host.target
+    host.setPositionsTimer = OnNextFrame(() => {
+        const target = host.target
 
-    if (!host.showing || !target) { return }
+        if (!host.showing || !target) { return }
 
-    const container = host.elements.contentContainer
-    const inner = host.elements.inner
-    const rootBox = host.elements.root.getBoundingClientRect()
+        const container = host.elements.contentContainer
+        const inner = host.elements.inner
+        const rootBox = host.elements.root.getBoundingClientRect()
 
-    if (rootBox.y !== 0) {
-        inner.style.top = `-${rootBox.y}px`
-    }
+        if (rootBox.y !== 0) {
+            inner.style.top = `-${rootBox.y}px`
+        }
 
-    if (rootBox.x !== 0) {
-        inner.style.left = `-${rootBox.x}px`
-    }
+        if (rootBox.x !== 0) {
+            inner.style.left = `-${rootBox.x}px`
+        }
 
-    if (rootBox.width !== document.documentElement.clientWidth) {
-        inner.style.width = `${document.documentElement.clientWidth}px`
-    }
+        if (rootBox.width !== document.documentElement.clientWidth) {
+            inner.style.width = `${document.documentElement.clientWidth}px`
+        }
 
-    if (rootBox.height !== document.documentElement.clientHeight) {
-        inner.style.height = `${document.documentElement.clientHeight}px`
-    }
+        if (rootBox.height !== document.documentElement.clientHeight) {
+            inner.style.height = `${document.documentElement.clientHeight}px`
+        }
 
-    const targetBox = target.getBoundingClientRect()
-    const isOnTop = host.isOnTop
+        const targetBox = target.getBoundingClientRect()
+        const isOnTop = host.isOnTop
 
-    if (targetBox.top - 10 > document.documentElement.clientHeight || targetBox.bottom + 10 < 0) {
-        return host.hide()
-    }
+        if (targetBox.top - 10 > document.documentElement.clientHeight || targetBox.bottom + 10 < 0) {
+            return host.hide()
+        }
 
-    const widths = getWidth(host)
-    container.style.width = widths.width
-    container.style.minWidth = widths.minWidth
-    container.style.height = `auto`
-    container.style.maxHeight = `${host.height}px`
+        const widths = getWidth(host)
+        container.style.width = widths.width
+        container.style.minWidth = widths.minWidth
+        container.style.height = `auto`
+        container.style.maxHeight = `${host.height}px`
 
-    const left = targetBox.left + container.offsetWidth >= (window.innerWidth - 10)
-        ? targetBox.right - container.offsetWidth
-        : targetBox.left
+        const left = targetBox.left + container.offsetWidth >= (window.innerWidth - 10)
+            ? targetBox.right - container.offsetWidth
+            : targetBox.left
 
-    container.style.left = `${left}px`
-    container.style.top = `${isOnTop ? targetBox.top - container.offsetHeight : host.spaceAbove + targetBox.height}px`
-    let origin = `center ${isOnTop ? `bottom` : `top`}`
+        container.style.left = `${left}px`
+        container.style.top = `${isOnTop ? targetBox.top - container.offsetHeight : host.spaceAbove + targetBox.height}px`
+        let origin = `center ${isOnTop ? `bottom` : `top`}`
 
-    host.width = container.offsetWidth
+        host.width = container.offsetWidth
 
-    container.style.transformOrigin = `${origin}`
+        container.style.transformOrigin = `${origin}`
 
-    if (inner.classList.contains(`bottom`) && isOnTop) {
-        inner.classList.remove(`bottom`)
-    }
+        if (inner.classList.contains(`bottom`) && isOnTop) {
+            inner.classList.remove(`bottom`)
+        }
 
-    if (!inner.classList.contains(`bottom`) && !isOnTop) {
-        inner.classList.add(`bottom`)
-    }
+        if (!inner.classList.contains(`bottom`) && !isOnTop) {
+            inner.classList.add(`bottom`)
+        }
 
-    host.positionTimer = requestAnimationFrame(() => {
-        setPositions(host)()
+        setPositions(host)
     })
+
+
 }
+
+const animator = (points, speed, stepFn) => new Promise(resolve =>
+    Timer(
+        speed,
+        stepFn,
+        EaseInOut(points, speed),
+        resolve
+    )
+)
 
 export const OverlayContent = WCConstructor({
     componentName,
@@ -160,13 +174,10 @@ export const OverlayContent = WCConstructor({
     observedAttributes: Object.keys(attributes),
     // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     properties: Object.assign({}, {
-        positionTimer: { format: val => val, },
         showing: { format: val => ToBool(val).value, },
         width: {
             format: val => val,
-            onChange: (_val, host) => {
-                host.dispatchEvent(new CustomEvent(`widthchange`, { detail: host }))
-            }
+            onChange: (_val, host) => host.dispatchEvent(new CustomEvent(`widthchange`, { detail: host }))
         },
     }, attributes),
     computed: {
@@ -176,26 +187,39 @@ export const OverlayContent = WCConstructor({
         spaceBelow: host => ({ get() { return document.documentElement.clientHeight - (host.spaceAbove + (host.target ? host.target.getBoundingClientRect().height : 0)) } }),
         position: host => ({
             get() {
-                const container = host.elements.contentContainer
+                return OnNextFrame(() => {
+                    const container = host.elements.contentContainer
 
-                if (!container) {
-                    return { top: 0, y: 0, bottom: 0, left: 0, x: 0, right: 0, width: 0, height: 0, scrollTop: 0, scrollLeft: 0 }
-                }
+                    if (!container) {
+                        return {
+                            top: 0,
+                            y: 0,
+                            bottom: 0,
+                            left: 0,
+                            x: 0,
+                            right: 0,
+                            width: 0,
+                            height: 0,
+                            scrollTop: 0,
+                            scrollLeft: 0
+                        }
+                    }
 
-                const box = container.getBoundingClientRect()
+                    const box = container.getBoundingClientRect()
 
-                return {
-                    top: box.top,
-                    y: box.y,
-                    bottom: box.bottom,
-                    left: box.left,
-                    x: box.x,
-                    right: box.right,
-                    width: box.width,
-                    height: box.height,
-                    scrollTop: container.scrollTop,
-                    scrollLeft: container.scrollLeft,
-                }
+                    return {
+                        top: box.top,
+                        y: box.y,
+                        bottom: box.bottom,
+                        left: box.left,
+                        x: box.x,
+                        right: box.right,
+                        width: box.width,
+                        height: box.height,
+                        scrollTop: container.scrollTop,
+                        scrollLeft: container.scrollLeft,
+                    }
+                }).promise
             }
         }),
     },
@@ -209,36 +233,24 @@ export const OverlayContent = WCConstructor({
             if (host.showing) { return Promise.resolve() }
 
             return new Promise(resolve => {
-                host.elements.root.classList.add(`activating`)
                 host.showing = true
-                setPositions(host)()
 
-                const scalePoints = GetCurve([0, 1.02, 0.99, 1])
-                const timeout = GetCurve([0, host.speed / scalePoints.length])
-                const widths = getWidth(host)
                 const container = host.elements.contentContainer
+                const inner = host.elements.inner
 
-                container.style.width = widths.width
-                container.style.minWidth = widths.minWidth
+                container.style.pointerEvents = `all`
+                inner.style.display = `block`
 
-                const loop = () => {
-                    if (!host.showing) { return Promise.resolve() }
-
-                    const scalePoint = scalePoints.shift()
-                    const time = timeout[scalePoints.length]
+                animator([0, 1.02, 0.99, 1], host.speed / 2, scalePoint => {
                     container.style.transform = `scale(1, ${scalePoint})`
+                    container.style.opacity = scalePoint
+                }).then(() => {
+                    container.style.transform = `scale(1, 1)`
+                    container.style.opacity = 1
+                    resolve(host.dispatchEvent(new CustomEvent(`shown`)))
+                })
 
-                    if (scalePoints.length) {
-                        setTimeout(() => loop(), time)
-                    } else {
-                        host.elements.root.classList.add(`active`)
-                        host.elements.root.classList.remove(`activating`)
-                        resolve()
-                        host.dispatchEvent(new CustomEvent(`shown`))
-                    }
-                }
-
-                loop()
+                setPositions(host)
             })
         },
 
@@ -246,30 +258,15 @@ export const OverlayContent = WCConstructor({
             if (!host.showing) { return Promise.resolve() }
 
             return new Promise(resolve => {
-                host.elements.root.classList.remove(`activating`)
                 host.showing = false
-                const scalePoints = GetCurve([1, 0])
-                const timeout = GetCurve([0, host.speed / scalePoints.length])
+
                 const container = host.elements.contentContainer
+                const inner = host.elements.inner
 
-                const loop = () => {
-                    if (host.showing) { return resolve() }
-
-                    const scalePoint = scalePoints.shift()
-                    const time = timeout[scalePoint.length]
-
-                    container.style.transform = `scale(1, ${scalePoint})`
-
-                    if (scalePoints.length) {
-                        setTimeout(() => loop(), time)
-                    } else {
-                        host.elements.root.classList.remove(`active`)
-                        resolve()
-                        host.dispatchEvent(new CustomEvent(`hidden`))
-                    }
-                }
-
-                loop()
+                inner.style.display = container.style.pointerEvents = `none`
+                container.style.transform = `scale(1, 0)`
+                container.style.opacity = 0
+                resolve(host.dispatchEvent(new CustomEvent(`hidden`)))
             })
         }
     },

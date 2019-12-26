@@ -19,6 +19,24 @@ const setTheme = (value, host) => {
 
 const setName = (btn, name) => btn ? btn.setAttribute(`name`, name) : undefined
 
+const setRipple = host => {
+    const ripple = host.elements.ripple
+
+    if (!ripple) { return }
+
+    ripple.color = host.accentcolor
+    ripple.targets = host.ripple ? [host.elements.button] : []
+}
+
+const setBounce = host => {
+    const bounce = host.elements.bounce
+    const button = host.elements.button
+
+    if (!bounce || !button) { return }
+
+    bounce.targets = host.bounce ? [button] : []
+}
+
 const properties = {
     accentcolor: {
         format: val => Pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
@@ -96,24 +114,6 @@ const elements = {
         selector: `style.themeStyles`,
         onChange: (_el, host) => setTheme(host.theme, host)
     }
-}
-
-const setRipple = host => {
-    const ripple = host.elements.ripple
-
-    if (!ripple) { return }
-
-    ripple.color = host.accentcolor
-    ripple.targets = host.ripple ? [host.elements.button] : []
-}
-
-const setBounce = host => {
-    const bounce = host.elements.bounce
-    const button = host.elements.button
-
-    if (!bounce || !button) { return }
-
-    bounce.targets = host.bounce ? [button] : []
 }
 
 const template = require(`./index.html`)
