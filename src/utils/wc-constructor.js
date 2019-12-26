@@ -49,8 +49,6 @@ const setStateProperty = (host, key, formatter, onChange, getter, setter) => {
 }
 
 export function WCConstructor(options) {
-    const genesis = performance.now()
-
     const {
         componentName,
         computed = {},
@@ -124,12 +122,13 @@ export function WCConstructor(options) {
         static get observedAttributes() { return observedAttributes }
 
         constructor() {
-            super()
-            this.wcID = ``
-            this.state = {}
-            this.elements = {}
-            this.disconnectElements = () => { }
-            SetShadowRoot({ componentName, template, style, element: this })
+            const self = super()
+            self.wcID = ``
+            self.state = {}
+            self.elements = {}
+            self.disconnectElements = () => { }
+            SetShadowRoot({ componentName, template, style, element: self })
+            return self
         }
 
         attributeChangedCallback(attrName, oldValue, newValue) { if (newValue !== oldValue) { this[attrName] = newValue } }

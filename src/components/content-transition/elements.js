@@ -14,7 +14,7 @@ export const setKeepChildren = host => {
     root.classList[host.keepchildren ? `add` : `remove`](`keepchildren`)
 }
 
-const elements = {
+export const elements = {
     root: {
         selector: `.content-transition-container`,
         onChange: (el, host) => {
@@ -49,5 +49,3 @@ const elements = {
         selector: `.current-slot`
     }
 }
-
-export default elements

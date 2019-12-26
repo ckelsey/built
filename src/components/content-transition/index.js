@@ -1,5 +1,5 @@
 import { WCConstructor, AppendStyleElement, WCDefine } from '../..'
-import elements, { setStyles } from './elements'
+import { elements, setStyles } from './elements'
 import { observedAttributes, properties } from './properties'
 import { transitionChild, transitionTo, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren, setCurrent } from './methods'
 

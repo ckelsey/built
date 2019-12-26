@@ -216,11 +216,11 @@ module.exports = _typeof;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayWithoutHoles = __webpack_require__(21);
+var arrayWithoutHoles = __webpack_require__(20);
 
-var iterableToArray = __webpack_require__(22);
+var iterableToArray = __webpack_require__(21);
 
-var nonIterableSpread = __webpack_require__(23);
+var nonIterableSpread = __webpack_require__(22);
 
 function _toConsumableArray(arr) {
   return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
@@ -292,7 +292,7 @@ function Get(obj, path, emptyVal) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return OnNextFrame; });
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
 /**
  * TODO
  * - memoize
@@ -1094,27 +1094,23 @@ var classCallCheck = __webpack_require__(16);
 var classCallCheck_default = /*#__PURE__*/__webpack_require__.n(classCallCheck);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js
-var possibleConstructorReturn = __webpack_require__(17);
+var possibleConstructorReturn = __webpack_require__(9);
 var possibleConstructorReturn_default = /*#__PURE__*/__webpack_require__.n(possibleConstructorReturn);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/getPrototypeOf.js
-var getPrototypeOf = __webpack_require__(8);
+var getPrototypeOf = __webpack_require__(7);
 var getPrototypeOf_default = /*#__PURE__*/__webpack_require__.n(getPrototypeOf);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/assertThisInitialized.js
-var assertThisInitialized = __webpack_require__(7);
-var assertThisInitialized_default = /*#__PURE__*/__webpack_require__.n(assertThisInitialized);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/createClass.js
 var createClass = __webpack_require__(10);
 var createClass_default = /*#__PURE__*/__webpack_require__.n(createClass);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/inherits.js
-var inherits = __webpack_require__(18);
+var inherits = __webpack_require__(17);
 var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/wrapNativeSuper.js
-var wrapNativeSuper = __webpack_require__(19);
+var wrapNativeSuper = __webpack_require__(18);
 var wrapNativeSuper_default = /*#__PURE__*/__webpack_require__.n(wrapNativeSuper);
 
 // CONCATENATED MODULE: ./src/utils/equals.js
@@ -1188,7 +1184,7 @@ function Equals(value1, value2) {
 var on_next_frame = __webpack_require__(4);
 
 // EXTERNAL MODULE: ./src/utils/id.js
-var utils_id = __webpack_require__(9);
+var utils_id = __webpack_require__(8);
 
 // CONCATENATED MODULE: ./src/utils/observer.js
 
@@ -1537,7 +1533,6 @@ var componentStore = __webpack_require__(13);
 
 
 
-
 /** Does not actually mutate anything, tho itself gets mutated across setting styles, properties, etc */
 
 var wc_constructor_setProperty = function setProperty(host, key, formatter, getter, setter) {
@@ -1594,7 +1589,6 @@ var wc_constructor_setStateProperty = function setStateProperty(host, key, forma
 };
 
 function WCConstructor(options) {
-  var genesis = performance.now();
   var componentName = options.componentName,
       _options$computed = options.computed,
       computed = _options$computed === void 0 ? {} : _options$computed,
@@ -1687,20 +1681,21 @@ function WCConstructor(options) {
 
       classCallCheck_default()(this, componentClass);
 
-      _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(componentClass).call(this));
-      _this.wcID = "";
-      _this.state = {};
-      _this.elements = {};
+      var self = _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(componentClass).call(this));
 
-      _this.disconnectElements = function () {};
+      self.wcID = "";
+      self.state = {};
+      self.elements = {};
+
+      self.disconnectElements = function () {};
 
       SetShadowRoot({
         componentName: componentName,
         template: template,
         style: style,
-        element: assertThisInitialized_default()(_this)
+        element: self
       });
-      return _this;
+      return possibleConstructorReturn_default()(_this, self);
     }
 
     createClass_default()(componentClass, [{
@@ -1954,7 +1949,7 @@ function WCDefine(componentName, componentClass) {
 // CONCATENATED MODULE: ./src/components/button-element/index.js
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var button_element_style = __webpack_require__(20).toString();
+var button_element_style = __webpack_require__(19).toString();
 
 var button_element_setStyles = function setStyles(el, host, styles) {
   if (!el) {
@@ -2109,7 +2104,7 @@ var button_element_elements = {
   }
 };
 
-var button_element_template = __webpack_require__(24);
+var button_element_template = __webpack_require__(23);
 
 var button_element_componentName = "button-element";
 var componentRoot = ".button-element";
@@ -3473,7 +3468,6 @@ var content_transition_elements_elements = {
     selector: ".current-slot"
   }
 };
-/* harmony default export */ var content_transition_elements = (content_transition_elements_elements);
 // CONCATENATED MODULE: ./src/components/content-transition/properties.js
 
 
@@ -3941,7 +3935,7 @@ var ContentTransition = WCConstructor({
   style: content_transition_style,
   observedAttributes: content_transition_properties_observedAttributes,
   properties: content_transition_properties_properties,
-  elements: content_transition_elements,
+  elements: content_transition_elements_elements,
   methods: {
     transitionChild: transitionChild,
     transitionTo: transitionTo,
@@ -14505,20 +14499,6 @@ function TransduceMap(conversionFunction) {
 /* 7 */
 /***/ (function(module, exports) {
 
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-module.exports = _assertThisInitialized;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
 function _getPrototypeOf(o) {
   module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
@@ -14529,7 +14509,7 @@ function _getPrototypeOf(o) {
 module.exports = _getPrototypeOf;
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14601,6 +14581,24 @@ function ID() {
 
   return idIterator.next().value;
 }
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _typeof = __webpack_require__(1);
+
+var assertThisInitialized = __webpack_require__(24);
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (_typeof(call) === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return assertThisInitialized(self);
+}
+
+module.exports = _possibleConstructorReturn;
 
 /***/ }),
 /* 10 */
@@ -14808,24 +14806,6 @@ module.exports = _classCallCheck;
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _typeof = __webpack_require__(1);
-
-var assertThisInitialized = __webpack_require__(7);
-
-function _possibleConstructorReturn(self, call) {
-  if (call && (_typeof(call) === "object" || typeof call === "function")) {
-    return call;
-  }
-
-  return assertThisInitialized(self);
-}
-
-module.exports = _possibleConstructorReturn;
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
 var setPrototypeOf = __webpack_require__(5);
 
 function _inherits(subClass, superClass) {
@@ -14846,10 +14826,10 @@ function _inherits(subClass, superClass) {
 module.exports = _inherits;
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getPrototypeOf = __webpack_require__(8);
+var getPrototypeOf = __webpack_require__(7);
 
 var setPrototypeOf = __webpack_require__(5);
 
@@ -14894,7 +14874,7 @@ function _wrapNativeSuper(Class) {
 module.exports = _wrapNativeSuper;
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14903,7 +14883,7 @@ exports.push([module.i, ":host(button-element){font:inherit;line-height:inherit;
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports) {
 
 function _arrayWithoutHoles(arr) {
@@ -14919,7 +14899,7 @@ function _arrayWithoutHoles(arr) {
 module.exports = _arrayWithoutHoles;
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports) {
 
 function _iterableToArray(iter) {
@@ -14929,7 +14909,7 @@ function _iterableToArray(iter) {
 module.exports = _iterableToArray;
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports) {
 
 function _nonIterableSpread() {
@@ -14939,10 +14919,24 @@ function _nonIterableSpread() {
 module.exports = _nonIterableSpread;
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=button-element> <button> <effect-ripple start=mousedown end=mouseup speed=600 opacity=0.25 direction=auto></effect-ripple> <effect-bounce-z start=mousedown amount=-4 speed=300></effect-bounce-z> <slot></slot> <style type=text/css rel=stylesheet style=display:none class=themeStyles></style> <style type=text/css rel=stylesheet style=display:none class=injectedStyles></style> </button> </div> ";
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+module.exports = _assertThisInitialized;
 
 /***/ }),
 /* 25 */
