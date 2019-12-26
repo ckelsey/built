@@ -1,18 +1,6 @@
-let iframe, doc, fragment
+const fragment = document.createDocumentFragment()
 
 export const CreateElement = obj => {
-    if (!iframe) {
-        iframe = document.createElement(`iframe`)
-    }
-
-    if (!doc) {
-        doc = iframe.contentWindow.document
-    }
-
-    if (!fragment) {
-        fragment = doc.createDocumentFragment()
-    }
-
     const el = document.createElement(obj.tagName || `div`)
     fragment.appendChild(el)
 

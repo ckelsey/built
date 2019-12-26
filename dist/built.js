@@ -1449,20 +1449,8 @@ function WCElements(host, elements) {
 }
 // CONCATENATED MODULE: ./src/utils/create-element.js
 
-var iframe, create_element_doc, fragment;
+var fragment = document.createDocumentFragment();
 var create_element_CreateElement = function CreateElement(obj) {
-  if (!iframe) {
-    iframe = document.createElement("iframe");
-  }
-
-  if (!create_element_doc) {
-    create_element_doc = iframe.contentWindow.document;
-  }
-
-  if (!fragment) {
-    fragment = create_element_doc.createDocumentFragment();
-  }
-
   var el = document.createElement(obj.tagName || "div");
   fragment.appendChild(el);
   Object.keys(obj).forEach(function (key) {
