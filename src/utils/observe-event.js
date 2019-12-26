@@ -18,7 +18,17 @@ export function ObserveEvent(element, eventName, options = {}) {
         element.alert &&
         element.setInterval
 
-    const getParent = () => !element ? undefined : Get(element, `parentNode`, Get(element, `host`, Get(element, `__shady_parent.host`)))
+    const getParent = () => {
+        if (!element) { return undefined }
+
+        const parent = Get(element, `parentNode`, Get(element, `host`, Get(element, `__shady_parent.host`)))
+
+        if (parent.nodeName === `#document-fragment`) {
+            return Get(parent, `host`)
+        }
+
+        return parent
+    }
 
     const startup = () => {
         if (!element || (!element.parentNode && !element.host) || isRunning) { return }
@@ -74,9 +84,9 @@ export function ObserveEvent(element, eventName, options = {}) {
     })
 
     let max = 1000
+
     const tryToObserveIt = () => {
         const parent = getParent()
-        console.log(parent, element)
         max = max - 1
 
         if (!max) { return dispose() }

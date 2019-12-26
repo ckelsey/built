@@ -2254,7 +2254,17 @@ function ObserveEvent(element, eventName) {
   };
 
   var getParent = function getParent() {
-    return !element ? undefined : Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")));
+    if (!element) {
+      return undefined;
+    }
+
+    var parent = Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")));
+
+    if (parent.nodeName === "#document-fragment") {
+      return Object(utils_get["a" /* Get */])(parent, "host");
+    }
+
+    return parent;
   };
 
   var startup = function startup() {
@@ -2324,7 +2334,6 @@ function ObserveEvent(element, eventName) {
 
   var tryToObserveIt = function tryToObserveIt() {
     var parent = getParent();
-    console.log(parent, element);
     max = max - 1;
 
     if (!max) {
