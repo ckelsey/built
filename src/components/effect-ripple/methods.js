@@ -4,11 +4,9 @@ const maxScale = 1.3
 
 const animator = (points, speed, stepFn) => new Promise(resolve =>
     Timer(
-        speed,
         stepFn,
-        EaseInOut(points, speed),
-        resolve
-    )
+        EaseInOut(points, speed)
+    ).then(resolve)
 )
 
 const runStart = host => {

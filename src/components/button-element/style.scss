@@ -12,7 +12,7 @@ button-element {
     position: relative;
 }
 
-.button-element {
+.button-element-container {
     display: block;
     position: relative;
     margin: 1.4em 0;
@@ -30,6 +30,28 @@ button-element {
     &.short {
         button {
             padding: 0.5em 1em;
+        }
+    }
+
+    &.nobackground {
+        button {
+            background: transparent;
+            background-color: transparent;
+
+            &:hover {
+                background: transparent;
+                background-color: transparent;
+            }
+        }
+    }
+
+    &.noshadow {
+        button {
+            box-shadow: none;
+
+            &:hover {
+                box-shadow: none;
+            }
         }
     }
 

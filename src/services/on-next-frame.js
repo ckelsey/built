@@ -1,9 +1,3 @@
-/**
- * TODO
- * - memoize
- * - return promise
- */
-
 import { ID } from '..'
 
 const OnNextFrameKey = Symbol.for(`builtjs.OnNextFrameKey`)
@@ -60,7 +54,10 @@ if (!hasOnNextFrame) {
             resolve,
             reject,
             id,
-            cancel: () => delete OnNextFrameQueueObject[id]
+            cancel: () => {
+                OnNextFrameQueueObject[id] = null
+                delete OnNextFrameQueueObject[id]
+            }
         }
 
         OnNextFrameQueue.push(id)

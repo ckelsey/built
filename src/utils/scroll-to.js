@@ -2,11 +2,9 @@ import { Timer, EaseInOut, Get } from '..'
 
 const animator = (from, to, speed, stepFn) => new Promise(resolve =>
     Timer(
-        speed,
         stepFn,
-        EaseInOut([from, to], speed),
-        resolve
-    )
+        EaseInOut([from, to], speed)
+    ).then(resolve)
 )
 
 export function ScrollTo(options) {

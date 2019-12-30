@@ -159,11 +159,9 @@ const setPositions = host => {
 
 const animator = (points, speed, stepFn) => new Promise(resolve =>
     Timer(
-        speed,
         stepFn,
         EaseInOut(points, speed),
-        resolve
-    )
+    ).then(resolve)
 )
 
 export const OverlayContent = WCConstructor({

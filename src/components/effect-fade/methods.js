@@ -4,17 +4,15 @@ const runAnimation = (host, isOn) => {
     if (!Array.isArray(host.targets)) { return }
 
     Timer(
-        host.speed,
         opacity => {
             const set = el => el.style.opacity = opacity
             host.targets.forEach(target => Array.isArray(target) ? target.forEach(set) : set(target))
         },
-        GetCurve(isOn ? host.opacity.slice() : host.opacity.slice().reverse(), isOn ? host.spring : 0.5, false, host.speed),
-        () => {
-            const set = el => el.style.opacity = isOn ? 1 : 0
-            host.targets.forEach(target => Array.isArray(target) ? target.forEach(set) : set(target))
-        }
-    )
+        GetCurve(isOn ? host.opacity.slice() : host.opacity.slice().reverse(), isOn ? host.spring : 0.5, false, host.speed)
+    ).then(() => {
+        const set = el => el.style.opacity = isOn ? 1 : 0
+        host.targets.forEach(target => Array.isArray(target) ? target.forEach(set) : set(target))
+    })
 }
 
 const runEnd = host => () => {

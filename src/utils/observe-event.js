@@ -23,6 +23,8 @@ export function ObserveEvent(element, eventName, options = {}) {
 
         const parent = Get(element, `parentNode`, Get(element, `host`, Get(element, `__shady_parent.host`)))
 
+        if (!parent) { return }
+
         if (parent.nodeName === `#document-fragment`) {
             return Get(parent, `host`)
         }

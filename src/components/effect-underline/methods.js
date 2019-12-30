@@ -4,11 +4,9 @@ const signalEnd = host => runEnd(host)
 
 const animator = (points, speed, stepFn) => new Promise(resolve =>
     Timer(
-        speed,
         stepFn,
         EaseInOut(points, speed),
-        resolve
-    )
+    ).then(resolve)
 )
 
 const runAnimation = (host, isOn) => {

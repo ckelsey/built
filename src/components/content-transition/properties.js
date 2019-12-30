@@ -1,4 +1,4 @@
-import { ComponentClassObject, Pipe, ToBool, IfInvalid } from '../..'
+import { ComponentClassObject, Pipe, ToBool, IfInvalid, ToNumber } from '../..'
 import { setStyles, setKeepChildren } from './elements'
 
 export const properties = {
@@ -15,7 +15,7 @@ export const properties = {
     },
 
     speed: {
-        format: val => isNaN(val) ? 300 : val
+        format: val => Pipe(ToNumber, IfInvalid(300))(val).value
     },
 
     type: {

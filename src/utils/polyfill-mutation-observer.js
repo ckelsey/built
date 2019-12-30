@@ -1,4 +1,4 @@
-import { Timer } from '..'
+import { OnNextFrame } from '..'
 
 export function PolyfillMutationObserver(w) {
     (function () {
@@ -15,14 +15,18 @@ export function PolyfillMutationObserver(w) {
             const cb = this.callBack
             let oldHtml
 
-            this.interval = Timer(0, () => {
+            const func = () => {
                 const html = element.innerHTML
 
                 if (html !== oldHtml) {
                     oldHtml = html
                     return cb.apply(null)
                 }
-            })
+
+                this.interval = OnNextFrame(func)
+            }
+
+            func()
         }
 
         w.MutationObserver.prototype.disconnect = function () {

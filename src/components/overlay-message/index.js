@@ -2,7 +2,7 @@ import {
     // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool,
     IfInvalid, ToString, IndexOf, Get, Set, ObserveEvent, EaseInOut,
-    ObserverUnsubscribe, ObserveSlots, OnNextFrame, Animator
+    ObserverUnsubscribe, ObserveSlots, OnNextFrame, Timer
 } from '../..'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -11,6 +11,7 @@ const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `overlay-message`
 const componentRoot = `.${componentName}-container`
+const speed = 333
 
 const setStyles = (el, styles) => {
     if (!el) { return }
@@ -26,16 +27,14 @@ const setShown = host => {
 
     if (!host.shown && (opacityNow === `` || opacityNow === `0`)) { return }
 
-    Animator({
-        duration: 333,
-        frameValues: EaseInOut(host.shown ? [0, 1] : [1, 0], 200),
-        stepFn: opacityStep => root.style.opacity = opacityStep,
-        completeFn: () => OnNextFrame(() => {
-            root.classList[host.shown ? `add` : `remove`](`shown`)
-            host.dispatchEvent(
-                new CustomEvent(host.shown ? `opened` : `closed`, { detail: host })
-            )
-        })
+    Timer(
+        opacityStep => root.style.opacity = opacityStep,
+        EaseInOut(host.shown ? [0, 1] : [1, 0], speed)
+    ).then(() => {
+        root.classList[host.shown ? `add` : `remove`](`shown`)
+        host.dispatchEvent(
+            new CustomEvent(host.shown ? `opened` : `closed`, { detail: host })
+        )
     })
 }
 

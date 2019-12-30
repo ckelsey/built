@@ -2,11 +2,9 @@ import { GetCurve, ObserveEvent, Timer, Get, OnNextFrame } from '../..'
 
 const animator = (points, speed, stepFn) => new Promise(resolve =>
     Timer(
-        speed,
         stepFn,
-        GetCurve(points, 0.5, false, speed),
-        resolve
-    )
+        GetCurve(points, 0.5, false, speed)
+    ).then(resolve)
 )
 
 const runStart = host => () => {

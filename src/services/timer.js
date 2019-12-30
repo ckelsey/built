@@ -1,7 +1,27 @@
 import { ID, OnNextFrame } from '..'
 
+const TimerKey = Symbol.for(`builtjs.TimerKey`)
+const globalSymbols = Object.getOwnPropertySymbols(global)
+const hasTimerKey = (globalSymbols.indexOf(TimerKey) > -1)
+
 const subscriptions = {}
 let isRunning = false
+
+const removeSubscription = subscription => {
+    if (!subscription || !subscription.id) { return }
+
+    const id = subscription.id
+
+    if (!subscriptions[id] || subscriptions[id].resolved) { return }
+
+    subscriptions[id].resolved = true
+    subscriptions[id].resolve()
+
+    OnNextFrame(() => {
+        subscriptions[id] = null
+        delete subscriptions[id]
+    })
+}
 
 const loop = () => {
     isRunning = true
@@ -13,46 +33,52 @@ const loop = () => {
     }
 
     subscriptionKeys.forEach(key => {
+        if (!subscriptions[key] || subscriptions[key].resolved) { return }
         const subscription = subscriptions[key]
+        const index = new Date().getTime() - subscription.started
 
-        OnNextFrame(() => {
-            const currentFrame = new Date().getTime() - subscription.started
-
-            if (!!subscription.duration && typeof subscription.frames[currentFrame] === `undefined`) {
-                return subscription.cancel()
-            }
-
-            subscription.fn(subscription.frames[currentFrame])
-        })
+        if (index >= subscription.frameValues.length) {
+            subscription.end = index
+            OnNextFrame(() => subscription.stepFn(subscription.frameValues[subscription.frameValues.length - 1]))
+            OnNextFrame(() => removeSubscription(subscription))
+        } else {
+            OnNextFrame(() => subscription.stepFn(subscription.frameValues[index]))
+        }
     })
 
     OnNextFrame(loop)
 }
 
-export function Timer(duration, stepFn, frameValues = undefined, completeFn = () => { }) {
-    if (!duration && duration !== 0) { return }
+if (!hasTimerKey) {
+    global[TimerKey] = (stepFn, frameValues) => {
+        if (!Array.isArray(frameValues) || frameValues.length === 0) { return }
+        if (typeof stepFn !== `function`) { return }
 
-    const id = ID()
+        const id = ID()
+        let resolve, reject
+        const promise = new Promise((res, rej) => {
+            resolve = res
+            reject = rej
+        })
 
-    subscriptions[id] = {
-        id,
-        duration,
-        complete: typeof completeFn !== `function` ? () => { } : completeFn,
-        cancel: () => {
-            if (!subscriptions[id]) { return }
+        subscriptions[id] = {
+            id,
+            stepFn,
+            frameValues: frameValues,
+            resolved: false,
+            started: new Date().getTime(),
+            cancel: () => removeSubscription(subscriptions[id]),
+            then: (fn) => promise.then(fn),
+            catch: (fn) => promise.catch(fn),
+            promise,
+            resolve,
+            reject
+        }
 
-            subscriptions[id].complete()
-            subscriptions[id] = null
-            delete subscriptions[id]
-        },
-        fn: typeof stepFn !== `function` ? () => { } : stepFn,
-        frames: frameValues ? frameValues.slice() : duration ? Array(duration).fill(0) : [],
-        started: new Date().getTime()
+        if (!isRunning) { loop() }
+
+        return subscriptions[id]
     }
-
-    if (!isRunning) {
-        loop()
-    }
-
-    return subscriptions[id]
 }
+
+export const Timer = Object.freeze(global[TimerKey])

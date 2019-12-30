@@ -91,7 +91,11 @@
             </snack-bar>
         </div>
 
-        <overlay-message id="overlayMessage"></overlay-message>
+        <overlay-message id="overlayMessage">
+            <div slot="header">Anti-Piracy Terms</div>
+            <div slot="body">Bods</div>
+            <button-element id="overlayMessageClose" slot="button">Close</button-element>
+        </overlay-message>
 
         <overlay-content id="overlayContnt">
             <p>Content!</p>
@@ -128,13 +132,25 @@
         <script type="text/javascript" src="dist/built.js"></script>
 
         <script>
+            var overlayMessage = document.getElementById('overlayMessage')
+            var overlayMessageClose = document.getElementById('overlayMessageClose')
+            overlayMessageClose.addEventListener('click', function () {
+                overlayMessage.shown = false
+            })
+
             var transition = document.getElementById('content-transition')
             var ripple = document.getElementById('ripple-box')
             var icon = document.getElementById('icon')
             icon.svg = builtjs.iconArrow
             ripple.addEventListener('click', function () {
-                transition.transitionTo(transition.getIndex() === 0 ? 1 : 0)
+                overlayMessage.shown = true
+                transition
+                    .transitionChild(transition.querySelector('grid-layout'))
+                    .then(function (res) {
+                        console.log('trans', res)
+                    })
             })
+
         </script>
     </body>
 

@@ -3,6 +3,10 @@ import {
     ToString, SetStyleRules, ToBool
 } from '../..'
 
+const template = require(`./index.html`)
+const componentName = `button-element`
+const componentRoot = `.${componentName}-container`
+
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
 
@@ -84,11 +88,11 @@ const observedAttributes = Object.keys(properties)
 
 const elements = {
     root: {
-        selector: `.button-element`,
+        selector: componentRoot,
         onChange: () => { }
     },
     button: {
-        selector: `.button-element > button`,
+        selector: `${componentRoot} > button`,
         onChange: (el, host) => {
             setBounce(host)
             setRipple(host)
@@ -99,26 +103,23 @@ const elements = {
         }
     },
     ripple: {
-        selector: `effect-ripple`,
+        selector: `${componentRoot} > button > effect-ripple`,
         onChange: (_el, host) => setRipple(host)
     },
     bounce: {
-        selector: `effect-bounce-z`,
+        selector: `${componentRoot} > button > effect-bounce-z`,
         onChange: (_el, host) => setBounce(host)
     },
     injectedStyles: {
-        selector: `style.injectedStyles`,
+        selector: `${componentRoot} style.injectedStyles`,
         onChange: setStyles
     },
     theme: {
-        selector: `style.themeStyles`,
+        selector: `${componentRoot} style.themeStyles`,
         onChange: (_el, host) => setTheme(host.theme, host)
     }
 }
 
-const template = require(`./index.html`)
-const componentName = `button-element`
-const componentRoot = `.button-element`
 export const ButtonElement = WCConstructor({
     componentName,
     componentRoot,
