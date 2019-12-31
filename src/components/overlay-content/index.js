@@ -59,7 +59,6 @@ const setPositions = host => {
     host.getPositions().then(positions => {
         if (positions.outOfView) { return host.hide() }
 
-        console.log(host.showing, positions.inner.getBoundingClientRect().left)
         host.width = positions.containerWidth
 
         if (positions.rootBox.y !== 0) {
@@ -134,8 +133,6 @@ export const OverlayContent = WCConstructor({
             const inner = host.elements.inner
             const innerBox = Get(inner, `getBoundingClientRect()`, emptyBox)
             const isOnTop = spaceAbove > spaceBelow
-
-            console.log(innerBox.y)
 
             return Object.assign(
                 {},

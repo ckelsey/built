@@ -10968,7 +10968,6 @@ var overlay_content_setPositions = function setPositions(host) {
       return host.hide();
     }
 
-    console.log(host.showing, positions.inner.getBoundingClientRect().left);
     host.width = positions.containerWidth;
 
     if (positions.rootBox.y !== 0) {
@@ -11066,7 +11065,6 @@ var OverlayContent = WCConstructor({
           var inner = host.elements.inner;
           var innerBox = Object(utils_get["a" /* Get */])(inner, "getBoundingClientRect()", emptyBox);
           var isOnTop = spaceAbove > spaceBelow;
-          console.log(innerBox.y);
           return Object.assign({}, Object(utils_get["a" /* Get */])(container, "getBoundingClientRect()", emptyBox), {
             hostHeight: (isOnTop ? spaceAbove : spaceBelow) - positionPadding,
             scrollTop: Object(utils_get["a" /* Get */])(container, "scrollTop", 0),
@@ -11799,7 +11797,7 @@ var snack_bar_setIcon = function setIcon(host, key) {
     }
 
     icon[host[key][0] === "<" ? "svg" : "type"] = host[key];
-  })["catch"](console.log);
+  });
 };
 
 var showHideClose = function showHideClose(el, show) {

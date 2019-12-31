@@ -62,7 +62,6 @@ const setIcon = (host, key) => {
 
             icon[host[key][0] === `<` ? `svg` : `type`] = host[key]
         })
-        .catch(console.log)
 }
 
 const showHideClose = (el, show) => {
