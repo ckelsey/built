@@ -18,19 +18,15 @@ export function ObserveEvent(element, eventName, options = {}) {
         element.alert &&
         element.setInterval
 
-    const getParent = () => {
-        if (!element) { return undefined }
+    const getParent = () => Get(
+        element,
+        `parentNode`,
+        Get(element, `host`,
+            Get(element, `__shady_parent.host`)
+        ),
+        p => !!p & p.nodeName === `#document-fragment` ? Get(p, `host`) : p
+    )
 
-        const parent = Get(element, `parentNode`, Get(element, `host`, Get(element, `__shady_parent.host`)))
-
-        if (!parent) { return }
-
-        if (parent.nodeName === `#document-fragment`) {
-            return Get(parent, `host`)
-        }
-
-        return parent
-    }
 
     const startup = () => {
         if (!element || (!element.parentNode && !element.host) || isRunning) { return }

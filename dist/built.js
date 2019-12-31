@@ -2175,21 +2175,9 @@ function ObserveEvent(element, eventName) {
   };
 
   var getParent = function getParent() {
-    if (!element) {
-      return undefined;
-    }
-
-    var parent = Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")));
-
-    if (!parent) {
-      return;
-    }
-
-    if (parent.nodeName === "#document-fragment") {
-      return Object(utils_get["a" /* Get */])(parent, "host");
-    }
-
-    return parent;
+    return Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")), function (p) {
+      return !!p & p.nodeName === "#document-fragment" ? Object(utils_get["a" /* Get */])(p, "host") : p;
+    });
   };
 
   var startup = function startup() {
@@ -4001,15 +3989,18 @@ var cookie_message_properties = {
       return Pipe(ToBool, IfInvalid(!getCookie()))(val).value;
     },
     onChange: function onChange(val, host) {
+      var root = host.elements.root;
+
       if (val) {
         try {
           localStorage.removeItem(cookieName);
         } catch (error) {}
-
-        host.elements.root.classList.add("shown");
       } else {
         setCookie();
-        host.elements.root.classList.remove("shown");
+      }
+
+      if (root) {
+        root.classList[val ? "add" : "remove"]("shown");
       }
     }
   },
@@ -4365,11 +4356,7 @@ var DropDown = WCConstructor({
       slotObserver: ObserveSlots(host, true).subscribe(addClasses),
       docClick: ObserveEvent(document.body, "click").subscribe(function (e) {
         if (!WasClickedOn(host, e)) {
-          if (host.open) {
-            return drop_down_openClose(false, host);
-          }
-
-          return;
+          return host.open ? drop_down_openClose(false, host) : undefined;
         }
 
         if (WasClickedOn(Array.from(host.querySelectorAll("[slot=\"option\"]")), e)) {
@@ -10871,43 +10858,55 @@ WCDefine(input_field_componentName, InputField);
 
 var overlay_content_style = __webpack_require__(60).toString();
 
-var overlay_content_setStyles = function setStyles(el, styles) {
-  if (!el) {
-    return;
-  }
-
-  SetStyleRules(el, styles);
-};
+var positionPadding = 40;
+var widths = ["content", "target"];
 var overlay_content_alignments = ["center", "left", "right", "top", "bottom", "center center", "center top", "center bottom", "left center", "left top", "left bottom", "right center", "right top", "right bottom"];
+var emptyBox = {
+  top: 0,
+  y: 0,
+  bottom: 0,
+  left: 0,
+  x: 0,
+  right: 0,
+  width: 0,
+  height: 0
+};
 
 var overlay_content_template = __webpack_require__(61);
 
 var overlay_content_componentName = "overlay-content";
 var overlay_content_componentRoot = ".overlay-content-container";
-var positionPadding = 40;
-var overlay_content_elements = {};
-var overlay_content_elementSelectors = {
-  root: overlay_content_componentRoot,
-  contentContainer: ".overlay-content-content-container",
-  contentInner: ".overlay-content-content-inner",
-  inner: ".overlay-content-container-inner",
-  themeStyles: "style.themeStyles",
-  injectedStyles: "style.injectedStyles"
-}; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-
-Object.keys(overlay_content_elementSelectors).forEach(function (key) {
-  overlay_content_elements[key] = {
-    selector: overlay_content_elementSelectors[key],
-    onChange: key === "injectedStyles" ? function (el, host) {
+var overlay_content_elements = {
+  root: {
+    selector: overlay_content_componentRoot
+  },
+  contentContainer: {
+    selector: ".".concat(overlay_content_componentName, "-content-container")
+  },
+  contentInner: {
+    selector: ".".concat(overlay_content_componentName, "-content-inner")
+  },
+  inner: {
+    selector: ".".concat(overlay_content_componentName, "-container-inner")
+  },
+  themeStyles: {
+    selector: "style.themeStyles",
+    onChange: function onChange(el, host) {
       return overlay_content_setStyles(el, host.styles);
-    } : function () {}
-  };
-});
-var widths = ["content", "target"];
+    }
+  },
+  injectedStyles: {
+    selector: "style.injectedStyles",
+    onChange: function onChange(el, host) {
+      return overlay_content_setStyles(el, host.styles);
+    }
+  }
+};
 var overlay_content_attributes = {
+  "class": ComponentClassObject,
   target: {
     format: function format(val) {
-      return val instanceof HTMLElement ? val : null;
+      return val instanceof HTMLElement || val instanceof HTMLUnknownElement ? val : null;
     }
   },
   align: {
@@ -10925,7 +10924,6 @@ var overlay_content_attributes = {
       return Pipe(ToNumber, IfInvalid(333))(val).value;
     }
   },
-  "class": ComponentClassObject,
   widthbasis: {
     format: function format(val) {
       return Pipe(IndexOf(widths), IfInvalid("content"))(val).value;
@@ -10949,71 +10947,67 @@ var overlay_content_attributes = {
   }
 };
 
-var getWidth = function getWidth(host) {
-  var targetWidth = host.target ? "".concat(host.target.getBoundingClientRect().width, "px") : "auto";
-  return {
-    width: !host.widthbasis || host.widthbasis === "content" ? "auto" : targetWidth,
-    minWidth: targetWidth
-  };
+var overlay_content_setStyles = function setStyles(el, styles) {
+  if (!el) {
+    return;
+  }
+
+  SetStyleRules(el, styles);
 };
 
 var overlay_content_setPositions = function setPositions(host) {
-  Object(utils_get["a" /* Get */])(host, "setPositionsTimer.cancel()");
-  host.setPositionsTimer = Object(on_next_frame["a" /* OnNextFrame */])(function () {
-    var target = host.target;
+  cancelAnimationFrame(host.positionTimer);
+  var target = host.target;
 
-    if (!host.showing || !target) {
-      return;
-    }
+  if (!host.showing || !target) {
+    return;
+  }
 
-    var container = host.elements.contentContainer;
-    var inner = host.elements.inner;
-    var rootBox = host.elements.root.getBoundingClientRect();
-
-    if (rootBox.y !== 0) {
-      inner.style.top = "-".concat(rootBox.y, "px");
-    }
-
-    if (rootBox.x !== 0) {
-      inner.style.left = "-".concat(rootBox.x, "px");
-    }
-
-    if (rootBox.width !== document.documentElement.clientWidth) {
-      inner.style.width = "".concat(document.documentElement.clientWidth, "px");
-    }
-
-    if (rootBox.height !== document.documentElement.clientHeight) {
-      inner.style.height = "".concat(document.documentElement.clientHeight, "px");
-    }
-
-    var targetBox = target.getBoundingClientRect();
-    var isOnTop = host.isOnTop;
-
-    if (targetBox.top - 10 > document.documentElement.clientHeight || targetBox.bottom + 10 < 0) {
+  host.getPositions().then(function (positions) {
+    if (positions.outOfView) {
       return host.hide();
     }
 
-    var widths = getWidth(host);
-    container.style.width = widths.width;
-    container.style.minWidth = widths.minWidth;
-    container.style.height = "auto";
-    container.style.maxHeight = "".concat(host.height, "px");
-    var left = targetBox.left + container.offsetWidth >= window.innerWidth - 10 ? targetBox.right - container.offsetWidth : targetBox.left;
-    container.style.left = "".concat(left, "px");
-    container.style.top = "".concat(isOnTop ? targetBox.top - container.offsetHeight : host.spaceAbove + targetBox.height, "px");
-    var origin = "center ".concat(isOnTop ? "bottom" : "top");
-    host.width = container.offsetWidth;
-    container.style.transformOrigin = "".concat(origin);
+    console.log(host.showing, positions.inner.getBoundingClientRect().left);
+    host.width = positions.containerWidth;
 
-    if (inner.classList.contains("bottom") && isOnTop) {
-      inner.classList.remove("bottom");
+    if (positions.rootBox.y !== 0) {
+      positions.inner.style.top = "-".concat(positions.rootBox.y, "px");
     }
 
-    if (!inner.classList.contains("bottom") && !isOnTop) {
-      inner.classList.add("bottom");
+    if (positions.rootBox.x !== 0) {
+      positions.inner.style.left = "-".concat(positions.rootBox.x, "px");
     }
 
-    setPositions(host);
+    if (positions.rootBox.width !== positions.clientWidth) {
+      positions.inner.style.width = "".concat(positions.clientWidth, "px");
+    }
+
+    if (positions.rootBox.height !== positions.clientHeight) {
+      positions.inner.style.height = "".concat(positions.clientHeight, "px");
+    }
+
+    positions.container.style.width = positions.targetWidth;
+    positions.container.style.minWidth = positions.targetMinWidth;
+    positions.container.style.height = "auto";
+    positions.container.style.maxHeight = "".concat(positions.hostHeight, "px");
+    positions.container.style.left = "".concat(positions.containerLeft, "px");
+    positions.container.style.top = "".concat(positions.isOnTop ? positions.targetBox.top - positions.containerHeight : positions.spaceAbove + positions.targetBox.height, "px");
+    positions.container.style.transformOrigin = "center ".concat(positions.isOnTop ? "bottom" : "top");
+
+    if (positions.inner.classList.contains("bottom") && positions.isOnTop) {
+      positions.inner.classList.remove("bottom");
+    }
+
+    if (!positions.inner.classList.contains("bottom") && !positions.isOnTop) {
+      positions.inner.classList.add("bottom");
+    }
+
+    host.positionTimer = requestAnimationFrame(function () {
+      return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        return setPositions(host);
+      });
+    });
   });
 };
 
@@ -11048,77 +11042,65 @@ var OverlayContent = WCConstructor({
     }
   }, overlay_content_attributes),
   computed: {
-    height: function height(host) {
-      return {
-        get: function get() {
-          return (host.isOnTop ? host.spaceAbove : host.spaceBelow) - positionPadding;
-        }
-      };
-    },
-    isOnTop: function isOnTop(host) {
-      return {
-        get: function get() {
-          return host.spaceAbove > host.spaceBelow;
-        }
-      };
-    },
-    spaceAbove: function spaceAbove(host) {
-      return {
-        get: function get() {
-          return host.target ? host.target.getBoundingClientRect().top : 0;
-        }
-      };
-    },
-    spaceBelow: function spaceBelow(host) {
-      return {
-        get: function get() {
-          return document.documentElement.clientHeight - (host.spaceAbove + (host.target ? host.target.getBoundingClientRect().height : 0));
-        }
-      };
-    },
     position: function position(host) {
       return {
         get: function get() {
-          return Object(on_next_frame["a" /* OnNextFrame */])(function () {
-            var container = host.elements.contentContainer;
-
-            if (!container) {
-              return {
-                top: 0,
-                y: 0,
-                bottom: 0,
-                left: 0,
-                x: 0,
-                right: 0,
-                width: 0,
-                height: 0,
-                scrollTop: 0,
-                scrollLeft: 0
-              };
-            }
-
-            var box = container.getBoundingClientRect();
-            return {
-              top: box.top,
-              y: box.y,
-              bottom: box.bottom,
-              left: box.left,
-              x: box.x,
-              right: box.right,
-              width: box.width,
-              height: box.height,
-              scrollTop: container.scrollTop,
-              scrollLeft: container.scrollLeft
-            };
-          }).promise;
+          return host.getPositions();
         }
       };
     }
   },
   methods: {
+    getPositions: function getPositions(host) {
+      return function () {
+        return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+          var container = host.elements.contentContainer;
+          var targetBox = Object(utils_get["a" /* Get */])(host, "target.getBoundingClientRect()", emptyBox);
+          var targetMinWidth = targetBox.width ? "".concat(targetBox.width, "px") : "auto";
+          var spaceAbove = targetBox.top;
+          var clientHeight = document.documentElement.clientHeight;
+          var spaceBelow = clientHeight - (targetBox.top + targetBox.height);
+          var containerWidth = Object(utils_get["a" /* Get */])(container, "offsetWidth", 0);
+          var containerHeight = Object(utils_get["a" /* Get */])(container, "offsetHeight", 0);
+          var windowWidth = window.innerWidth;
+          var inner = host.elements.inner;
+          var innerBox = Object(utils_get["a" /* Get */])(inner, "getBoundingClientRect()", emptyBox);
+          var isOnTop = spaceAbove > spaceBelow;
+          console.log(innerBox.y);
+          return Object.assign({}, Object(utils_get["a" /* Get */])(container, "getBoundingClientRect()", emptyBox), {
+            hostHeight: (isOnTop ? spaceAbove : spaceBelow) - positionPadding,
+            scrollTop: Object(utils_get["a" /* Get */])(container, "scrollTop", 0),
+            scrollLeft: Object(utils_get["a" /* Get */])(container, "scrollLeft", 0),
+            targetWidth: !host.widthbasis || host.widthbasis === "content" ? "auto" : targetMinWidth,
+            targetMinWidth: targetMinWidth,
+            targetBox: targetBox,
+            rootBox: Object(utils_get["a" /* Get */])(host, "elements.root.getBoundingClientRect()", emptyBox),
+            spaceAbove: spaceAbove,
+            spaceBelow: spaceBelow,
+            isOnTop: isOnTop,
+            clientWidth: document.documentElement.clientWidth,
+            clientHeight: clientHeight,
+            windowWidth: windowWidth,
+            containerWidth: containerWidth,
+            containerHeight: containerHeight,
+            containerTop: (isOnTop ? targetBox.top - containerHeight : spaceAbove + targetBox.height) - innerBox.y,
+            containerLeft: (targetBox.left + containerWidth >= windowWidth - 10 ? targetBox.right - containerWidth : targetBox.left) - innerBox.left,
+            container: container,
+            inner: inner,
+            innerBox: innerBox,
+            outOfView: targetBox.top - 10 > clientHeight || targetBox.bottom + 10 < 0
+          });
+        }).promise;
+      };
+    },
     scrollContent: function scrollContent(host) {
       return function (x, y) {
         var container = host.elements.contentContainer;
+
+        if (!container) {
+          return;
+        }
+
         container.scrollTop = y;
         container.scrollLeft = x;
       };
@@ -11133,6 +11115,11 @@ var OverlayContent = WCConstructor({
           host.showing = true;
           var container = host.elements.contentContainer;
           var inner = host.elements.inner;
+
+          if (!container || !inner) {
+            return;
+          }
+
           container.style.pointerEvents = "all";
           inner.style.display = "block";
           overlay_content_animator([0, 1.02, 0.99, 1], host.speed / 2, function (scalePoint) {
@@ -11157,6 +11144,11 @@ var OverlayContent = WCConstructor({
           host.showing = false;
           var container = host.elements.contentContainer;
           var inner = host.elements.inner;
+
+          if (!container || !inner) {
+            return;
+          }
+
           inner.style.display = container.style.pointerEvents = "none";
           container.style.transform = "scale(1, 0)";
           container.style.opacity = 0;
@@ -15894,7 +15886,7 @@ module.exports = "<div class=cookie-message-container> <div class=cookie-message
 
 exports = module.exports = __webpack_require__(0)(false);
 // Module
-exports.push([module.i, "drop-down{outline:none !important}.drop-down-container{display:-webkit-box;display:flex;flex-wrap:nowrap;-webkit-box-align:center;align-items:center;width:100%;position:relative;cursor:pointer;outline:none !important}.drop-down-container.opened overlay-content{z-index:4}.drop-down-container .drop-down-heading{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;flex-wrap:nowrap}.drop-down-container .drop-down-arrow{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;margin:0 0.25em 0 -0.5em}.drop-down-container .drop-down-arrow svg{fill:currentColor}.drop-down-container .drop-down-label{position:relative;display:-webkit-inline-box;display:inline-flex;-webkit-box-align:center;align-items:center;opacity:1;-webkit-transition:opacity 0.2s ease-in-out;transition:opacity 0.2s ease-in-out}.drop-down-container .drop-down-label:after{position:relative;display:inline-block;content:\"\\00a0\"}.drop-down-option{padding:0.5em 1em;color:inherit;background-color:#fafafa;outline:none !important}\n", ""]);
+exports.push([module.i, ":host(drop-down){outline:none !important;display:inline-block;position:relative}drop-down{outline:none !important;display:inline-block;position:relative}.drop-down-container{display:-webkit-box;display:flex;flex-wrap:nowrap;-webkit-box-align:center;align-items:center;width:100%;position:relative;cursor:pointer;outline:none !important}.drop-down-container.opened overlay-content{z-index:4}.drop-down-container .drop-down-heading{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;flex-wrap:nowrap}.drop-down-container .drop-down-arrow{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;margin:0 0.25em 0 -0.5em}.drop-down-container .drop-down-arrow svg{fill:currentColor}.drop-down-container .drop-down-label{position:relative;display:-webkit-inline-box;display:inline-flex;-webkit-box-align:center;align-items:center;opacity:1;-webkit-transition:opacity 0.2s ease-in-out;transition:opacity 0.2s ease-in-out}.drop-down-container .drop-down-label:after{position:relative;display:inline-block;content:\"\\00a0\"}.drop-down-option{padding:0.5em 1em;color:inherit;background-color:#fafafa;outline:none !important}\n", ""]);
 
 
 /***/ }),

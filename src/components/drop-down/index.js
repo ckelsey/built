@@ -145,10 +145,7 @@ export const DropDown = WCConstructor({
             slotObserver: ObserveSlots(host, true).subscribe(addClasses),
             docClick: ObserveEvent(document.body, `click`).subscribe(e => {
                 if (!WasClickedOn(host, e)) {
-                    if (host.open) {
-                        return openClose(false, host)
-                    }
-                    return
+                    return host.open ? openClose(false, host) : undefined
                 }
 
                 if (WasClickedOn(Array.from(host.querySelectorAll(`[slot="option"]`)), e)) {
@@ -156,7 +153,6 @@ export const DropDown = WCConstructor({
                 }
 
                 if (WasClickedOn([host.elements.heading, host.querySelector(`[slot="label"]`)], e)) {
-
                     host.dispatchEvent(new CustomEvent(`labelclick`, { detail: { host, event: e } }))
 
                     if (host.open) {

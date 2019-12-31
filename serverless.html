@@ -53,8 +53,10 @@
             }
 
         </style>
-        <script src="node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
-        <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+        <!-- 
+            <script src="node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
+            <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+         -->
     </head>
 
     <body>
@@ -101,11 +103,15 @@
             <p>Content!</p>
         </overlay-content>
 
-        <drop-down>
-            <span slot="label">Drop down</span>
-            <span slot="option">Option 1</span>
-            <span slot="option">Option 2</span>
-        </drop-down>
+        <div style="width:50%;position:fixed;left:50%;">
+            <div style="width:50%;position:relative;left:50%;">
+                <drop-down>
+                    <span slot="label">Drop down</span>
+                    <span slot="option">Option 1</span>
+                    <span slot="option">Option 2</span>
+                </drop-down>
+            </div>
+        </div>
 
         <div id="ripple-box">
             <effect-ripple targets='["#ripple-box"]'></effect-ripple>
@@ -129,27 +135,28 @@
             </grid-layout>
         </content-transition>
 
-        <script type="text/javascript" src="dist/built.js"></script>
+        <!-- <script type="text/javascript" src="dist/built.js"></script> -->
+        <script src="src/index.js" type="module"></script>
 
         <script>
-            var overlayMessage = document.getElementById('overlayMessage')
-            var overlayMessageClose = document.getElementById('overlayMessageClose')
-            overlayMessageClose.addEventListener('click', function () {
-                overlayMessage.shown = false
-            })
+            // var overlayMessage = document.getElementById('overlayMessage')
+            // var overlayMessageClose = document.getElementById('overlayMessageClose')
+            // overlayMessageClose.addEventListener('click', function () {
+            //     overlayMessage.shown = false
+            // })
 
-            var transition = document.getElementById('content-transition')
-            var ripple = document.getElementById('ripple-box')
-            var icon = document.getElementById('icon')
-            icon.svg = builtjs.iconArrow
-            ripple.addEventListener('click', function () {
-                overlayMessage.shown = true
-                transition
-                    .transitionChild(transition.querySelector('grid-layout'))
-                    .then(function (res) {
-                        console.log('trans', res)
-                    })
-            })
+            // var transition = document.getElementById('content-transition')
+            // var ripple = document.getElementById('ripple-box')
+            // var icon = document.getElementById('icon')
+            // icon.svg = builtjs.iconArrow
+            // ripple.addEventListener('click', function () {
+            //     overlayMessage.shown = true
+            //     transition
+            //         .transitionChild(transition.querySelector('grid-layout'))
+            //         .then(function (res) {
+            //             console.log('trans', res)
+            //         })
+            // })
 
         </script>
     </body>

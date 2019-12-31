@@ -1,5 +1,13 @@
+:host(drop-down) {
+    outline: none !important;
+    display: inline-block;
+    position: relative;
+}
+
 drop-down {
     outline: none !important;
+    display: inline-block;
+    position: relative;
 }
 
 .drop-down-container {

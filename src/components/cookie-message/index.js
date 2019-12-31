@@ -58,14 +58,18 @@ const properties = {
     shown: {
         format: val => Pipe(ToBool, IfInvalid(!getCookie()))(val).value,
         onChange: (val, host) => {
+            const root = host.elements.root
+
             if (val) {
                 try {
                     localStorage.removeItem(cookieName)
                 } catch (error) { }
-                host.elements.root.classList.add(`shown`)
             } else {
                 setCookie()
-                host.elements.root.classList.remove(`shown`)
+            }
+
+            if (root) {
+                root.classList[val ? `add` : `remove`](`shown`)
             }
         }
     },
