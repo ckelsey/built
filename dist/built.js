@@ -3603,7 +3603,29 @@ var methods_transitionEnd = function transitionEnd(next) {
   }).join(" "));
 };
 
-var methods_transitionSlide = function transitionSlide(host, index, speed, keepchildren) {
+var methods_resetElements = function resetElements(host, elements) {
+  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    elements.currentContainer.style.opacity = "1";
+    elements.currentContainer.style.removeProperty("opacity");
+    elements.currentContainer.removeAttribute("style");
+    elements.nextContainer.style.opacity = "0";
+    elements.nextContainer.style.removeProperty("opacity");
+    elements.nextContainer.removeAttribute("style");
+    elements.root.classList.remove("sliding");
+    dispatchTransitioned(host, elements.current, elements.child);
+    methods_transitionEnd(elements.child);
+    cleanup(host);
+    elements.root.style.removeProperty("height");
+
+    if (!host.keepchildren) {
+      while (host.getChildren().length > 1) {
+        removeElement(host.getChildren()[0]);
+      }
+    }
+  }).promise;
+};
+
+var methods_transitionSlide = function transitionSlide(host, index, speed) {
   return new Promise(function (resolve) {
     Object(on_next_frame["a" /* OnNextFrame */])(function () {
       var elements = getTransitionElements(host, index);
@@ -3628,12 +3650,7 @@ var methods_transitionSlide = function transitionSlide(host, index, speed, keepc
       var endHeight = elements.child.offsetHeight;
       methods_transitionStart(elements.current).then(function () {
         if (startHeight !== endHeight) {
-          animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed).then(function () {
-            Object(on_next_frame["a" /* OnNextFrame */])(function () {
-              elements.root.style.removeProperty("height");
-              methods_transitionEnd(elements.child);
-            });
-          });
+          animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed);
         }
 
         Object(on_next_frame["a" /* OnNextFrame */])(function () {
@@ -3650,24 +3667,16 @@ var methods_transitionSlide = function transitionSlide(host, index, speed, keepc
             elements.child.setAttribute("slot", "current");
           }
 
-          elements.currentContainer.removeAttribute("style");
-          elements.nextContainer.removeAttribute("style");
-          elements.root.classList.remove("sliding");
-          methods_transitionEnd(elements.child);
-          dispatchTransitioned(host, elements.current, elements.child);
-
-          if (!keepchildren) {
-            removeElement(elements.current);
-          }
-
-          return resolve(cleanup(host));
+          methods_resetElements(host, elements).then(function () {
+            return resolve(host.current);
+          });
         });
       });
     });
   });
 };
 
-var methods_runHeight = function runHeight(elements, speed, keepchildren, host) {
+var methods_runHeight = function runHeight(elements, speed, host) {
   return new Promise(function (resolve) {
     Object(on_next_frame["a" /* OnNextFrame */])(function () {
       dispatchTransition(host, elements.current, elements.child);
@@ -3689,12 +3698,6 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
       var endHeight = elements.child.offsetHeight;
       methods_transitionStart(elements.current).then(function () {
         var afterHeightSet = function afterHeightSet() {
-          if (!keepchildren) {
-            while (host.getChildren().length > 1) {
-              removeElement(host.getChildren()[0]);
-            }
-          }
-
           if (typeof Object(utils_get["a" /* Get */])(elements, "current.setAttribute") === "function") {
             elements.current.setAttribute("slot", "hidden");
           }
@@ -3704,15 +3707,12 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
             elements.child.style.removeProperty("opacity");
           }
 
-          elements.currentContainer.style.removeProperty("opacity");
-          elements.nextContainer.style.removeProperty("opacity");
           Object(on_next_frame["a" /* OnNextFrame */])(function () {
-            dispatchTransitioned(host, elements.current, elements.child);
-            methods_transitionEnd(elements.child);
-            cleanup(host);
+            elements.root.style.height = "unset";
             elements.root.style.removeProperty("height");
-            return resolve(host.current);
+            elements.root.removeAttribute("style");
           });
+          return resolve(host.current);
         };
 
         if (endHeight === startHeight) {
@@ -3725,7 +3725,7 @@ var methods_runHeight = function runHeight(elements, speed, keepchildren, host) 
   });
 };
 
-var transitionFade = function transitionFade(host, child, speed, keepchildren) {
+var methods_transitionFade = function transitionFade(host, child, speed) {
   return new Promise(function (resolve) {
     var elements = getTransitionElements(host, child);
 
@@ -3734,14 +3734,18 @@ var transitionFade = function transitionFade(host, child, speed, keepchildren) {
     }
 
     animateOpacity(1, 0, elements.currentContainer, speed * 0.75);
-    animateOpacity(0, 1, elements.nextContainer, speed);
-    methods_runHeight(elements, speed, keepchildren, host).then(function () {
-      resolve();
+    methods_runHeight(elements, speed, host);
+    animateOpacity(0, 1, elements.nextContainer, speed).then(function () {
+      Object(on_next_frame["a" /* OnNextFrame */])(function () {
+        methods_resetElements(host, elements).then(function () {
+          return resolve();
+        });
+      });
     });
   });
 };
 
-var transitionHeight = function transitionHeight(host, child, speed, keepchildren) {
+var transitionHeight = function transitionHeight(host, child, speed) {
   return new Promise(function (resolve) {
     var elements = getTransitionElements(host, child);
 
@@ -3749,7 +3753,11 @@ var transitionHeight = function transitionHeight(host, child, speed, keepchildre
       return resolve();
     }
 
-    methods_runHeight(elements, speed, keepchildren, host).then(resolve);
+    methods_runHeight(elements, speed, host).then(function () {
+      return methods_resetElements(host, elements).then(function () {
+        return resolve();
+      });
+    });
   });
 };
 
@@ -3771,13 +3779,13 @@ var methods_transitionTo = function transitionTo(host) {
 
         switch (host.type) {
           case "slide":
-            return methods_transitionSlide(host, index, host.speed, host.keepchildren).then(resolve);
+            return methods_transitionSlide(host, index, host.speed).then(resolve);
 
           case "fade":
-            return transitionFade(host, index, host.speed, host.keepchildren).then(resolve);
+            return methods_transitionFade(host, index, host.speed).then(resolve);
 
           case "height":
-            return transitionHeight(host, index, host.speed, host.keepchildren).then(resolve);
+            return transitionHeight(host, index, host.speed).then(resolve);
         }
       };
 
@@ -3803,13 +3811,13 @@ var methods_transitionChild = function transitionChild(host) {
 
         switch (host.type) {
           case "slide":
-            return methods_transitionSlide(host, child, host.speed, host.keepchildren).then(resolve);
+            return methods_transitionSlide(host, child, host.speed).then(resolve);
 
           case "fade":
-            return transitionFade(host, child, host.speed, host.keepchildren).then(resolve);
+            return methods_transitionFade(host, child, host.speed).then(resolve);
 
           case "height":
-            return transitionHeight(host, child, host.speed, host.keepchildren).then(resolve);
+            return transitionHeight(host, child, host.speed).then(resolve);
         }
       };
 
