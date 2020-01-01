@@ -85,7 +85,12 @@ const openClose = (open, host) => {
 const elements = {
     root: { selector: componentRoot },
     heading: { selector: `.drop-down-heading` },
-    overlay: { selector: `.drop-down-overlay` },
+    overlay: {
+        selector: `.drop-down-overlay`,
+        onChange(el, host) {
+            el.target = host
+        }
+    },
     injectedStyles: {
         selector: `style.injectedStyles`,
         onChange: (_el, host) => setStyleElement(host)
@@ -167,9 +172,6 @@ export const DropDown = WCConstructor({
                 }
             })
         }
-
-        const overlay = host.elements.overlay
-        overlay.target = host
     },
     onDisconnected(host) { ObserverUnsubscribe(host) }
 })
