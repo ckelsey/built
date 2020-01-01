@@ -200,12 +200,8 @@ const transitionFade = (host, child, speed) => new Promise(resolve => {
 
     animateOpacity(1, 0, elements.currentContainer, speed * 0.75)
     runHeight(elements, speed, host)
-    animateOpacity(0, 1, elements.nextContainer, speed)
-        .then(() => {
-            OnNextFrame(() => {
-                resetElements(host, elements).then(() => resolve())
-            })
-        })
+    animateOpacity(0, 1, elements.nextContainer, speed * 1.1)
+        .then(() => resetElements(host, elements).then(resolve))
 })
 
 const transitionHeight = (host, child, speed) => new Promise(resolve => {
@@ -247,9 +243,9 @@ export const transitionChild = host => child => new Promise(resolve => {
     let maxTries = 1000
     const run = () => {
         maxTries = maxTries - 1
-        if (!host.speed) {
-            if (!maxTries) { return }
 
+        if (!host.speed && host.speed !== 0) {
+            if (!maxTries) { return }
             return OnNextFrame(run)
         }
 

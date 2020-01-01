@@ -3725,7 +3725,7 @@ var methods_runHeight = function runHeight(elements, speed, host) {
   });
 };
 
-var methods_transitionFade = function transitionFade(host, child, speed) {
+var transitionFade = function transitionFade(host, child, speed) {
   return new Promise(function (resolve) {
     var elements = getTransitionElements(host, child);
 
@@ -3735,12 +3735,8 @@ var methods_transitionFade = function transitionFade(host, child, speed) {
 
     animateOpacity(1, 0, elements.currentContainer, speed * 0.75);
     methods_runHeight(elements, speed, host);
-    animateOpacity(0, 1, elements.nextContainer, speed).then(function () {
-      Object(on_next_frame["a" /* OnNextFrame */])(function () {
-        methods_resetElements(host, elements).then(function () {
-          return resolve();
-        });
-      });
+    animateOpacity(0, 1, elements.nextContainer, speed * 1.1).then(function () {
+      return methods_resetElements(host, elements).then(resolve);
     });
   });
 };
@@ -3782,7 +3778,7 @@ var methods_transitionTo = function transitionTo(host) {
             return methods_transitionSlide(host, index, host.speed).then(resolve);
 
           case "fade":
-            return methods_transitionFade(host, index, host.speed).then(resolve);
+            return transitionFade(host, index, host.speed).then(resolve);
 
           case "height":
             return transitionHeight(host, index, host.speed).then(resolve);
@@ -3801,7 +3797,7 @@ var methods_transitionChild = function transitionChild(host) {
       var run = function run() {
         maxTries = maxTries - 1;
 
-        if (!host.speed) {
+        if (!host.speed && host.speed !== 0) {
           if (!maxTries) {
             return;
           }
@@ -3814,7 +3810,7 @@ var methods_transitionChild = function transitionChild(host) {
             return methods_transitionSlide(host, child, host.speed).then(resolve);
 
           case "fade":
-            return methods_transitionFade(host, child, host.speed).then(resolve);
+            return transitionFade(host, child, host.speed).then(resolve);
 
           case "height":
             return transitionHeight(host, child, host.speed).then(resolve);
