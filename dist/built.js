@@ -4308,7 +4308,10 @@ var drop_down_elements = {
     selector: ".drop-down-heading"
   },
   overlay: {
-    selector: ".drop-down-overlay"
+    selector: ".drop-down-overlay",
+    onChange: function onChange(el, host) {
+      el.target = host;
+    }
   },
   injectedStyles: {
     selector: "style.injectedStyles",
@@ -4400,8 +4403,6 @@ var DropDown = WCConstructor({
         }
       })
     };
-    var overlay = host.elements.overlay;
-    overlay.target = host;
   },
   onDisconnected: function onDisconnected(host) {
     ObserverUnsubscribe(host);
