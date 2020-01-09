@@ -3487,39 +3487,13 @@ function EaseInOut(values, duration) {
   });
 }
 // CONCATENATED MODULE: ./src/components/content-transition/methods.js
- // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+
 
 var methods_style = __webpack_require__(14).toString();
 
-var dispatchTransition = function dispatchTransition(host, from, to) {
-  host.dispatchEvent(new CustomEvent("transitioning", {
-    detail: {
-      host: host,
-      from: from,
-      to: to
-    }
-  }));
-};
-
-var dispatchTransitioned = function dispatchTransitioned(host, from, to) {
-  host.dispatchEvent(new CustomEvent("transitioned", {
-    detail: {
-      host: host,
-      from: from,
-      to: to
-    }
-  }));
-};
-
-var removeElement = function removeElement(el) {
-  try {
-    el.parentNode.removeChild(el);
-  } catch (error) {}
-};
-
 var methods_animator = function animator(from, to, speed, stepFn) {
   return new Promise(function (resolve) {
-    Object(timer["a" /* Timer */])(stepFn, EaseInOut([from, to], speed)).then(resolve);
+    return Object(timer["a" /* Timer */])(stepFn, EaseInOut([from, to], speed)).then(resolve);
   });
 };
 
@@ -3541,6 +3515,29 @@ var animateOpacity = function animateOpacity(from, to, el, speed) {
   });
 };
 
+var removeElement = function removeElement(el) {
+  try {
+    el.parentNode.removeChild(el);
+  } catch (error) {}
+};
+
+var dispatchTransition = function dispatchTransition(host, from, to, isEnd) {
+  return host.dispatchEvent(new CustomEvent("transition".concat(isEnd ? "ed" : "ing"), {
+    detail: {
+      host: host,
+      from: from,
+      to: to
+    }
+  }));
+};
+
+var methods_elementOpacity = function elementOpacity(el) {
+  var defaultOpacity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+  return Object(utils_get["a" /* Get */])(el, "style.opacity", defaultOpacity, function (val) {
+    return val === "" ? defaultOpacity : parseFloat(val);
+  });
+};
+
 var getChildren = function getChildren(host) {
   return function () {
     return Array.from(host.querySelectorAll("[slot]"));
@@ -3551,279 +3548,9 @@ var getCurrent = function getCurrent(host) {
     return host.querySelector("[slot=\"current\"]");
   };
 };
-
-var getTransitionElements = function getTransitionElements(host, indexOrChild) {
-  var nextContainer = host.elements.nextContainer;
-  var currentContainer = host.elements.currentContainer;
-  var root = host.elements.root;
-  var child = isNaN(indexOrChild) ? indexOrChild : host.getChildren()[indexOrChild];
-  var current = host.current || host.getCurrent();
-
-  if (!root || !nextContainer || !currentContainer || !child) {
-    return;
-  }
-
-  host.current = child;
-  return {
-    nextContainer: nextContainer,
-    currentContainer: currentContainer,
-    root: root,
-    child: child,
-    current: current
-  };
-};
-
-var cleanup = function cleanup(host) {
-  var children = host.getChildren();
-  var current = host.getCurrent();
-  host.end = {
-    current: current,
-    index: children.indexOf(current)
-  };
-  return host.current;
-};
-
-var methods_transitionStart = function transitionStart(current) {
-  return new Promise(function (resolve) {
-    if (current) {
-      current.className = Object(utils_get["a" /* Get */])(current, "className", "").split("content-transition-shown").join("").split(" ").filter(function (s) {
-        return !!s.trim();
-      }).join(" ");
-    }
-
-    Object(on_next_frame["a" /* OnNextFrame */])(function () {
-      return resolve();
-    });
-  });
-};
-
-var methods_transitionEnd = function transitionEnd(next) {
-  return next.className = "content-transition-shown ".concat(Object(utils_get["a" /* Get */])(next, "className", "").split("content-transition-shown").join("").split(" ").filter(function (s) {
-    return !!s.trim();
-  }).join(" "));
-};
-
-var methods_resetElements = function resetElements(host, elements) {
-  return Object(on_next_frame["a" /* OnNextFrame */])(function () {
-    elements.currentContainer.style.opacity = "1";
-    elements.currentContainer.style.removeProperty("opacity");
-    elements.currentContainer.removeAttribute("style");
-    elements.nextContainer.style.opacity = "0";
-    elements.nextContainer.style.removeProperty("opacity");
-    elements.nextContainer.removeAttribute("style");
-    elements.root.classList.remove("sliding");
-    dispatchTransitioned(host, elements.current, elements.child);
-    methods_transitionEnd(elements.child);
-    cleanup(host);
-    elements.root.style.removeProperty("height");
-
-    if (!host.keepchildren) {
-      while (host.getChildren().length > 1) {
-        removeElement(host.getChildren()[0]);
-      }
-    }
-  }).promise;
-};
-
-var methods_transitionSlide = function transitionSlide(host, index, speed) {
-  return new Promise(function (resolve) {
-    Object(on_next_frame["a" /* OnNextFrame */])(function () {
-      var elements = getTransitionElements(host, index);
-
-      if (!elements) {
-        return resolve();
-      }
-
-      dispatchTransition(host, elements.current, elements.child);
-      host.start = {
-        from: elements.current,
-        to: elements.child
-      };
-      var startHeight = elements.root.offsetHeight;
-      elements.root.style.height = "".concat(startHeight, "px");
-      elements.root.classList.add("sliding");
-
-      if (typeof Object(utils_get["a" /* Get */])(elements, "child.setAttribute") === "function") {
-        elements.child.setAttribute("slot", "next");
-      }
-
-      var endHeight = elements.child.offsetHeight;
-      methods_transitionStart(elements.current).then(function () {
-        if (startHeight !== endHeight) {
-          animateHeight(startHeight, elements.child.offsetHeight, elements.root, speed);
-        }
-
-        Object(on_next_frame["a" /* OnNextFrame */])(function () {
-          animateOpacity(0, 1, elements.nextContainer, speed * 0.25);
-        });
-        animateOpacity(1, 0, elements.currentContainer, speed * 0.8);
-        animateLeft(0, 100, elements.currentContainer, speed * 0.8);
-        animateLeft(-100, 0, elements.nextContainer, speed).then(function () {
-          if (typeof Object(utils_get["a" /* Get */])(elements, "current.setAttribute") === "function") {
-            elements.current.setAttribute("slot", "hidden");
-          }
-
-          if (typeof Object(utils_get["a" /* Get */])(elements, "child.setAttribute") === "function") {
-            elements.child.setAttribute("slot", "current");
-          }
-
-          methods_resetElements(host, elements).then(function () {
-            return resolve(host.current);
-          });
-        });
-      });
-    });
-  });
-};
-
-var methods_runHeight = function runHeight(elements, speed, host) {
-  return new Promise(function (resolve) {
-    Object(on_next_frame["a" /* OnNextFrame */])(function () {
-      dispatchTransition(host, elements.current, elements.child);
-      host.start = {
-        from: elements.current,
-        to: elements.child
-      };
-      var startHeight = elements.root.offsetHeight;
-      elements.root.style.height = "".concat(startHeight, "px");
-
-      if (typeof Object(utils_get["a" /* Get */])(elements, "child.setAttribute") === "function") {
-        elements.child.setAttribute("slot", "next");
-      }
-
-      if (!host.contains(elements.child)) {
-        host.appendChild(elements.child);
-      }
-
-      var endHeight = elements.child.offsetHeight;
-      methods_transitionStart(elements.current).then(function () {
-        var afterHeightSet = function afterHeightSet() {
-          if (typeof Object(utils_get["a" /* Get */])(elements, "current.setAttribute") === "function") {
-            elements.current.setAttribute("slot", "hidden");
-          }
-
-          if (typeof Object(utils_get["a" /* Get */])(elements, "child.setAttribute") === "function") {
-            elements.child.setAttribute("slot", "current");
-            elements.child.style.removeProperty("opacity");
-          }
-
-          Object(on_next_frame["a" /* OnNextFrame */])(function () {
-            elements.root.style.height = "unset";
-            elements.root.style.removeProperty("height");
-            elements.root.removeAttribute("style");
-          });
-          return resolve(host.current);
-        };
-
-        if (endHeight === startHeight) {
-          return setTimeout(afterHeightSet, speed);
-        }
-
-        animateHeight(startHeight, endHeight, elements.root, speed).then(afterHeightSet);
-      });
-    });
-  });
-};
-
-var transitionFade = function transitionFade(host, child, speed) {
-  return new Promise(function (resolve) {
-    var elements = getTransitionElements(host, child);
-
-    if (!elements) {
-      return resolve();
-    }
-
-    animateOpacity(1, 0, elements.currentContainer, speed * 0.75);
-    methods_runHeight(elements, speed, host);
-    animateOpacity(0, 1, elements.nextContainer, speed * 1.1).then(function () {
-      return methods_resetElements(host, elements).then(resolve);
-    });
-  });
-};
-
-var transitionHeight = function transitionHeight(host, child, speed) {
-  return new Promise(function (resolve) {
-    var elements = getTransitionElements(host, child);
-
-    if (!elements) {
-      return resolve();
-    }
-
-    methods_runHeight(elements, speed, host).then(function () {
-      return methods_resetElements(host, elements).then(function () {
-        return resolve();
-      });
-    });
-  });
-};
-
-var methods_transitionTo = function transitionTo(host) {
-  return function (index) {
-    return new Promise(function (resolve) {
-      var maxTries = 1000;
-
-      var run = function run() {
-        maxTries = maxTries - 1;
-
-        if (!host.speed) {
-          if (!maxTries) {
-            return;
-          }
-
-          return Object(on_next_frame["a" /* OnNextFrame */])(run);
-        }
-
-        switch (host.type) {
-          case "slide":
-            return methods_transitionSlide(host, index, host.speed).then(resolve);
-
-          case "fade":
-            return transitionFade(host, index, host.speed).then(resolve);
-
-          case "height":
-            return transitionHeight(host, index, host.speed).then(resolve);
-        }
-      };
-
-      run();
-    });
-  };
-};
-var methods_transitionChild = function transitionChild(host) {
-  return function (child) {
-    return new Promise(function (resolve) {
-      var maxTries = 1000;
-
-      var run = function run() {
-        maxTries = maxTries - 1;
-
-        if (!host.speed && host.speed !== 0) {
-          if (!maxTries) {
-            return;
-          }
-
-          return Object(on_next_frame["a" /* OnNextFrame */])(run);
-        }
-
-        switch (host.type) {
-          case "slide":
-            return methods_transitionSlide(host, child, host.speed).then(resolve);
-
-          case "fade":
-            return transitionFade(host, child, host.speed).then(resolve);
-
-          case "height":
-            return transitionHeight(host, child, host.speed).then(resolve);
-        }
-      };
-
-      run();
-    });
-  };
-};
 var getComponentStyles = function getComponentStyles(host) {
   return function () {
-    return "".concat(methods_style).concat(host.styles);
+    return "".concat(methods_style).concat(host.theme).concat(host.styles);
   };
 };
 var getIndex = function getIndex(host) {
@@ -3845,29 +3572,140 @@ var end$ = function end$(host) {
     return host.state.end.subscribe(next, error, complete);
   };
 };
+
+var getTransitionElements = function getTransitionElements(host, indexOrChild) {
+  var child = isNaN(indexOrChild) ? indexOrChild : host.getChildren()[indexOrChild];
+  var current = host.current || host.getCurrent();
+
+  if (!child) {
+    return;
+  }
+
+  host.current = child;
+  return {
+    nextContainer: host.elements.nextContainer,
+    currentContainer: host.elements.currentContainer,
+    root: host.elements.root,
+    child: child,
+    current: current
+  };
+};
+
+var endTransition = function endTransition(host, old, current, currentContainer, nextContainer) {
+  try {
+    if (old && old.slot !== "hidden") {
+      old.slot = "hidden";
+    }
+
+    if (current && current.slot !== "current") {
+      current.slot = "current";
+    }
+
+    currentContainer.style.removeProperty("transform");
+    currentContainer.style.removeProperty("opacity");
+    nextContainer.style.removeProperty("transform");
+    nextContainer.style.removeProperty("opacity");
+    host.elements.root.style.removeProperty("height");
+    host.end = {
+      current: current,
+      index: host.getChildren().indexOf(current)
+    };
+  } catch (error) {}
+
+  return current;
+};
+
+var startTransition = function startTransition(host, current, child) {
+  try {
+    if (!host.contains(child)) {
+      host.appendChild(child);
+    }
+
+    child.setAttribute("slot", "next");
+    host.start = {
+      from: current,
+      to: child
+    };
+    dispatchTransition(host, current, child);
+  } catch (error) {}
+};
+
+var methods_switchHeights = function switchHeights(root, child, speed) {
+  return new Promise(function (resolve) {
+    return Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      var endHeight = Object(utils_get["a" /* Get */])(child, "offsetHeight", 0);
+      var startHeight = Object(utils_get["a" /* Get */])(root, "offsetHeight", endHeight);
+      return endHeight === startHeight ? setTimeout(resolve, speed) : animateHeight(startHeight, endHeight, root, speed).then(resolve);
+    });
+  });
+};
+
+var transitionFade = function transitionFade(host, elements, speed) {
+  return Promise.all([Promise.resolve(function () {
+    return startTransition(host, elements.current, elements.child);
+  }), animateOpacity(methods_elementOpacity(elements.currentContainer), 0, elements.currentContainer, speed * 0.75), animateOpacity(methods_elementOpacity(elements.nextContainer, 0), 1, elements.nextContainer, speed * 1.1), methods_switchHeights(elements.root, elements.child, speed)]);
+};
+
+var transitionHeight = function transitionHeight(host, elements, speed) {
+  return Promise.all([Promise.resolve(function () {
+    return startTransition(host, elements.current, elements.child);
+  }), methods_switchHeights(elements.root, elements.child, speed)]);
+};
+
+var transitionSlide = function transitionSlide(host, elements, speed) {
+  return Promise.all([Promise.resolve(function () {
+    return startTransition(host, elements.current, elements.child);
+  }), animateOpacity(methods_elementOpacity(elements.currentContainer), 0, elements.currentContainer, speed * 0.5), animateOpacity(methods_elementOpacity(elements.nextContainer, 0), 1, elements.nextContainer, speed * 0.7), animateLeft(0, 100, elements.currentContainer, speed * 0.8), animateLeft(-100, 0, elements.nextContainer, speed), methods_switchHeights(elements.root, elements.child, speed)]);
+};
+
+var methods_methods = {
+  slide: transitionSlide,
+  fade: transitionFade,
+  height: transitionHeight
+};
+var methods_transition = function transition(host) {
+  return function (index) {
+    return new Promise(function (resolve) {
+      var maxTries = 1000;
+
+      var run = function run() {
+        maxTries = maxTries - 1;
+
+        if (!host.speed) {
+          if (!maxTries) {
+            return;
+          }
+
+          return Object(on_next_frame["a" /* OnNextFrame */])(run);
+        }
+
+        var elements = getTransitionElements(host, index);
+
+        if (!elements) {
+          return resolve();
+        }
+
+        return methods_methods[host.type](host, elements, host.speed).then(function () {
+          return endTransition(host, elements.current, elements.child, elements.currentContainer, elements.nextContainer);
+        }).then(function () {
+          if (!host.keepchildren) {
+            while (host.getChildren().length > 1) {
+              removeElement(host.getChildren()[0]);
+            }
+          }
+
+          return elements.child;
+        }).then(resolve);
+      };
+
+      run();
+    });
+  };
+};
 var setCurrent = function setCurrent(host) {
   return function (index) {
     var elements = getTransitionElements(host, index);
-
-    var end = function end() {
-      if (elements.current && elements.current.slot !== "hidden") {
-        elements.current.slot = "hidden";
-      }
-
-      if (elements.child && elements.child.slot !== "current") {
-        elements.child.slot = "current";
-      }
-    };
-
-    if (elements.current === elements.child) {
-      return Promise.resolve(end());
-    }
-
-    return methods_transitionStart(elements.current).then(function () {
-      methods_transitionEnd(elements.child);
-      cleanup(host);
-      return end();
-    });
+    return endTransition(host, elements.current, elements.child, elements.currentContainer, elements.nextContainer);
   };
 };
 // CONCATENATED MODULE: ./src/components/content-transition/index.js
@@ -3908,8 +3746,7 @@ var ContentTransition = WCConstructor({
   properties: content_transition_properties_properties,
   elements: content_transition_elements_elements,
   methods: {
-    transitionChild: methods_transitionChild,
-    transitionTo: methods_transitionTo,
+    transition: methods_transition,
     getComponentStyles: getComponentStyles,
     getIndex: getIndex,
     getCurrent: getCurrent,
