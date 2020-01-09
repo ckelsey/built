@@ -1,4 +1,6 @@
-import { TMonad, Type, FromURIComponent } from '..'
+import { TMonad } from './t-monad.js'
+import { FromURIComponent } from './from-uri-component.js'
+import { Type } from './type.js'
 
 export function FromJSON(value) {
     const result = TMonad(value)

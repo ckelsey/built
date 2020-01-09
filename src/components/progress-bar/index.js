@@ -1,13 +1,20 @@
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
-    IndexOf, ToNumber, CommasToArray, ToMap, ValidateHtml, OnNextFrame
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 import { ObserveEvent } from '../../utils/observe-event'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ValidateHtml } from '../../utils/validate-html.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { CommasToArray } from '../../utils/commas-to-array.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { IndexOf } from '../../utils/index-of.js'
+import { ToMap } from '../../utils/to-map.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `progress-bar`
 const componentRoot = `.${componentName}-container`

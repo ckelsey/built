@@ -1,4 +1,6 @@
-import { TMonad, TMonadUpdate, ToJoinMeta } from '..'
+import { TMonad } from './t-monad.js'
+import { ToJoinMeta } from './to-join-meta.js'
+import { TMonadUpdate } from './t-monad-update.js'
 
 export function ToJoin(delimeter) {
     return function (value) {

@@ -1,4 +1,7 @@
-import { Observer, ObserverUnsubscribe, Get, OnNextFrame } from '..'
+import { Observer } from './observer.js'
+import { Get } from './get.js'
+import { OnNextFrame } from '../services/on-next-frame.js'
+import { ObserverUnsubscribe } from './observer-unsubscribe.js'
 
 const removeOld = el => {
     const parent = Get(el, `parentNode`, Get(el, `host`))

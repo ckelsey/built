@@ -1,11 +1,15 @@
-import {
-    Pipe, AppendStyleElement, ToBool, ToString, IfInvalid,
-    WCDefine, WCConstructor, ObserveEvent, SetStyleRules, ValidateHtml
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { AppendStyleElement } from '../../utils/append-style-element.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ValidateHtml } from '../../utils/validate-html.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `image-loader`
 const componentRoot = `.image-loader-container`

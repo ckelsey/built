@@ -1,4 +1,5 @@
-import { TMonad, Type } from '..'
+import { TMonad } from './t-monad.js'
+import { Type } from './type.js'
 
 export function ToBool(value) {
     const result = TMonad(value)

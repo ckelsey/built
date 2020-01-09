@@ -38,11 +38,7 @@ const attributes = {
     },
 
     emptyoption: {
-        format: val => val === false || val === `false`
-            ? false
-            : val === undefined
-                ? `Select...`
-                : val,
+        format: val => val === false || val === `false` ? false : val === undefined ? `Select...` : val,
         onChange: (_val, host) => setSelectOptions(host)
     },
 
@@ -53,23 +49,17 @@ const attributes = {
 
     multiple: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (val, host) => {
-            AddRemoveAttribute(host.elements.input, `multiple`, val)
-        }
+        onChange: (val, host) => AddRemoveAttribute(host.elements.input, `multiple`, val)
     },
 
     name: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange: (val, host) => {
-            AddRemoveAttribute(host.elements.input, `name`, val)
-        }
+        onChange: (val, host) => AddRemoveAttribute(host.elements.input, `name`, val)
     },
 
     native: {
         format: val => Pipe(ToBool, IfInvalid(false || IsMobile))(val).value,
-        onChange: (val, host) => {
-            host.elements.root.classList[val ? `add` : `remove`](`native-select`)
-        }
+        onChange: (val, host) => host.elements.root.classList[val ? `add` : `remove`](`native-select`)
     },
 
     options: {
@@ -102,9 +92,7 @@ const attributes = {
 
     required: {
         format: val => Pipe(ToBool, IfNot(true, null))(val).value,
-        onChange: (val, host) => {
-            AddRemoveAttribute(host.elements.input, `required`, val)
-        }
+        onChange: (val, host) => AddRemoveAttribute(host.elements.input, `required`, val)
     },
 
     styles: {

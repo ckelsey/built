@@ -1,4 +1,7 @@
-import { IsEmpty, IsObject, ReduceFilter, Type } from '..'
+import { IsEmpty } from './is-empty.js'
+import { IsObject } from './is-object.js'
+import { ReduceFilter } from './reduce-filter.js'
+import { Type } from './type.js'
 
 /**
  * Determines if a value is a TMonad

@@ -1,4 +1,5 @@
-import { ToObject, Type } from '..'
+import { ToObject } from './to-object.js'
+import { Type } from './type.js'
 
 export function PropertiesAre(compare) {
     return function (value) {

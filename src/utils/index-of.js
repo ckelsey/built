@@ -1,4 +1,5 @@
-import { ToArray, TMonad } from '..'
+import { TMonad } from './t-monad.js'
+import { ToArray } from './to-array.js'
 
 export function IndexOf(array) {
     return function (value) {

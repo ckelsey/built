@@ -1,7 +1,9 @@
-import { ObserveEvent, AddRemoveAttribute, Set, SetStyleRules } from '../..'
-import { setInputID, setEffects, inputAttributeList, setInputValue } from './methods-elements'
-import { clearInput } from './methods-value'
-import { dispatch, onInput, onFocus, onBlur, onKeyDown, onLabelClick, setDroppable } from './methods-events'
+import { setInputID, setEffects, inputAttributeList, setInputValue } from './methods-elements.js'
+import { clearInput } from './methods-value.js'
+import { dispatch, onInput, onFocus, onBlur, onKeyDown, onLabelClick, setDroppable } from './methods-events.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { AddRemoveAttribute } from '../../utils/add-remove-attribute.js'
 
 export const setStyles = (el, styles) => {
     if (!el) { return }

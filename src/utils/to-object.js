@@ -1,4 +1,9 @@
-import { TMonad, FromJSON, Type, FromEntities, FromURIComponent, Pipe } from '..'
+import { TMonad } from './t-monad.js'
+import { Pipe } from './pipe.js'
+import { FromURIComponent } from './from-uri-component.js'
+import { FromEntities } from './from-entities.js'
+import FromJSON from './from-json.js'
+import { Type } from './type.js'
 
 export const ToObject = value => {
     let result = TMonad(value)

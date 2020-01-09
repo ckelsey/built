@@ -1,4 +1,9 @@
-import { TMonad, TMonadUpdate, Pipe, StopIfInvalid, Type, ToArray } from '..'
+import { TMonad } from './t-monad.js'
+import { Pipe } from './pipe.js'
+import { TMonadUpdate } from './t-monad-update.js'
+import { ToArray } from './to-array.js'
+import { StopIfInvalid } from './stop-if-invalid.js'
+import { Type } from './type.js'
 
 export function ToMap(fn) {
     return function (value) {

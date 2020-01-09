@@ -1,8 +1,6 @@
-import { ID, OnNextFrame } from '..'
-
-const TimerKey = Symbol.for(`builtjs.TimerKey`)
-const globalSymbols = Object.getOwnPropertySymbols(global)
-const hasTimerKey = (globalSymbols.indexOf(TimerKey) > -1)
+import { Singleton } from './singleton.js'
+import { ID } from './id.js'
+import { OnNextFrame } from './on-next-frame.js'
 
 const subscriptions = {}
 let isRunning = false
@@ -49,36 +47,32 @@ const loop = () => {
     OnNextFrame(loop)
 }
 
-if (!hasTimerKey) {
-    global[TimerKey] = (stepFn, frameValues) => {
-        if (!Array.isArray(frameValues) || frameValues.length === 0) { return }
-        if (typeof stepFn !== `function`) { return }
+export const Timer = Singleton(`Timer`, (stepFn, frameValues) => {
+    if (!Array.isArray(frameValues) || frameValues.length === 0) { return }
+    if (typeof stepFn !== `function`) { return }
 
-        const id = ID()
-        let resolve, reject
-        const promise = new Promise((res, rej) => {
-            resolve = res
-            reject = rej
-        })
+    const id = ID()
+    let resolve, reject
+    const promise = new Promise((res, rej) => {
+        resolve = res
+        reject = rej
+    })
 
-        subscriptions[id] = {
-            id,
-            stepFn,
-            frameValues: frameValues,
-            resolved: false,
-            started: new Date().getTime(),
-            cancel: () => removeSubscription(subscriptions[id]),
-            then: (fn) => promise.then(fn),
-            catch: (fn) => promise.catch(fn),
-            promise,
-            resolve,
-            reject
-        }
-
-        if (!isRunning) { loop() }
-
-        return subscriptions[id]
+    subscriptions[id] = {
+        id,
+        stepFn,
+        frameValues: frameValues,
+        resolved: false,
+        started: new Date().getTime(),
+        cancel: () => removeSubscription(subscriptions[id]),
+        then: (fn) => promise.then(fn),
+        catch: (fn) => promise.catch(fn),
+        promise,
+        resolve,
+        reject
     }
-}
 
-export const Timer = Object.freeze(global[TimerKey])
+    if (!isRunning) { loop() }
+
+    return subscriptions[id]
+})

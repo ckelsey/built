@@ -1,5 +1,10 @@
-import { Pipe, IfInvalid, ToNumber, SelectorArrayToElements, ComponentClassObject, ToString } from '../..'
-import { unloadTargets, loadTargets } from './methods'
+import { unloadTargets, loadTargets } from './methods.js'
+import { SelectorArrayToElements } from '../../utils/selector-array-to-elements.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { ToString } from '../../utils/to-string.js'
 
 const resetTargets = host => {
     unloadTargets(host)

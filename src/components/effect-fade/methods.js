@@ -1,4 +1,6 @@
-import { GetCurve, ObserveEvent, Timer } from '../..'
+import { Timer } from '../../services/timer.js'
+import { GetCurve } from '../../utils/get-curve.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
 const runAnimation = (host, isOn) => {
     if (!Array.isArray(host.targets)) { return }

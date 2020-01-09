@@ -1,4 +1,10 @@
-import { TMonadUpdate, TMonad, FromEntities, Pipe, StopIfInvalid, ToString, FromURIComponent } from '..'
+import { TMonadUpdate } from './t-monad-update.js'
+import { TMonad } from './t-monad.js'
+import { Pipe } from './pipe.js'
+import { ToString } from './to-string.js'
+import { StopIfInvalid } from './stop-if-invalid.js'
+import { FromURIComponent } from './from-uri-component.js'
+import { FromEntities } from './from-entities.js'
 
 export function ToPlainText(value) {
     let result = TMonad(value)
@@ -10,7 +16,7 @@ export function ToPlainText(value) {
             ToString,
             StopIfInvalid,
             FromURIComponent,
-            FromEntities
+            FromEntities(value)
         )(result)
     } else {
         result = Pipe(

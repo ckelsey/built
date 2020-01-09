@@ -1,4 +1,4 @@
-import { ReduceMap } from '..'
+import { ReduceMap } from './reduce-map.js'
 
 /**
  * Performs a provided mapping operation to a provided collection. Intended to be used inconjunction with a transducer.

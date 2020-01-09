@@ -1,4 +1,6 @@
-import { Timer, EaseInOut, Get } from '..'
+import { Timer } from '../services/timer.js'
+import { EaseInOut } from './ease-in-out.js'
+import { Get } from './get.js'
 
 const animator = (from, to, speed, stepFn) => new Promise(resolve =>
     Timer(

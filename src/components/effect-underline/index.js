@@ -1,27 +1,17 @@
-import { WCConstructor, WCDefine } from '../..'
 import {
-    observedAttributes,
-    properties,
-    hasTargets,
-    hasTargets$,
-    hasStart,
-    canLoadTargets,
-    canStart,
-    canEnd,
-    canRunStart,
-    canRunEnd,
-    nonAutoOrigin
-} from './properties'
-import { toggle, unloadTargets, open, close } from './methods'
-import elements from './elements'
+    observedAttributes, properties, hasTargets, hasTargets$, hasStart, canLoadTargets,
+    canStart, canEnd, canRunStart, canRunEnd, nonAutoOrigin
+} from './properties.js'
+import { toggle, unloadTargets, open, close } from './methods.js'
+import elements from './elements.js'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `effect-underline`
 const componentRoot = `.effect-underline-container`
-export const EffectUnderline = /*#__PURE__*/ WCConstructor({
+export const EffectUnderline = WCConstructor({
     componentName,
     componentRoot,
     template,

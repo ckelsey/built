@@ -1,4 +1,4 @@
-import { SetStyleRules } from '../..'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
 
 export const setStyles = (el, styles) => {
     if (!el) { return }

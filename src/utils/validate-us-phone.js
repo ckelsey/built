@@ -1,4 +1,7 @@
-import { IfInvalid, FromEntities, ToString, Pipe } from '..'
+import { Pipe } from './pipe.js'
+import { ToString } from './to-string.js'
+import { FromEntities } from './from-entities.js'
+import { IfInvalid } from './if-invalid.js'
 
 export function ValidateUsPhone(val) {
     const original = val

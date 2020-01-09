@@ -1,4 +1,4 @@
-import { OnNextFrame } from '..'
+import { OnNextFrame } from '../services/on-next-frame.js'
 
 export function PolyfillMutationObserver(w) {
     (function () {

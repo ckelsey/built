@@ -1,7 +1,16 @@
-import {
-    Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, OnNextFrame,
-    ComponentClassObject, SetStyleRules, IndexOf, Timer, EaseInOut, Get
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { Get } from '../../utils/get.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { Pipe } from '../../utils/pipe.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { IndexOf } from '../../utils/index-of.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { Timer } from '../../services/timer.js'
+import { EaseInOut } from '../../utils/ease-in-out.js'
+import { ToBool } from '../../utils/to-bool.js'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()

@@ -1,14 +1,13 @@
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-import { WCConstructor, WCDefine, ID } from '../..'
-import { observedAttributes, properties } from './properties'
-import { setEffects } from './methods-elements'
-import { processedValue, labelContainer, formattedValue, valid, validationMessage } from './computed'
-import elements from './elements'
-import { setError } from './methods-value'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { observedAttributes, properties } from './properties.js'
+import { setEffects } from './methods-elements.js'
+import { processedValue, labelContainer, formattedValue, valid, validationMessage } from './computed.js'
+import elements from './elements.js'
+import { setError } from './methods-value.js'
+import { ID } from '../../services/id.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `input-field`
 const componentRoot = `.input-field-container`

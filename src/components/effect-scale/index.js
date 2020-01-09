@@ -1,11 +1,10 @@
-import { WCConstructor, WCDefine } from '../..'
-import { observedAttributes, properties } from './properties'
-import { dispose, run } from './methods'
-import elements from './elements'
+import { observedAttributes, properties } from './properties.js'
+import { dispose, run } from './methods.js'
+import elements from './elements.js'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `effect-scale`
 const componentRoot = `.effect-scale-container`

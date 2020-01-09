@@ -1,4 +1,5 @@
-import { TMonad, Get } from '..'
+import { TMonad } from './t-monad.js'
+import { Get } from './get.js'
 
 export function IsElement(value) {
     const result = TMonad(value)

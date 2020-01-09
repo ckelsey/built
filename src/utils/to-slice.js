@@ -1,4 +1,4 @@
-import { TMonad } from '..'
+import { TMonad } from './t-monad.js'
 
 export function ToSlice(start, end) {
     return function (value) {

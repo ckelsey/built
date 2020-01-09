@@ -1,4 +1,6 @@
-import { ToArray, UseIf, SelectorToElement } from '..'
+import { ToArray } from './to-array.js'
+import { UseIf } from './use-if.js'
+import { SelectorToElement } from './selector-to-element.js'
 
 export function SelectorArrayToElements(parent, value) {
     const Value = ToArray(value)

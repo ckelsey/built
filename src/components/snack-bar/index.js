@@ -1,13 +1,20 @@
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
-    ObserveEvent, IndexOf, IfEmpty, EventName, OnNextFrame, WCwhenPropertyReady, iconInfo, iconCheck,
-    iconError, iconWarning, iconClose
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { EventName } from '../../utils/event-name.js'
+import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToString } from '../../utils/to-string.js'
+import { IndexOf } from '../../utils/index-of.js'
+import { iconError, iconWarning, iconCheck, iconInfo, iconClose } from '../../services/icons.js'
+import { IfEmpty } from '../../utils/if-empty.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `snack-bar`
 const componentRoot = `.${componentName}-container`
@@ -126,10 +133,7 @@ const elements = {
     button: {
         selector: `.snack-bar-close`,
         onChange: (el, host) => OnNextFrame(() => {
-            el.eventListeners = {
-                click: ObserveEvent(el, `click`).subscribe(() => host.shown = false)
-            }
-
+            el.eventListeners = { click: ObserveEvent(el, `click`).subscribe(() => host.shown = false) }
             showHideClose(host.elements.root, !host.hideclose)
         })
     },

@@ -1,6 +1,8 @@
-import { EaseInOut, Timer, OnNextFrame, Get } from '../..'
+import { EaseInOut } from '../../utils/ease-in-out.js'
+import { Timer } from '../../services/timer.js'
+import { Get } from '../../utils/get.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
 
 const dispatchTransition = (host, from, to) => {
@@ -94,7 +96,7 @@ const resetElements = (host, elements) =>
     }).promise
 
 
-const transitionSlide = (host, index, speed) => new Promise(resolve => {
+const slide = (host, index, speed) => new Promise(resolve => {
     OnNextFrame(() => {
         const elements = getTransitionElements(host, index)
 
@@ -193,7 +195,7 @@ const runHeight = (elements, speed, host) => new Promise(resolve => {
     })
 })
 
-const transitionFade = (host, child, speed) => new Promise(resolve => {
+const fade = (host, child, speed) => new Promise(resolve => {
     const elements = getTransitionElements(host, child)
 
     if (!elements) { return resolve() }
@@ -204,7 +206,7 @@ const transitionFade = (host, child, speed) => new Promise(resolve => {
         .then(() => resetElements(host, elements).then(resolve))
 })
 
-const transitionHeight = (host, child, speed) => new Promise(resolve => {
+const height = (host, child, speed) => new Promise(resolve => {
     const elements = getTransitionElements(host, child)
 
     if (!elements) { return resolve() }
@@ -213,34 +215,13 @@ const transitionHeight = (host, child, speed) => new Promise(resolve => {
         .then(() => resetElements(host, elements).then(() => resolve()))
 })
 
-export const transitionTo = host => index => new Promise(resolve => {
+const doTransition = (host, to) => new Promise(resolve => {
     let maxTries = 1000
-    const run = () => {
-        maxTries = maxTries - 1
-        if (!host.speed) {
-            if (!maxTries) { return }
-
-            return OnNextFrame(run)
-        }
-
-        switch (host.type) {
-            case `slide`:
-                return transitionSlide(host, index, host.speed)
-                    .then(resolve)
-            case `fade`:
-                return transitionFade(host, index, host.speed)
-                    .then(resolve)
-            case `height`:
-                return transitionHeight(host, index, host.speed)
-                    .then(resolve)
-        }
+    const methods = {
+        slide,
+        fade,
+        height
     }
-
-    run()
-})
-
-export const transitionChild = host => child => new Promise(resolve => {
-    let maxTries = 1000
     const run = () => {
         maxTries = maxTries - 1
 
@@ -249,21 +230,14 @@ export const transitionChild = host => child => new Promise(resolve => {
             return OnNextFrame(run)
         }
 
-        switch (host.type) {
-            case `slide`:
-                return transitionSlide(host, child, host.speed)
-                    .then(resolve)
-            case `fade`:
-                return transitionFade(host, child, host.speed)
-                    .then(resolve)
-            case `height`:
-                return transitionHeight(host, child, host.speed)
-                    .then(resolve)
-        }
+        return methods[host.type](host, to, host.speed).then(resolve)
     }
 
     run()
 })
+
+export const transitionTo = host => index => doTransition(host, index)
+export const transitionChild = host => child => doTransition(host, child)
 
 export const getComponentStyles = host => () => `${style}${host.styles}`
 

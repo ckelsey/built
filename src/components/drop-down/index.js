@@ -1,11 +1,17 @@
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCDefine, WCConstructor, ObserveEvent, ToBool, IfInvalid, ComponentClassObject,
-    SetStyleRules, AppendStyleElement, Pipe, WasClickedOn, ObserverUnsubscribe,
-    ObserveSlots, OnNextFrame
-} from '../..'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { AppendStyleElement } from '../../utils/append-style-element.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { WasClickedOn } from '../../utils/was-clicked-on.js'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ObserveSlots } from '../../utils/observe-slots.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
 
 const setStyles = (el, styles) => {

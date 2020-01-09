@@ -1,4 +1,4 @@
-import { ToDate } from '..'
+import { ToDate } from './to-date.js'
 
 export function DateToObject(value) {
     let result = ToDate(value)

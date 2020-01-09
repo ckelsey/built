@@ -1,22 +1,20 @@
-/**
- * add ripple and bounce to toggle container
- */
+import { iconTriangle } from '../../services/icons.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { AppendStyleElement } from '../../utils/append-style-element.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ToString } from '../../utils/to-string.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, AppendStyleElement, ComponentClassObject, WCDefine,
-    ToNumber, ToString, IfInvalid, ToBool, Pipe, SetStyleRules, ObserveEvent
-    // ObserverUnsubscribe, ObserveSlots
-} from '../..'
-import { iconTriangle } from '../..'
-
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `content-collapse`
 const componentRoot = `.${componentName}-container`
-
 const setStyles = (el, styles) => el ? SetStyleRules(el, styles) : undefined
 
 export const setStyleElement = host => {

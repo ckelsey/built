@@ -1,4 +1,5 @@
-import { Type, IsNonCollection } from '..'
+import { Type } from './type.js'
+import { IsNonCollection } from './is-non-collection.js'
 
 export function Equals(value1, value2) {
     const type = Type(value1)

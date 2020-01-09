@@ -1,4 +1,6 @@
-import { PolyfillObjectAssign, PolyfillMutationObserver, PolyFillWC } from '..'
+import { PolyfillObjectAssign } from './polyfill-object-assign.js'
+import { PolyfillMutationObserver } from './polyfill-mutation-observer.js'
+import { PolyFillWC } from './polyfill-wc.js'
 
 export function WCDefine(componentName, componentClass) {
     const wc = window.WebComponents

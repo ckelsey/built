@@ -1,14 +1,19 @@
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-import {
-    WCConstructor, WCDefine, ComponentClassObject, SetStyleRules,
-    Pipe, ToBool, IfInvalid, ToString
-} from '../..'
-import '../button-element'
+import '../button-element/index.js'
+import { WCConstructor } from '../utils/wc-constructor.js'
+import { WCDefine } from '../utils/wc-define.js'
+import { SetStyleRules } from '../utils/set-style-rules.js'
+import { ComponentClassObject } from '../utils/component-class-object.js'
+import { IfInvalid } from '../utils/if-invalid.js'
+import { ToBool } from '../utils/to-bool.js'
+import { Pipe } from '../utils/pipe.js'
+import { ToString } from '../utils/to-string.js'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
+
 const componentName = `component-name`
 const componentRoot = `.${componentName}-container`
 

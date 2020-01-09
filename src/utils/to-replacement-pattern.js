@@ -1,4 +1,7 @@
-import { ToString, Pipe, ToDigits, ToNumber } from '..'
+import { ToString } from './to-string.js'
+import { Pipe } from './pipe.js'
+import { ToDigits } from './to-digits.js'
+import { ToNumber } from './to-number.js'
 
 export const ToReplacementPattern = string => {
     if (!string) {

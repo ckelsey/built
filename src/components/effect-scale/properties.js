@@ -1,5 +1,12 @@
-import { ToBool, Pipe, IndexOf, IfInvalid, ToNumber, ToString, ComponentClassObject, SelectorArrayToAllElements } from '../..'
-import { unloadTargets, unloadTriggers, loadTriggers, setOrigin, run, loadTargets } from './methods'
+import { unloadTargets, unloadTriggers, loadTriggers, setOrigin, run, loadTargets } from './methods.js'
+import { SelectorArrayToAllElements } from '../../utils/selector-array-to-all-elements.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { ToString } from '../../utils/to-string.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { IndexOf } from '../../utils/index-of.js'
 
 const reset = host => {
     unloadTargets(host)

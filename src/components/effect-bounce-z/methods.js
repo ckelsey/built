@@ -1,4 +1,8 @@
-import { GetCurve, ObserveEvent, Timer, Get, OnNextFrame } from '../..'
+import { Get } from '../../utils/get.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { Timer } from '../../services/timer.js'
+import { GetCurve } from '../../utils/get-curve.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
 
 const animator = (points, speed, stepFn) => new Promise(resolve =>
     Timer(

@@ -1,4 +1,5 @@
-import { /* tree-shaking no-side-effects-when-called */ IsDom, IsObject } from '..'
+import { IsDom } from './is-dom.js'
+import { IsObject } from './is-object.js'
 
 /**
  * Looks for subscriptions in an object, DOM element or a subscription itself and unsubscribes.

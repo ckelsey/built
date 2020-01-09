@@ -1,7 +1,15 @@
-import {
-    WCConstructor, WCDefine, AppendStyleElement, ID, ToNumber,
-    Pipe, SetStyleRules, ToString, IfInvalid, Get, ToBool, OnNextFrame
-} from '../..'
+import { ID } from '../../services/id.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { AppendStyleElement } from '../../utils/append-style-element.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToString } from '../../utils/to-string.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { Get } from '../../utils/get.js'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()

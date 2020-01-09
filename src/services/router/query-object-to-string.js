@@ -1,4 +1,4 @@
-import { IsEmpty } from '../..'
+import { IsEmpty } from '../../utils/is-empty.js'
 
 const queryObjectToString = (query = {}) => {
     if (!Object.keys(query).length) { return `` }

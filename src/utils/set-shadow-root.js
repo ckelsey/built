@@ -1,4 +1,4 @@
-import { AppendStyleElement } from '..'
+import { AppendStyleElement } from './append-style-element.js'
 
 /* un-pure - modifies component element */
 

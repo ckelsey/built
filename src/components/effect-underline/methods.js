@@ -1,4 +1,8 @@
-import { ObserveEvent, EaseInOut, Timer, Get, OnNextFrame } from '../..'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { Timer } from '../../services/timer.js'
+import { EaseInOut } from '../../utils/ease-in-out.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { Get } from '../../utils/get.js'
 
 const signalEnd = host => runEnd(host)
 

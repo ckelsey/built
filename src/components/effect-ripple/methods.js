@@ -1,4 +1,7 @@
-import { ObserveEvent, EaseInOut, Timer, OnNextFrame } from '../..'
+import { Timer } from '../../services/timer.js'
+import { EaseInOut } from '../../utils/ease-in-out.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
 const maxScale = 1.3
 

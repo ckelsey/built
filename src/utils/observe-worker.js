@@ -1,4 +1,7 @@
-import { ID, Get, ToJSON, ToString } from '..'
+import { ID } from '../services/id.js'
+import { ToString } from './to-string.js'
+import { Get } from './get.js'
+import { ToJSON } from './to-json.js'
 
 export function ObserveWorker(func) {
     let value

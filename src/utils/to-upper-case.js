@@ -1,4 +1,5 @@
-import { TMonad } from '..'
+import { TMonad } from './t-monad.js'
+
 export function ToUpperCase(string) {
     const result = TMonad(string)
 

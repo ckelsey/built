@@ -1,4 +1,5 @@
-import { ToString, ToRegex } from '..'
+import { ToString } from './to-string.js'
+import { ToRegex } from './to-regex.js'
 
 export function ToMatchMeta(string, search, justOne = false) {
     const matches = []

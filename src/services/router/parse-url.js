@@ -1,4 +1,4 @@
-import { ValidateHtml } from '../..'
+import { ValidateHtml } from '../../utils/validate-html.js'
 
 const parseUrl = url => typeof url === `string`
     ? ValidateHtml(url.split(`?`)[0]).sanitized // prevent XSS

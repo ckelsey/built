@@ -1,5 +1,7 @@
-import { SetStyleRules, ObserveEvent, Get } from '../..'
-import { goToNextPage, goToPreviousPage, autoplay } from './methods'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { goToNextPage, goToPreviousPage, autoplay } from './methods.js'
+import { Get } from '../../utils/get.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
 const sliderItemSelectedClass = `active-horizontal-slider-item`
 const sliderItemClass = `horizontal-slider-item`
@@ -183,12 +185,8 @@ const elements = {
         selector: `slot:not([name])`,
         onChange: setSlot
     },
-    inner: {
-        selector: `.horizontal-slider-inner`
-    },
-    itemContainer: {
-        selector: `.horizontal-slider-items`,
-    },
+    inner: { selector: `.horizontal-slider-inner` },
+    itemContainer: { selector: `.horizontal-slider-items`, },
     previous: {
         selector: `.horizontal-slider-previous`,
         onChange: setPrevious

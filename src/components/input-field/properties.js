@@ -1,13 +1,22 @@
-import {
-    IndexOf, CommasToArray, IfNot, ComponentClassObject, Pipe, IfInvalid,
-    ToNumber, ToBool, ToObject, ToArray, ToString, ValidateHtml,
-    ReplaceElementContents, SetAttribute
-} from '../..'
-import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition } from './methods-elements'
-import { setColors, setStyles } from './elements'
-import { processValue } from './methods-value'
-import { setDroppable } from './methods-events'
-import { labelPositions, resizeOptions } from './definitions'
+import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition } from './methods-elements.js'
+import { setColors, setStyles } from './elements.js'
+import { processValue } from './methods-value.js'
+import { setDroppable } from './methods-events.js'
+import { labelPositions, resizeOptions } from './definitions.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { Pipe } from '../../utils/pipe.js'
+import { IfNot } from '../../utils/if-not.js'
+import { SetAttribute } from '../../utils/set-attribute.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ReplaceElementContents } from '../../utils/replace-element-contents.js'
+import { CommasToArray } from '../../utils/commas-to-array.js'
+import { ToString } from '../../utils/to-string.js'
+import { ToArray } from '../../utils/to-array.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { ToObject } from '../../utils/to-object.js'
+import { ValidateHtml } from '../../utils/validate-html.js'
+import { IndexOf } from '../../utils/index-of.js'
 
 const trueOrNull = val => Pipe(ToBool, IfNot(true, null))(val).value
 const addRemoveContainerClass = (val, host, clss) => host.elements.container.classList[val ? `add` : `remove`](clss)
@@ -243,13 +252,11 @@ const inputFieldProperties = {
 }
 
 export const observedAttributes = Object.keys(inputAttributes)
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     .concat(
         Object.keys(inputFieldProperties),
         Object.keys(inputStates)
     )
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 export const properties = Object.assign(
     {},
     inputAttributes,

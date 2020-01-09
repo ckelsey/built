@@ -1,4 +1,6 @@
-import { ValidateHtml, Pipe, ToString, FromEntities } from '..'
+import { Pipe } from './pipe.js'
+import { ToString } from './to-string.js'
+import { FromEntities } from './from-entities.js'
 
 export function ValidateEmail(str) {
     const original = str
@@ -43,5 +45,10 @@ export function ValidateEmail(str) {
         }
     }
 
-    return ValidateHtml(val)
+    return {
+        original,
+        valid: reasons.length === 0,
+        sanitized: val,
+        reason: reasons
+    }
 }

@@ -1,4 +1,4 @@
-import { ToObject } from '..'
+import { ToObject } from './to-object.js'
 
 export function HasKeys(compare) {
     return function (value) {

@@ -1,4 +1,7 @@
-import { TMonad, TMonadUpdate, ToReplaceMeta, ToString } from '..'
+import { TMonad } from './t-monad.js'
+import { ToReplaceMeta } from './to-replace-meta.js'
+import { ToString } from './to-string.js'
+import { TMonadUpdate } from './t-monad-update.js'
 
 export function ToReplace(search, replace) {
     return function (value) {

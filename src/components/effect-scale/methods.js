@@ -1,4 +1,5 @@
-import { ObserveEvent, GetCurve } from '../..'
+import { GetCurve } from '../../utils/get-curve.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
 const idealFPS = 60
 const frames = speed => Math.round(idealFPS * (speed / 1000))
@@ -25,18 +26,6 @@ const setTransform = (element, X, Y, doX, doY, lastFrame, toScaledState) => {
     if (doY === true) {
         element.style.height = lastFrame && !toScaledState ? `unset` : `${box.height}px`
     }
-
-    /*
-    if (doX === true) {
-        const calculatedWidth = element.scrollWidth * X
-        element.style.width = lastFrame && !toScaledState ? `unset` : `${calculatedWidth}px`
-    }
-
-    if (doY === true) {
-        const calculatedHeight = element.scrollHeight * Y
-        element.style.height = lastFrame && !toScaledState ? `unset` : `${calculatedHeight}px`
-    }
-    */
 }
 
 const transformElements = (targets, X, Y, doX, doY, lastFrame, toScaledState) => {

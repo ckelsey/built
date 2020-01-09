@@ -1,6 +1,12 @@
-import { elementSelectors } from './elements'
-import { InputFieldInputAttributes } from './definitions'
-import { ValidateHtml, ReplaceElementContents, FindElementIn, ObserveEvent, SetAttribute, AddRemoveAttribute, OnNextFrame } from '../..'
+import { elementSelectors } from './elements.js'
+import { InputFieldInputAttributes } from './definitions.js'
+import { SetAttribute } from '../../utils/set-attribute.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { FindElementIn } from '../../utils/find-element-in.js'
+import { ReplaceElementContents } from '../../utils/replace-element-contents.js'
+import { AddRemoveAttribute } from '../../utils/add-remove-attribute.js'
+import { ValidateHtml } from '../../utils/validate-html.js'
 
 export const setDefaultLabelPosition = host => [`checkbox`, `radio`].indexOf(host.type) === -1 ? `inside` : `left`
 
@@ -9,26 +15,7 @@ const tagType = type =>
         ? `textarea`
         : `input`
 
-const getInputType = (tag, type) => {
-    if (tag === `input`) {
-        switch (type) {
-        case `checkbox`:
-        case `date`:
-        case `email`:
-        case `file`:
-        case `number`:
-        case `password`:
-        case `radio`:
-        case `tel`:
-        case `url`:
-            return type
-        }
-
-        return `text`
-    }
-
-    return false
-}
+const getInputType = (tag, type) => tag === `input` ? [`checkbox`, `date`, `email`, `file` `number`, `radio`, `tel`, `url`].indexOf(type) > -1 ? type : `text` : false
 
 export const setInputValue = (input, host) => {
     SetAttribute(input, `value`, host.processedValue.original)

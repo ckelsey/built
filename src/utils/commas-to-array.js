@@ -1,4 +1,9 @@
-import { TMonad, Pipe, ToSplit, ToMap, ToPlainText, ToTrim } from '..'
+import { TMonad } from './t-monad.js'
+import { Pipe } from './pipe.js'
+import { ToPlainText } from './to-plain-text.js'
+import { ToSplit } from './to-split.js'
+import { ToMap } from './to-map.js'
+import { ToTrim } from './to-trim.js'
 
 export function CommasToArray(value) {
     let result = TMonad(value)

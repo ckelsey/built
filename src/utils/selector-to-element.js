@@ -1,4 +1,5 @@
-import { TMonad, IsElement } from '..'
+import { TMonad } from './t-monad.js'
+import { IsElement } from './is-element.js'
 
 export function SelectorToElement(parent, value) {
     const Value = TMonad(value)

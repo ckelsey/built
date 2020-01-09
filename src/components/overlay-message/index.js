@@ -1,13 +1,21 @@
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool,
-    IfInvalid, ToString, IndexOf, Get, Set, ObserveEvent, EaseInOut,
-    ObserverUnsubscribe, ObserveSlots, OnNextFrame, Timer
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { Get } from '../../utils/get.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { Pipe } from '../../utils/pipe.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToString } from '../../utils/to-string.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { Timer } from '../../services/timer.js'
+import { EaseInOut } from '../../utils/ease-in-out.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { IndexOf } from '../../utils/index-of.js'
+import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
+import { ObserveSlots } from '../../utils/observe-slots.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `overlay-message`
 const componentRoot = `.${componentName}-container`

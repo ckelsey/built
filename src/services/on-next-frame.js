@@ -1,5 +1,6 @@
-import { ID } from '..'
+import { ID } from './id.js'
 
+const global = window.global
 const OnNextFrameKey = Symbol.for(`builtjs.OnNextFrameKey`)
 const globalSymbols = Object.getOwnPropertySymbols(global)
 const hasOnNextFrame = (globalSymbols.indexOf(OnNextFrameKey) > -1)

@@ -1,4 +1,4 @@
-import { setActiveChicklet, setActiveItem } from './elements'
+import { setActiveChicklet, setActiveItem } from './elements.js'
 
 function whichTransitionEvent() {
     var t

@@ -1,4 +1,5 @@
-import { Observer, Get } from '..'
+import { Observer } from './observer.js'
+import { Get } from './get.js'
 
 export function ObserveEvent(element, eventName, options = {}) {
     if (!element || !eventName) { return }

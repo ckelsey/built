@@ -1,4 +1,5 @@
-import { ToUsZip } from '..'
+import { ToUsZip } from './to-us-zip.js'
+
 export function ValidateUsZip(val) {
     const original = val
     const reason = []

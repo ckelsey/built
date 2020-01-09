@@ -1,4 +1,4 @@
-import { Type } from '..'
+import { Type } from './type.js'
 
 const mergeArray = (arr1, arr2) => {
     const result = arr1.slice(0)

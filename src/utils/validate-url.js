@@ -1,4 +1,6 @@
-import { FromEntities, Pipe, ToString } from '..'
+import { Pipe } from './pipe.js'
+import { ToString } from './to-string.js'
+import { FromEntities } from './from-entities.js'
 
 export function ValidateUrl(str) {
     const original = str

@@ -1,30 +1,23 @@
-import { WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, OnNextFrame } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-
-const elementSelectors = {
-    root: `.icon-element-container`,
-    svgContainer: `.svg-container`,
-    injectedStyles: `style.injectedStyles`
-}
-
 const setStyles = (el, styles) => {
     if (!el) { return }
     SetStyleRules(el, styles)
 }
 
-const elements = {}
-
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-Object.keys(elementSelectors).forEach(key => {
-    elements[key] = {
-        selector: elementSelectors[key],
-        onChange: key === `injectedStyles`
-            ? (el, host) => setStyles(el, host.styles)
-            : () => { }
+const elements = {
+    root: { selector: `.icon-element-container` },
+    svgContainer: { selector: `.svg-container` },
+    injectedStyles: {
+        selector: `style.injectedStyles`,
+        onChange: (el, host) => setStyles(el, host.styles)
     }
-})
+}
 
 const attributes = {
     svg: {

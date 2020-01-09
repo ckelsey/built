@@ -1,7 +1,17 @@
-import { Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, OnNextFrame } from '../..'
+import { Pipe } from '../../utils/pipe.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
+const template = require(`./index.html`)
+const componentName = `spinner-element`
+const componentRoot = `.${componentName}-container`
 
 const setStyles = (el, styles) => {
     OnNextFrame(() => {
@@ -17,11 +27,6 @@ const setTheme = (value, host) => {
         SetStyleRules(themeElement, value)
     })
 }
-
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-const template = require(`./index.html`)
-const componentName = `spinner-element`
-const componentRoot = `.${componentName}-container`
 
 const doAllTheThings = host => {
     const root = host.elements.root

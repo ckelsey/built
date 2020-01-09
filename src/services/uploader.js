@@ -1,5 +1,7 @@
 /* eslint-disable tree-shaking/no-side-effects-in-initialization */
-import { ToObject, ObserveWorker, UseIf } from '..'
+import { ToObject } from '../utils/to-object.js'
+import { ObserveWorker } from '../utils/observe-worker.js'
+import { UseIf } from '../utils/use-if.js'
 // TODO pako is not so great, minimal size savings. Is there anything else?
 // const pako = require('../lib/pako/dist/pako.min.js')
 // var reader = new FileReader();

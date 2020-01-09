@@ -54,10 +54,11 @@
 
         </style>
         <!-- <script src="node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script> -->
-        <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+        <!-- <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script> -->
     </head>
 
     <body>
+        <button-element>Hi</button-element>
         <content-collapse id="collapse1">
             <div slot="content-collapse-toggler">Howdy</div>
             <div slot="content-collapse-content">
@@ -133,7 +134,9 @@
             </grid-layout>
         </content-transition>
 
-        <script type="text/javascript" src="dist/built.js"></script>
+        <!-- <script src="build/index.esm.js" type="module"></script> -->
+        <script src="src/components/button-element/index.js" type="module"></script>
+        <!-- <script type="text/javascript" src="dist/built.js"></script> -->
         <!-- <script src="src/index.js" type="module"></script> -->
 
         <script>

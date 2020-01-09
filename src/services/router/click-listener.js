@@ -1,4 +1,4 @@
-import { Get } from '../..'
+import { Get } from '../../utils/get.js'
 
 const findParentLink = parent => {
     let link

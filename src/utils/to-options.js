@@ -1,4 +1,9 @@
-import { TMonad, TMonadUpdate, Pipe, ToMap, IfInvalid, CommasToArray } from '..'
+import { TMonad } from './t-monad.js'
+import { TMonadUpdate } from './t-monad-update.js'
+import { Pipe } from './pipe.js'
+import { CommasToArray } from './commas-to-array.js'
+import { IfInvalid } from './if-invalid.js'
+import { ToMap } from './to-map.js'
 
 export function ToOptions(value) {
     let result = TMonad(value)

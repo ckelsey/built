@@ -1,4 +1,5 @@
-import { Get, TMonad } from '..'
+import { Get } from './get.js'
+import { TMonad } from './t-monad.js'
 
 export function ToTrim(value) {
     let stop = Get(value, `stop`, false)

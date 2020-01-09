@@ -1,4 +1,5 @@
-import { ToRegex, ToReplacementPattern } from '..'
+import { ToRegex } from './to-regex.js'
+import { ToReplacementPattern } from './to-replacement-pattern.js'
 
 export function ToReplaceMeta(string, search, insert) {
     const replacements = ToReplacementPattern(insert)

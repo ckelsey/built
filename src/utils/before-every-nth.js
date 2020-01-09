@@ -1,4 +1,9 @@
-import { ToString, Pipe, ToSplit, ToJoin, ToMap, TMonad } from '..'
+import { ToString } from './to-string.js'
+import { TMonad } from './t-monad.js'
+import { ToMap } from './to-map.js'
+import { Pipe } from './pipe.js'
+import { ToSplit } from './to-split.js'
+import { ToJoin } from './to-join.js'
 
 export function BeforeEveryNth(nth, insert) {
     return function (value) {

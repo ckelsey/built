@@ -1,4 +1,5 @@
-import { SetStyleRules, CreateElement } from '..'
+import { SetStyleRules } from './set-style-rules.js'
+import { CreateElement } from './create-element.js'
 
 /**
  * Appends a style element with the provided rules to a provided element

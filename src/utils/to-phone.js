@@ -1,4 +1,9 @@
-import { TMonad, Pipe, ToDigits, ToSplit, ToMap, ToJoin } from '..'
+import { TMonad } from './t-monad.js'
+import { ToMap } from './to-map.js'
+import { Pipe } from './pipe.js'
+import { ToDigits } from './to-digits.js'
+import { ToSplit } from './to-split.js'
+import { ToJoin } from './to-join.js'
 
 export function ToPhone(value) {
     let result = TMonad(value)

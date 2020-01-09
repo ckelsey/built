@@ -1,4 +1,10 @@
-import { Pipe, ToString, IfInvalid, ToSplit, ToMap, ToFilter, CommasToArray } from '..'
+import { Pipe } from './pipe.js'
+import { CommasToArray } from './commas-to-array.js'
+import { IfInvalid } from './if-invalid.js'
+import { ToString } from './to-string.js'
+import { ToSplit } from './to-split.js'
+import { ToMap } from './to-map.js'
+import { ToFilter } from './to-filter.js'
 
 const wcClass = (el, newClasses, previousClasses) => {
     if (!el) { return }

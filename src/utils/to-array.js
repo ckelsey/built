@@ -1,4 +1,8 @@
-import { TMonad, Pipe, Type, FromJSON, ToPlainText } from '..'
+import { TMonad } from './t-monad.js'
+import { Pipe } from './pipe.js'
+import { ToPlainText } from './to-plain-text.js'
+import FromJSON from './from-json.js'
+import { Type } from './type.js'
 
 export function ToArray(value) {
     const temp = TMonad(value)

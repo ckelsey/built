@@ -1,4 +1,4 @@
-import { Type } from '..'
+import { Type } from './type.js'
 
 export function TMonadUpdate(tmonad, expectedType) {
     return Object.assign(tmonad, {

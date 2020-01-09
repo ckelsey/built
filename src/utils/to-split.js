@@ -1,5 +1,7 @@
-import { TMonad, TMonadUpdate, ToSplitMeta, ToString } from '..'
-
+import { TMonad } from './t-monad.js'
+import { ToString } from './to-string.js'
+import { ToSplitMeta } from './to-split-meta.js'
+import { TMonadUpdate } from './t-monad-update.js'
 
 export function ToSplit(delimeter) {
     return function ToSplitInner(value) {

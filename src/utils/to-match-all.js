@@ -1,4 +1,6 @@
-import { TMonad, ToMatchMeta, ToString } from '..'
+import { TMonad } from './t-monad.js'
+import { ToMatchMeta } from './to-match-meta.js'
+import { ToString } from './to-string.js'
 
 export function ToMatchAll(search) {
     return function (value) {

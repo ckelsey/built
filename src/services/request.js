@@ -1,4 +1,4 @@
-import { ObserveWorker } from '..'
+import { ObserveWorker } from '../utils/observe-worker.js'
 
 export function Request(apiBase) {
     return function (reqData) {
@@ -8,10 +8,7 @@ export function Request(apiBase) {
             data: undefined,
             headers: {},
             method: `POST`
-        },
-            reqData,
-            { path }
-        )
+        }, reqData, { path })
 
         const isFormData = REQ.data instanceof FormData
 

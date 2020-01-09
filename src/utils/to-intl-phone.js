@@ -1,4 +1,6 @@
-import { TMonad, ToDigits, ToPhone } from '..'
+import { TMonad } from './t-monad.js'
+import { ToPhone } from './to-phone.js'
+import { ToDigits } from './to-digits.js'
 
 export function ToIntlPhone(value) {
     let result = TMonad(value)

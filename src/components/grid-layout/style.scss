@@ -1,19 +1,9 @@
 :host(grid-layout) {
     display: block;
-    opacity: 0;
-
-    &[viewable="true"] {
-        opacity: 1;
-    }
 }
 
 grid-layout {
     display: block;
-    opacity: 0;
-
-    &[viewable="true"] {
-        opacity: 1;
-    }
 }
 
 .grid-layout-items {

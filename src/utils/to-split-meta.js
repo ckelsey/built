@@ -1,4 +1,4 @@
-import { ToRegex } from '..'
+import { ToRegex } from './to-regex.js'
 
 export function ToSplitMeta(string, delimeter = ``) {
     let match

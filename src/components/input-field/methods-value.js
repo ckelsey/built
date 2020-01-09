@@ -1,13 +1,34 @@
-/* eslint-disable no-fallthrough */
-import {
-    TMonad, Pipe, ToSplit, ValidateNumber, ValidateBool, ValidateEmail,
-    ValidateHtml, ValidateText, ValidateUsZip, ValidateUsPhone, ValidateUrl,
-    ValidateIntlPhone, ToUsZip, ToIntlPhone, ToJoin, SetAttribute, IsAutoFilled,
-    SetCaret, ToPhone, RemoveMeta, ToSlice, ToMatchAll, ToMatch, ToReplace,
-    AfterEveryNth, BeforeEveryNth, ToUpperCase, ToLowerCase, ToCapitalize
-} from '../..'
-import { textareaHeight } from './methods-elements'
-import { processedFileValue } from './definitions'
+import { textareaHeight } from './methods-elements.js'
+import { processedFileValue } from './definitions.js'
+import { ValidateNumber } from '../../utils/validate-number.js'
+import { ValidateBool } from '../../utils/validate-bool.js'
+import { ValidateEmail } from '../../utils/validate-email.js'
+import { ValidateUsPhone } from '../../utils/validate-us-phone.js'
+import { ValidateIntlPhone } from '../../utils/validate-intl-phone.js'
+import { ValidateUsZip } from '../../utils/validate-us-zip.js'
+import ValidateUrl from '../../utils/validate-url.js'
+import { ValidateHtml } from '../../utils/validate-html.js'
+import { ValidateText } from '../../utils/validate-text.js'
+import { ToSlice } from '../../utils/to-slice.js'
+import { ToSplit } from '../../utils/to-split.js'
+import { ToJoin } from '../../utils/to-join.js'
+import { ToMatch } from '../../utils/to-match.js'
+import { ToMatchAll } from '../../utils/to-match-all.js'
+import { ToReplace } from '../../utils/to-replace.js'
+import { ToUpperCase } from '../../utils/to-upper-case.js'
+import { ToLowerCase } from '../../utils/to-lower-case.js'
+import { ToCapitalize } from '../../utils/to-capitalize.js'
+import { AfterEveryNth } from '../../utils/after-every-nth.js'
+import { BeforeEveryNth } from '../../utils/before-every-nth.js'
+import { TMonad } from '../../utils/t-monad.js'
+import { ToPhone } from '../../utils/to-phone.js'
+import { ToIntlPhone } from '../../utils/to-intl-phone.js'
+import { ToUsZip } from '../../utils/to-us-zip.js'
+import { Pipe } from '../../utils/pipe.js'
+import { RemoveMeta } from '../../utils/remove-meta.js'
+import { IsAutoFilled } from '../../utils/is-autofilled.js'
+import { SetAttribute } from '../../utils/set-attribute.js'
+import { SetCaret } from '../../utils/set-caret.js'
 
 export const setMaskPositions = (input, positions) => {
     if (!input) { return }
@@ -185,41 +206,30 @@ export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
 
     let validation
 
-    switch (type) {
-    case `number`:
-    case `month`:
+    if ([`number`, `month`].indexOf(type) > -1) {
         validation = ValidateNumber(val)
-        break
-    case `radio`:
-    case `checkbox`:
+    } else if ([`radio`, `checkbox`].indexOf(type) > -1) {
         validation = ValidateBool(val)
-        break
-    case `email`:
+    } else if (type === `email`) {
         validation = ValidateEmail(val)
-        break
-    case `tel`:
-    case `usphone`:
+    } else if ([`tel`, `usphone`].indexOf(type) > -1) {
         validation = ValidateUsPhone(val)
-        break
-    case `intlphone`:
+    } else if (type === `intlphone`) {
         validation = ValidateIntlPhone(val)
-        break
-    case `uszip`:
+    } else if (type === `uszip`) {
         validation = ValidateUsZip(val)
-        break
-    case `url`:
+    } else if (type === `url`) {
         validation = ValidateUrl(val)
-        break
-    case `file`:
+    } else if (type === `file`) {
         validation = processedFileValue(val)
-        break
-    default:
+    } else {
         if (allowhtml || disallowhtml) {
             validation = ValidateHtml(val, allowhtml, disallowhtml)
         } else {
             validation = ValidateText(val)
         }
     }
+
 
     if (validation && !validation.valid && validation.reason[0] === `no value`) {
         validation.reason.shift()
@@ -230,45 +240,27 @@ export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
 }
 
 const getFunction = (functionString, args = []) => {
-    switch (functionString) {
-    case `Slice`:
-    case `slice`:
+    if ([`Slice`, `slice`].indexOf(functionString) > -1) {
         return ToSlice.apply(null, args || [])
-
-    case `Split`:
-    case `split`:
+    } else if ([`Split`, `split`].indexOf(functionString) > -1) {
         return ToSplit(args[0])
-
-    case `Join`:
-    case `join`:
+    } else if ([`Join`, `join`].indexOf(functionString) > -1) {
         return ToJoin(args[0])
-
-    case `Match`:
-    case `match`:
+    } else if ([`Match`, `match`].indexOf(functionString) > -1) {
         return ToMatch.call(null, args[0])
-
-    case `MatchAll`:
+    } else if ([`MatchAll`].indexOf(functionString) > -1) {
         return ToMatchAll.call(null, args[0])
-
-    case `Replace`:
-    case `replace`:
+    } else if ([`Replace`, `replace`].indexOf(functionString) > -1) {
         return ToReplace.apply(null, args || [])
-
-    case `UpperCase`:
-    case `toUpperCase`:
+    } else if ([`UpperCase`, `toUpperCase`].indexOf(functionString) > -1) {
         return ToUpperCase
-
-    case `LowerCase`:
-    case `toLowerCase`:
+    } else if ([`LowerCase`, `toLowerCase`].indexOf(functionString) > -1) {
         return ToLowerCase
-
-    case `Capitalize`:
+    } else if ([`Capitalize`].indexOf(functionString) > -1) {
         return ToCapitalize
-
-    case `AfterEveryNth`:
+    } else if ([`AfterEveryNth`].indexOf(functionString) > -1) {
         return AfterEveryNth.apply(null, args || [])
-
-    case `BeforeEveryNth`:
+    } else if ([`BeforeEveryNth`].indexOf(functionString) > -1) {
         return BeforeEveryNth.apply(null, args || [])
     }
 
@@ -284,15 +276,11 @@ export const InputFieldFormatValue = (value, format) => {
         try {
             Format = JSON.parse(format).slice()
         } catch (error) {
-            switch (format) {
-            case `tel`:
-            case `telephone`:
-            case `phone`:
-            case `usphone`:
+            if ([`tel`, `telephone`, `phone`, `usphone`].indexOf(format) > -1) {
                 return ToPhone(value)
-            case `intlphone`:
+            } else if (format === `intlphone`) {
                 return ToIntlPhone(value)
-            case `uszip`:
+            } else if (format === `uszip`) {
                 return ToUsZip(value)
             }
 

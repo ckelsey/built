@@ -1,4 +1,5 @@
-import { ToDate, DateToObject } from '..'
+import { ToDate } from './to-date.js'
+import { DateToObject } from './date-to-object.js'
 
 export const FirstOfMonth = value => {
     let result = ToDate(value)

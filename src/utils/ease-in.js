@@ -1,4 +1,4 @@
-import { GetEase } from '..'
+import { GetEase } from './get-ease.js'
 
 export function EaseIn(values, duration, pow = 4) {
     return GetEase(

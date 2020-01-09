@@ -1,4 +1,4 @@
-import { Observer } from '..'
+import { Observer } from './observer.js'
 
 export function ObserveSlots(element, mustHaveSlotAttribute) {
     if (!element) { return }

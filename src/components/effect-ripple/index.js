@@ -1,4 +1,3 @@
-import { WCConstructor, WCDefine } from '../..'
 import {
     observedAttributes,
     properties,
@@ -8,17 +7,17 @@ import {
     canLoadTargets,
     canStart,
     nonAutoOrigin
-} from './properties'
-import { trigger, unloadTargets } from './methods'
-import elements from './elements'
+} from './properties.js'
+import { trigger, unloadTargets } from './methods.js'
+import elements from './elements.js'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `effect-ripple`
 const componentRoot = `.effect-ripple-container`
-export const EffectRipple = /*#__PURE__*/ WCConstructor({
+export const EffectRipple = WCConstructor({
     componentName,
     componentRoot,
     template,

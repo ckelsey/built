@@ -1,8 +1,13 @@
-import {
-    ToBool, Pipe, ToMap, IfInvalid, ToNumber, SelectorArrayToElements,
-    CommasToArray, ComponentClassObject, ToString
-} from '../..'
-import { unloadTriggers, loadTriggers } from './methods'
+import { unloadTriggers, loadTriggers } from './methods.js'
+import { SelectorArrayToElements } from '../../utils/selector-array-to-elements.js'
+import { CommasToArray } from '../../utils/commas-to-array.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToString } from '../../utils/to-string.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToMap } from '../../utils/to-map.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ComponentClassObject } from '../../utils/component-class-object.js'
+import { ToBool } from '../../utils/to-bool.js'
 
 const resetTriggers = host => {
     unloadTriggers(host)

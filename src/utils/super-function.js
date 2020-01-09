@@ -1,4 +1,5 @@
-import { Observer, FunctionToPartial } from '..'
+import { Observer } from './observer.js'
+import { FunctionToPartial } from './function-to-partial.js'
 
 /**
  * Gives functions super powers. Allows functions to be curried, passing in 

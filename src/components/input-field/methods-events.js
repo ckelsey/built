@@ -1,5 +1,8 @@
-import { processValue, getFileValue } from './methods-value'
-import { ObserveEvent, GetInputValue, UseIf, DragDropService } from '../..'
+import { processValue, getFileValue } from './methods-value.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { GetInputValue } from '../../utils/get-input-value.js'
+import { UseIf } from '../../utils/use-if.js'
+import { DragDropService } from '../../services/dragDrop.js'
 
 export const dispatch = (host, type, data) =>
     host.dispatchEvent(

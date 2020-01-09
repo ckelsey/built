@@ -1,8 +1,14 @@
-import {
-    ComponentStore, Equals, Pipe,
-    IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot,
-    ObserverUnsubscribe, OnNextFrame
-} from '..'
+import { Equals } from './equals.js'
+import { OnNextFrame } from '../services/on-next-frame.js'
+import { Observer } from './observer.js'
+import { ObserverUnsubscribe } from './observer-unsubscribe.js'
+import { WCElements } from './wc-elements.js'
+import { Pipe } from './pipe.js'
+import { ToBool } from './to-bool.js'
+import { IfInvalid } from './if-invalid.js'
+import { SetShadowRoot } from './set-shadow-root.js'
+import { ComponentStore } from '../services/componentStore.js'
+import { ID } from '../services/id.js'
 
 /** Does not actually mutate anything, tho itself gets mutated across setting styles, properties, etc */
 

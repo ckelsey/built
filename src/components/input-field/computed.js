@@ -1,6 +1,6 @@
-import { Get } from '../..'
-import { processedNullValue } from './definitions'
-import { sanitizeValue, isEmpty, InputFieldFormatValue, maxMin, pattern } from './methods-value'
+import { Get } from '../../utils/get.js'
+import { processedNullValue } from './definitions.js'
+import { sanitizeValue, isEmpty, InputFieldFormatValue, maxMin, pattern } from './methods-value.js'
 
 const processedErrorText = sanitized => sanitized && sanitized.reason ? sanitized.reason.join(`, `) : ``
 

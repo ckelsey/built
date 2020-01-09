@@ -1,4 +1,4 @@
-import { SetAttribute } from '..'
+import { SetAttribute } from './set-attribute.js'
 export function AddRemoveAttribute(el, attr, value) {
     if (!el) { return }
 

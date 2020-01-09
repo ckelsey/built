@@ -1,4 +1,4 @@
-import { ToNumber } from '..'
+import { ToNumber } from './to-number'
 
 export function ValidateNumber(num) {
     const original = num

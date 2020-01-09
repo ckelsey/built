@@ -1,3 +1,5 @@
+import { Singleton } from './singleton.js'
+
 /**
  * Generates a runtime unique ID
  * @generator
@@ -26,8 +28,8 @@ let idIterator
  * @return { string }
  */
 
-export function ID() {
+export const ID = Singleton(`ID`, function ID() {
     if (!idIterator) { idIterator = idGenerator() }
 
     return idIterator.next().value
-}
+})
