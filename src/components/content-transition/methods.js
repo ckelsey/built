@@ -1,7 +1,13 @@
 import { EaseInOut, Timer, OnNextFrame, Get } from '../..'
 
 const style = require(`./style.scss`).toString()
-const animator = (from, to, speed, stepFn) => new Promise(resolve => Timer(stepFn, EaseInOut([from, to], speed)).then(resolve))
+const animator = (from, to, speed, stepFn) => new Promise(resolve => {
+    try {
+        Timer(stepFn, EaseInOut([from, to], speed)).then(resolve)
+    } catch (error) {
+        resolve()
+    }
+})
 const animateHeight = (from, to, el, speed) => animator(from, to, speed, heightStep => el.style.height = `${heightStep}px`)
 const animateLeft = (from, to, el, speed) => animator(from, to, speed, leftStep => el.style.transform = `translateZ(0) translateX(${leftStep}%)`)
 const animateOpacity = (from, to, el, speed) => animator(from, to, speed, opacityStep => el.style.opacity = opacityStep)
