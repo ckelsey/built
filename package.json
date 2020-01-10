@@ -1,6 +1,6 @@
 {
     "name": "builtjs",
-    "version": "0.3.38",
+    "version": "0.3.39",
     "main": "dist/built.js",
     "scripts": {
         "start": "NODE_ENV=development webpack-dev-server --config ./webpack.config.js",
