@@ -3640,28 +3640,17 @@ var methods_switchHeights = function switchHeights(root, child, speed) {
   });
 };
 
-var transitionFade = function transitionFade(host, elements, speed) {
-  return Promise.all([Promise.resolve(function () {
-    return startTransition(host, elements.current, elements.child);
-  }), animateOpacity(methods_elementOpacity(elements.currentContainer), 0, elements.currentContainer, speed * 0.75), animateOpacity(methods_elementOpacity(elements.nextContainer, 0), 1, elements.nextContainer, speed * 1.1), methods_switchHeights(elements.root, elements.child, speed)]);
+var transitionFade = function transitionFade(current, next, speed) {
+  return Promise.all([animateOpacity(methods_elementOpacity(current), 0, current, speed * 0.75), animateOpacity(methods_elementOpacity(next, 0), 1, next, speed * 1.1)]);
 };
 
-var transitionHeight = function transitionHeight(host, elements, speed) {
-  return Promise.all([Promise.resolve(function () {
-    return startTransition(host, elements.current, elements.child);
-  }), methods_switchHeights(elements.root, elements.child, speed)]);
-};
-
-var transitionSlide = function transitionSlide(host, elements, speed) {
-  return Promise.all([Promise.resolve(function () {
-    return startTransition(host, elements.current, elements.child);
-  }), animateOpacity(methods_elementOpacity(elements.currentContainer), 0, elements.currentContainer, speed * 0.5), animateOpacity(methods_elementOpacity(elements.nextContainer, 0), 1, elements.nextContainer, speed * 0.7), animateLeft(0, 100, elements.currentContainer, speed * 0.8), animateLeft(-100, 0, elements.nextContainer, speed), methods_switchHeights(elements.root, elements.child, speed)]);
+var transitionSlide = function transitionSlide(current, next, speed) {
+  return Promise.all([animateOpacity(methods_elementOpacity(current), 0, current, speed * 0.5), animateOpacity(methods_elementOpacity(next, 0), 1, next, speed * 0.7), animateLeft(0, 100, current, speed * 0.8), animateLeft(-100, 0, next, speed)]);
 };
 
 var methods_methods = {
   slide: transitionSlide,
-  fade: transitionFade,
-  height: transitionHeight
+  fade: transitionFade
 };
 var methods_transition = function transition(host) {
   return function (index) {
@@ -3671,7 +3660,7 @@ var methods_transition = function transition(host) {
       var run = function run() {
         maxTries = maxTries - 1;
 
-        if (!host.speed) {
+        if (host.speed === undefined) {
           if (!maxTries) {
             return;
           }
@@ -3685,7 +3674,8 @@ var methods_transition = function transition(host) {
           return resolve();
         }
 
-        return methods_methods[host.type](host, elements, host.speed).then(function () {
+        startTransition(host, elements.current, elements.child);
+        return Promise.all([methods_switchHeights(elements.root, elements.child, host.speed), !methods_methods[host.type] ? Promise.resolve() : methods_methods[host.type](elements.currentContainer, elements.nextContainer, host.speed)]).then(function () {
           return endTransition(host, elements.current, elements.child, elements.currentContainer, elements.nextContainer);
         }).then(function () {
           if (!host.keepchildren) {

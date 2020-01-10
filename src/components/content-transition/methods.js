@@ -71,38 +71,31 @@ const switchHeights = (root, child, speed) => new Promise(resolve =>
     })
 )
 
-const transitionFade = (host, elements, speed) => Promise.all([
-    Promise.resolve(() => startTransition(host, elements.current, elements.child)),
-    animateOpacity(elementOpacity(elements.currentContainer), 0, elements.currentContainer, speed * 0.75),
-    animateOpacity(elementOpacity(elements.nextContainer, 0), 1, elements.nextContainer, speed * 1.1),
-    switchHeights(elements.root, elements.child, speed),
+const transitionFade = (current, next, speed) => Promise.all([
+    animateOpacity(elementOpacity(current), 0, current, speed * 0.75),
+    animateOpacity(elementOpacity(next, 0), 1, next, speed * 1.1)
 ])
 
-const transitionHeight = (host, elements, speed) => Promise.all([
-    Promise.resolve(() => startTransition(host, elements.current, elements.child)),
-    switchHeights(elements.root, elements.child, speed),
-])
-
-const transitionSlide = (host, elements, speed) => Promise.all([
-    Promise.resolve(() => startTransition(host, elements.current, elements.child)),
-    animateOpacity(elementOpacity(elements.currentContainer), 0, elements.currentContainer, speed * 0.5),
-    animateOpacity(elementOpacity(elements.nextContainer, 0), 1, elements.nextContainer, speed * 0.7),
-    animateLeft(0, 100, elements.currentContainer, speed * 0.8),
-    animateLeft(-100, 0, elements.nextContainer, speed),
-    switchHeights(elements.root, elements.child, speed),
+const transitionSlide = (current, next, speed) => Promise.all([
+    animateOpacity(elementOpacity(current), 0, current, speed * 0.5),
+    animateOpacity(elementOpacity(next, 0), 1, next, speed * 0.7),
+    animateLeft(0, 100, current, speed * 0.8),
+    animateLeft(-100, 0, next, speed)
 ])
 
 const methods = {
     slide: transitionSlide,
-    fade: transitionFade,
-    height: transitionHeight
+    fade: transitionFade
 }
 
 export const transition = host => index => new Promise(resolve => {
     let maxTries = 1000
+
     const run = () => {
+
         maxTries = maxTries - 1
-        if (!host.speed) {
+
+        if (host.speed === undefined) {
             if (!maxTries) { return }
 
             return OnNextFrame(run)
@@ -112,7 +105,14 @@ export const transition = host => index => new Promise(resolve => {
 
         if (!elements) { return resolve() }
 
-        return methods[host.type](host, elements, host.speed)
+        startTransition(host, elements.current, elements.child)
+
+        return Promise.all([
+            switchHeights(elements.root, elements.child, host.speed),
+            !methods[host.type] ?
+                Promise.resolve() :
+                methods[host.type](elements.currentContainer, elements.nextContainer, host.speed)
+        ])
             .then(() => endTransition(
                 host,
                 elements.current,
