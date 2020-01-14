@@ -143,6 +143,9 @@ export const transition = host => index => new Promise(resolve => {
 
 export const setCurrent = host => index => {
     const elements = getTransitionElements(host, index)
+
+    if (!elements) { return Promise.reject() }
+
     return endTransition(
         host,
         elements.current,

@@ -1,0 +1,37 @@
+<script>
+    const WCConstructor = window.builtjs.WCConstructor
+    const WCDefine = window.builtjs.WCDefine
+    const ComponentClassObject = window.builtjs.ComponentClassObject
+    const componentName = 'test-element'
+    const componentRoot = '.' + componentName + '-container'
+    const style = ':host(' + componentName + '){display:block;}' + componentName + '{display:block;}'
+    const template = '<div class="' + componentName + '-container">' +
+        '<form action="https://api.cklsylabs.com/built" method="POST" id="loginform">' +
+        '<input-field id="login_username" name="login_username" label="Username"></input-field>' +
+        '<input-field id="login_password" name="login_password" label="Password" type="password"></input-field>' +
+        '<button-element type="submit">Submit</button-element>' +
+        '</form>' +
+        '</div>'
+
+    const properties = { class: ComponentClassObject }
+
+    const elements = {
+        root: { selector: componentRoot, },
+        button: { selector: 'button-element[type="submit"]', onChange(el, host) { el.addEventListener('click', function () { host.elements.form.submit() }) } },
+        password: { selector: '#login_password' },
+        username: { selector: '#login_username' },
+        form: { selector: '#loginform' }
+    }
+
+    const TestElement = WCConstructor({
+        componentName,
+        componentRoot,
+        template,
+        style,
+        observedAttributes: Object.keys(properties),
+        properties,
+        elements
+    })
+
+    WCDefine(componentName, TestElement)
+</script>

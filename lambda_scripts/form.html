@@ -1,0 +1,61 @@
+<script>
+    var formWrap = document.getElementById('formWrap')
+
+    var formthing = document.createElement('form')
+    formthing.id = 'formthing'
+    formthing.method = 'POST'
+    formthing.name = 'login'
+    formthing.action = 'https://api.cklsylabs.com/built'
+
+    var username = document.createElement('input-field')
+    username.name = username.label = username.id = 'username'
+    username.required = true
+
+    var password = document.createElement('input-field')
+    password.name = password.label = password.id = 'password'
+    password.required = true
+    password.type = 'password'
+
+    var submit = document.createElement('button-element')
+    submit.textContent = 'Submit'
+    submit.type = 'submit'
+    submit.id = 'button1'
+
+    formWrap.appendChild(formthing)
+    formthing.appendChild(username)
+    formthing.appendChild(password)
+    formthing.appendChild(submit)
+
+    formthing.addEventListener('submit', function (e) {
+        e.preventDefault()
+        var formData = new FormData(formthing)
+        var data = {}
+        formData.forEach(function (value, key) { data[key] = value })
+        var xhr = new XMLHttpRequest()
+        xhr.addEventListener("load", function () { location.reload() });
+        xhr.open(formthing.method, formthing.action);
+        xhr.send(JSON.stringify(data))
+        return false
+    })
+
+    const bounceAmount = -4
+    const bounceSpeed = 300
+    const bounce = document.createElement('effect-bounce-z')
+    document.body.appendChild(bounce)
+
+    bounce.targets = [{
+        element: username,
+        amount: bounceAmount,
+        speed: bounceSpeed
+    }, {
+        element: password,
+        amount: bounceAmount,
+        speed: bounceSpeed
+    }, {
+        element: submit,
+        amount: bounceAmount,
+        speed: bounceSpeed
+    }]
+
+    submit.addEventListener('click', function () { formthing.dispatchEvent(new Event('submit')) })
+</script>

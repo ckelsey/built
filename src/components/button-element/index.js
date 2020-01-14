@@ -12,7 +12,7 @@ const properties = {
     class: ComponentClassObject,
     name: {
         format: (val, host) => Pipe(ToString, IfInvalid(host.textContent))(val).value,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`name`, `submit`))
+        onChange: (_val, host) => WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`name`, `submit`))
     },
     styles: {
         format: val => typeof val === `string` ? val : ``,

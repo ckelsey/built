@@ -51,7 +51,7 @@ export const ContentTransition = WCConstructor({
         start$,
         end$,
         setCurrent
-    },
+    }
 })
 
 WCDefine(componentName, ContentTransition)

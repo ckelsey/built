@@ -16,7 +16,7 @@ export function SetShadowRoot(options) {
     AppendStyleElement(style, Template.content, `${componentName}-innerstyles`)
 
     const clone = document.importNode(Template.content, true)
-    element.attachShadow({ mode: `open`, delegatesFocus: true }).appendChild(clone)
+    element.attachShadow({ mode: `open` }).appendChild(clone)
 
     if (!(`registerElement` in document) && !document.head.querySelector(`style[name="${componentName}"]`)) {
         AppendStyleElement(style, document.head, componentName)

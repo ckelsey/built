@@ -1641,8 +1641,7 @@ function SetShadowRoot(options) {
   AppendStyleElement(style, Template.content, "".concat(componentName, "-innerstyles"));
   var clone = document.importNode(Template.content, true);
   element.attachShadow({
-    mode: "open",
-    delegatesFocus: true
+    mode: "open"
   }).appendChild(clone);
 
   if (!("registerElement" in document) && !document.head.querySelector("style[name=\"".concat(componentName, "\"]"))) {
@@ -1663,10 +1662,7 @@ var componentStore = __webpack_require__(5);
 
 
 
-var outlineRule = "outline: none !important;";
 function WCClass(componentName, template, style, observedAttributes, ConnectedFn, onDisconnected, formElement) {
-  var modifiedStyle = ":host(".concat(componentName, "){").concat(outlineRule, "} ").concat(componentName, "{").concat(outlineRule, "} ").concat(style);
-
   var ComponentClass =
   /*#__PURE__*/
   function (_HTMLElement) {
@@ -1695,9 +1691,14 @@ function WCClass(componentName, template, style, observedAttributes, ConnectedFn
       SetShadowRoot({
         componentName: componentName,
         template: template,
-        style: modifiedStyle,
+        style: style,
         element: self
       });
+
+      try {
+        self.internals_ = self.attachInternals();
+      } catch (error) {}
+
       return possibleConstructorReturn_default()(_this, self);
     }
 
@@ -2082,7 +2083,7 @@ var button_element_properties = {
     format: function format(val, host) {
       return Pipe(ToString, IfInvalid(host.textContent))(val).value;
     },
-    onChange: function onChange(val, host) {
+    onChange: function onChange(_val, host) {
       return WCwhenPropertyReady(host, "elements.button").then(function (btn) {
         return btn.setAttribute("name", "submit");
       });
@@ -3378,6 +3379,11 @@ var methods_transition = function transition(host) {
 var setCurrent = function setCurrent(host) {
   return function (index) {
     var elements = getTransitionElements(host, index);
+
+    if (!elements) {
+      return Promise.reject();
+    }
+
     return endTransition(host, elements.current, elements.child, elements.currentContainer, elements.nextContainer);
   };
 };

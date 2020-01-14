@@ -298,84 +298,6 @@ arguments)},g.revokeObjectURL=function(r){E.revokeObjectURL(r)});a.URL=g}})(wind
 
 //# sourceMappingURL=webcomponents-bundle.js.map
 </script>
-</head><body>
-
-        <div id="formWrap"></div>
-
-        <script>
-            console.log(10)
-
-            var formWrap = document.getElementById('formWrap')
-            
-            var formthing = document.createElement('form')
-            formthing.id = 'formthing'
-            formthing.method = 'POST' 
-            formthing.name = 'login'
-            formthing.action = 'https://api.cklsylabs.com/built'
-
-            var username = document.createElement('input-field')
-            username.name = username.label = username.id = 'username'
-            username.required = true
-
-            var password = document.createElement('input-field')
-            password.name = password.label = password.id = 'password'
-            password.required = true
-            password.type = 'password'
-
-            var submit = document.createElement('button-element')
-            submit.textContent = 'Submit'
-            submit.type = 'submit'
-            submit.id = 'button1'
-
-            formWrap.appendChild(formthing)
-            formthing.appendChild(username)
-            formthing.appendChild(password)
-            formthing.appendChild(submit)
-
-            formthing.addEventListener('submit', function (e) {
-                e.preventDefault()
-                var formData = new FormData(formthing)
-                var data = {}
-                formData.forEach(function(value, key){ data[key] = value })
-                var xhr = new XMLHttpRequest()
-                xhr.addEventListener("load", function () { location.reload() });
-                xhr.open(formthing.method, formthing.action);
-                xhr.send(JSON.stringify(data))
-                return false
-            })
-
-            const bounceAmount = -4
-            const bounceSpeed = 300
-            const bounce = document.createElement('effect-bounce-z')
-            document.body.appendChild(bounce)
-            
-            bounce.targets = [{
-                element:username,
-                amount: bounceAmount,
-                speed: bounceSpeed
-            }, {
-                element:password,
-                amount: bounceAmount,
-                speed: bounceSpeed
-            },{
-                element: submit,
-                amount: bounceAmount,
-                speed: bounceSpeed
-            }]
-
-            submit.addEventListener('click', function(){formthing.dispatchEvent(new Event('submit'))})
-
-            const fade = document.createElement('effect-fade')
-            document.body.appendChild(fade)
-            fade.targets = [
-                // {
-                //     element:username,
-                //     opacity:[1,0]
-                // }
-            ]
-
-        </script>
-    
 <script>(function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -2019,8 +1941,7 @@ function SetShadowRoot(options) {
   AppendStyleElement(style, Template.content, "".concat(componentName, "-innerstyles"));
   var clone = document.importNode(Template.content, true);
   element.attachShadow({
-    mode: "open",
-    delegatesFocus: true
+    mode: "open"
   }).appendChild(clone);
 
   if (!("registerElement" in document) && !document.head.querySelector("style[name=\"".concat(componentName, "\"]"))) {
@@ -2041,10 +1962,7 @@ var componentStore = __webpack_require__(5);
 
 
 
-var outlineRule = "outline: none !important;";
 function WCClass(componentName, template, style, observedAttributes, ConnectedFn, onDisconnected, formElement) {
-  var modifiedStyle = ":host(".concat(componentName, "){").concat(outlineRule, "} ").concat(componentName, "{").concat(outlineRule, "} ").concat(style);
-
   var ComponentClass =
   /*#__PURE__*/
   function (_HTMLElement) {
@@ -2073,9 +1991,14 @@ function WCClass(componentName, template, style, observedAttributes, ConnectedFn
       SetShadowRoot({
         componentName: componentName,
         template: template,
-        style: modifiedStyle,
+        style: style,
         element: self
       });
+
+      try {
+        self.internals_ = self.attachInternals();
+      } catch (error) {}
+
       return possibleConstructorReturn_default()(_this, self);
     }
 
@@ -2460,7 +2383,7 @@ var button_element_properties = {
     format: function format(val, host) {
       return Pipe(ToString, IfInvalid(host.textContent))(val).value;
     },
-    onChange: function onChange(val, host) {
+    onChange: function onChange(_val, host) {
       return WCwhenPropertyReady(host, "elements.button").then(function (btn) {
         return btn.setAttribute("name", "submit");
       });
@@ -3756,6 +3679,11 @@ var methods_transition = function transition(host) {
 var setCurrent = function setCurrent(host) {
   return function (index) {
     var elements = getTransitionElements(host, index);
+
+    if (!elements) {
+      return Promise.reject();
+    }
+
     return endTransition(host, elements.current, elements.child, elements.currentContainer, elements.nextContainer);
   };
 };
@@ -15609,4 +15537,110 @@ module.exports = "<div class=spinner-element-container> <div class=spinner-eleme
 /***/ })
 /******/ ]);
 });</script>
+</head><body>
+
+        <content-transition id="transition"><div id="formWrap" slot="current"></div></content-transition>
+        <script>
+    var formWrap = document.getElementById('formWrap')
+
+    var formthing = document.createElement('form')
+    formthing.id = 'formthing'
+    formthing.method = 'POST'
+    formthing.name = 'login'
+    formthing.action = 'https://api.cklsylabs.com/built'
+
+    var username = document.createElement('input-field')
+    username.name = username.label = username.id = 'username'
+    username.required = true
+
+    var password = document.createElement('input-field')
+    password.name = password.label = password.id = 'password'
+    password.required = true
+    password.type = 'password'
+
+    var submit = document.createElement('button-element')
+    submit.textContent = 'Submit'
+    submit.type = 'submit'
+    submit.id = 'button1'
+
+    formWrap.appendChild(formthing)
+    formthing.appendChild(username)
+    formthing.appendChild(password)
+    formthing.appendChild(submit)
+
+    formthing.addEventListener('submit', function (e) {
+        e.preventDefault()
+        var formData = new FormData(formthing)
+        var data = {}
+        formData.forEach(function (value, key) { data[key] = value })
+        var xhr = new XMLHttpRequest()
+        xhr.addEventListener("load", function () { location.reload() });
+        xhr.open(formthing.method, formthing.action);
+        xhr.send(JSON.stringify(data))
+        return false
+    })
+
+    const bounceAmount = -4
+    const bounceSpeed = 300
+    const bounce = document.createElement('effect-bounce-z')
+    document.body.appendChild(bounce)
+
+    bounce.targets = [{
+        element: username,
+        amount: bounceAmount,
+        speed: bounceSpeed
+    }, {
+        element: password,
+        amount: bounceAmount,
+        speed: bounceSpeed
+    }, {
+        element: submit,
+        amount: bounceAmount,
+        speed: bounceSpeed
+    }]
+
+    submit.addEventListener('click', function () { formthing.dispatchEvent(new Event('submit')) })
+</script>
+
+        <script>
+    const WCConstructor = window.builtjs.WCConstructor
+    const WCDefine = window.builtjs.WCDefine
+    const ComponentClassObject = window.builtjs.ComponentClassObject
+    const componentName = 'test-element'
+    const componentRoot = '.' + componentName + '-container'
+    const style = ':host(' + componentName + '){display:block;}' + componentName + '{display:block;}'
+    const template = '<div class="' + componentName + '-container">' +
+        '<form action="https://api.cklsylabs.com/built" method="POST" id="loginform">' +
+        '<input-field id="login_username" name="login_username" label="Username"></input-field>' +
+        '<input-field id="login_password" name="login_password" label="Password" type="password"></input-field>' +
+        '<button-element type="submit">Submit</button-element>' +
+        '</form>' +
+        '</div>'
+
+    const properties = { class: ComponentClassObject }
+
+    const elements = {
+        root: { selector: componentRoot, },
+        button: { selector: 'button-element[type="submit"]', onChange(el, host) { el.addEventListener('click', function () { host.elements.form.submit() }) } },
+        password: { selector: '#login_password' },
+        username: { selector: '#login_username' },
+        form: { selector: '#loginform' }
+    }
+
+    const TestElement = WCConstructor({
+        componentName,
+        componentRoot,
+        template,
+        style,
+        observedAttributes: Object.keys(properties),
+        properties,
+        elements
+    })
+
+    WCDefine(componentName, TestElement)
+</script>
+
+
+        <test-element></test-element>
+    
 </body></html>
