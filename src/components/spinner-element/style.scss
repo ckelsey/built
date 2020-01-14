@@ -1,31 +1,31 @@
-:host(spinner-element) {
+@mixin hostin {
     position: absolute;
     height: 100%;
     width: 100%;
     display: block;
     pointer-events: none;
     z-index: 999999999999999999;
-    outline: none !important;
+}
+
+@mixin hostin2 {
+    top: 0;
+    left: 0;
+}
+
+:host(spinner-element) {
+    @include hostin();
 }
 
 :host(spinner-element)[page="true"] {
-    top: 0;
-    left: 0;
+    @include hostin2();
 }
 
 spinner-element {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    display: block;
-    pointer-events: none;
-    z-index: 999999999999999999;
-    outline: none !important;
+    @include hostin();
 }
 
 spinner-element[page="true"] {
-    top: 0;
-    left: 0;
+    @include hostin2();
 }
 
 .spinner-element-container {

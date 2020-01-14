@@ -1,15 +1,15 @@
-:host(icon-element) {
+@mixin hostin {
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
-    outline: none !important;
+}
+
+:host(icon-element) {
+    @include hostin();
 }
 
 icon-element {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    outline: none !important;
+    @include hostin();
 }
 
 .icon-element-container {

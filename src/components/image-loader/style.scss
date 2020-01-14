@@ -1,11 +1,14 @@
-:host(image-loader) {
+@mixin hostin {
     display: inline-block;
     outline: none !important;
 }
 
+:host(image-loader) {
+    @include hostin();
+}
+
 image-loader {
-    display: inline-block;
-    outline: none !important;
+    @include hostin();
 
     &[fit] {
         width: 100%;

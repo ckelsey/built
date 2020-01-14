@@ -2,6 +2,8 @@ import { SetShadowRoot } from "./set-shadow-root"
 import { ComponentStore } from "../services/componentStore"
 import { ObserverUnsubscribe } from "./observer-unsubscribe"
 
+const outlineRule = `outline: none !important;`
+
 export function WCClass(
     componentName,
     template,
@@ -11,6 +13,8 @@ export function WCClass(
     onDisconnected,
     formElement,
 ) {
+    const modifiedStyle = `:host(${componentName}){${outlineRule}} ${componentName}{${outlineRule}} ${style}`
+
     class ComponentClass extends HTMLElement {
         static get observedAttributes() { return observedAttributes }
 
@@ -20,7 +24,7 @@ export function WCClass(
             self.state = {}
             self.elements = {}
             self.disconnectElements = () => { }
-            SetShadowRoot({ componentName, template, style, element: self })
+            SetShadowRoot({ componentName, template, style: modifiedStyle, element: self })
             return self
         }
 

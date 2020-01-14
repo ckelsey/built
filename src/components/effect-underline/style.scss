@@ -1,15 +1,16 @@
-:host(effect-underline) {
+@mixin hostin {
     pointer-events: none;
     box-sizing: border-box;
-    outline: none !important;
+}
+
+:host(effect-underline) {
+    @include hostin();
 }
 
 effect-underline,
 .effect-underline-container,
 .effect-underline-container * {
-    pointer-events: none;
-    box-sizing: border-box;
-    outline: none !important;
+    @include hostin();
 }
 
 .effect-underline-container {

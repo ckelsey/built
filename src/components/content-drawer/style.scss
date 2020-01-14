@@ -1,21 +1,19 @@
-:host(content-drawer) {
+@mixin hostin {
     display: block;
     width: 100%;
     position: relative;
     height: auto;
     left: 0%;
     top: 0px;
-    outline: none !important;
+}
+
+
+:host(content-drawer) {
+    @include hostin();
 }
 
 content-drawer {
-    display: block;
-    width: 100%;
-    position: relative;
-    height: auto;
-    left: 0%;
-    top: 0px;
-    outline: none !important;
+    @include hostin();
 }
 
 .content-drawer-container {

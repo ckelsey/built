@@ -1,4 +1,4 @@
-:host(dropdown-select) {
+@mixin hostin {
     display: inline-block;
     max-width: 100%;
     vertical-align: top;
@@ -8,20 +8,14 @@
     line-height: inherit;
     height: 100%;
     width: 100%;
-    outline: none !important;
+}
+
+:host(dropdown-select) {
+    @include hostin();
 }
 
 dropdown-select {
-    display: inline-block;
-    max-width: 100%;
-    vertical-align: top;
-    position: relative;
-    font: inherit;
-    color: inherit;
-    line-height: inherit;
-    height: 100%;
-    width: 100%;
-    outline: none !important;
+    @include hostin();
 }
 
 .dropdown-select-container {

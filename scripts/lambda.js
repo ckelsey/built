@@ -76,10 +76,12 @@ const html = `<!DOCTYPE html><html dir="ltr" lang="en"><head> <meta charset="utf
 
             const fade = document.createElement('effect-fade')
             document.body.appendChild(fade)
-            fade.targets = [{
-                element:username,
-                opacity:[1,0]
-            }]
+            fade.targets = [
+                // {
+                //     element:username,
+                //     opacity:[1,0]
+                // }
+            ]
 
         </script>
     `)

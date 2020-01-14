@@ -1,11 +1,18 @@
-input-field {
+@mixin hostin {
     display: inline-block;
     width: 300px;
     max-width: 100%;
     vertical-align: top;
     position: relative;
     color: inherit;
-    outline: none !important;
+}
+
+:host(input-field) {
+    @include hostin();
+}
+
+input-field {
+    @include hostin();
 
     &[type="checkbox"],
     &[type="radio"] {

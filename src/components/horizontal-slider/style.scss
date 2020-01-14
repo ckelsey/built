@@ -1,4 +1,4 @@
-:host(horizontal-slider) {
+@mixin hostin {
     display: flex;
     width: 100%;
     height: 100%;
@@ -7,19 +7,14 @@
     position: relative;
     padding: 0 0 2.5em;
     box-sizing: border-box;
-    outline: none !important;
+}
+
+:host(horizontal-slider) {
+    @include hostin();
 }
 
 horizontal-slider {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    position: relative;
-    padding: 0;
-    box-sizing: border-box;
-    outline: none !important;
+    @include hostin();
 }
 
 .horizontal-slider-container {

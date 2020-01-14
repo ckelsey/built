@@ -1,7 +1,11 @@
-:host(grid-layout) {
+@mixin hostin {
     display: block;
     opacity: 0;
-    outline: none !important;
+}
+
+
+:host(grid-layout) {
+    @include hostin();
 
     &[viewable="true"] {
         opacity: 1;
@@ -9,9 +13,7 @@
 }
 
 grid-layout {
-    display: block;
-    opacity: 0;
-    outline: none !important;
+    @include hostin();
 
     &[viewable="true"] {
         opacity: 1;
