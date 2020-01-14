@@ -3,7 +3,7 @@ import {
     ToNumber, ToBool, ToObject, ToArray, ToString, ValidateHtml,
     ReplaceElementContents, SetAttribute, Get
 } from '../..'
-import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition } from './methods-elements'
+import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition, setInputTheme } from './methods-elements'
 import { setColors, setStyles } from './elements'
 import { processValue } from './methods-value'
 import { setDroppable } from './methods-events'
@@ -240,6 +240,11 @@ const inputFieldProperties = {
     theme: {
         format: val => typeof val === `string` ? val : ``,
         onChange: (val, host) => setStyles(host.elements.themeStyles, val)
+    },
+
+    inputtheme: {
+        format: val => typeof val === `string` ? val : ``,
+        onChange: (val, host) => setInputTheme(val, host)
     },
 
     warningcolor: {

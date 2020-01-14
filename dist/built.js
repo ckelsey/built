@@ -9416,18 +9416,21 @@ var methods_elements_setInputValue = function setInputValue(input, host) {
   SetAttribute(input, "value", host.processedValue.original);
   return input;
 };
+var methods_elements_setInputTheme = function setInputTheme(theme, host) {
+  if (!host.inputStyle) {
+    host.inputStyle = create_element_CreateElement({
+      tagName: "style",
+      "class": "input-style",
+      style: "display:none;"
+    });
+    host.appendChild(host.inputStyle);
+  }
+
+  input_field_elements_setStyles(host.inputStyle, "".concat(inputStyle).concat(theme));
+};
 var methods_elements_setInput = function setInput(host) {
   Object(on_next_frame["a" /* OnNextFrame */])(function () {
-    if (!host.inputStyle) {
-      host.inputStyle = create_element_CreateElement({
-        tagName: "style",
-        "class": "input-style",
-        style: "display:none;"
-      });
-      host.appendChild(host.inputStyle);
-    }
-
-    input_field_elements_setStyles(host.inputStyle, inputStyle);
+    methods_elements_setInputTheme(host.inputtheme, host);
 
     try {
       ObserverUnsubscribe(host.input);
@@ -9914,6 +9917,14 @@ var inputFieldProperties = {
     },
     onChange: function onChange(val, host) {
       return input_field_elements_setStyles(host.elements.themeStyles, val);
+    }
+  },
+  inputtheme: {
+    format: function format(val) {
+      return typeof val === "string" ? val : "";
+    },
+    onChange: function onChange(val, host) {
+      return methods_elements_setInputTheme(val, host);
     }
   },
   warningcolor: {

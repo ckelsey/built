@@ -29,14 +29,18 @@ export const setInputValue = (input, host) => {
     return input
 }
 
+export const setInputTheme = (theme, host) => {
+    if (!host.inputStyle) {
+        host.inputStyle = CreateElement({ tagName: `style`, class: `input-style`, style: `display:none;` })
+        host.appendChild(host.inputStyle)
+    }
+
+    setStyles(host.inputStyle, `${inputStyle}${theme}`)
+}
+
 export const setInput = host => {
     OnNextFrame(() => {
-        if (!host.inputStyle) {
-            host.inputStyle = CreateElement({ tagName: `style`, class: `input-style`, style: `display:none;` })
-            host.appendChild(host.inputStyle)
-        }
-
-        setStyles(host.inputStyle, inputStyle)
+        setInputTheme(host.inputtheme, host)
 
         try {
             ObserverUnsubscribe(host.input)
