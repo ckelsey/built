@@ -1,7 +1,7 @@
 import {
     IndexOf, CommasToArray, IfNot, ComponentClassObject, Pipe, IfInvalid,
     ToNumber, ToBool, ToObject, ToArray, ToString, ValidateHtml,
-    ReplaceElementContents, SetAttribute
+    ReplaceElementContents, SetAttribute, Get
 } from '../..'
 import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition } from './methods-elements'
 import { setColors, setStyles } from './elements'
@@ -10,7 +10,7 @@ import { setDroppable } from './methods-events'
 import { labelPositions, resizeOptions } from './definitions'
 
 const trueOrNull = val => Pipe(ToBool, IfNot(true, null))(val).value
-const addRemoveContainerClass = (val, host, clss) => host.elements.container.classList[val ? `add` : `remove`](clss)
+const addRemoveContainerClass = (val, host, clss) => Get(host, `elements.container.classList`, { add: () => { }, remove: () => { } })[val ? `add` : `remove`](clss)
 const onChange = () => { }
 
 const inputStates = {
@@ -48,6 +48,10 @@ const inputAttributes = {
     autocomplete: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
         onChange: (val, host) => setInputAttribute(host, `autocomplete`, val)
+    },
+    autocorrect: {
+        format: val => Pipe(ToString, IfInvalid(null))(val).value,
+        onChange: (val, host) => setInputAttribute(host, `autocorrect`, val)
     },
     autofocus: {
         format: val => Pipe(ToBool, IfNot(true, null))(val).value,
@@ -101,7 +105,10 @@ const inputAttributes = {
     },
     required: {
         format: trueOrNull,
-        onChange: (val, host) => setInputAttribute(host, `required`, val),
+        onChange: (val, host) => {
+            setInputAttribute(host, `required`, val)
+            setInputAttribute(host, `aria-required`, val)
+        },
     },
     step: {
         format: val => Pipe(ToNumber, IfInvalid(null))(val).value,
@@ -177,7 +184,6 @@ const inputFieldProperties = {
         onChange: (val, host) => setInputID(host, val),
     },
 
-    // Needs to be before the label property otherwise won't be able to find labelContainer in computed
     labelposition: {
         format: (val, host) => Pipe(IndexOf(labelPositions), IfInvalid(setDefaultLabelPosition(host)))(val).value,
         onChange: (val, host) => {
@@ -243,13 +249,11 @@ const inputFieldProperties = {
 }
 
 export const observedAttributes = Object.keys(inputAttributes)
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     .concat(
         Object.keys(inputFieldProperties),
         Object.keys(inputStates)
     )
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 export const properties = Object.assign(
     {},
     inputAttributes,

@@ -1,123 +1,40 @@
 import {
     WCConstructor, WCDefine, Pipe, IfInvalid, ComponentClassObject,
-    ToString, SetStyleRules, ToBool
+    ToString, SetStyleRules, ToBool, WCwhenPropertyReady
 } from '../..'
 
 const template = require(`./index.html`)
 const componentName = `button-element`
 const componentRoot = `.${componentName}-container`
-
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
 
-const setStyles = (el, host, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles || host.styles)
-}
-
-const setTheme = (value, host) => {
-    const themeElement = host.elements.theme
-    if (!themeElement || value === undefined) { return }
-    SetStyleRules(themeElement, value)
-}
-
-const setName = (btn, name) => btn ? btn.setAttribute(`name`, name) : undefined
-
-const setRipple = host => {
-    const ripple = host.elements.ripple
-
-    if (!ripple) { return }
-
-    ripple.color = host.accentcolor
-    ripple.targets = host.ripple ? [host.elements.button] : []
-}
-
-const setBounce = host => {
-    const bounce = host.elements.bounce
-    const button = host.elements.button
-
-    if (!bounce || !button) { return }
-
-    bounce.targets = host.bounce ? [button] : []
-}
-
 const properties = {
-    accentcolor: {
-        format: val => Pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
-        onChange: (val, host) => {
-            if (host.hasRipple) {
-                host.elements.ripple.color = val
-            }
-            if (host.hasBounce) {
-                host.elements.bounce.color = val
-            }
-        }
-    },
     class: ComponentClassObject,
-    ready: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (val, host) => {
-            if (!val) { return }
-            setBounce(host)
-            setRipple(host)
-        }
-    },
-    ripple: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange: (_val, host) => setRipple(host)
-    },
-    bounce: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange: (_val, host) => setBounce(host)
-    },
     name: {
         format: (val, host) => Pipe(ToString, IfInvalid(host.textContent))(val).value,
-        onChange: (val, host) => setName(host.elements.button, val)
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`name`, `submit`))
     },
     styles: {
         format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, host, val)
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.injectedStyles`).then(stylesElement => SetStyleRules(stylesElement, val))
     },
     theme: {
         format: (val, host) => typeof val === `string` ? val : host.theme,
-        onChange: setTheme
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.theme`).then(themeElement => SetStyleRules(themeElement, val))
+    },
+    submit: {
+        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
+        onChange(val, host) {
+            WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`type`, `submit`))
+        }
     }
 }
 
-const observedAttributes = Object.keys(properties)
-
 const elements = {
-    root: {
-        selector: componentRoot,
-        onChange: () => { }
-    },
-    button: {
-        selector: `${componentRoot} > button`,
-        onChange: (el, host) => {
-            setBounce(host)
-            setRipple(host)
-
-            if (!el.getAttribute(`name`)) {
-                setName(el, host.name)
-            }
-        }
-    },
-    ripple: {
-        selector: `${componentRoot} > button > effect-ripple`,
-        onChange: (_el, host) => setRipple(host)
-    },
-    bounce: {
-        selector: `${componentRoot} > button > effect-bounce-z`,
-        onChange: (_el, host) => setBounce(host)
-    },
-    injectedStyles: {
-        selector: `${componentRoot} style.injectedStyles`,
-        onChange: setStyles
-    },
-    theme: {
-        selector: `${componentRoot} style.themeStyles`,
-        onChange: (_el, host) => setTheme(host.theme, host)
-    }
+    root: { selector: componentRoot, },
+    button: { selector: `${componentRoot} > button` },
+    injectedStyles: { selector: `${componentRoot} style.injectedStyles`, },
+    theme: { selector: `${componentRoot} style.themeStyles`, }
 }
 
 export const ButtonElement = WCConstructor({
@@ -125,38 +42,10 @@ export const ButtonElement = WCConstructor({
     componentRoot,
     template,
     style,
-    observedAttributes,
+    observedAttributes: Object.keys(properties),
     properties,
     elements,
-    computed: {
-        hasRipple: host => ({
-            get() {
-                const el = host.elements.ripple
-                return !!el && el.ready === true
-            }
-        }),
-        hasBounce: host => ({
-            get() {
-                const el = host.elements.bounce
-                return !!el && el.ready === true
-            }
-        }),
-        canRipple: host => ({
-            get() {
-                const can = !!host.ripple
-                return host.hasRipple && can && !!host.elements.button && host.ready === true
-            }
-        }),
-        canBounce: host => ({
-            get() {
-                const can = !!host.bounce
-                return host.hasBounce && can && !!host.elements.button && host.ready === true
-            }
-        })
-    },
-    onConnected: host => {
-        host.elements.button.classList.add(`ready`)
-    },
+    onConnected: host => host.elements.button.classList.add(`ready`),
 })
 
 WCDefine(componentName, ButtonElement)

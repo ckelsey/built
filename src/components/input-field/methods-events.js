@@ -1,5 +1,5 @@
 import { processValue, getFileValue } from './methods-value'
-import { ObserveEvent, GetInputValue, UseIf, DragDropService } from '../..'
+import { ObserveEvent, GetInputValue, UseIf, DragDropService, Get } from '../..'
 
 export const dispatch = (host, type, data) =>
     host.dispatchEvent(
@@ -7,7 +7,7 @@ export const dispatch = (host, type, data) =>
     )
 
 export const onInput = host => {
-    const input = host.elements.input
+    const input = host.input
     let value = GetInputValue(input)
 
     if (host.type === `file`) {
@@ -34,7 +34,7 @@ export const onBlur = host => {
     host.setAttribute(`focused`, `false`)
 
     dispatch(host, `blur`, host)
-    host.elements.input.blur()
+    host.input.blur()
     processValue(host)
 }
 
@@ -47,7 +47,7 @@ export const onKeyDown = (e, host) => {
 }
 
 export const onLabelClick = (e, host) => {
-    const input = host.elements.input
+    const input = host.input
     if (!input) { return }
 
     dispatch(host, `labelClick`, host)
@@ -66,7 +66,7 @@ export const onLabelClick = (e, host) => {
 }
 
 export const onDone = host => {
-    const input = host.elements.input
+    const input = host.input
 
     if (!input) { return }
 
@@ -85,6 +85,32 @@ export const onDone = host => {
         valid,
         error
     })
+
+    const form = Get(host, `internals_.form`)
+
+    if (form) {
+        form.dispatchEvent(new Event(`submit`))
+        // const domEvent = document.createEvent(`Event`)
+        // domEvent.initEvent(`submit`, false, true)
+        // form.dispatchEvent(domEvent)
+
+        // const event = new InputEvent(``)
+
+        //     , {
+        //     view: window,
+        //     bubbles: true,
+        //     cancelable: true
+        // });
+        // var cb = document.getElementById('checkbox');
+        // var cancelled = !cb.dispatchEvent(event);
+        // if (cancelled) {
+        //     // A handler called preventDefault.
+        //     alert("cancelled");
+        // } else {
+        //     // None of the handlers called preventDefault.
+        //     alert("not cancelled");
+        // }
+    }
 }
 
 export const onInvalid = host => dispatch(host, `invalid`, {
@@ -94,7 +120,7 @@ export const onInvalid = host => dispatch(host, `invalid`, {
 })
 
 export const setDroppable = host => {
-    const input = host.elements.input
+    const input = host.input
     const container = host.elements.container
 
     function drop(e) {

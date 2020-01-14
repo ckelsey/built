@@ -4,15 +4,6 @@ import { sanitizeValue, isEmpty, InputFieldFormatValue, maxMin, pattern } from '
 
 const processedErrorText = sanitized => sanitized && sanitized.reason ? sanitized.reason.join(`, `) : ``
 
-export const multiProcessedValue = (host, value) => {
-
-    const sanitized = host.type.map((t, i) => sanitizeValue(value[i], t.type, host.allowhtml, host.disallowhtml))
-
-    host.processedError = sanitized.map(processedErrorText).filter(s => !!s).join(`, `)
-
-    return sanitized
-}
-
 const getVal = (host, value) => {
     const sanitized = sanitizeValue(value, host.type, host.allowhtml, host.disallowhtml)
     const maxMined = maxMin(host, pattern(host, sanitized.sanitized))
@@ -62,30 +53,6 @@ export const processedValue = host => ({
     }
 })
 
-export const multiFormattedValue = (host, value) => {
-    const sanitized = host.type.map(
-        (t, i) =>
-            sanitizeValue(
-                InputFieldFormatValue(value[i], host.format || t.type).value,
-                t.type,
-                host.allowhtml,
-                host.disallowhtml
-            )
-    )
-
-    const values = []
-    const errors = []
-
-    sanitized.forEach(s => {
-        values.push(s.sanitized)
-        errors.push(processedErrorText(s))
-    })
-
-    host.processedError = errors.filter(s => !!s).join(`, `)
-
-    return values
-}
-
 export const formattedValue = host => ({
     get() {
         const value = Get(host.state, `value.value`)
@@ -98,16 +65,9 @@ export const formattedValue = host => ({
     }
 })
 
-export const labelContainer = host => ({
-    get() {
-        if (!host.shadowRoot) { return }
-        return host.shadowRoot.querySelector(`.input-field-label-${host.labelposition}`)
-    }
-})
-
 export const valid = host => ({
     get() {
-        return (!host.processedError || host.processedError === ``) && Get(host, `elements.input.validity.valid`)
+        return (!host.processedError || host.processedError === ``) && Get(host, `input.validity.valid`)
     }
 })
 
@@ -115,7 +75,7 @@ export const validationMessage = host => ({
     get() {
         return [
             host.processedError,
-            Get(host, `elements.input.validationMessage`)
+            Get(host, `input.validationMessage`)
         ].filter(m => !!m)
     }
 })

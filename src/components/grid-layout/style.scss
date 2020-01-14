@@ -1,6 +1,7 @@
 :host(grid-layout) {
     display: block;
     opacity: 0;
+    outline: none !important;
 
     &[viewable="true"] {
         opacity: 1;
@@ -10,6 +11,7 @@
 grid-layout {
     display: block;
     opacity: 0;
+    outline: none !important;
 
     &[viewable="true"] {
         opacity: 1;

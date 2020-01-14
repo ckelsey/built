@@ -1,6 +1,7 @@
 :host(effect-scale) {
     pointer-events: none;
     box-sizing: border-box;
+    outline: none !important;
 }
 
 effect-scale,
@@ -8,4 +9,5 @@ effect-scale,
 .effect-scale-container * {
     pointer-events: none;
     box-sizing: border-box;
+    outline: none !important;
 }

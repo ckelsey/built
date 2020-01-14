@@ -36,9 +36,8 @@ const postPlugin = {
     apply: compiler => compiler.hooks.afterEmit.tap(
         `AfterEmitPlugin`,
         () => new Promise(resolve => {
-            exec(`osascript -e 'display notification "Complete" with title "WEBPACK"'`, () => {
-                return resolve()
-            })
+            exec(`node scripts/lambda.js`, resolve)
+            exec(`osascript -e 'display notification "Complete" with title "WEBPACK"'`)
             // const alert = () => {
             //     exec(`osascript -e 'display notification "Complete" with title "WEBPACK"'`, () => {
             //         return resolve()

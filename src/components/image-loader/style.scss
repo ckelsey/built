@@ -1,9 +1,11 @@
 :host(image-loader) {
     display: inline-block;
+    outline: none !important;
 }
 
 image-loader {
     display: inline-block;
+    outline: none !important;
 
     &[fit] {
         width: 100%;

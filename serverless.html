@@ -96,7 +96,11 @@
             <div slot="content-collapse-content">Or hi?</div>
         </content-collapse>
 
-        <input-field label="test" id="input1"></input-field>
+        <form id="formthing" method="POST" action="http://localhost:3000">
+            <input-field label="username" id="username" name="username" required="true"></input-field>
+            <input-field label="password" id="password" name="password" type="password" required="true"></input-field>
+            <input type="submit">
+        </form>
 
         <div style="position: relative;">
             <spinner-element visible="true" id="spinner1"></spinner-element>
@@ -156,9 +160,25 @@
                 // overlayMessage.shown = true
                 transition
                     .transition(transition.getIndex() ? 0 : 1)
-                    .then(function (res) {
-                        console.dir(transition.getIndex())
-                    })
+            })
+
+            var formthing = document.getElementById('formthing')
+            formthing.addEventListener('formdata', function (e) {
+                e.formData.append('username', document.getElementById('username').value)
+                e.formData.append('password', document.getElementById('password').value)
+            })
+            formthing.addEventListener('submit', function (e) {
+                e.preventDefault()
+
+                var formData = new FormData(formthing)
+                var xhr = new XMLHttpRequest()
+                xhr.addEventListener("load", function () {
+                    console.log(xhr.response)
+                });
+                xhr.open(formthing.method, formthing.action);
+                xhr.send(formData);
+
+                return false
             })
 
         </script>

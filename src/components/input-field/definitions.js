@@ -1,8 +1,8 @@
 export const labelPositions = [`top`, `bottom`, `left`, `right`, `inside`]
 export const resizeOptions = [`true`, `false`, `horizontal`, `vertical`, `auto`]
 export const InputFieldInputAttributes = {
-    all: [`accept`, `aria-describedby`, `aria-labelledby`, `autocomplete`, `autofocus`, `disabled`, `id`, `maxlength`, `name`, `placeholder`, `readonly`, `required`, `tabindex`, `value`,],
-    bool: [`aria-describedby`, `aria-labelledby`, `disabled`, `id`, `name`, `readonly`, `required`, `tabindex`, `value`]
+    all: [`accept`, `autocorrect`, `aria-required`, `aria-labelledby`, `autocomplete`, `autofocus`, `disabled`, `id`, `maxlength`, `name`, `placeholder`, `readonly`, `required`, `tabindex`, `value`,],
+    bool: [`aria-labelledby`, `disabled`, `id`, `name`, `readonly`, `required`, `tabindex`, `value`]
 }
 
 export const supportedInputTypes = [

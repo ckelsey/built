@@ -1,9 +1,11 @@
 :host(collapse-menu) {
     display: block;
+    outline: none !important;
 }
 
 collapse-menu {
     display: block;
+    outline: none !important;
 }
 
 .collapse-menu-container {
@@ -113,7 +115,9 @@ collapse-menu {
             pointer-events: none;
             z-index: -1;
             position: fixed;
-            transform: translateX(-105%);
+            transform: translateX(-105%) perspective(1px) translateZ(0);
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
         }
 
         .collapse-menu-items-bg {
@@ -136,7 +140,9 @@ collapse-menu {
 
         &[align="right"] {
             .collapse-menu-items {
-                transform: translateX(105%);
+                transform: translateX(105%) perspective(1px) translateZ(0);
+                transform-style: preserve-3d;
+                backface-visibility: hidden;
             }
         }
     }
@@ -144,7 +150,9 @@ collapse-menu {
     &[expandable="false"] {
         .collapse-menu-items {
             position: relative;
-            transform: translateX(0%);
+            transform: translateX(0%) perspective(1px) translateZ(0);
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
         }
 
         .collapse-menu-toggle-inner {
@@ -156,7 +164,9 @@ collapse-menu {
 
     &[expandable="true"][expanded="true"] {
         .collapse-menu-items {
-            transform: translateX(0em);
+            transform: translateX(0em) perspective(1px) translateZ(0);
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
             opacity: 1;
             z-index: unset;
             flex-direction: column;
@@ -186,10 +196,13 @@ collapse-menu {
             .collapse-menu-items {
                 right: 0;
                 left: unset;
+                text-align: left;
             }
 
             .collapse-menu-toggle-inner {
-                transform: rotate(180deg);
+                transform: rotate(180deg) perspective(1px) translateZ(0);
+                transform-style: preserve-3d;
+                backface-visibility: hidden;
                 padding-left: 0;
                 padding-right: 7%;
             }
@@ -202,6 +215,9 @@ collapse-menu>[slot="item"] {
     padding-right: 1em;
     box-sizing: border-box;
     opacity: 0;
+    transform: perspective(1px) translateZ(0);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
 
     &:last-of-type {
         padding-right: 0;

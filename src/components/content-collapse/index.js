@@ -9,6 +9,7 @@ import {
     // ObserverUnsubscribe, ObserveSlots
 } from '../..'
 import { iconTriangle } from '../..'
+import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
@@ -42,22 +43,16 @@ const properties = {
     class: ComponentClassObject,
     expanded: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (val, host) => {
-            const transition = host.elements.transition
-            if (transition && typeof transition.transitionTo === `function`) {
-                transition.transitionTo(val ? 1 : 0)
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.transition.transition`)
+            .then(transition => {
+                transition(val ? 1 : 0)
                 host.elements.icon.setAttribute(`rotation`, val ? `down` : `right`)
-            }
-        }
+            })
     },
     speed: {
         format: val => Pipe(ToNumber, IfInvalid(333))(val).value,
-        onChange: (val, host) => {
-            const transition = host.elements.transition
-            if (transition) {
-                transition.speed = val
-            }
-        }
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.transition`).then(transition => transition.speed = val)
+
     },
     styles: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,

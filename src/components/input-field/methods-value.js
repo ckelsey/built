@@ -9,6 +9,8 @@ import {
 import { textareaHeight } from './methods-elements'
 import { processedFileValue } from './definitions'
 
+const supportsInternals = `ElementInternals` in window && `setFormData` in window.ElementInternals
+
 export const setMaskPositions = (input, positions) => {
     if (!input) { return }
 
@@ -186,39 +188,39 @@ export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
     let validation
 
     switch (type) {
-    case `number`:
-    case `month`:
-        validation = ValidateNumber(val)
-        break
-    case `radio`:
-    case `checkbox`:
-        validation = ValidateBool(val)
-        break
-    case `email`:
-        validation = ValidateEmail(val)
-        break
-    case `tel`:
-    case `usphone`:
-        validation = ValidateUsPhone(val)
-        break
-    case `intlphone`:
-        validation = ValidateIntlPhone(val)
-        break
-    case `uszip`:
-        validation = ValidateUsZip(val)
-        break
-    case `url`:
-        validation = ValidateUrl(val)
-        break
-    case `file`:
-        validation = processedFileValue(val)
-        break
-    default:
-        if (allowhtml || disallowhtml) {
-            validation = ValidateHtml(val, allowhtml, disallowhtml)
-        } else {
-            validation = ValidateText(val)
-        }
+        case `number`:
+        case `month`:
+            validation = ValidateNumber(val)
+            break
+        case `radio`:
+        case `checkbox`:
+            validation = ValidateBool(val)
+            break
+        case `email`:
+            validation = ValidateEmail(val)
+            break
+        case `tel`:
+        case `usphone`:
+            validation = ValidateUsPhone(val)
+            break
+        case `intlphone`:
+            validation = ValidateIntlPhone(val)
+            break
+        case `uszip`:
+            validation = ValidateUsZip(val)
+            break
+        case `url`:
+            validation = ValidateUrl(val)
+            break
+        case `file`:
+            validation = processedFileValue(val)
+            break
+        default:
+            if (allowhtml || disallowhtml) {
+                validation = ValidateHtml(val, allowhtml, disallowhtml)
+            } else {
+                validation = ValidateText(val)
+            }
     }
 
     if (validation && !validation.valid && validation.reason[0] === `no value`) {
@@ -231,45 +233,45 @@ export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
 
 const getFunction = (functionString, args = []) => {
     switch (functionString) {
-    case `Slice`:
-    case `slice`:
-        return ToSlice.apply(null, args || [])
+        case `Slice`:
+        case `slice`:
+            return ToSlice.apply(null, args || [])
 
-    case `Split`:
-    case `split`:
-        return ToSplit(args[0])
+        case `Split`:
+        case `split`:
+            return ToSplit(args[0])
 
-    case `Join`:
-    case `join`:
-        return ToJoin(args[0])
+        case `Join`:
+        case `join`:
+            return ToJoin(args[0])
 
-    case `Match`:
-    case `match`:
-        return ToMatch.call(null, args[0])
+        case `Match`:
+        case `match`:
+            return ToMatch.call(null, args[0])
 
-    case `MatchAll`:
-        return ToMatchAll.call(null, args[0])
+        case `MatchAll`:
+            return ToMatchAll.call(null, args[0])
 
-    case `Replace`:
-    case `replace`:
-        return ToReplace.apply(null, args || [])
+        case `Replace`:
+        case `replace`:
+            return ToReplace.apply(null, args || [])
 
-    case `UpperCase`:
-    case `toUpperCase`:
-        return ToUpperCase
+        case `UpperCase`:
+        case `toUpperCase`:
+            return ToUpperCase
 
-    case `LowerCase`:
-    case `toLowerCase`:
-        return ToLowerCase
+        case `LowerCase`:
+        case `toLowerCase`:
+            return ToLowerCase
 
-    case `Capitalize`:
-        return ToCapitalize
+        case `Capitalize`:
+            return ToCapitalize
 
-    case `AfterEveryNth`:
-        return AfterEveryNth.apply(null, args || [])
+        case `AfterEveryNth`:
+            return AfterEveryNth.apply(null, args || [])
 
-    case `BeforeEveryNth`:
-        return BeforeEveryNth.apply(null, args || [])
+        case `BeforeEveryNth`:
+            return BeforeEveryNth.apply(null, args || [])
     }
 
     return TMonad
@@ -285,15 +287,15 @@ export const InputFieldFormatValue = (value, format) => {
             Format = JSON.parse(format).slice()
         } catch (error) {
             switch (format) {
-            case `tel`:
-            case `telephone`:
-            case `phone`:
-            case `usphone`:
-                return ToPhone(value)
-            case `intlphone`:
-                return ToIntlPhone(value)
-            case `uszip`:
-                return ToUsZip(value)
+                case `tel`:
+                case `telephone`:
+                case `phone`:
+                case `usphone`:
+                    return ToPhone(value)
+                case `intlphone`:
+                    return ToIntlPhone(value)
+                case `uszip`:
+                    return ToUsZip(value)
             }
 
             return TMonad(value)
@@ -355,7 +357,7 @@ export const getFileValue = input => !input || !input.files || input.files.lengt
 const getDroppedFiles = value => Array.isArray(value) && value.filter(f => f instanceof File).length ? value : null
 
 export const processValue = host => {
-    const input = host.elements.input
+    const input = host.input
 
     if (!input) { return }
 
@@ -388,6 +390,10 @@ export const processValue = host => {
             return
         } else if (filenames.length) {
             host.pathvalue = ``
+        }
+
+        if (supportsInternals) {
+            host.internals_.setFormValue(input.files)
         }
 
     } else {
@@ -424,6 +430,14 @@ export const processValue = host => {
 
                 if (formatted.stringChanges && formatted.stringChanges.length) {
                     SetCaret(input, cursorPosition, host.shadowRoot)
+                }
+
+                if (supportsInternals) {
+                    host.internals_.setFormValue(newValue)
+                }
+            } else {
+                if (supportsInternals) {
+                    host.internals_.setFormValue(current)
                 }
             }
 

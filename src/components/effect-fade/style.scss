@@ -1,6 +1,7 @@
 :host(effect-fade) {
     pointer-events: none;
     box-sizing: border-box;
+    outline: none !important;
 }
 
 effect-fade,
@@ -8,4 +9,5 @@ effect-fade,
 .effect-fade-container * {
     pointer-events: none;
     box-sizing: border-box;
+    outline: none !important;
 }

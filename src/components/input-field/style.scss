@@ -5,6 +5,7 @@
     vertical-align: top;
     position: relative;
     color: inherit;
+    outline: none !important;
 }
 
 input-field {
@@ -14,6 +15,7 @@ input-field {
     vertical-align: top;
     position: relative;
     color: inherit;
+    outline: none !important;
 }
 
 .input-field-container {
@@ -29,39 +31,6 @@ input-field {
         box-sizing: border-box;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-    }
-
-    label {
-        padding: 0.1em;
-        font-weight: bold;
-        min-height: 1.6em;
-        display: flex;
-        align-items: center;
-        outline: none !important;
-        opacity: 1;
-        cursor: pointer;
-        transition: opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out;
-
-        &.input-field-left-label {
-            padding-right: 1em;
-        }
-
-        &.input-field-right-label {
-            padding-left: 1em;
-        }
-
-        &.input-field-inside-label {
-            position: relative;
-            pointer-events: none;
-            padding: 0;
-            font-weight: normal;
-            opacity: 0.5;
-            font-size: 85%;
-            transform: scale(1.1) translateY(2.5em) translateX(1em);
-            transform-origin: left center;
-            min-height: 1.6em;
-            max-width: calc(100% - 4em);
-        }
     }
 
     .input-field-container-inner {
@@ -124,11 +93,6 @@ input-field {
             flex-direction: column;
             justify-content: center;
 
-            label.input-field-left-label,
-            label.input-field-right-label {
-                margin-top: -0.2em;
-            }
-
             .input-field-input-container-inner {
                 width: 1.7em;
                 height: 1.7em;
@@ -143,35 +107,6 @@ input-field {
 
             .input-field-border {
                 box-shadow: none;
-            }
-
-            .input-field-input {
-                width: 100%;
-                height: 100%;
-                padding: 0;
-                position: relative;
-                opacity: 0;
-                pointer-events: none;
-
-                &::-webkit-input-placeholder {
-                    color: currentColor;
-                    opacity: 0.62;
-                }
-
-                &:-webkit-input-placeholder {
-                    color: currentColor;
-                    opacity: 0.62;
-                }
-
-                &:-ms-input-placeholder {
-                    color: currentColor;
-                    opacity: 0.62;
-                }
-
-                &::placeholder {
-                    color: currentColor;
-                    opacity: 0.62;
-                }
             }
 
             effect-underline {
@@ -263,32 +198,6 @@ input-field {
             }
         }
 
-
-
-        &[input-kind="checkbox"],
-        &[input-kind="radio"] {
-            input {
-                cursor: pointer;
-            }
-        }
-
-        &.notempty label.input-field-inside-label,
-        &.focused label.input-field-inside-label,
-        &.icon.notempty[icon-align="left"] label.input-field-inside-label,
-        &.icon.notempty[icon-align="right"] label.input-field-inside-label,
-        &.icon.focused[icon-align="left"] label.input-field-inside-label,
-        &.icon.focused[icon-align="right"] label.input-field-inside-label,
-        &.icon.clearbutton.notempty label.input-field-inside-label,
-        &.icon.clearbutton.focused label.input-field-inside-label {
-            pointer-events: all;
-            padding: 0;
-            font-weight: bold;
-            opacity: 1;
-            font-size: 85%;
-            transform: scale(1) translateY(0em) translateX(0em);
-            max-width: 100%;
-        }
-
         &.icon {
             .input-field-icon {
                 pointer-events: all;
@@ -299,33 +208,6 @@ input-field {
         &.notempty.checked[input-kind="checkbox"] {
             .input-field-checkbox-overlay {
                 opacity: 1;
-            }
-        }
-
-        &:not(.focused) {
-            transform-style: preserve-3d;
-
-            .input-field-label-inside {
-                transform: translate3d(0, 0, 1px);
-            }
-        }
-
-        &[resize="auto"],
-        &[resize="none"] {
-            .input-field-input {
-                resize: none;
-            }
-        }
-
-        &[resize="horizontal"] {
-            .input-field-input {
-                resize: horizontal;
-            }
-        }
-
-        &[resize="vertical"] {
-            .input-field-input {
-                resize: vertical;
             }
         }
 
@@ -394,13 +276,6 @@ input-field {
         &.icon[icon-align="left"] {
             .input-field-input {
                 padding-left: 2.2em;
-            }
-        }
-
-        &.icon[icon-align="left"],
-        &.icon.clearbutton {
-            label.input-field-inside-label {
-                padding-left: 1.2em;
             }
         }
 
@@ -493,87 +368,6 @@ input-field {
         position: relative;
     }
 
-    .input-field-input,
-    .input-field-input.multi-input input {
-        background: rgba(255, 255, 255, .4);
-        position: relative;
-        border: none;
-        border-radius: 2px;
-        display: block;
-        margin: 0em;
-        width: 100%;
-        padding: 1em;
-        opacity: 1;
-        font: inherit;
-        color: inherit;
-        outline: none !important;
-        appearance: none;
-        box-sizing: border-box;
-        text-overflow: ellipsis;
-        hyphens: auto;
-        box-shadow: none;
-        transition: color 0.4s, background-color 0.4s, opacity 0.2s, box-shadow 0.3s;
-
-        &[disabled] {
-            pointer-events: none;
-            cursor: not-allowed;
-            opacity: 0.6;
-            background: rgba(200, 200, 200, 0.6);
-        }
-
-        &[readonly] {
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        &.intl-phone-input {
-            padding: 0;
-            display: flex;
-            flex-wrap: nowrap;
-            align-items: center;
-
-            input {
-                flex-grow: 1;
-                width: 100%;
-                padding: 1em 1em 1em 0.25em;
-                margin: 0;
-                border: none;
-                appearance: none;
-                background: transparent;
-                outline: none !important;
-                font: inherit;
-                line-height: inherit;
-            }
-        }
-
-        &.multi-input {
-            display: flex;
-            align-items: center;
-            padding: 0;
-
-            &>input {
-                background: transparent;
-            }
-        }
-    }
-
-    input,
-    textarea {
-        cursor: text;
-    }
-
-    input::-ms-clear {
-        display: none;
-    }
-
-    @supports (-webkit-overflow-scrolling: touch) {
-
-        input.input-field-input:focus,
-        textarea.input-field-input:focus {
-            font-size: 16px !important;
-        }
-    }
-
     .input-field-border {
         position: absolute;
         width: 100%;
@@ -585,18 +379,6 @@ input-field {
         box-shadow: inset 0px 0px 0px 1px;
         color: inherit;
         transition: box-shadow 0.4s;
-    }
-
-    .input-field-input-effects {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0px;
-        left: 0px;
-        pointer-events: none;
-        padding: 0em;
-        overflow: hidden;
-        border-radius: 2px;
     }
 
     .input-field-input-overlay {

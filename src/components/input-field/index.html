@@ -1,18 +1,21 @@
 <div class="input-field-container">
     <div class="input-field-container-inner">
         <div class="input-field-top-section">
-            <div class="input-field-label-top"></div>
+            <div class="input-field-label-top">
+                <slot name="label-top"></slot>
+            </div>
         </div>
         <div class="input-field-middle-section">
-            <div class="input-field-label-left"></div>
+            <div class="input-field-label-left">
+                <slot name="label-left"></slot>
+            </div>
             <div class="input-field-input-section">
-                <div class="input-field-label-inside"></div>
+                <div class="input-field-label-inside">
+                    <slot name="label-inside"></slot>
+                </div>
                 <div class="input-field-input-container">
-                    <div class="input-field-input-container-inner"></div>
-                    <div class="input-field-input-effects">
-                        <effect-underline start="focus" end="blur" opacity="0.8" speed="700"></effect-underline>
-                        <effect-ripple start="focus" opacity="0.25" speed="600"></effect-ripple>
-                        <effect-bounce-z amount="-4" speed="300"></effect-bounce-z>
+                    <div class="input-field-input-container-inner">
+                        <slot name="input"></slot>
                     </div>
                     <div class="input-field-input-overlay">
                         <icon-element class="input-field-icon" size="1.25em"></icon-element>
@@ -26,10 +29,14 @@
                     <input type="hidden" class="input-field-hidden-input">
                 </div>
             </div>
-            <div class="input-field-label-right"></div>
+            <div class="input-field-label-right">
+                <slot name="label-right"></slot>
+            </div>
         </div>
         <div class="input-field-bottom-section">
-            <div class="input-field-label-bottom"></div>
+            <div class="input-field-label-bottom">
+                <slot name="label-bottom"></slot>
+            </div>
             <div class="input-field-bottom-content">
                 <div class="input-field-messages">
                     <div class="input-field-message-help"></div>

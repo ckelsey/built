@@ -8,6 +8,7 @@
     z-index: 99999;
     overflow: visible;
     pointer-events: none;
+    outline: none !important;
 }
 
 :host(overlay-content) {

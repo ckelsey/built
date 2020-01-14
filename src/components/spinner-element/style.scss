@@ -5,6 +5,7 @@
     display: block;
     pointer-events: none;
     z-index: 999999999999999999;
+    outline: none !important;
 }
 
 :host(spinner-element)[page="true"] {
@@ -19,6 +20,7 @@ spinner-element {
     display: block;
     pointer-events: none;
     z-index: 999999999999999999;
+    outline: none !important;
 }
 
 spinner-element[page="true"] {

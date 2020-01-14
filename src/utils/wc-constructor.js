@@ -1,7 +1,6 @@
 import {
-    ComponentStore, Equals, Pipe,
-    IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot,
-    ObserverUnsubscribe, OnNextFrame
+    Equals, Pipe, IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot,
+    ObserverUnsubscribe, OnNextFrame, WCClass
 } from '..'
 
 /** Does not actually mutate anything, tho itself gets mutated across setting styles, properties, etc */
@@ -63,6 +62,7 @@ export function WCConstructor(options) {
         setters = {},
         style = ``,
         template = `<slot></slot>`,
+        formElement = false,
     } = options
 
     if (!componentName) { return }
@@ -117,45 +117,15 @@ export function WCConstructor(options) {
         })
     }
 
-    class componentClass extends HTMLElement {
-
-        static get observedAttributes() { return observedAttributes }
-
-        constructor() {
-            const self = super()
-            self.wcID = ``
-            self.state = {}
-            self.elements = {}
-            self.disconnectElements = () => { }
-            SetShadowRoot({ componentName, template, style, element: self })
-            return self
-        }
-
-        attributeChangedCallback(attrName, oldValue, newValue) { if (newValue !== oldValue) { this[attrName] = newValue } }
-
-        connectedCallback() {
-            ComponentStore.addComponent(this)
-            ConnectedFn(this)
-        }
-
-        disconnectedCallback() {
-            ComponentStore.removeComponent(this)
-
-            if (this.state) {
-                Object.keys(this.state).forEach(key => {
-                    this.state[key].complete()
-                })
-            }
-
-            this.disconnectElements()
-
-            ObserverUnsubscribe(this)
-
-            if (onDisconnected) {
-                onDisconnected(this)
-            }
-        }
-    }
+    const componentClass = WCClass(
+        componentName,
+        template,
+        style,
+        observedAttributes,
+        ConnectedFn,
+        onDisconnected,
+        formElement,
+    )
 
     function newComponentObject() {
         return function (element) {

@@ -1,6 +1,7 @@
 :host(effect-underline) {
     pointer-events: none;
     box-sizing: border-box;
+    outline: none !important;
 }
 
 effect-underline,
@@ -8,6 +9,7 @@ effect-underline,
 .effect-underline-container * {
     pointer-events: none;
     box-sizing: border-box;
+    outline: none !important;
 }
 
 .effect-underline-container {
