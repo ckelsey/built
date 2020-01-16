@@ -1,0 +1,19 @@
+<script>
+    var contentTransition = window.builtjs.CreateElement({
+        tagName: 'content-transition',
+        id: 'contentTransition',
+        innerHTML: '<div style="padding:1px;" slot="hidden"><p>item 1</p></div><div style="padding:1px;" slot="hidden"><p>item 2</p></div>',
+        keepchildren: true,
+        type: 'fade',
+        speed: 600
+    })
+
+    document.body.appendChild(contentTransition)
+
+    var index = 0
+
+    setInterval(() => {
+        index = index ? 0 : 1
+        contentTransition.transition(index)
+    }, 2000);
+</script>

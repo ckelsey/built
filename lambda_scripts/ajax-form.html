@@ -1,0 +1,7 @@
+<script>
+    var el = window.builtjs.CreateElement({ tagName: 'ajax-form', action: 'https://api.cklsylabs.com/built', reload: true })
+    el.appendChild(window.builtjs.CreateElement({ tagName: 'input-field', label: 'username', required: true, autocomplete: 'username' }))
+    el.appendChild(window.builtjs.CreateElement({ tagName: 'input-field', label: 'password', type: 'password', required: true, autocomplete: 'current-password' }))
+    el.appendChild(window.builtjs.CreateElement({ tagName: 'button-element', textContent: 'Submit', type: 'submit' }))
+    document.body.appendChild(el)
+</script>

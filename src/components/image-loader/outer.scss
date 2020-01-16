@@ -1,0 +1,22 @@
+@mixin hostin {
+    display: inline-block;
+    outline: none !important;
+}
+
+:host(image-loader) {
+    @include hostin();
+}
+
+image-loader {
+    @include hostin();
+
+    &[fit] {
+        width: 100%;
+        height: 100%;
+
+        &[error="true"] {
+            width: auto;
+            height: auto;
+        }
+    }
+}
