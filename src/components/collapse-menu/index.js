@@ -1,78 +1,85 @@
-import { WCConstructor, WCDefine, ObserverUnsubscribe, ObserveEvent, ToNumber, IndexOf, ToString, IfInvalid, ToBool, Pipe, WasClickedOn, Get, Throttle } from '../..'
+import { WCConstructor, WCDefine, ObserveEvent, ToNumber, IndexOf, ToString, IfInvalid, ToBool, Pipe, WasClickedOn, Throttle } from '../..'
 
 const style = require(`./style.scss`).toString()
+const outerStyle = require(`./outer.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `collapse-menu`
 const componentRoot = `.${componentName}-container`
 const directions = [`horizontal`, `vertical`]
 const alignments = [`left`, `right`]
 const setAttr = (el, attr, value) => el ? el.setAttribute(attr, value) : undefined
-const removeSizer = el => (el.parentElement || el.parentNode.host).removeChild(el)
 
-const createSizer = () => {
-    const iframe = document.createElement(`iframe`)
-    iframe.style.opacity = `0`
-    iframe.style.position = `absolute`
-    iframe.style.width = `100%`
-    iframe.style.height = `100%`
-    iframe.style.top = `0%`
-    iframe.style.left = `0%`
-    iframe.style.zIndex = `-1`
-    iframe.style.pointerEvents = `none`
-    iframe.style.border = `none`
-    return iframe
-}
+/** 
+ * TODO
+ * commented out collapse on wrap and minwidth settings as they are buggy at best
+ */
 
-const handleCollapse = (container, host) => {
-    Throttle(() => {
-        if (!host.collapseonwrap || host.expanded) { return }
+// const removeSizer = el => (el.parentElement || el.parentNode.host).removeChild(el)
 
-        const scrollWidth = container.scrollWidth
-        const width = container.offsetWidth
-        const itemsWidth = host.elements.items.scrollWidth
-        const hostWidth = host.scrollWidth
-        const siblingsWidth = Array.from(container.children).reduce((total, current) => total + current.scrollWidth, -(hostWidth + host.sizer.scrollWidth))
+// const createSizer = () => {
+//     const iframe = document.createElement(`iframe`)
+//     iframe.style.opacity = `0`
+//     iframe.style.position = `absolute`
+//     iframe.style.width = `100%`
+//     iframe.style.height = `100%`
+//     iframe.style.top = `0%`
+//     iframe.style.left = `0%`
+//     iframe.style.zIndex = `-1`
+//     iframe.style.pointerEvents = `none`
+//     iframe.style.border = `none`
+//     return iframe
+// }
 
-        if (scrollWidth > width && !host.expandable) {
-            host.expandable = true
-        } else if (width >= itemsWidth + siblingsWidth) {
-            host.expandable = false
-        }
-    }, host.throttle || 0)()
-}
+// const handleCollapse = (container, host) => {
+//     Throttle(() => {
+//         if (!host.collapseonwrap || host.expanded) { return }
 
-const setContainer = (container, host) => {
-    if (host.sizer) { removeSizer(host.sizer) }
-    if (!container || !host.collapseonwrap) { return }
+//         const scrollWidth = container.scrollWidth
+//         const width = container.offsetWidth
+//         const itemsWidth = host.elements.items.scrollWidth
+//         const hostWidth = host.scrollWidth
+//         const siblingsWidth = Array.from(container.children).reduce((total, current) => total + current.scrollWidth, -(hostWidth + host.sizer.scrollWidth))
 
-    host.sizer = createSizer()
-    container.appendChild(host.sizer)
+//         if (scrollWidth > width && !host.expandable) {
+//             host.expandable = true
+//         } else if (width >= itemsWidth + siblingsWidth) {
+//             host.expandable = false
+//         }
+//     }, host.throttle || 0)()
+// }
 
-    host.sizer.contentWindow.addEventListener(`resize`, () => handleCollapse(container, host))
-    requestAnimationFrame(() => handleCollapse(container, host))
-}
+// const setContainer = (container, host) => {
+//     if (host.sizer) { removeSizer(host.sizer) }
+//     if (!container || !host.collapseonwrap) { return }
 
-const handleMinWidth = host => {
-    if (!host.minwidth) { return }
+//     host.sizer = createSizer()
+//     container.appendChild(host.sizer)
 
-    if (host.minWidthSizer.scrollWidth < host.minwidth) {
-        host.expandable = true
-    } else {
-        host.expandable = false
-    }
-}
+//     host.sizer.contentWindow.addEventListener(`resize`, () => handleCollapse(container, host))
+//     requestAnimationFrame(() => handleCollapse(container, host))
+// }
 
-const setMinWidth = (minWidth, host) => {
-    if (!minWidth && host.minWidthSizer) { return removeSizer(host.minWidthSizer) }
-    if (!minWidth) { return }
+// const handleMinWidth = host => {
+//     if (!host.minwidth) { return }
 
-    const root = host.elements.root
-    host.minWidthSizer = createSizer()
-    root.appendChild(host.minWidthSizer)
-    host.minWidthSizer.contentWindow.addEventListener(`resize`, () => handleMinWidth(host))
+//     if (host.minWidthSizer.scrollWidth < host.minwidth) {
+//         host.expandable = true
+//     } else {
+//         host.expandable = false
+//     }
+// }
 
-    requestAnimationFrame(() => handleMinWidth(host))
-}
+// const setMinWidth = (minWidth, host) => {
+//     if (!minWidth && host.minWidthSizer) { return removeSizer(host.minWidthSizer) }
+//     if (!minWidth) { return }
+
+//     const root = host.elements.root
+//     host.minWidthSizer = createSizer()
+//     root.appendChild(host.minWidthSizer)
+//     host.minWidthSizer.contentWindow.addEventListener(`resize`, () => handleMinWidth(host))
+
+//     requestAnimationFrame(() => handleMinWidth(host))
+// }
 
 const setMinPageWidth = (minWidth, host) => {
     if (!minWidth) { return }
@@ -92,6 +99,13 @@ const setMinPageWidth = (minWidth, host) => {
 }
 
 const setBackground = (color, el) => !el ? undefined : el.style.backgroundColor = color
+const clickToggle = (el, host) => {
+    if (!el.eventSubscriptions) {
+        el.eventSubscriptions = {}
+    }
+
+    el.eventSubscriptions.click = ObserveEvent(el, `click`).subscribe(() => host.expanded = !host.expanded)
+}
 
 const properties = {
     expanded: {
@@ -112,24 +126,9 @@ const properties = {
             }
         }
     },
-    throttle: {
-        format: val => Pipe(ToNumber, IfInvalid(0))(val).value
-    },
-    minwidth: {
-        format: val => Pipe(ToNumber, IfInvalid(null))(val).value,
-        onChange: setMinWidth,
-    },
     minpagewidth: {
         format: val => Pipe(ToNumber, IfInvalid(null))(val).value,
         onChange: setMinPageWidth
-    },
-    collapseonwrap: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange(val, host) {
-            const root = host.elements.root
-            if (!root) { return }
-            root.classList[val ? `add` : `remove`](`collapseonwrap`)
-        }
     },
     direction: {
         format: val => Pipe(ToString, IndexOf(directions), IfInvalid(directions[0]))(val).value,
@@ -143,10 +142,26 @@ const properties = {
         format: val => Pipe(ToString, IfInvalid(`none`))(val).value,
         onChange(val, host) { setBackground(val, host.elements.background) }
     },
-    container: {
-        format: (val, host) => Get(host, val, host),
-        onChange: setContainer
-    }
+
+    // throttle: {
+    //     format: val => Pipe(ToNumber, IfInvalid(0))(val).value
+    // },
+    // minwidth: {
+    //     format: val => Pipe(ToNumber, IfInvalid(null))(val).value,
+    //     onChange: setMinWidth,
+    // },
+    // collapseonwrap: {
+    //     format: val => Pipe(ToBool, IfInvalid(false))(val).value,
+    //     onChange(val, host) {
+    //         const root = host.elements.root
+    //         if (!root) { return }
+    //         root.classList[val ? `add` : `remove`](`collapseonwrap`)
+    //     }
+    // },
+    // container: {
+    //     format: (val, host) => Get(host, val, host),
+    //     onChange: setContainer
+    // }
 }
 
 const observedAttributes = Object.keys(properties)
@@ -167,7 +182,7 @@ const elements = {
                         len = len - 1
 
                         if (WasClickedOn(items[len], e)) {
-                            return host.dispatchEvent(new CustomEvent(`itemclick`, { detail: e }))
+                            return host.dispatchEvent(new CustomEvent(`itemclick`, { detail: { event: e, item: items[len] } }))
                         }
                     }
                 })
@@ -181,19 +196,11 @@ const elements = {
     },
     toggle: {
         selector: `.collapse-menu-toggle`,
-        onChange(el, host) {
-            el.eventSubscriptions = {
-                click: ObserveEvent(el, `click`).subscribe(() => host.expanded = !host.expanded)
-            }
-        }
+        onChange: clickToggle
     },
     toggleInner: {
         selector: `.collapse-menu-toggle-inner`,
-        onChange(el, host) {
-            el.eventSubscriptions = {
-                click: ObserveEvent(el, `click`).subscribe(() => host.expanded = !host.expanded)
-            }
-        }
+        onChange: clickToggle
     }
 }
 
@@ -202,23 +209,10 @@ export const CollapseMenu = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes,
     properties,
-    elements,
-    onConnected(host) {
-        requestAnimationFrame(() => {
-            host.eventSubscriptions = {
-                click: ObserveEvent(window, `click`).subscribe(e => {
-                    if (!host.expanded) { return }
-
-                    if (WasClickedOn(host.elements.root, e)) { host.expanded = false }
-                }),
-            }
-        })
-    },
-    onDisconnected(host) {
-        ObserverUnsubscribe(host)
-    }
+    elements
 })
 
 WCDefine(componentName, CollapseMenu)

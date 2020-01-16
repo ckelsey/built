@@ -1,11 +1,3 @@
-:host(collapse-menu) {
-    display: block;
-}
-
-collapse-menu {
-    display: block;
-}
-
 .collapse-menu-container {
     position: relative;
 
@@ -178,7 +170,6 @@ collapse-menu {
             .collapse-menu-items-inner {
                 flex-direction: column;
                 height: calc(100vh - 3.5em);
-                overflow: auto;
             }
         }
 
@@ -203,41 +194,8 @@ collapse-menu {
                 transform-style: preserve-3d;
                 backface-visibility: hidden;
                 padding-left: 0;
-                padding-right: 7%;
+                padding-right: 1em;
             }
         }
     }
-}
-
-
-collapse-menu>[slot="item"] {
-    padding-right: 1em;
-    box-sizing: border-box;
-    opacity: 0;
-    transform: perspective(1px) translateZ(0);
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-
-    &:last-of-type {
-        padding-right: 0;
-    }
-}
-
-
-collapse-menu[expandable="false"]>[slot="item"],
-collapse-menu:not([expandable])>[slot="item"],
-collapse-menu[expanded="true"]>[slot="item"] {
-    opacity: 1;
-}
-
-collapse-menu[expandable="false"]>[slot="item"],
-collapse-menu:not([expandable])>[slot="item"] {
-    &:last-of-type {
-        padding-right: 0;
-    }
-}
-
-collapse-menu[expandable="true"][expanded="true"]>[slot="item"] {
-    padding: 0.5em 1em;
-    position: relative;
 }

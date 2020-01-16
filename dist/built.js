@@ -2804,7 +2804,9 @@ function WasClickedOn(element, event) {
 
 var collapse_menu_style = __webpack_require__(32).toString();
 
-var collapse_menu_template = __webpack_require__(33);
+var collapse_menu_outerStyle = __webpack_require__(33).toString();
+
+var collapse_menu_template = __webpack_require__(34);
 
 var collapse_menu_componentName = "collapse-menu";
 var collapse_menu_componentRoot = ".".concat(collapse_menu_componentName, "-container");
@@ -2814,97 +2816,65 @@ var alignments = ["left", "right"];
 var setAttr = function setAttr(el, attr, value) {
   return el ? el.setAttribute(attr, value) : undefined;
 };
+/** 
+ * TODO
+ * commented out collapse on wrap and minwidth settings as they are buggy at best
+ */
+// const removeSizer = el => (el.parentElement || el.parentNode.host).removeChild(el)
+// const createSizer = () => {
+//     const iframe = document.createElement(`iframe`)
+//     iframe.style.opacity = `0`
+//     iframe.style.position = `absolute`
+//     iframe.style.width = `100%`
+//     iframe.style.height = `100%`
+//     iframe.style.top = `0%`
+//     iframe.style.left = `0%`
+//     iframe.style.zIndex = `-1`
+//     iframe.style.pointerEvents = `none`
+//     iframe.style.border = `none`
+//     return iframe
+// }
+// const handleCollapse = (container, host) => {
+//     Throttle(() => {
+//         if (!host.collapseonwrap || host.expanded) { return }
+//         const scrollWidth = container.scrollWidth
+//         const width = container.offsetWidth
+//         const itemsWidth = host.elements.items.scrollWidth
+//         const hostWidth = host.scrollWidth
+//         const siblingsWidth = Array.from(container.children).reduce((total, current) => total + current.scrollWidth, -(hostWidth + host.sizer.scrollWidth))
+//         if (scrollWidth > width && !host.expandable) {
+//             host.expandable = true
+//         } else if (width >= itemsWidth + siblingsWidth) {
+//             host.expandable = false
+//         }
+//     }, host.throttle || 0)()
+// }
+// const setContainer = (container, host) => {
+//     if (host.sizer) { removeSizer(host.sizer) }
+//     if (!container || !host.collapseonwrap) { return }
+//     host.sizer = createSizer()
+//     container.appendChild(host.sizer)
+//     host.sizer.contentWindow.addEventListener(`resize`, () => handleCollapse(container, host))
+//     requestAnimationFrame(() => handleCollapse(container, host))
+// }
+// const handleMinWidth = host => {
+//     if (!host.minwidth) { return }
+//     if (host.minWidthSizer.scrollWidth < host.minwidth) {
+//         host.expandable = true
+//     } else {
+//         host.expandable = false
+//     }
+// }
+// const setMinWidth = (minWidth, host) => {
+//     if (!minWidth && host.minWidthSizer) { return removeSizer(host.minWidthSizer) }
+//     if (!minWidth) { return }
+//     const root = host.elements.root
+//     host.minWidthSizer = createSizer()
+//     root.appendChild(host.minWidthSizer)
+//     host.minWidthSizer.contentWindow.addEventListener(`resize`, () => handleMinWidth(host))
+//     requestAnimationFrame(() => handleMinWidth(host))
+// }
 
-var removeSizer = function removeSizer(el) {
-  return (el.parentElement || el.parentNode.host).removeChild(el);
-};
-
-var createSizer = function createSizer() {
-  var iframe = document.createElement("iframe");
-  iframe.style.opacity = "0";
-  iframe.style.position = "absolute";
-  iframe.style.width = "100%";
-  iframe.style.height = "100%";
-  iframe.style.top = "0%";
-  iframe.style.left = "0%";
-  iframe.style.zIndex = "-1";
-  iframe.style.pointerEvents = "none";
-  iframe.style.border = "none";
-  return iframe;
-};
-
-var collapse_menu_handleCollapse = function handleCollapse(container, host) {
-  Throttle(function () {
-    if (!host.collapseonwrap || host.expanded) {
-      return;
-    }
-
-    var scrollWidth = container.scrollWidth;
-    var width = container.offsetWidth;
-    var itemsWidth = host.elements.items.scrollWidth;
-    var hostWidth = host.scrollWidth;
-    var siblingsWidth = Array.from(container.children).reduce(function (total, current) {
-      return total + current.scrollWidth;
-    }, -(hostWidth + host.sizer.scrollWidth));
-
-    if (scrollWidth > width && !host.expandable) {
-      host.expandable = true;
-    } else if (width >= itemsWidth + siblingsWidth) {
-      host.expandable = false;
-    }
-  }, host.throttle || 0)();
-};
-
-var setContainer = function setContainer(container, host) {
-  if (host.sizer) {
-    removeSizer(host.sizer);
-  }
-
-  if (!container || !host.collapseonwrap) {
-    return;
-  }
-
-  host.sizer = createSizer();
-  container.appendChild(host.sizer);
-  host.sizer.contentWindow.addEventListener("resize", function () {
-    return collapse_menu_handleCollapse(container, host);
-  });
-  requestAnimationFrame(function () {
-    return collapse_menu_handleCollapse(container, host);
-  });
-};
-
-var handleMinWidth = function handleMinWidth(host) {
-  if (!host.minwidth) {
-    return;
-  }
-
-  if (host.minWidthSizer.scrollWidth < host.minwidth) {
-    host.expandable = true;
-  } else {
-    host.expandable = false;
-  }
-};
-
-var setMinWidth = function setMinWidth(minWidth, host) {
-  if (!minWidth && host.minWidthSizer) {
-    return removeSizer(host.minWidthSizer);
-  }
-
-  if (!minWidth) {
-    return;
-  }
-
-  var root = host.elements.root;
-  host.minWidthSizer = createSizer();
-  root.appendChild(host.minWidthSizer);
-  host.minWidthSizer.contentWindow.addEventListener("resize", function () {
-    return handleMinWidth(host);
-  });
-  requestAnimationFrame(function () {
-    return handleMinWidth(host);
-  });
-};
 
 var collapse_menu_setMinPageWidth = function setMinPageWidth(minWidth, host) {
   if (!minWidth) {
@@ -2932,6 +2902,16 @@ var setBackground = function setBackground(color, el) {
   return !el ? undefined : el.style.backgroundColor = color;
 };
 
+var collapse_menu_clickToggle = function clickToggle(el, host) {
+  if (!el.eventSubscriptions) {
+    el.eventSubscriptions = {};
+  }
+
+  el.eventSubscriptions.click = ObserveEvent(el, "click").subscribe(function () {
+    return host.expanded = !host.expanded;
+  });
+};
+
 var collapse_menu_properties = {
   expanded: {
     format: function format(val) {
@@ -2955,36 +2935,11 @@ var collapse_menu_properties = {
       }
     }
   },
-  throttle: {
-    format: function format(val) {
-      return Pipe(ToNumber, IfInvalid(0))(val).value;
-    }
-  },
-  minwidth: {
-    format: function format(val) {
-      return Pipe(ToNumber, IfInvalid(null))(val).value;
-    },
-    onChange: setMinWidth
-  },
   minpagewidth: {
     format: function format(val) {
       return Pipe(ToNumber, IfInvalid(null))(val).value;
     },
     onChange: collapse_menu_setMinPageWidth
-  },
-  collapseonwrap: {
-    format: function format(val) {
-      return Pipe(ToBool, IfInvalid(false))(val).value;
-    },
-    onChange: function onChange(val, host) {
-      var root = host.elements.root;
-
-      if (!root) {
-        return;
-      }
-
-      root.classList[val ? "add" : "remove"]("collapseonwrap");
-    }
   },
   direction: {
     format: function format(val) {
@@ -3009,13 +2964,26 @@ var collapse_menu_properties = {
     onChange: function onChange(val, host) {
       setBackground(val, host.elements.background);
     }
-  },
-  container: {
-    format: function format(val, host) {
-      return Object(utils_get["a" /* Get */])(host, val, host);
-    },
-    onChange: setContainer
-  }
+  } // throttle: {
+  //     format: val => Pipe(ToNumber, IfInvalid(0))(val).value
+  // },
+  // minwidth: {
+  //     format: val => Pipe(ToNumber, IfInvalid(null))(val).value,
+  //     onChange: setMinWidth,
+  // },
+  // collapseonwrap: {
+  //     format: val => Pipe(ToBool, IfInvalid(false))(val).value,
+  //     onChange(val, host) {
+  //         const root = host.elements.root
+  //         if (!root) { return }
+  //         root.classList[val ? `add` : `remove`](`collapseonwrap`)
+  //     }
+  // },
+  // container: {
+  //     format: (val, host) => Get(host, val, host),
+  //     onChange: setContainer
+  // }
+
 };
 var collapse_menu_observedAttributes = Object.keys(collapse_menu_properties);
 var collapse_menu_elements = {
@@ -3034,7 +3002,10 @@ var collapse_menu_elements = {
 
             if (WasClickedOn(items[len], e)) {
               return host.dispatchEvent(new CustomEvent("itemclick", {
-                detail: e
+                detail: {
+                  event: e,
+                  item: items[len]
+                }
               }));
             }
           }
@@ -3053,23 +3024,11 @@ var collapse_menu_elements = {
   },
   toggle: {
     selector: ".collapse-menu-toggle",
-    onChange: function onChange(el, host) {
-      el.eventSubscriptions = {
-        click: ObserveEvent(el, "click").subscribe(function () {
-          return host.expanded = !host.expanded;
-        })
-      };
-    }
+    onChange: collapse_menu_clickToggle
   },
   toggleInner: {
     selector: ".collapse-menu-toggle-inner",
-    onChange: function onChange(el, host) {
-      el.eventSubscriptions = {
-        click: ObserveEvent(el, "click").subscribe(function () {
-          return host.expanded = !host.expanded;
-        })
-      };
-    }
+    onChange: collapse_menu_clickToggle
   }
 };
 var CollapseMenu = WCConstructor({
@@ -3077,27 +3036,10 @@ var CollapseMenu = WCConstructor({
   componentRoot: collapse_menu_componentRoot,
   template: collapse_menu_template,
   style: collapse_menu_style,
+  outerStyle: collapse_menu_outerStyle,
   observedAttributes: collapse_menu_observedAttributes,
   properties: collapse_menu_properties,
-  elements: collapse_menu_elements,
-  onConnected: function onConnected(host) {
-    requestAnimationFrame(function () {
-      host.eventSubscriptions = {
-        click: ObserveEvent(window, "click").subscribe(function (e) {
-          if (!host.expanded) {
-            return;
-          }
-
-          if (WasClickedOn(host.elements.root, e)) {
-            host.expanded = false;
-          }
-        })
-      };
-    });
-  },
-  onDisconnected: function onDisconnected(host) {
-    ObserverUnsubscribe(host);
-  }
+  elements: collapse_menu_elements
 });
 WCDefine(collapse_menu_componentName, CollapseMenu);
 // CONCATENATED MODULE: ./src/services/icons.js
@@ -3137,9 +3079,9 @@ var Icons = {
 
 
 
-var content_collapse_style = __webpack_require__(34).toString();
+var content_collapse_style = __webpack_require__(35).toString();
 
-var content_collapse_template = __webpack_require__(35);
+var content_collapse_template = __webpack_require__(36);
 
 var content_collapse_componentName = "content-collapse";
 var content_collapse_componentRoot = ".".concat(content_collapse_componentName, "-container");
@@ -3248,9 +3190,9 @@ WCDefine(content_collapse_componentName, ContentCollapse);
 // CONCATENATED MODULE: ./src/components/content-drawer/index.js
 
 
-var content_drawer_style = __webpack_require__(36).toString();
+var content_drawer_style = __webpack_require__(37).toString();
 
-var content_drawer_template = __webpack_require__(37);
+var content_drawer_template = __webpack_require__(38);
 
 var content_drawer_componentName = "content-drawer";
 var content_drawer_componentRoot = ".content-drawer-container";
@@ -3607,9 +3549,9 @@ var setCurrent = function setCurrent(host) {
 
 var content_transition_style = __webpack_require__(16).toString();
 
-var content_transition_outerStyle = __webpack_require__(38).toString();
+var content_transition_outerStyle = __webpack_require__(39).toString();
 
-var content_transition_template = __webpack_require__(39);
+var content_transition_template = __webpack_require__(40);
 
 var content_transition_componentName = "content-transition";
 var content_transition_componentRoot = ".content-transition-container";
@@ -3713,9 +3655,9 @@ WCDefine(content_transition_componentName, ContentTransition);
 // CONCATENATED MODULE: ./src/components/cookie-message/index.js
 
 
-var cookie_message_style = __webpack_require__(40).toString();
+var cookie_message_style = __webpack_require__(41).toString();
 
-var cookie_message_template = __webpack_require__(41);
+var cookie_message_template = __webpack_require__(42);
 
 var cookie_message_componentName = "cookie-message";
 var cookie_message_componentRoot = ".cookie-message-container";
@@ -3864,9 +3806,9 @@ WCDefine(cookie_message_componentName, CookieMessage);
 // CONCATENATED MODULE: ./src/components/drop-down/index.js
 
 
-var drop_down_style = __webpack_require__(42).toString();
+var drop_down_style = __webpack_require__(43).toString();
 
-var drop_down_outerStyle = __webpack_require__(43).toString();
+var drop_down_outerStyle = __webpack_require__(44).toString();
 
 var drop_down_toggleOptions = function toggleOptions(show, host) {
   var overlay = host.elements.overlay;
@@ -3911,7 +3853,7 @@ var drop_down_properties = {
   }
 };
 
-var drop_down_template = __webpack_require__(44);
+var drop_down_template = __webpack_require__(45);
 
 var drop_down_componentName = "drop-down";
 var drop_down_componentRoot = ".".concat(drop_down_componentName, "-container");
@@ -4112,7 +4054,7 @@ function IsElement(value) {
 // CONCATENATED MODULE: ./src/components/effect-bounce-z/index.js
 
 
-var effect_bounce_z_template = __webpack_require__(45);
+var effect_bounce_z_template = __webpack_require__(46);
 
 var effect_bounce_z_componentName = "effect-bounce-z";
 var effect_bounce_z_componentRoot = ".effect-push-container";
@@ -4213,9 +4155,9 @@ WCDefine(effect_bounce_z_componentName, EffectBounceZ);
 // CONCATENATED MODULE: ./src/components/effect-fade/index.js
 
 
-var effect_fade_style = __webpack_require__(46).toString();
+var effect_fade_style = __webpack_require__(47).toString();
 
-var effect_fade_template = __webpack_require__(47);
+var effect_fade_template = __webpack_require__(48);
 
 var effect_fade_componentName = "effect-fade";
 var effect_fade_componentRoot = ".effect-fade-container";
@@ -4412,9 +4354,9 @@ function SelectorArrayToElements(parent, value) {
 // CONCATENATED MODULE: ./src/components/effect-ripple/index.js
 
 
-var effect_ripple_style = __webpack_require__(48).toString();
+var effect_ripple_style = __webpack_require__(49).toString();
 
-var effect_ripple_template = __webpack_require__(49);
+var effect_ripple_template = __webpack_require__(50);
 
 var effect_ripple_componentName = "effect-ripple";
 var effect_ripple_componentRoot = ".effect-ripple-container";
@@ -5018,10 +4960,10 @@ var elements_elements = {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_scale_style = __webpack_require__(50).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var effect_scale_style = __webpack_require__(51).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var effect_scale_template = __webpack_require__(51);
+var effect_scale_template = __webpack_require__(52);
 
 var effect_scale_componentName = "effect-scale";
 var effect_scale_componentRoot = ".effect-scale-container";
@@ -5329,9 +5271,9 @@ var effect_underline_elements = {
   }
 };
 
-var effect_underline_style = __webpack_require__(52).toString();
+var effect_underline_style = __webpack_require__(53).toString();
 
-var effect_underline_template = __webpack_require__(53);
+var effect_underline_template = __webpack_require__(54);
 
 var effect_underline_componentName = "effect-underline";
 var effect_underline_componentRoot = ".effect-underline-container";
@@ -5372,9 +5314,9 @@ WCDefine(effect_underline_componentName, EffectUnderline);
 
 var grid_layout_style = __webpack_require__(18).toString();
 
-var grid_layout_outerStyle = __webpack_require__(54).toString();
+var grid_layout_outerStyle = __webpack_require__(55).toString();
 
-var grid_layout_template = __webpack_require__(55);
+var grid_layout_template = __webpack_require__(56);
 
 var grid_layout_componentName = "grid-layout";
 var grid_layout_componentRoot = ".".concat(grid_layout_componentName, "-container");
@@ -6093,9 +6035,9 @@ var horizontal_slider_properties_observedAttributes = Object.keys(horizontal_sli
 
 
 
-var horizontal_slider_style = __webpack_require__(56).toString();
+var horizontal_slider_style = __webpack_require__(57).toString();
 
-var horizontal_slider_template = __webpack_require__(57);
+var horizontal_slider_template = __webpack_require__(58);
 
 var horizontal_slider_componentName = "horizontal-slider";
 var horizontal_slider_componentRoot = ".horizontal-slider-container";
@@ -6126,7 +6068,7 @@ WCDefine(horizontal_slider_componentName, HorizontalSlider);
 // CONCATENATED MODULE: ./src/components/icon-element/index.js
 
 
-var icon_element_style = __webpack_require__(58).toString();
+var icon_element_style = __webpack_require__(59).toString();
 
 var icon_element_elements = {
   root: {
@@ -6188,7 +6130,7 @@ var icon_element_properties = Object.assign({}, {
   }
 }, icon_element_attributes); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var icon_element_template = __webpack_require__(59);
+var icon_element_template = __webpack_require__(60);
 
 var icon_element_componentName = "icon-element";
 var icon_element_componentRoot = ".icon-element-container";
@@ -6291,11 +6233,11 @@ function ValidateHtml(str, allowedHtmlTags, disallowedHtmlTags) {
 // CONCATENATED MODULE: ./src/components/image-loader/index.js
 
 
-var image_loader_style = __webpack_require__(60).toString();
+var image_loader_style = __webpack_require__(61).toString();
 
-var image_loader_outerStyle = __webpack_require__(61).toString();
+var image_loader_outerStyle = __webpack_require__(62).toString();
 
-var image_loader_template = __webpack_require__(62);
+var image_loader_template = __webpack_require__(63);
 
 var image_loader_componentName = "image-loader";
 var image_loader_componentRoot = ".image-loader-container";
@@ -9033,11 +8975,11 @@ var computed_validationMessage = function validationMessage(host) {
 
 
 
-var input_field_outerStyle = __webpack_require__(63);
+var input_field_outerStyle = __webpack_require__(64);
 
-var input_field_style = __webpack_require__(64).toString();
+var input_field_style = __webpack_require__(65).toString();
 
-var input_field_template = __webpack_require__(65);
+var input_field_template = __webpack_require__(66);
 
 var input_field_componentName = "input-field";
 var input_field_componentRoot = ".input-field-container";
@@ -9156,9 +9098,9 @@ WCDefine(input_field_componentName, InputField, "input");
 // CONCATENATED MODULE: ./src/components/overlay-content/index.js
 
 
-var overlay_content_style = __webpack_require__(66).toString();
+var overlay_content_style = __webpack_require__(67).toString();
 
-var overlay_content_outerStyle = __webpack_require__(67).toString();
+var overlay_content_outerStyle = __webpack_require__(68).toString();
 
 var positionPadding = 40;
 var widths = ["content", "target"];
@@ -9174,7 +9116,7 @@ var emptyBox = {
   height: 0
 };
 
-var overlay_content_template = __webpack_require__(68);
+var overlay_content_template = __webpack_require__(69);
 
 var overlay_content_componentName = "overlay-content";
 var overlay_content_componentRoot = ".overlay-content-container";
@@ -9426,9 +9368,9 @@ WCDefine(overlay_content_componentName, OverlayContent);
 // CONCATENATED MODULE: ./src/components/overlay-message/index.js
 
 
-var overlay_message_style = __webpack_require__(69).toString();
+var overlay_message_style = __webpack_require__(70).toString();
 
-var overlay_message_template = __webpack_require__(70);
+var overlay_message_template = __webpack_require__(71);
 
 var overlay_message_componentName = "overlay-message";
 var overlay_message_componentRoot = ".".concat(overlay_message_componentName, "-container");
@@ -9542,10 +9484,10 @@ WCDefine(overlay_message_componentName, OverlayMessage);
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var progress_bar_style = __webpack_require__(71).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var progress_bar_style = __webpack_require__(72).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var progress_bar_template = __webpack_require__(72);
+var progress_bar_template = __webpack_require__(73);
 
 var progress_bar_componentName = "progress-bar";
 var progress_bar_componentRoot = ".".concat(progress_bar_componentName, "-container");
@@ -9899,9 +9841,9 @@ function IfEmpty(newValue) {
 // CONCATENATED MODULE: ./src/components/snack-bar/index.js
 
 
-var snack_bar_style = __webpack_require__(73).toString();
+var snack_bar_style = __webpack_require__(74).toString();
 
-var snack_bar_template = __webpack_require__(74);
+var snack_bar_template = __webpack_require__(75);
 
 var snack_bar_componentName = "snack-bar";
 var snack_bar_componentRoot = ".".concat(snack_bar_componentName, "-container");
@@ -10131,11 +10073,11 @@ WCDefine(snack_bar_componentName, SnackBar);
 // CONCATENATED MODULE: ./src/components/spinner-element/index.js
 
 
-var spinner_element_style = __webpack_require__(75).toString();
+var spinner_element_style = __webpack_require__(76).toString();
 
-var spinner_element_outerStyle = __webpack_require__(76).toString();
+var spinner_element_outerStyle = __webpack_require__(77).toString();
 
-var spinner_element_template = __webpack_require__(77);
+var spinner_element_template = __webpack_require__(78);
 
 var spinner_element_componentName = "spinner-element";
 var spinner_element_componentRoot = ".".concat(spinner_element_componentName, "-container");
@@ -13908,17 +13850,26 @@ exports.push([module.i, ":host(button-element){font:inherit;line-height:inherit;
 
 exports = module.exports = __webpack_require__(0)(false);
 // Module
-exports.push([module.i, ":host(collapse-menu){display:block}collapse-menu{display:block}.collapse-menu-container{position:relative}.collapse-menu-container .toggle-arrow,.collapse-menu-container .default-toggle-icon{display:inline-block;cursor:pointer;pointer-events:none;opacity:0;position:absolute;top:0;left:0;z-index:-1}.collapse-menu-container .toggle-arrow{position:relative;margin-left:-0.5em;margin-right:-0.5em}.collapse-menu-container .toggle-arrow svg{fill:currentColor}.collapse-menu-container .collapse-menu-items{-webkit-transition:-webkit-transform 0.2s;transition:-webkit-transform 0.2s;transition:transform 0.2s;transition:transform 0.2s, -webkit-transform 0.2s}.collapse-menu-container .collapse-menu-items .collapse-menu-items-inner{flex-wrap:nowrap;white-space:nowrap;position:relative}.collapse-menu-container:not(.collapseonwrap) .collapse-menu-items .collapse-menu-items-inner{flex-wrap:wrap;white-space:normal}.collapse-menu-container .collapse-menu-items-bg{position:absolute;width:100%;height:100%;opacity:0;-webkit-transition:opacity 0s;transition:opacity 0s}.collapse-menu-container .collapse-menu-toggle{position:absolute;opacity:0;pointer-events:none;height:1.5em;display:-webkit-box;display:flex;cursor:pointer;-webkit-transition:opacity 0.2s;transition:opacity 0.2s}.collapse-menu-container .collapse-menu-toggle-icon{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center}.collapse-menu-container .collapse-menu-toggle-inner{padding-left:1em;position:relative;display:none;cursor:pointer;margin:0;opacity:0;height:0}.collapse-menu-container .collapse-menu-toggle-inner .default-toggle-inner-icon{position:relative;left:-0.33em;pointer-events:none}.collapse-menu-container[direction=\"horizontal\"] .collapse-menu-items{display:-webkit-box;display:flex}.collapse-menu-container[direction=\"horizontal\"] .collapse-menu-items .collapse-menu-items-inner{display:-webkit-box;display:flex}.collapse-menu-container[expandable=\"true\"] .toggle-arrow,.collapse-menu-container[expandable=\"true\"] .default-toggle-icon{opacity:1;position:relative;pointer-events:all;z-index:unset}.collapse-menu-container[expandable=\"true\"] .collapse-menu-items{opacity:0;pointer-events:none;z-index:-1;position:fixed;-webkit-transform:translateX(-105%) perspective(1px) translateZ(0);transform:translateX(-105%) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden}.collapse-menu-container[expandable=\"true\"] .collapse-menu-items-bg{opacity:1;-webkit-transition:opacity 0s linear 0.3s;transition:opacity 0s linear 0.3s}.collapse-menu-container[expandable=\"true\"] .collapse-menu-toggle-inner{display:block;margin:1em 0;height:1.5em;-webkit-transition:margin 0.01s linear 0.4s, height 0.01s linear 0.4s;transition:margin 0.01s linear 0.4s, height 0.01s linear 0.4s}.collapse-menu-container[expandable=\"true\"] .collapse-menu-toggle{position:relative;opacity:1;pointer-events:all}.collapse-menu-container[expandable=\"true\"][align=\"right\"] .collapse-menu-items{-webkit-transform:translateX(105%) perspective(1px) translateZ(0);transform:translateX(105%) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden}.collapse-menu-container[expandable=\"false\"] .collapse-menu-items{position:relative;-webkit-transform:translateX(0%) perspective(1px) translateZ(0);transform:translateX(0%) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden}.collapse-menu-container[expandable=\"false\"] .collapse-menu-toggle-inner{opacity:0;z-index:-1;pointer-events:none}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-items{-webkit-transform:translateX(0em) perspective(1px) translateZ(0);transform:translateX(0em) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden;opacity:1;z-index:unset;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;top:0;left:0;height:100vh;-webkit-box-align:start;align-items:flex-start;pointer-events:all}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-items .collapse-menu-items-inner{-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;height:calc(100vh - 3.5em);overflow:auto}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-toggle{opacity:0}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-toggle-inner{opacity:1;-webkit-transition:opacity 0.5s ease-in-out 0.1s;transition:opacity 0.5s ease-in-out 0.1s}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"][align=\"right\"] .collapse-menu-items{right:0;left:unset;text-align:left}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"][align=\"right\"] .collapse-menu-toggle-inner{-webkit-transform:rotate(180deg) perspective(1px) translateZ(0);transform:rotate(180deg) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden;padding-left:0;padding-right:7%}collapse-menu>[slot=\"item\"]{padding-right:1em;box-sizing:border-box;opacity:0;-webkit-transform:perspective(1px) translateZ(0);transform:perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden}collapse-menu>[slot=\"item\"]:last-of-type{padding-right:0}collapse-menu[expandable=\"false\"]>[slot=\"item\"],collapse-menu:not([expandable])>[slot=\"item\"],collapse-menu[expanded=\"true\"]>[slot=\"item\"]{opacity:1}collapse-menu[expandable=\"false\"]>[slot=\"item\"]:last-of-type,collapse-menu:not([expandable])>[slot=\"item\"]:last-of-type{padding-right:0}collapse-menu[expandable=\"true\"][expanded=\"true\"]>[slot=\"item\"]{padding:0.5em 1em;position:relative}\n", ""]);
+exports.push([module.i, ".collapse-menu-container{position:relative}.collapse-menu-container .toggle-arrow,.collapse-menu-container .default-toggle-icon{display:inline-block;cursor:pointer;pointer-events:none;opacity:0;position:absolute;top:0;left:0;z-index:-1}.collapse-menu-container .toggle-arrow{position:relative;margin-left:-0.5em;margin-right:-0.5em}.collapse-menu-container .toggle-arrow svg{fill:currentColor}.collapse-menu-container .collapse-menu-items{-webkit-transition:-webkit-transform 0.2s;transition:-webkit-transform 0.2s;transition:transform 0.2s;transition:transform 0.2s, -webkit-transform 0.2s}.collapse-menu-container .collapse-menu-items .collapse-menu-items-inner{flex-wrap:nowrap;white-space:nowrap;position:relative}.collapse-menu-container:not(.collapseonwrap) .collapse-menu-items .collapse-menu-items-inner{flex-wrap:wrap;white-space:normal}.collapse-menu-container .collapse-menu-items-bg{position:absolute;width:100%;height:100%;opacity:0;-webkit-transition:opacity 0s;transition:opacity 0s}.collapse-menu-container .collapse-menu-toggle{position:absolute;opacity:0;pointer-events:none;height:1.5em;display:-webkit-box;display:flex;cursor:pointer;-webkit-transition:opacity 0.2s;transition:opacity 0.2s}.collapse-menu-container .collapse-menu-toggle-icon{display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center}.collapse-menu-container .collapse-menu-toggle-inner{padding-left:1em;position:relative;display:none;cursor:pointer;margin:0;opacity:0;height:0}.collapse-menu-container .collapse-menu-toggle-inner .default-toggle-inner-icon{position:relative;left:-0.33em;pointer-events:none}.collapse-menu-container[direction=\"horizontal\"] .collapse-menu-items{display:-webkit-box;display:flex}.collapse-menu-container[direction=\"horizontal\"] .collapse-menu-items .collapse-menu-items-inner{display:-webkit-box;display:flex}.collapse-menu-container[expandable=\"true\"] .toggle-arrow,.collapse-menu-container[expandable=\"true\"] .default-toggle-icon{opacity:1;position:relative;pointer-events:all;z-index:unset}.collapse-menu-container[expandable=\"true\"] .collapse-menu-items{opacity:0;pointer-events:none;z-index:-1;position:fixed;-webkit-transform:translateX(-105%) perspective(1px) translateZ(0);transform:translateX(-105%) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden}.collapse-menu-container[expandable=\"true\"] .collapse-menu-items-bg{opacity:1;-webkit-transition:opacity 0s linear 0.3s;transition:opacity 0s linear 0.3s}.collapse-menu-container[expandable=\"true\"] .collapse-menu-toggle-inner{display:block;margin:1em 0;height:1.5em;-webkit-transition:margin 0.01s linear 0.4s, height 0.01s linear 0.4s;transition:margin 0.01s linear 0.4s, height 0.01s linear 0.4s}.collapse-menu-container[expandable=\"true\"] .collapse-menu-toggle{position:relative;opacity:1;pointer-events:all}.collapse-menu-container[expandable=\"true\"][align=\"right\"] .collapse-menu-items{-webkit-transform:translateX(105%) perspective(1px) translateZ(0);transform:translateX(105%) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden}.collapse-menu-container[expandable=\"false\"] .collapse-menu-items{position:relative;-webkit-transform:translateX(0%) perspective(1px) translateZ(0);transform:translateX(0%) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden}.collapse-menu-container[expandable=\"false\"] .collapse-menu-toggle-inner{opacity:0;z-index:-1;pointer-events:none}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-items{-webkit-transform:translateX(0em) perspective(1px) translateZ(0);transform:translateX(0em) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden;opacity:1;z-index:unset;-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;top:0;left:0;height:100vh;-webkit-box-align:start;align-items:flex-start;pointer-events:all}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-items .collapse-menu-items-inner{-webkit-box-orient:vertical;-webkit-box-direction:normal;flex-direction:column;height:calc(100vh - 3.5em)}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-toggle{opacity:0}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"] .collapse-menu-toggle-inner{opacity:1;-webkit-transition:opacity 0.5s ease-in-out 0.1s;transition:opacity 0.5s ease-in-out 0.1s}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"][align=\"right\"] .collapse-menu-items{right:0;left:unset;text-align:left}.collapse-menu-container[expandable=\"true\"][expanded=\"true\"][align=\"right\"] .collapse-menu-toggle-inner{-webkit-transform:rotate(180deg) perspective(1px) translateZ(0);transform:rotate(180deg) perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden;padding-left:0;padding-right:1em}\n", ""]);
 
 
 /***/ }),
 /* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(false);
+// Module
+exports.push([module.i, ":host(collapse-menu){display:block}collapse-menu{display:block}collapse-menu>[slot=\"item\"]{padding-right:1em;box-sizing:border-box;opacity:0;-webkit-transform:perspective(1px) translateZ(0);transform:perspective(1px) translateZ(0);-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-backface-visibility:hidden;backface-visibility:hidden}collapse-menu>[slot=\"item\"]:last-of-type{padding-right:0}collapse-menu[expandable=\"false\"]>[slot=\"item\"],collapse-menu:not([expandable])>[slot=\"item\"],collapse-menu[expanded=\"true\"]>[slot=\"item\"]{opacity:1}collapse-menu[expandable=\"false\"]>[slot=\"item\"]:last-of-type,collapse-menu:not([expandable])>[slot=\"item\"]:last-of-type{padding-right:0}collapse-menu[expandable=\"true\"][expanded=\"true\"]>[slot=\"item\"]{padding:0.5em 1.5em;position:relative}\n", ""]);
+
+
+/***/ }),
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=collapse-menu-container expanded=false expandable=false> <div class=collapse-menu-toggle> <div class=collapse-menu-toggle-icon> <slot name=toggle-icon> <icon-element style=height:1.5em class=default-toggle-icon size=1.5em svg='<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z\"/></svg>'></icon-element> <div class=toggle-arrow style=height:1.5em;margin-top:-.3em> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> </slot> </div> </div> <div class=collapse-menu-items> <div class=collapse-menu-items-bg></div> <div class=collapse-menu-toggle-inner> <icon-element class=default-toggle-inner-icon size=1.5em svg='<svg class=\"default-inner-toggle-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\" /></svg>'></icon-element> </div> <div class=collapse-menu-items-inner> <slot name=item></slot> </div> </div> </div> ";
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -13927,13 +13878,13 @@ exports.push([module.i, ":host(content-collapse){display:block}.content-collapse
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=content-collapse-container> <div class=content-collapse-toggler> <icon-element class=content-collapse-toggler-icon size=1.5em></icon-element> <div class=content-collapse-toggler-content> <slot name=content-collapse-toggler></slot> </div> </div> <div class=content-collapse-content> <content-transition class=content-collapse-transition keepchildren=true type=fade> <div class=content-collapse-empty slot=hidden></div> <div class=content-collapse-content-holder slot=hidden> <slot name=content-collapse-content></slot> </div> </content-transition> </div> </div> ";
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -13942,13 +13893,13 @@ exports.push([module.i, ":host(content-drawer){display:block;width:100%;position
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=content-drawer-container> <div class=content-drawer-header> <icon-element class=content-drawer-header-icon size=1.38em></icon-element> <slot name=header></slot> <effect-underline start=none opacity=1 speed=700></effect-underline> <effect-ripple start=none speed=600></effect-ripple> <effect-fade start=none speed=600 opacity=0,1></effect-fade> </div> <div class=content-drawer-content> <div class=content-drawer-content-inner> <div class=content-drawer-content-inner-inner> <slot name=content></slot> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -13957,13 +13908,13 @@ exports.push([module.i, ":host(content-transition){display:block;width:100%;posi
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=content-transition-container> <div class=content-transition-inner> <div class=next-slot> <slot name=next></slot> </div> <div class=current-slot> <slot current=true name=current></slot> </div> <div class=hidden-slot> <div class=hidden-slot-inner> <slot name=hidden></slot> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -13972,13 +13923,13 @@ exports.push([module.i, ":host(cookie-message){font:inherit;line-height:inherit;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=cookie-message-container> <div class=cookie-message-inner> <div class=cookie-message-text></div> <button-element class=cookie-message-button></button-element> </div> </div> ";
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -13987,7 +13938,7 @@ exports.push([module.i, ".drop-down-container{display:-webkit-box;display:flex;f
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -13996,19 +13947,19 @@ exports.push([module.i, ":host(drop-down){outline:none !important;display:inline
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=drop-down-container> <div class=drop-down-heading> <div class=drop-down-label> <slot name=label></slot> </div> <div class=drop-down-arrow> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> </div> <overlay-content align=\"center bottom\" class=drop-down-overlay> <slot name=option></slot> </overlay-content> <slot name=nonitem></slot> </div> ";
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-push-container></div> ";
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14017,13 +13968,13 @@ exports.push([module.i, ":host(effect-fade){pointer-events:none;box-sizing:borde
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-fade-container></div> ";
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14032,13 +13983,13 @@ exports.push([module.i, ".effect-ripple-container,.effect-ripple-container *{poi
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-ripple-container> <span class=ripple></span> </div> ";
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14047,13 +13998,13 @@ exports.push([module.i, ":host(effect-scale){pointer-events:none;box-sizing:bord
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-scale-container></div> ";
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14062,13 +14013,13 @@ exports.push([module.i, ":host(effect-underline){pointer-events:none;box-sizing:
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-underline-container> <span class=underline></span> </div> ";
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14077,13 +14028,13 @@ exports.push([module.i, ":host(grid-layout){display:block;opacity:0;-webkit-tran
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=grid-layout-container> <div class=grid-layout-items></div> </div> ";
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14092,13 +14043,13 @@ exports.push([module.i, ":host(horizontal-slider){display:-webkit-box;display:fl
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=horizontal-slider-container> <div class=horizontal-slider-chicklets></div> <div class=horizontal-slider-previous> <slot name=previous-button> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\" class=horizontal-slider-default-arrow> <path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\"/></svg> </slot> </div> <div class=horizontal-slider-inner> <div class=horizontal-slider-items> <slot></slot> </div> </div> <div class=horizontal-slider-next> <slot name=next-button> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\" class=horizontal-slider-default-arrow> <path d=\"M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z\"/></svg> </slot> </div> </div> ";
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14107,13 +14058,13 @@ exports.push([module.i, ":host(icon-element){display:-webkit-inline-box;display:
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=icon-element-container> <div class=svg-container></div> </div> ";
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14122,7 +14073,7 @@ exports.push([module.i, ".image-loader-container{position:relative;width:0%;heig
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14131,13 +14082,13 @@ exports.push([module.i, ":host(image-loader){display:inline-block;outline:none !
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=\"image-loader-container notready\" style=opacity:0> <img class=image-loader-image> <div class=image-loader-text></div> <spinner-element scrim=true page=false type=circle visible=false style=opacity:0></spinner-element> <style type=text/css rel=stylesheet style=display:none class=internalStyles></style> </div> ";
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14146,7 +14097,7 @@ exports.push([module.i, ":host(input-field){display:inline-block;width:300px;max
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14155,13 +14106,13 @@ exports.push([module.i, ":host(input-field){display:inline-block;width:300px;max
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=input-field-container> <div class=input-field-container-inner> <div class=input-field-top-section> <div class=input-field-label-top> <slot name=label-top></slot> </div> </div> <div class=input-field-middle-section> <div class=input-field-label-left> <slot name=label-left></slot> </div> <div class=input-field-input-section> <div class=input-field-label-inside> <slot name=label-inside></slot> </div> <div class=input-field-input-container> <div class=input-field-input-container-inner> <slot name=input></slot> </div> <div class=input-field-input-overlay> <icon-element class=input-field-icon size=1.25em></icon-element> <icon-element class=input-field-clear size=1.25em></icon-element> <input type=text class=input-field-file-path-overlay> <div class=input-field-checkbox-overlay> <icon-element class=input-field-checkbox-icon size=0.7em></icon-element> </div> </div> <div class=input-field-border></div> <input type=hidden class=input-field-hidden-input> </div> </div> <div class=input-field-label-right> <slot name=label-right></slot> </div> </div> <div class=input-field-bottom-section> <div class=input-field-label-bottom> <slot name=label-bottom></slot> </div> <div class=input-field-bottom-content> <div class=input-field-messages> <div class=input-field-message-help></div> <div class=input-field-message-error></div> </div> <div class=input-field-character-count-container> <div class=input-field-character-count-inner> <div class=input-field-character-count></div> <div class=input-field-character-count-max-divider>/</div> <div class=input-field-character-count-max></div> </div> </div> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14170,7 +14121,7 @@ exports.push([module.i, ".overlay-content-container{display:block;position:absol
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14179,13 +14130,13 @@ exports.push([module.i, ":host(overlay-content){display:block;position:fixed;hei
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=overlay-content-container> <div class=overlay-content-container-inner> <div class=overlay-content-content-container> <div class=overlay-content-content-inner> <slot></slot> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14194,13 +14145,13 @@ exports.push([module.i, ".overlay-message-container{position:fixed;width:100%;he
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=overlay-message-container> <div class=overlay-message-scrim></div> <div class=overlay-message-content-container> <div class=overlay-message-header> <slot name=header></slot> </div> <div class=overlay-message-body> <slot name=body></slot> </div> <div class=overlay-message-buttons> <slot name=button></slot> </div> </div> </div> ";
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14209,13 +14160,13 @@ exports.push([module.i, "@-webkit-keyframes indeterminate{0%{-webkit-transform-o
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=progress-bar-container> <div class=progress-bar-heading> <div class=progress-bar-header></div> <div class=progress-bar-percentage></div> </div> <div class=progress-bar-inner> <div class=progress-bar-track> <div class=progress-bar-track-inner> <div class=progress-bar-bottom></div> <div class=progress-bar-top></div> </div> </div> </div> <div class=progress-bar-bottom-container> <div class=progress-bar-text></div> <button-element class=progress-bar-button></button-element> </div> </div> ";
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14224,13 +14175,13 @@ exports.push([module.i, ".snack-bar-container{pointer-events:none;opacity:0;posi
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=snack-bar-container> <div class=snack-bar-inner> <div class=snack-bar-icon> <div class=snack-bar-icon-inner> <icon-element size=1.5em class=infoicon></icon-element> <icon-element size=1.5em class=successicon></icon-element> <icon-element size=1.5em class=erroricon></icon-element> <icon-element size=1.5em class=warningicon></icon-element> </div> </div> <div class=snack-bar-text> <div class=snack-bar-text-inner> <slot name=body></slot> </div> </div> <div class=snack-bar-close> <div class=snack-bar-close-inner> <button-element class=\"snack-bar-default-button nomargin slim nobackground noshadow\"> <icon-element size=1.5em class=snack-bar-close-icon></icon-element> </button-element> </div> </div> <div class=snack-bar-type-bar></div> </div> </div> ";
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14239,7 +14190,7 @@ exports.push([module.i, ".spinner-element-container{width:100%;height:100%;top:0
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(0)(false);
@@ -14248,7 +14199,7 @@ exports.push([module.i, ":host(spinner-element){position:absolute;height:100%;wi
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=spinner-element-container> <div class=spinner-element-scrim></div> <div class=spinner-element-inner> <slot> <div class=spin></div> </slot> </div> </div> ";
