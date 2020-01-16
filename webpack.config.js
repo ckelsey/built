@@ -24,12 +24,12 @@ let plugins = []
 
 const optimization = {
     minimize: false,
-    splitChunks: {
-        name: true,
-        chunks: `async`,
-    },
-    usedExports: true,
-    providedExports: true,
+    // splitChunks: {
+    //     name: true,
+    //     chunks: `async`,
+    // },
+    // usedExports: true,
+    // providedExports: true,
 }
 
 const postPlugin = {

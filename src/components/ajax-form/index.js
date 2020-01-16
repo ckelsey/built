@@ -32,34 +32,40 @@ const getFormData = host => {
 
     document.body.appendChild(newForm)
 
-    newForm.addEventListener(`submit`, e => {
-        e.preventDefault()
+    const data = {}
+    const formData = new FormData(newForm)
+    formData.forEach((value, key) => { data[key] = value })
+    host.dispatchEvent(new CustomEvent(`submitdata`, { detail: data }))
+    OnNextFrame(() => document.body.removeChild(newForm))
 
-        const data = {}
-        const formData = new FormData(newForm)
-        formData.forEach((value, key) => { data[key] = value })
+    // newForm.addEventListener(`submit`, e => {
+    //     e.preventDefault()
 
-        if (!host.request) {
-            host.dispatchEvent(new CustomEvent(`submitdata`, { detail: data }))
-            OnNextFrame(() => document.body.removeChild(newForm))
-            return false
-        }
+    //     const data = {}
+    //     const formData = new FormData(newForm)
+    //     formData.forEach((value, key) => { data[key] = value })
 
-        const xhr = new XMLHttpRequest()
-        xhr.open(host.method, host.action)
-        xhr.setRequestHeader(`Content-Type`, host.contenttype)
-        xhr.addEventListener(`load`, () => {
-            host.dispatchEvent(new CustomEvent(`response`, { detail: xhr }))
-            return host.reload ? location.reload() : undefined
-        })
-        xhr.send(JSON.stringify(data))
+    //     if (!host.request) {
+    //         host.dispatchEvent(new CustomEvent(`submitdata`, { detail: data }))
+    //         OnNextFrame(() => document.body.removeChild(newForm))
+    //         return false
+    //     }
 
-        OnNextFrame(() => document.body.removeChild(newForm))
+    //     const xhr = new XMLHttpRequest()
+    //     xhr.open(host.method, host.action)
+    //     xhr.setRequestHeader(`Content-Type`, host.contenttype)
+    //     xhr.addEventListener(`load`, () => {
+    //         host.dispatchEvent(new CustomEvent(`response`, { detail: xhr }))
+    //         return host.reload ? location.reload() : undefined
+    //     })
+    //     xhr.send(JSON.stringify(data))
 
-        return false
-    })
+    //     OnNextFrame(() => document.body.removeChild(newForm))
 
-    newForm.dispatchEvent(new Event(`submit`))
+    //     return false
+    // })
+
+    // newForm.dispatchEvent(new Event(`submit`))
 }
 
 const elements = {
@@ -69,7 +75,11 @@ const elements = {
         selector: `.${componentName}-form`,
         onChange: (el, host) => {
             el.eventSubscriptions = {
-                submit: ObserveEvent(el, `submit`, { preventDefault: true }).subscribe(() => getFormData(host))
+                submit: ObserveEvent(el, `submit`, { preventDefault: true })
+                    .subscribe(e => {
+                        e.preventDefault()
+                        getFormData(host)
+                    })
             }
         }
     }

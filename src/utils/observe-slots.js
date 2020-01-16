@@ -1,78 +1,39 @@
-import { Observer } from '..'
+import { Observer, ObserveExists } from '..'
 
-export function ObserveSlots(element, mustHaveSlotAttribute) {
+export function ObserveSlots(element, mustHaveSlotAttribute = false) {
     if (!element) { return }
 
-    let mObserver = { disconnect: () => { } }
-    let slotObserver = { disconnect: () => { } }
     const observer = Observer()
-
-    const dispose = () => {
-        observer.complete()
-        mObserver.disconnect()
-        slotObserver.disconnect()
-    }
-
-    const newSlots = (added = [], removed = []) => {
-        if (added.length || removed.length) {
-            observer.next({ added, removed })
-        }
-    }
-
-    slotObserver = new MutationObserver(mutationsList => {
+    const exists = ObserveExists(element).subscribe(exists => exists ? undefined : dispose())
+    const newSlots = (added = [], removed = []) => added.length || removed.length ? observer.next({ added, removed }) : undefined
+    const slotObserver = new MutationObserver(mutationsList => {
+        const added = []
+        const removed = []
         const list = Array.from(mutationsList)
+        let len = list.length
 
-        while (list.length) {
-            const mutation = list.shift()
-            if (mutation.type === `childList` && (mutation.addedNodes.length || mutation.removedNodes.length)) {
+        while (len--) {
+            if (list[len].type === `childList` && (list[len].addedNodes.length || list[len].removedNodes.length)) {
                 if (mustHaveSlotAttribute) {
-                    const added = []
-                    const removed = []
-
-                    mutation.addedNodes.forEach(a => a.getAttribute(`slot`) ? added.push(a) : undefined)
-                    mutation.removedNodes.forEach(r => r.getAttribute(`slot`) ? removed.push(r) : undefined)
-
-                    newSlots(added, removed)
+                    list[len].addedNodes.forEach(a => a.getAttribute(`slot`) ? added.push(a) : undefined)
+                    list[len].removedNodes.forEach(r => r.getAttribute(`slot`) ? removed.push(r) : undefined)
                 } else {
-                    return newSlots(mutation.addedNodes, mutation.removedNodes)
+                    list[len].addedNodes.forEach(a => added.push(a))
+                    list[len].removedNodes.forEach(r => removed.push(r))
                 }
             }
         }
+
+        newSlots(added, removed)
     })
 
-    mObserver = new MutationObserver(e => {
-        let elementIsRemoved = false
-        let ii = e.length
-
-        while (!elementIsRemoved && ii) {
-            ii = ii - 1
-            let i = e[ii].removedNodes.length
-
-            while (!elementIsRemoved && i) {
-                i = i - 1
-                elementIsRemoved = e[ii].removedNodes[i] === element
-            }
-        }
-
-        if (elementIsRemoved) { dispose() }
-    })
-
-    let max = 1000
-    const tryIt = () => {
-        max = max - 1
-
-        if (!max) { return dispose() }
-
-        const parent = element.parentNode || element.host
-        if (!parent) { return requestAnimationFrame(tryIt) }
-
-        newSlots(Array.from(element.children))
-
-        mObserver.observe(parent, { childList: true })
-        slotObserver.observe(element, { childList: true })
+    const dispose = () => {
+        try { exists } catch (error) { }
+        observer.complete()
+        slotObserver.disconnect()
     }
 
-    tryIt()
+    slotObserver.observe(element, { childList: true })
 
     return observer
 }

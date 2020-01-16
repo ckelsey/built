@@ -1,10 +1,9 @@
-import { Observer, Get } from '..'
+import { Observer, ObserveExists } from '..'
 
 export function ObserveEvent(element, eventName, options = {}) {
     if (!element || !eventName) { return }
 
     let isRunning = false
-    let mObserver = { disconnect: () => { } }
 
     options = Object.assign({}, {
         preventDefault: false,
@@ -18,31 +17,16 @@ export function ObserveEvent(element, eventName, options = {}) {
         element.alert &&
         element.setInterval
 
-    const getParent = () => Get(
-        element,
-        `parentNode`,
-        Get(element, `host`,
-            Get(element, `__shady_parent.host`)
-        ),
-        p => !!p & p.nodeName === `#document-fragment` ? Get(p, `host`) : p
-    )
-
-
     const startup = () => {
-        if (!element || (!element.parentNode && !element.host) || isRunning) { return }
-
+        if (isRunning) { return }
         isRunning = true
-
-        element.addEventListener(eventName, eventHandler, options.useCapture)
+        try { element.addEventListener(eventName, eventHandler, options.useCapture) } catch (error) { }
     }
 
     const observer = Observer(undefined, undefined, startup)
 
     const eventHandler = event => {
         if (!observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0) { return shutDown() }
-
-        if (!isWindow() && !getParent()) { return dispose() }
-
         if (options.preventDefault) { event.preventDefault() }
         if (options.stopPropagation) { event.stopPropagation() }
 
@@ -61,44 +45,12 @@ export function ObserveEvent(element, eventName, options = {}) {
     const dispose = () => {
         shutDown()
         observer.complete()
-        mObserver.disconnect()
+        try { exists() } catch (error) { }
     }
 
-    mObserver = new MutationObserver(e => {
-        let elementIsRemoved = false
-        let ii = e.length
+    const exists = isWindow() ? () => { } : ObserveExists(element).subscribe(exists => exists ? undefined : dispose())
 
-        while (!elementIsRemoved && ii) {
-            ii = ii - 1
-            let i = e[ii].removedNodes.length
-
-            while (!elementIsRemoved && i) {
-                i = i - 1
-                elementIsRemoved = e[ii].removedNodes[i] === element
-            }
-        }
-
-        if (elementIsRemoved) { dispose() }
-    })
-
-    let max = 1000
-
-    const tryToObserveIt = () => {
-        const parent = getParent()
-        max = max - 1
-
-        if (!max) { return dispose() }
-        if (!parent) { return requestAnimationFrame(tryToObserveIt) }
-
-        mObserver.observe(parent, { childList: true })
-        startup()
-    }
-
-    if (isWindow()) {
-        startup()
-    } else {
-        tryToObserveIt()
-    }
+    startup()
 
     return observer
 }

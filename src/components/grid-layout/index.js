@@ -1,4 +1,5 @@
-import { WCConstructor, WCDefine, WCwhenPropertyReady, AppendStyleElement, ObserverUnsubscribe, SetStyleRules, ID, ToNumber, Pipe, IfInvalid, Get, ToBool, OnNextFrame, ObserveSlots, CommasToArray, ToMap } from '../..'
+import { WCConstructor, WCDefine, AppendStyleElement, ObserverUnsubscribe, SetStyleRules, ID, ToNumber, Pipe, IfInvalid, Get, ToBool, OnNextFrame, ObserveSlots, CommasToArray, ToMap } from '../..'
+import { Try } from '../../utils/try'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./external.scss`).toString()
@@ -73,6 +74,25 @@ const properties = {
 }
 
 const getComponentStyles = host => () => `${require(`./style.scss`).toString()}${host.theme || ``}${host.styles}`
+const notSlottable = el => Get(el, `nongrid`) || Get(el, `tagName.toLowerCase()`) === `style`
+const clear = host => () => Array.from(host.children).forEach(el => !notSlottable(el) ? Try(el => host.removeChild(el))(el) : undefined)
+const wrap = host => () => Array.from(host.children).forEach(el => notSlottable(el) || el.container ? undefined : wrapItem(host.elements.itemsContainer, el))
+
+const wrapItem = (itemsContainer, el) => {
+    const id = ID()
+    const slotWrapper = document.createElement(`div`)
+    slotWrapper.className = `grid-layout-item`
+    slotWrapper.id = id
+    itemsContainer.appendChild(slotWrapper)
+
+    const slot = document.createElement(`slot`)
+    slot.name = id
+    slotWrapper.appendChild(slot)
+    el.slot = id
+    el.container = slotWrapper
+
+    return el
+}
 
 export const GridLayout = WCConstructor({
     componentName,
@@ -90,49 +110,29 @@ export const GridLayout = WCConstructor({
             }
         })
     },
-    methods: { getComponentStyles },
+    methods: {
+        getComponentStyles,
+        clear,
+        wrap
+    },
     onConnected(host) {
         host.elements.innerStyles = AppendStyleElement(` `, host.shadowRoot, `innerStyles`, `innerStyles`)
 
-        WCwhenPropertyReady(host, `elements.itemsContainer`)
-            .then(itemsContainer => {
-                const wrapItem = el => {
-                    const id = ID()
-                    const slotWrapper = document.createElement(`div`)
-                    slotWrapper.className = `grid-layout-item`
-                    slotWrapper.id = id
-                    itemsContainer.appendChild(slotWrapper)
+        const observeEl = el => notSlottable(el) ? undefined : wrapItem(host.elements.itemsContainer, el)
+        const disconnectEl = el => {
+            const containerParent = Get(el, `container.parentElement`)
+            Get(el, `eventSubscriptions.span.disconnect()`)
+            if (containerParent) { containerParent.removeChild(el.container) }
+        }
 
-                    const slot = document.createElement(`slot`)
-                    slot.name = id
-                    slotWrapper.appendChild(slot)
-                    el.slot = id
-                    el.container = slotWrapper
-
-                    return el
-                }
-
-                const observeEl = el => el.nongrid || el.tagName.toLowerCase() === `style` ? undefined : wrapItem(el)
-
-                const disconnectEl = el => {
-                    const containerParent = Get(el, `container.parentElement`)
-
-                    Get(el, `eventSubscriptions.span.disconnect()`)
-
-                    if (containerParent) {
-                        containerParent.removeChild(el.container)
-                    }
-                }
-
-                host.eventSubscriptions = {
-                    slot: ObserveSlots(host, false).subscribe(results => {
-                        results.added.forEach(observeEl)
-                        results.removed.forEach(disconnectEl)
-                    })
-                }
-
-                OnNextFrame(() => host.setAttribute(`viewable`, true))
+        host.eventSubscriptions = {
+            slot: ObserveSlots(host).subscribe(results => {
+                results.added.reverse().forEach(observeEl)
+                results.removed.forEach(disconnectEl)
             })
+        }
+
+        OnNextFrame(() => host.setAttribute(`viewable`, true))
 
         window.addEventListener(`resize`, () => setScale(host))
     },

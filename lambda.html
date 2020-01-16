@@ -1013,6 +1013,75 @@ function Observer(initialValue) {
 }
 
 
+// CONCATENATED MODULE: ./src/utils/get-parent.js
+
+function GetParent(element) {
+  return Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")), function (p) {
+    return !!p & p.nodeName === "#document-fragment" ? Object(utils_get["a" /* Get */])(p, "host") : p;
+  });
+}
+// CONCATENATED MODULE: ./src/utils/observe-exists.js
+
+function ObserveExists(element) {
+  var initialParent = GetParent(element);
+
+  if (!initialParent) {
+    var _observer = Observer(false);
+
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      _observer.next(false);
+
+      _observer.complete();
+    });
+    return _observer;
+  }
+
+  var isRunning = false;
+  var mObserver = new MutationObserver(function (e) {
+    var elementIsRemoved = false;
+    var ii = e.length;
+
+    while (!elementIsRemoved && ii) {
+      ii = ii - 1;
+      var i = e[ii].removedNodes.length;
+
+      while (!elementIsRemoved && i) {
+        i = i - 1;
+        elementIsRemoved = e[ii].removedNodes[i] === element;
+      }
+    }
+
+    if (elementIsRemoved) {
+      dispose();
+    }
+  });
+
+  var startup = function startup() {
+    if (!GetParent(element) || isRunning) {
+      return;
+    }
+
+    isRunning = true;
+    mObserver.observe(initialParent, {
+      childList: true
+    });
+  };
+
+  var observer = Observer(!!initialParent, undefined, startup);
+
+  var shutDown = function shutDown() {
+    return isRunning = false;
+  };
+
+  var dispose = function dispose() {
+    shutDown();
+    observer.next(false);
+    observer.complete();
+    mObserver.disconnect();
+  };
+
+  return observer;
+}
 // CONCATENATED MODULE: ./src/utils/observe-event.js
 
 function ObserveEvent(element, eventName) {
@@ -1023,9 +1092,6 @@ function ObserveEvent(element, eventName) {
   }
 
   var isRunning = false;
-  var mObserver = {
-    disconnect: function disconnect() {}
-  };
   options = Object.assign({}, {
     preventDefault: false,
     stopPropagation: false,
@@ -1036,19 +1102,16 @@ function ObserveEvent(element, eventName) {
     return element && element.document && element.location && element.alert && element.setInterval;
   };
 
-  var getParent = function getParent() {
-    return Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")), function (p) {
-      return !!p & p.nodeName === "#document-fragment" ? Object(utils_get["a" /* Get */])(p, "host") : p;
-    });
-  };
-
   var startup = function startup() {
-    if (!element || !element.parentNode && !element.host || isRunning) {
+    if (isRunning) {
       return;
     }
 
     isRunning = true;
-    element.addEventListener(eventName, eventHandler, options.useCapture);
+
+    try {
+      element.addEventListener(eventName, eventHandler, options.useCapture);
+    } catch (error) {}
   };
 
   var observer = Observer(undefined, undefined, startup);
@@ -1056,10 +1119,6 @@ function ObserveEvent(element, eventName) {
   var eventHandler = function eventHandler(event) {
     if (!observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0) {
       return shutDown();
-    }
-
-    if (!isWindow() && !getParent()) {
-      return dispose();
     }
 
     if (options.preventDefault) {
@@ -1084,53 +1143,16 @@ function ObserveEvent(element, eventName) {
   var dispose = function dispose() {
     shutDown();
     observer.complete();
-    mObserver.disconnect();
+
+    try {
+      exists();
+    } catch (error) {}
   };
 
-  mObserver = new MutationObserver(function (e) {
-    var elementIsRemoved = false;
-    var ii = e.length;
-
-    while (!elementIsRemoved && ii) {
-      ii = ii - 1;
-      var i = e[ii].removedNodes.length;
-
-      while (!elementIsRemoved && i) {
-        i = i - 1;
-        elementIsRemoved = e[ii].removedNodes[i] === element;
-      }
-    }
-
-    if (elementIsRemoved) {
-      dispose();
-    }
+  var exists = isWindow() ? function () {} : ObserveExists(element).subscribe(function (exists) {
+    return exists ? undefined : dispose();
   });
-  var max = 1000;
-
-  var tryToObserveIt = function tryToObserveIt() {
-    var parent = getParent();
-    max = max - 1;
-
-    if (!max) {
-      return dispose();
-    }
-
-    if (!parent) {
-      return requestAnimationFrame(tryToObserveIt);
-    }
-
-    mObserver.observe(parent, {
-      childList: true
-    });
-    startup();
-  };
-
-  if (isWindow()) {
-    startup();
-  } else {
-    tryToObserveIt();
-  }
-
+  startup();
   return observer;
 }
 // CONCATENATED MODULE: ./src/utils/pipe.js
@@ -2464,105 +2486,68 @@ function Try(fn) {
 }
 // CONCATENATED MODULE: ./src/utils/observe-slots.js
 
-function ObserveSlots(element, mustHaveSlotAttribute) {
+function ObserveSlots(element) {
+  var mustHaveSlotAttribute = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
   if (!element) {
     return;
   }
 
-  var mObserver = {
-    disconnect: function disconnect() {}
-  };
-  var slotObserver = {
-    disconnect: function disconnect() {}
-  };
   var observer = Observer();
-
-  var dispose = function dispose() {
-    observer.complete();
-    mObserver.disconnect();
-    slotObserver.disconnect();
-  };
+  var exists = ObserveExists(element).subscribe(function (exists) {
+    return exists ? undefined : dispose();
+  });
 
   var newSlots = function newSlots() {
     var added = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     var removed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-    if (added.length || removed.length) {
-      observer.next({
-        added: added,
-        removed: removed
-      });
-    }
+    return added.length || removed.length ? observer.next({
+      added: added,
+      removed: removed
+    }) : undefined;
   };
 
-  slotObserver = new MutationObserver(function (mutationsList) {
+  var slotObserver = new MutationObserver(function (mutationsList) {
+    var added = [];
+    var removed = [];
     var list = Array.from(mutationsList);
+    var len = list.length;
 
-    while (list.length) {
-      var mutation = list.shift();
-
-      if (mutation.type === "childList" && (mutation.addedNodes.length || mutation.removedNodes.length)) {
+    while (len--) {
+      if (list[len].type === "childList" && (list[len].addedNodes.length || list[len].removedNodes.length)) {
         if (mustHaveSlotAttribute) {
-          (function () {
-            var added = [];
-            var removed = [];
-            mutation.addedNodes.forEach(function (a) {
-              return a.getAttribute("slot") ? added.push(a) : undefined;
-            });
-            mutation.removedNodes.forEach(function (r) {
-              return r.getAttribute("slot") ? removed.push(r) : undefined;
-            });
-            newSlots(added, removed);
-          })();
+          list[len].addedNodes.forEach(function (a) {
+            return a.getAttribute("slot") ? added.push(a) : undefined;
+          });
+          list[len].removedNodes.forEach(function (r) {
+            return r.getAttribute("slot") ? removed.push(r) : undefined;
+          });
         } else {
-          return newSlots(mutation.addedNodes, mutation.removedNodes);
+          list[len].addedNodes.forEach(function (a) {
+            return added.push(a);
+          });
+          list[len].removedNodes.forEach(function (r) {
+            return removed.push(r);
+          });
         }
       }
     }
+
+    newSlots(added, removed);
   });
-  mObserver = new MutationObserver(function (e) {
-    var elementIsRemoved = false;
-    var ii = e.length;
 
-    while (!elementIsRemoved && ii) {
-      ii = ii - 1;
-      var i = e[ii].removedNodes.length;
+  var dispose = function dispose() {
+    try {
+      exists;
+    } catch (error) {}
 
-      while (!elementIsRemoved && i) {
-        i = i - 1;
-        elementIsRemoved = e[ii].removedNodes[i] === element;
-      }
-    }
-
-    if (elementIsRemoved) {
-      dispose();
-    }
-  });
-  var max = 1000;
-
-  var tryIt = function tryIt() {
-    max = max - 1;
-
-    if (!max) {
-      return dispose();
-    }
-
-    var parent = element.parentNode || element.host;
-
-    if (!parent) {
-      return requestAnimationFrame(tryIt);
-    }
-
-    newSlots(Array.from(element.children));
-    mObserver.observe(parent, {
-      childList: true
-    });
-    slotObserver.observe(element, {
-      childList: true
-    });
+    observer.complete();
+    slotObserver.disconnect();
   };
 
-  tryIt();
+  slotObserver.observe(element, {
+    childList: true
+  });
   return observer;
 }
 // CONCATENATED MODULE: ./src/utils/polyfill-object-assign.js
@@ -2734,40 +2719,38 @@ var ajax_form_getFormData = function getFormData(host) {
     }));
   });
   document.body.appendChild(newForm);
-  newForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var data = {};
-    var formData = new FormData(newForm);
-    formData.forEach(function (value, key) {
-      data[key] = value;
-    });
-
-    if (!host.request) {
-      host.dispatchEvent(new CustomEvent("submitdata", {
-        detail: data
-      }));
-      Object(on_next_frame["a" /* OnNextFrame */])(function () {
-        return document.body.removeChild(newForm);
-      });
-      return false;
-    }
-
-    var xhr = new XMLHttpRequest();
-    xhr.open(host.method, host.action);
-    xhr.setRequestHeader("Content-Type", host.contenttype);
-    xhr.addEventListener("load", function () {
-      host.dispatchEvent(new CustomEvent("response", {
-        detail: xhr
-      }));
-      return host.reload ? location.reload() : undefined;
-    });
-    xhr.send(JSON.stringify(data));
-    Object(on_next_frame["a" /* OnNextFrame */])(function () {
-      return document.body.removeChild(newForm);
-    });
-    return false;
+  var data = {};
+  var formData = new FormData(newForm);
+  formData.forEach(function (value, key) {
+    data[key] = value;
   });
-  newForm.dispatchEvent(new Event("submit"));
+  host.dispatchEvent(new CustomEvent("submitdata", {
+    detail: data
+  }));
+  Object(on_next_frame["a" /* OnNextFrame */])(function () {
+    return document.body.removeChild(newForm);
+  }); // newForm.addEventListener(`submit`, e => {
+  //     e.preventDefault()
+  //     const data = {}
+  //     const formData = new FormData(newForm)
+  //     formData.forEach((value, key) => { data[key] = value })
+  //     if (!host.request) {
+  //         host.dispatchEvent(new CustomEvent(`submitdata`, { detail: data }))
+  //         OnNextFrame(() => document.body.removeChild(newForm))
+  //         return false
+  //     }
+  //     const xhr = new XMLHttpRequest()
+  //     xhr.open(host.method, host.action)
+  //     xhr.setRequestHeader(`Content-Type`, host.contenttype)
+  //     xhr.addEventListener(`load`, () => {
+  //         host.dispatchEvent(new CustomEvent(`response`, { detail: xhr }))
+  //         return host.reload ? location.reload() : undefined
+  //     })
+  //     xhr.send(JSON.stringify(data))
+  //     OnNextFrame(() => document.body.removeChild(newForm))
+  //     return false
+  // })
+  // newForm.dispatchEvent(new Event(`submit`))
 };
 
 var ajax_form_elements = {
@@ -2783,8 +2766,9 @@ var ajax_form_elements = {
       el.eventSubscriptions = {
         submit: ObserveEvent(el, "submit", {
           preventDefault: true
-        }).subscribe(function () {
-          return ajax_form_getFormData(host);
+        }).subscribe(function (e) {
+          e.preventDefault();
+          ajax_form_getFormData(host);
         })
       };
     }
@@ -5685,6 +5669,7 @@ WCDefine(effect_underline_componentName, EffectUnderline);
 // CONCATENATED MODULE: ./src/components/grid-layout/index.js
 
 
+
 var grid_layout_style = __webpack_require__(18).toString();
 
 var grid_layout_outerStyle = __webpack_require__(54).toString();
@@ -5800,6 +5785,42 @@ var grid_layout_getComponentStyles = function getComponentStyles(host) {
   };
 };
 
+var grid_layout_notSlottable = function notSlottable(el) {
+  return Object(utils_get["a" /* Get */])(el, "nongrid") || Object(utils_get["a" /* Get */])(el, "tagName.toLowerCase()") === "style";
+};
+
+var grid_layout_clear = function clear(host) {
+  return function () {
+    return Array.from(host.children).forEach(function (el) {
+      return !grid_layout_notSlottable(el) ? Try(function (el) {
+        return host.removeChild(el);
+      })(el) : undefined;
+    });
+  };
+};
+
+var grid_layout_wrap = function wrap(host) {
+  return function () {
+    return Array.from(host.children).forEach(function (el) {
+      return grid_layout_notSlottable(el) || el.container ? undefined : grid_layout_wrapItem(host.elements.itemsContainer, el);
+    });
+  };
+};
+
+var grid_layout_wrapItem = function wrapItem(itemsContainer, el) {
+  var id = Object(utils_id["a" /* ID */])();
+  var slotWrapper = document.createElement("div");
+  slotWrapper.className = "grid-layout-item";
+  slotWrapper.id = id;
+  itemsContainer.appendChild(slotWrapper);
+  var slot = document.createElement("slot");
+  slot.name = id;
+  slotWrapper.appendChild(slot);
+  el.slot = id;
+  el.container = slotWrapper;
+  return el;
+};
+
 var GridLayout = WCConstructor({
   componentName: grid_layout_componentName,
   componentRoot: grid_layout_componentRoot,
@@ -5821,47 +5842,34 @@ var GridLayout = WCConstructor({
     }
   },
   methods: {
-    getComponentStyles: grid_layout_getComponentStyles
+    getComponentStyles: grid_layout_getComponentStyles,
+    clear: grid_layout_clear,
+    wrap: grid_layout_wrap
   },
   onConnected: function onConnected(host) {
     host.elements.innerStyles = AppendStyleElement(" ", host.shadowRoot, "innerStyles", "innerStyles");
-    WCwhenPropertyReady(host, "elements.itemsContainer").then(function (itemsContainer) {
-      var wrapItem = function wrapItem(el) {
-        var id = Object(utils_id["a" /* ID */])();
-        var slotWrapper = document.createElement("div");
-        slotWrapper.className = "grid-layout-item";
-        slotWrapper.id = id;
-        itemsContainer.appendChild(slotWrapper);
-        var slot = document.createElement("slot");
-        slot.name = id;
-        slotWrapper.appendChild(slot);
-        el.slot = id;
-        el.container = slotWrapper;
-        return el;
-      };
 
-      var observeEl = function observeEl(el) {
-        return el.nongrid || el.tagName.toLowerCase() === "style" ? undefined : wrapItem(el);
-      };
+    var observeEl = function observeEl(el) {
+      return grid_layout_notSlottable(el) ? undefined : grid_layout_wrapItem(host.elements.itemsContainer, el);
+    };
 
-      var disconnectEl = function disconnectEl(el) {
-        var containerParent = Object(utils_get["a" /* Get */])(el, "container.parentElement");
-        Object(utils_get["a" /* Get */])(el, "eventSubscriptions.span.disconnect()");
+    var disconnectEl = function disconnectEl(el) {
+      var containerParent = Object(utils_get["a" /* Get */])(el, "container.parentElement");
+      Object(utils_get["a" /* Get */])(el, "eventSubscriptions.span.disconnect()");
 
-        if (containerParent) {
-          containerParent.removeChild(el.container);
-        }
-      };
+      if (containerParent) {
+        containerParent.removeChild(el.container);
+      }
+    };
 
-      host.eventSubscriptions = {
-        slot: ObserveSlots(host, false).subscribe(function (results) {
-          results.added.forEach(observeEl);
-          results.removed.forEach(disconnectEl);
-        })
-      };
-      Object(on_next_frame["a" /* OnNextFrame */])(function () {
-        return host.setAttribute("viewable", true);
-      });
+    host.eventSubscriptions = {
+      slot: ObserveSlots(host).subscribe(function (results) {
+        results.added.reverse().forEach(observeEl);
+        results.removed.forEach(disconnectEl);
+      })
+    };
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      return host.setAttribute("viewable", true);
     });
     window.addEventListener("resize", function () {
       return grid_layout_setScale(host);
@@ -12629,6 +12637,7 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport GetCurve */__webpack_require__.d(__webpack_exports__, "GetCurve", function() { return GetCurve; });
 /* concated harmony reexport GetEase */__webpack_require__.d(__webpack_exports__, "GetEase", function() { return GetEase; });
 /* concated harmony reexport GetInputValue */__webpack_require__.d(__webpack_exports__, "GetInputValue", function() { return GetInputValue; });
+/* concated harmony reexport GetParent */__webpack_require__.d(__webpack_exports__, "GetParent", function() { return GetParent; });
 /* concated harmony reexport HasKeys */__webpack_require__.d(__webpack_exports__, "HasKeys", function() { return HasKeys; });
 /* concated harmony reexport HasMethod */__webpack_require__.d(__webpack_exports__, "HasMethod", function() { return HasMethod; });
 /* concated harmony reexport htmlTags */__webpack_require__.d(__webpack_exports__, "htmlTags", function() { return htmlTags; });
@@ -12654,6 +12663,7 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport Memoize */__webpack_require__.d(__webpack_exports__, "Memoize", function() { return Memoize; });
 /* concated harmony reexport Merge */__webpack_require__.d(__webpack_exports__, "Merge", function() { return Merge; });
 /* concated harmony reexport MonthData */__webpack_require__.d(__webpack_exports__, "MonthData", function() { return month_data_MonthData; });
+/* concated harmony reexport ObserveExists */__webpack_require__.d(__webpack_exports__, "ObserveExists", function() { return ObserveExists; });
 /* concated harmony reexport ObserveEvent */__webpack_require__.d(__webpack_exports__, "ObserveEvent", function() { return ObserveEvent; });
 /* concated harmony reexport ObserveSlots */__webpack_require__.d(__webpack_exports__, "ObserveSlots", function() { return ObserveSlots; });
 /* concated harmony reexport ObserveWorker */__webpack_require__.d(__webpack_exports__, "ObserveWorker", function() { return ObserveWorker; });
@@ -12776,6 +12786,8 @@ function TransduceMap(conversionFunction) {
 
 
 /** UTILS */
+
+
 
 
 
