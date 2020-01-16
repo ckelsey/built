@@ -1,10 +1,7 @@
 import { InputFieldInputAttributes } from './definitions'
-import { ValidateHtml, CreateElement, SetAttribute, AddRemoveAttribute, OnNextFrame, ObserveEvent } from '../..'
+import { ValidateHtml, CreateElement, SetAttribute, AddRemoveAttribute, OnNextFrame, ObserveEvent, ObserverUnsubscribe } from '../..'
 import { setDroppable, onInput, dispatch, onFocus, onBlur, onKeyDown, onLabelClick } from './methods-events'
-import { setStyles } from './elements'
-import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe'
 
-const inputStyle = require(`./input-style.scss`)
 const asIsTypes = [
     `checkbox`,
     `checkbox`,
@@ -29,24 +26,12 @@ export const setInputValue = (input, host) => {
     return input
 }
 
-export const setInputTheme = (theme, host) => {
-    if (!host.inputStyle) {
-        host.inputStyle = CreateElement({ tagName: `style`, class: `input-style`, style: `display:none;` })
-        host.appendChild(host.inputStyle)
-    }
-
-    setStyles(host.inputStyle, `${inputStyle}${theme}`)
-}
-
 export const setInput = host => {
     OnNextFrame(() => {
-        setInputTheme(host.inputtheme, host)
-
         try {
             ObserverUnsubscribe(host.input)
             host.input.dispose()
             host.removeChild(host.input)
-
             host.elements.filePathInput.style.display = host.type !== `file` ? `none` : `block`
         } catch (error) { }
 
@@ -67,6 +52,10 @@ export const setInput = host => {
             setInputValue(input, host) :
             AddRemoveAttribute(input, attr, host[attr])
         )
+
+        if (!input.name) {
+            input.name = host.label || host.placeholder || ``
+        }
 
         input.eventSubscriptions = {
             onFocus: ObserveEvent(input, `focus`).subscribe(() => onFocus(host)),

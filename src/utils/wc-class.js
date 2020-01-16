@@ -7,6 +7,7 @@ export function WCClass(
     componentName,
     template,
     style,
+    outerStyle,
     observedAttributes,
     ConnectedFn,
     onDisconnected,
@@ -21,7 +22,7 @@ export function WCClass(
             self.state = {}
             self.elements = {}
             self.disconnectElements = () => { }
-            SetShadowRoot({ componentName, template, style, element: self })
+            SetShadowRoot({ componentName, template, style, outerStyle, element: self })
             try { self.internals_ = self.attachInternals() } catch (error) { }
             return self
         }

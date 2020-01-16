@@ -15,7 +15,7 @@ const removeElement = el => { try { el.parentNode.removeChild(el) } catch (error
 const dispatchTransition = (host, from, to, isEnd) => host.dispatchEvent(new CustomEvent(`transition${isEnd ? `ed` : `ing`}`, { detail: { host, from, to } }))
 const elementOpacity = (el, defaultOpacity = 1) => Get(el, `style.opacity`, defaultOpacity, val => val === `` ? defaultOpacity : parseFloat(val))
 
-export const getChildren = host => () => Array.from(host.querySelectorAll(`[slot]`))
+export const getChildren = host => () => Array.from(host.children).filter(c => c.hasAttribute(`slot`))
 export const getCurrent = host => () => host.querySelector(`[slot="current"]`)
 export const getComponentStyles = host => () => `${style}${host.theme}${host.styles}`
 export const getIndex = host => () => host.getChildren().indexOf(host.getCurrent())
@@ -71,6 +71,7 @@ const switchHeights = (root, child, speed) => new Promise(resolve =>
     OnNextFrame(() => {
         const endHeight = Get(child, `offsetHeight`, 0)
         const startHeight = Get(root, `offsetHeight`, endHeight)
+
         return endHeight === startHeight ?
             setTimeout(resolve, speed) :
             animateHeight(startHeight, endHeight, root, speed).then(resolve)

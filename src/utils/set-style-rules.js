@@ -1,5 +1,5 @@
 export function SetStyleRules(styleElement, ruleString) {
-    if (!styleElement || !ruleString || ruleString === `undefined` || ruleString === `null`) { return }
+    if (!styleElement || ruleString === undefined || ruleString === null || ruleString === `undefined` || ruleString === `null`) { return }
 
     if (styleElement.styleSheet) {   // IE
         styleElement.styleSheet.cssText = `${styleElement.styleSheet.cssText ? styleElement.styleSheet.cssText : ``}${ruleString}`

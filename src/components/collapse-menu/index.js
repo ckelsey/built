@@ -1,51 +1,13 @@
-/**
- * add ripple and bounce to toggle container
- */
+import { WCConstructor, WCDefine, ObserverUnsubscribe, ObserveEvent, ToNumber, IndexOf, ToString, IfInvalid, ToBool, Pipe, WasClickedOn, Get, Throttle } from '../..'
 
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, AppendStyleElement, ComponentClassObject, WCDefine, ObserverUnsubscribe,
-    ObserveEvent, ToNumber, IndexOf, ToString, IfInvalid, ToBool, Pipe, SetStyleRules,
-    WasClickedOn, Get, Throttle
-} from '../..'
-
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `collapse-menu`
 const componentRoot = `.${componentName}-container`
 const directions = [`horizontal`, `vertical`]
 const alignments = [`left`, `right`]
-
-const setStyles = (el, styles) => el ? SetStyleRules(el, styles) : undefined
 const setAttr = (el, attr, value) => el ? el.setAttribute(attr, value) : undefined
-
-export const setStyleElement = host => {
-    let outerStyle = host.querySelector(`style[name="outer"]`)
-    const componentStyle = host.shadowRoot.querySelector(`style[name=""]`)
-    const themeStyle = host.shadowRoot.querySelector(`style.themeStyles`)
-    const injectedStyle = host.shadowRoot.querySelector(`style.injectedStyles`)
-    const styleString = [
-        style,
-        host.theme,
-        host.styles,
-    ].join(``)
-
-    if (!outerStyle) {
-        AppendStyleElement(styleString, host, `outer`)
-        outerStyle = host.querySelector(`style[name="outer"]`)
-    }
-
-    setStyles(componentStyle, styleString)
-    setStyles(outerStyle, styleString)
-    setStyles(themeStyle, styleString)
-    setStyles(injectedStyle, styleString)
-}
-
-const removeSizer = el => {
-    (el.parentElement || el.parentNode.host).removeChild(el)
-}
+const removeSizer = el => (el.parentElement || el.parentNode.host).removeChild(el)
 
 const createSizer = () => {
     const iframe = document.createElement(`iframe`)
@@ -132,7 +94,6 @@ const setMinPageWidth = (minWidth, host) => {
 const setBackground = (color, el) => !el ? undefined : el.style.backgroundColor = color
 
 const properties = {
-    class: ComponentClassObject,
     expanded: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (val, host) => {
@@ -185,14 +146,6 @@ const properties = {
     container: {
         format: (val, host) => Get(host, val, host),
         onChange: setContainer
-    },
-    styles: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (_val, host) => setStyleElement(host)
-    },
-    theme: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (_val, host) => setStyleElement(host)
     }
 }
 
@@ -253,10 +206,7 @@ export const CollapseMenu = WCConstructor({
     properties,
     elements,
     onConnected(host) {
-        setStyleElement(host)
-
         requestAnimationFrame(() => {
-            setStyleElement(host)
             host.eventSubscriptions = {
                 click: ObserveEvent(window, `click`).subscribe(e => {
                     if (!host.expanded) { return }

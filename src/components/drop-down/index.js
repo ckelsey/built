@@ -1,17 +1,7 @@
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCDefine, WCConstructor, ObserveEvent, ToBool, IfInvalid, ComponentClassObject,
-    SetStyleRules, AppendStyleElement, Pipe, WasClickedOn, ObserverUnsubscribe,
-    ObserveSlots, OnNextFrame
-} from '../..'
+import { WCDefine, WCConstructor, ObserveEvent, ToBool, IfInvalid, Pipe, WasClickedOn, ObserverUnsubscribe, ObserveSlots, OnNextFrame } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-
-const setStyles = (el, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles)
-}
+const outerStyle = require(`./outer.scss`).toString()
 
 const toggleOptions = (show, host) => {
     const overlay = host.elements.overlay
@@ -34,18 +24,6 @@ const toggleOptions = (show, host) => {
 }
 
 const properties = {
-    class: ComponentClassObject,
-
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (_el, host) => setStyleElement(host)
-    },
-
-    theme: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (_el, host) => setStyleElement(host)
-    },
-
     open: {
         format: (val) => Pipe(ToBool, IfInvalid(false))(val).value,
         onChange: toggleOptions
@@ -55,7 +33,6 @@ const properties = {
     }
 }
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `drop-down`
 const componentRoot = `.${componentName}-container`
@@ -90,37 +67,7 @@ const elements = {
         onChange(el, host) {
             el.target = host
         }
-    },
-    injectedStyles: {
-        selector: `style.injectedStyles`,
-        onChange: (_el, host) => setStyleElement(host)
-    },
-    themedStyles: {
-        selector: `style.themedStyles`,
-        onChange: (_el, host) => setStyleElement(host)
-    },
-}
-
-export const setStyleElement = host => {
-    let outerStyle = host.querySelector(`style[name="outer"]`)
-    const componentStyle = host.shadowRoot.querySelector(`style[name=""]`)
-
-    const styleString = [
-        style,
-        host.theme,
-        host.styles,
-    ].join(``)
-
-    if (!outerStyle) {
-        AppendStyleElement(styleString, host, `outer`)
-        outerStyle = host.querySelector(`style[name="outer"]`)
-        outerStyle.nonchild = true
     }
-
-    setStyles(host.elements.injectedStyles, styleString)
-    setStyles(host.elements.themedStyles, styleString)
-    setStyles(componentStyle, styleString)
-    setStyles(outerStyle, styleString)
 }
 
 export const DropDown = WCConstructor({
@@ -128,6 +75,7 @@ export const DropDown = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     properties,
     elements,
     observedAttributes: Object.keys(properties),

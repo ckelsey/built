@@ -13,11 +13,13 @@ import {
     nonAutoOrigin
 } from './properties'
 import { toggle, unloadTargets, open, close } from './methods'
-import elements from './elements'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+const elements = {
+    root: { selector: `.effect-underline-container` },
+    underline: { selector: `.underline` }
+}
+
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `effect-underline`
 const componentRoot = `.effect-underline-container`

@@ -1,61 +1,28 @@
-import {
-    WCConstructor, WCDefine, AppendStyleElement, ID, ToNumber,
-    Pipe, SetStyleRules, ToString, IfInvalid, Get, ToBool, OnNextFrame
-} from '../..'
+import { WCConstructor, WCDefine, WCwhenPropertyReady, AppendStyleElement, ObserverUnsubscribe, SetStyleRules, ID, ToNumber, Pipe, IfInvalid, Get, ToBool, OnNextFrame, ObserveSlots, CommasToArray, ToMap } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+const outerStyle = require(`./external.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `grid-layout`
 const componentRoot = `.${componentName}-container`
-
 const defaultWidth = 240
-const defaultGap = 16
-
-const setStyles = (el, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles)
-}
-
-const setAllStyles = (host, string) => {
-    const componentStyle = host.shadowRoot.querySelector(`style[name="grid-layout-innerstyles"]`)
-    const themeStyles = host.elements.themeStyles
-    const injectedStyles = host.elements.injectedStyles
-    let outerStyle = host.querySelector(`style[name="outer"]`)
-
-    const styleString = [
-        style,
-        themeStyles ? themeStyles.innerHTML : ``,
-        injectedStyles ? injectedStyles.innerHTML : ``,
-        string
-    ].join(``)
-
-    if (!outerStyle) {
-        AppendStyleElement(styleString, host, `outer`)
-        outerStyle = host.querySelector(`style[name="outer"]`)
-        outerStyle.nongrid = true
-    }
-
-    setStyles(componentStyle, styleString)
-    setStyles(outerStyle, styleString)
-}
-
+const defaultGap = [16, 16]
 const unsupportedCSS = (host, gap, columnwidth) => typeof host.style.grid === `string` ? `` : `.grid-layout-items{margin-left:-${gap}px;margin-right:-${gap}px;}.grid-layout-items .grid-layout-item{max-width:${columnwidth}px;margin:${gap}px;}`
 
 const setScale = host =>
     OnNextFrame(() => {
         if (!host.scaletofit) { return }
 
-        let gap = host.gap || defaultGap
+        const gap = host.gap || defaultGap
+        let gapMedian = gap.reduce((t, c) => { t = t + c; return t }, 0) / 2
         let columnwidth = host.columnwidth || defaultWidth
-        const contentWidth = host.elements.root.offsetWidth + gap
-        let columnGapPercent = 100 / Math.round(contentWidth / (gap + columnwidth))
-        const ratio = 1 - (gap / columnwidth)
+        const contentWidth = host.elements.root.offsetWidth + gapMedian
+        let columnGapPercent = 100 / Math.round(contentWidth / (gapMedian + columnwidth))
+        const ratio = 1 - (gapMedian / columnwidth)
 
         if (columnwidth === `100%`) {
             columnwidth = 100
-            gap = 0
+            gapMedian = 0
         } else {
             if (columnGapPercent > 50) {
                 columnGapPercent = 50
@@ -63,36 +30,30 @@ const setScale = host =>
 
             columnwidth = columnGapPercent * ratio
 
-            gap = (columnGapPercent - columnwidth) / 2
+            gapMedian = (columnGapPercent - columnwidth) / 2
         }
 
-        setAllStyles(host, `.grid-layout-items{display:flex; width:${100 + (gap * 2)}%;margin-left:-${gap}%;}.grid-layout-item{width:${columnwidth}%;padding:${gap === 0 ? 4 : gap / 2}% ${gap}%;}`)
+        const thisStyle = `.grid-layout-items{display:flex; width:${100 + (gapMedian * 2)}%;margin-left:-${gapMedian}%;}.grid-layout-item{width:${columnwidth}%;padding:${gapMedian / 2}% ${gapMedian}%;}`
+
+        SetStyleRules(host.elements.innerStyles, thisStyle)
     })
 
 const setDimensions = host => OnNextFrame(() => {
     if (host.scaletofit) { return setScale(host) }
 
-    let gap = host.gap || defaultGap
-    let columnwidth = host.columnwidth || defaultWidth
+    const gap = host.gap || defaultGap
+    const gapValues = Array.isArray(gap) ? [gap[0], gap[1]] : [gap, gap]
+    const gapMedian = gapValues.reduce((t, c) => { t = t + c; return t }, 0) / 2
+    const columnwidth = host.columnwidth || defaultWidth
+    const thisStyle = `.grid-layout-items{grid-row-gap:${gapValues[0]}px; grid-column-gap:${gapValues[1]}px; grid-template-columns:repeat(auto-fit, minmax(${columnwidth}px, 0fr));}${unsupportedCSS(host, gapMedian, columnwidth)}`
 
-    setAllStyles(host, `.grid-layout-items{grid-gap:${gap}px; grid-template-columns:repeat(auto-fit, minmax(${columnwidth}px, 0fr));}${unsupportedCSS(host, gap, columnwidth)}`)
+    SetStyleRules(host.elements.innerStyles, thisStyle)
 })
 
 const elements = {
-    root: {
-        selector: componentRoot,
-    },
-    itemsContainer: {
-        selector: `.${componentName}-items`
-    },
-    injectedStyles: {
-        selector: `style.injectedStyles`,
-        onChange: (el, host) => setStyles(el, host.styles)
-    },
-    themeStyles: {
-        selector: `style.themeStyles`,
-        onChange: (el, host) => setStyles(el, host.theme)
-    }
+    root: { selector: componentRoot },
+    itemsContainer: { selector: `.${componentName}-items` },
+    innerStyles: { selector: `style.innerStyles` }
 }
 
 const properties = {
@@ -101,20 +62,14 @@ const properties = {
         onChange: (_val, host) => setDimensions(host)
     },
     gap: {
-        format: val => Pipe(ToNumber, IfInvalid(defaultGap))(val).value,
+        format: val => Pipe(CommasToArray, IfInvalid([val, val]), ToMap(v => {
+            const tv = ToNumber(v).value
+            if (isNaN(tv)) { return defaultGap[0] }
+            return tv
+        }))(val).value,
         onChange: (_val, host) => setDimensions(host)
     },
-    styles: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
-    },
-    theme: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => setStyles(host.elements.themeStyles, val)
-    },
-    scaletofit: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-    }
+    scaletofit: { format: val => Pipe(ToBool, IfInvalid(false))(val).value }
 }
 
 const getComponentStyles = host => () => `${require(`./style.scss`).toString()}${host.theme || ``}${host.styles}`
@@ -124,74 +79,64 @@ export const GridLayout = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes: Object.keys(properties),
     properties,
     elements,
     computed: {
         items: host => ({
             get() {
-                Array.from(host.children).filter(el => el.tagName.toLowerCase() !== `style`)
+                return Array.from(host.children).filter(el => el.tagName.toLowerCase() !== `style`)
             }
         })
     },
     methods: { getComponentStyles },
     onConnected(host) {
-        OnNextFrame(() => {
-            const itemsContainer = host.elements.itemsContainer
+        host.elements.innerStyles = AppendStyleElement(` `, host.shadowRoot, `innerStyles`, `innerStyles`)
 
-            const wrapItem = el => {
-                const id = ID()
-                const slotWrapper = document.createElement(`div`)
-                slotWrapper.className = `grid-layout-item`
-                slotWrapper.id = id
-                itemsContainer.appendChild(slotWrapper)
+        WCwhenPropertyReady(host, `elements.itemsContainer`)
+            .then(itemsContainer => {
+                const wrapItem = el => {
+                    const id = ID()
+                    const slotWrapper = document.createElement(`div`)
+                    slotWrapper.className = `grid-layout-item`
+                    slotWrapper.id = id
+                    itemsContainer.appendChild(slotWrapper)
 
-                const slot = document.createElement(`slot`)
-                slot.name = id
-                slotWrapper.appendChild(slot)
-                el.slot = id
-                el.container = slotWrapper
+                    const slot = document.createElement(`slot`)
+                    slot.name = id
+                    slotWrapper.appendChild(slot)
+                    el.slot = id
+                    el.container = slotWrapper
 
-                return el
-            }
-
-            const observeEl = el => {
-                if (el.nongrid) { return }
-                wrapItem(el)
-            }
-
-            const disconnectEl = el => {
-                const containerParent = Get(el, `container.parentElement`)
-
-                Get(el, `eventSubscriptions.span.disconnect()`)
-
-                if (containerParent) {
-                    containerParent.removeChild(el.container)
+                    return el
                 }
-            }
 
-            Array
-                .from(host.children)
-                .forEach(observeEl)
+                const observeEl = el => el.nongrid || el.tagName.toLowerCase() === `style` ? undefined : wrapItem(el)
 
-            host.slotObserver = new MutationObserver(mutationsList => {
-                const list = Array.from(mutationsList)
+                const disconnectEl = el => {
+                    const containerParent = Get(el, `container.parentElement`)
 
-                while (list.length) {
-                    const mutation = list.shift()
-                    if (mutation.type === `childList`) {
-                        Array.from(mutation.addedNodes).forEach(observeEl)
-                        Array.from(mutation.removedNodes).forEach(disconnectEl)
+                    Get(el, `eventSubscriptions.span.disconnect()`)
+
+                    if (containerParent) {
+                        containerParent.removeChild(el.container)
                     }
                 }
+
+                host.eventSubscriptions = {
+                    slot: ObserveSlots(host, false).subscribe(results => {
+                        results.added.forEach(observeEl)
+                        results.removed.forEach(disconnectEl)
+                    })
+                }
+
+                OnNextFrame(() => host.setAttribute(`viewable`, true))
             })
 
-            host.slotObserver.observe(host, { childList: true })
-            window.addEventListener(`resize`, () => setScale(host))
-
-            OnNextFrame(() => host.setAttribute(`viewable`, true))
-        })
-    }
+        window.addEventListener(`resize`, () => setScale(host))
+    },
+    onDisconnected(host) { ObserverUnsubscribe(host) }
 })
 
 WCDefine(componentName, GridLayout)

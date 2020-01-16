@@ -1,16 +1,9 @@
-import { WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString, ObserveEvent } from '../..'
+import { WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToString, ObserveEvent } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `cookie-message`
 const componentRoot = `.cookie-message-container`
-
-const setStyles = (el, host, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles || host.styles)
-}
 
 const setButton = host => {
     const button = host.elements.button
@@ -40,9 +33,7 @@ const setMessage = host => {
 }
 
 const cookieName = `accepted_cookies`
-const setCookie = () => {
-    document.cookie = `${cookieName}=true`
-}
+const setCookie = () => document.cookie = `${cookieName}=true`
 
 const getCookie = () => {
     try {
@@ -54,7 +45,6 @@ const getCookie = () => {
 }
 
 const properties = {
-    class: ComponentClassObject,
     shown: {
         format: val => Pipe(ToBool, IfInvalid(!getCookie()))(val).value,
         onChange: (val, host) => {
@@ -92,10 +82,6 @@ const properties = {
     buttonaccent: {
         format: val => Pipe(ToString, IfInvalid(`#59a2d8`))(val).value,
         onChange: (_val, host) => setButton(host)
-    },
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, host, val)
     }
 }
 
@@ -113,10 +99,6 @@ const elements = {
     message: {
         selector: `.cookie-message-text`,
         onChange: (_el, host) => setMessage(host)
-    },
-    injectedStyles: {
-        selector: `style.injectedStyles`,
-        onChange: setStyles
     }
 }
 

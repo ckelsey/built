@@ -1,7 +1,8 @@
 import {
-    Equals, Pipe, IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot,
-    ObserverUnsubscribe, OnNextFrame, WCClass
+    Equals, Pipe, IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot, WCwhenPropertyReady,
+    ObserverUnsubscribe, OnNextFrame, WCClass, ComponentClassObject, SetStyleRules
 } from '..'
+import { CreateElement } from './create-element'
 
 /** Does not actually mutate anything, tho itself gets mutated across setting styles, properties, etc */
 
@@ -54,18 +55,67 @@ export function WCConstructor(options) {
         elements = {},
         getters = {},
         methods = {},
-        observedAttributes = [],
         onConnected = () => { },
         onDisconnected = () => { },
         onReady = () => { },
         properties = {},
         setters = {},
         style = ``,
+        outerStyle,
         template = `<slot></slot>`,
-        formElement = false,
+        formElement = false
     } = options
 
     if (!componentName) { return }
+
+    options.observedAttributes = options.observedAttributes || []
+
+    properties[`class`] = ComponentClassObject
+
+    properties[`outertheme`] = {
+        format: val => typeof val === `string` ? val : ``,
+        onChange: (val, host) => {
+            let styleEl = host.querySelector(`style.outertheme`)
+
+            if (!styleEl) {
+                styleEl = CreateElement({
+                    tagName: `style`,
+                    class: `outertheme`,
+                    name: `outertheme`,
+                    style: `display:none;`
+                })
+
+                host.appendChild(styleEl)
+            }
+
+            SetStyleRules(styleEl, val)
+        }
+    }
+
+    properties[`styles`] = {
+        format: val => typeof val === `string` ? val : ``,
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.injectedStyles`)
+            .then(stylesElement => SetStyleRules(stylesElement, val))
+            .catch(() => { })
+    }
+
+    properties[`theme`] = {
+        format: (val, host) => typeof val === `string` ? val : host.theme,
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.theme`)
+            .then(themeElement => SetStyleRules(themeElement, val))
+            .catch(() => { })
+    }
+
+    options.observedAttributes.push(`class`)
+    options.observedAttributes.push(`styles`)
+    options.observedAttributes.push(`theme`)
+    options.observedAttributes.push(`outertheme`)
+
+    elements[`injectedStyles`] = { selector: `style.injectedStyles` }
+    elements[`theme`] = { selector: `style.themeStyles` }
+    elements[`componentStyle`] = { selector: `style.componentStyle` }
+
+    const observedAttributes = options.observedAttributes
 
     const ConnectedFn = element => {
         OnNextFrame(() => {
@@ -74,7 +124,6 @@ export function WCConstructor(options) {
             element.unsubscribeEvents = () => ObserverUnsubscribe(element)
 
             Object.keys(computed).forEach(key => {
-                // eslint-disable-next-line no-empty
                 try { Object.defineProperty(element, key, computed[key](element)) } catch (error) { }
             })
 
@@ -121,6 +170,7 @@ export function WCConstructor(options) {
         componentName,
         template,
         style,
+        outerStyle,
         observedAttributes,
         ConnectedFn,
         onDisconnected,
@@ -135,7 +185,7 @@ export function WCConstructor(options) {
             element.disconnectElements = () => { }
             element.attributeChangedCallback = () => { }
             element.disconnectedCallback = () => { }
-            SetShadowRoot(componentName, element, template, style, true, options.appendStylesToHead)
+            SetShadowRoot({ componentName, template, style, outerStyle, element })
             ConnectedFn(element)
             return element
         }

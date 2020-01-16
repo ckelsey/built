@@ -1,30 +1,11 @@
-import { WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, OnNextFrame } from '../..'
+import { WCConstructor, WCDefine, OnNextFrame } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
 
-const elementSelectors = {
-    root: `.icon-element-container`,
-    svgContainer: `.svg-container`,
-    injectedStyles: `style.injectedStyles`
+const elements = {
+    root: { selector: `.icon-element-container` },
+    svgContainer: { selector: `.svg-container` },
 }
-
-const setStyles = (el, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles)
-}
-
-const elements = {}
-
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-Object.keys(elementSelectors).forEach(key => {
-    elements[key] = {
-        selector: elementSelectors[key],
-        onChange: key === `injectedStyles`
-            ? (el, host) => setStyles(el, host.styles)
-            : () => { }
-    }
-})
 
 const attributes = {
     svg: {
@@ -45,12 +26,7 @@ const attributes = {
     size: {
         format: val => typeof val === `string` ? val : `1.5em`,
         onChange: (value, host) => OnNextFrame(() => host.elements.svgContainer.style.height = host.elements.svgContainer.style.width = value)
-    },
-    class: ComponentClassObject,
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
-    },
+    }
 }
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization

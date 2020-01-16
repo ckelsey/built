@@ -1,37 +1,51 @@
-import { WCConstructor, AppendStyleElement, WCDefine } from '../..'
-import { elements, setStyles } from './elements'
-import { observedAttributes, properties } from './properties'
+import { WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToNumber } from '../..'
 import { transition, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren, setCurrent } from './methods'
 
-
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+const outerStyle = require(`./outer.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `content-transition`
 const componentRoot = `.content-transition-container`
 
-export const setStyleElement = host => {
-    let outerStyle = host.querySelector(`style[name="outer"]`)
-    const componentStyle = host.shadowRoot.querySelector(`style[name=""]`)
+const elements = {
+    root: {
+        selector: `.content-transition-container`,
+        onChange: (el, host) => {
+            el.setAttribute(`type`, host.type)
+        }
+    },
+    current: { selector: `slot[name="current"]`, },
+    next: { selector: `slot[name="next"]`, },
+    nextContainer: { selector: `.next-slot` },
+    hidden: { selector: `slot[name="hidden"]`, },
+    hiddentContainer: { selector: `.hidden-slot` },
+    currentContainer: { selector: `.current-slot` }
+}
 
-    const themeStyles = host.elements.themeStyles
-    const injectedStyles = host.elements.injectedStyles
+const properties = {
+    speed: { format: val => Pipe(ToNumber, IfInvalid(300))(val).value },
 
-    const styleString = [
-        style,
-        themeStyles ? themeStyles.innerHTML : ``,
-        injectedStyles ? injectedStyles.innerHTML : ``
-    ].join(``)
+    type: {
+        format: val => [`fade`, `slide`, `height`].indexOf(val) > -1 ? val : `fade`,
+        onChange: (val, host) => {
+            const root = host.elements.root
+            if (!root) { return }
+            root.setAttribute(`type`, val)
+        }
+    },
 
-    if (!outerStyle) {
-        AppendStyleElement(styleString, host, `outer`)
-        outerStyle = host.querySelector(`style[name="outer"]`)
-        outerStyle.nonchild = true
-    }
+    keepchildren: {
+        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
+        onChange: (_val, host) => {
+            const root = host.elements.root
+            if (!root) { return }
+            root.classList[host.keepchildren ? `add` : `remove`](`keepchildren`)
+        }
+    },
 
-    setStyles(componentStyle, host, styleString)
-    setStyles(outerStyle, host, styleString)
+    current: { format: val => val },
+    start: { format: val => val },
+    end: { format: val => val }
 }
 
 export const ContentTransition = WCConstructor({
@@ -39,7 +53,8 @@ export const ContentTransition = WCConstructor({
     componentRoot,
     template,
     style,
-    observedAttributes,
+    outerStyle,
+    observedAttributes: Object.keys(properties),
     properties,
     elements,
     methods: {

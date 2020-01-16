@@ -11,7 +11,7 @@ import { SetStyleRules, CreateElement } from '..'
  */
 
 
-export function AppendStyleElement(rulesString, parent, name) {
+export function AppendStyleElement(rulesString, parent, name, classes) {
     if (!parent || !rulesString) { return }
 
     /** First create and add the style element */
@@ -19,7 +19,8 @@ export function AppendStyleElement(rulesString, parent, name) {
         tagName: `style`,
         type: `text/css`,
         style: `display:none;`,
-        name
+        class: classes,
+        name,
     }, true)
 
     parent.appendChild(style)

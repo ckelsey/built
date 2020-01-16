@@ -1,8 +1,4 @@
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
-    IndexOf, ToNumber, CommasToArray, ToMap, ValidateHtml, OnNextFrame
-} from '../..'
+import { WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToString, IndexOf, ToNumber, CommasToArray, ToMap, ValidateHtml, OnNextFrame } from '../..'
 import { ObserveEvent } from '../../utils/observe-event'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
@@ -13,7 +9,6 @@ const componentName = `progress-bar`
 const componentRoot = `.${componentName}-container`
 const types = [`bar`, `circle`]
 const animations = [`indeterminate`, `linear`, `volley`]
-const setStyles = (el, styles) => el ? SetStyleRules(el, styles) : undefined
 const setVisible = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`visible`) : undefined)
 const setOverlay = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`overlay`) : undefined)
 const setPercentage = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`percentage`) : undefined)
@@ -63,15 +58,6 @@ const setValues = (vals, host) => {
 }
 
 const properties = {
-    class: ComponentClassObject,
-    styles: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
-    },
-    theme: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => setStyles(host.elements.themeStyles, val)
-    },
     value: {
         format: val => Pipe(
             CommasToArray,
@@ -155,14 +141,6 @@ const elements = {
             setPercentage(host.percentage, el)
             setAnimation(host.animation, el)
         }
-    },
-    injectedStyles: {
-        selector: `style.injectedStyles`,
-        onChange: (el, host) => setStyles(el, host.styles)
-    },
-    themeStyles: {
-        selector: `style.themeStyles`,
-        onChange: (el, host) => setStyles(el, host.theme)
     },
     container: {
         selector: `.progress-bar-inner`,

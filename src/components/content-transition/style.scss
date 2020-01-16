@@ -1,46 +1,7 @@
-@mixin flexin {
-    /*
-    This seems to mess up the height calculations...flicker of incorrect heights on transition
-    flex-grow: 1;
-    display: inline-flex;
-    flex-direction: column;
-    width: 100%;
-    height: auto;
-    */
-}
-
-@mixin hostin {
-    display: block;
-    width: 100%;
-    position: relative;
-}
-
-:host(content-transition) {
-    @include hostin();
-}
-
-:host(content-transition).flex-stretch {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-content-transition {
-    @include hostin();
-
-    &.flex-stretch {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-}
-
 .content-transition-container {
     position: relative;
-    @include flexin;
 
     .current-slot {
-        @include flexin;
         opacity: 1;
     }
 
@@ -51,10 +12,6 @@ content-transition {
         top: 0;
         left: 0;
         opacity: 0;
-    }
-
-    .content-transition-inner {
-        @include flexin;
     }
 
     .hidden-slot {
@@ -113,6 +70,8 @@ content-transition {
         }
     }
 }
+
+
 
 /*
 [slot="hidden"] {

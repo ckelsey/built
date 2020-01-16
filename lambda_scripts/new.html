@@ -1,35 +1,49 @@
 <script>
-    const WCConstructor = window.builtjs.WCConstructor
-    const WCDefine = window.builtjs.WCDefine
-    const ComponentClassObject = window.builtjs.ComponentClassObject
-    const componentName = 'test-element'
-    const componentRoot = '.' + componentName + '-container'
-    const style = ':host(' + componentName + '){display:block;}' + componentName + '{display:block;}'
-    const template = '<div class="' + componentName + '-container">' +
-        '<form action="https://api.cklsylabs.com/built" method="POST" id="loginform">' +
-        '<input-field id="login_username" name="login_username" label="Username"></input-field>' +
-        '<input-field id="login_password" name="login_password" label="Password" type="password"></input-field>' +
+    var WCConstructor = window.builtjs.WCConstructor
+    var WCDefine = window.builtjs.WCDefine
+    var ObserveEvent = window.builtjs.ObserveEvent
+
+    var componentName = 'test-element'
+    var componentRoot = '.' + componentName + '-container'
+    var style = ':host(' + componentName + '){display:block;}' + componentName + '{display:block;}'
+    var template = '<div class="' + componentName + '-container">' +
+        '<form id="loginform" method="POST" name="login" action="https://api.cklsylabs.com/built">' +
+        '<input-field id="username" name="username" label="username" required="true" autocomplete="username"></input-field>' +
+        '<input-field id="current-password" name="current-password" label="password" required="true" autocomplete="current-password" type="password"></input-field>' +
         '<button-element type="submit">Submit</button-element>' +
         '</form>' +
         '</div>'
 
-    const properties = { class: ComponentClassObject }
 
-    const elements = {
+    var elements = {
         root: { selector: componentRoot, },
-        button: { selector: 'button-element[type="submit"]', onChange(el, host) { el.addEventListener('click', function () { host.elements.form.submit() }) } },
-        password: { selector: '#login_password' },
-        username: { selector: '#login_username' },
-        form: { selector: '#loginform' }
+        button: { selector: 'button-element', onChange(el, host) { el.addEventListener('click', function () { host.elements.form.dispatchEvent(new Event('submit')) }) } },
+        password: { selector: '#current-password' },
+        username: { selector: '#username' },
+        form: {
+            selector: '#loginform',
+            onChange: function (el, host) {
+                el.eventListeners = {
+                    submit: ObserveEvent(el, 'submit', { preventDefault: true })
+                        .subscribe(function () {
+                            var formData = new FormData(el)
+                            var data = {}
+                            formData.forEach(function (value, key) { data[key] = value })
+                            var xhr = new XMLHttpRequest()
+                            xhr.addEventListener("load", function () { location.reload() });
+                            xhr.open(el.method, el.action);
+                            xhr.send(JSON.stringify(data))
+                        })
+                }
+            }
+        }
     }
 
-    const TestElement = WCConstructor({
+    var TestElement = WCConstructor({
         componentName,
         componentRoot,
         template,
         style,
-        observedAttributes: Object.keys(properties),
-        properties,
         elements
     })
 

@@ -10,11 +10,13 @@
     var username = document.createElement('input-field')
     username.name = username.label = username.id = 'username'
     username.required = true
+    username.autocomplete = 'off'
 
     var password = document.createElement('input-field')
     password.name = password.label = password.id = 'password'
     password.required = true
     password.type = 'password'
+    password.autocomplete = 'off'
 
     var submit = document.createElement('button-element')
     submit.textContent = 'Submit'

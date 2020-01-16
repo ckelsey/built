@@ -1,11 +1,7 @@
-import {
-    Pipe, AppendStyleElement, ToBool, ToString, IfInvalid,
-    WCDefine, WCConstructor, ObserveEvent, SetStyleRules, ValidateHtml
-} from '../..'
+import { Pipe, ToBool, ToString, IfInvalid, WCDefine, WCConstructor, ObserveEvent, SetStyleRules, ValidateHtml } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+const outerStyle = require(`./outer.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `image-loader`
 const componentRoot = `.image-loader-container`
@@ -13,21 +9,6 @@ const componentRoot = `.image-loader-container`
 const setStyles = (el, styles) => {
     if (!el) { return }
     SetStyleRules(el, styles)
-}
-
-const setStyleElement = host => {
-    let outerStyle = host.querySelector(`style[name="outer"]`)
-    const componentStyle = host.shadowRoot.querySelector(`style[name=""]`)
-    const styleString = [style, host.theme, host.styles].join(``)
-
-    if (!outerStyle) {
-        AppendStyleElement(styleString, host, `outer`)
-        outerStyle = host.querySelector(`style[name="outer"]`)
-    }
-
-    setStyles(host.elements.themedStyles, styleString)
-    setStyles(componentStyle, styleString)
-    setStyles(outerStyle, styleString)
 }
 
 const setInternalStyle = host => {
@@ -149,10 +130,6 @@ const properties = {
     complete: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
     },
-    theme: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (_val, host) => setStyleElement(host)
-    },
     fit: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
         onChange(_val, host) { setInternalStyle(host) }
@@ -202,10 +179,6 @@ const elements = {
         }
     },
     text: { selector: `.image-loader-text` },
-    themedStyles: {
-        selector: `style.themeStyles`,
-        onChange: (_el, host) => setStyleElement(host)
-    },
     internalStyles: {
         selector: `style.internalStyles`,
         onChange: (_el, host) => setInternalStyle(host)
@@ -256,12 +229,12 @@ export const ImageLoader = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes,
     properties,
     elements,
     methods,
     onConnected(host) {
-        setStyleElement(host)
         setInternalStyle(host)
     }
 })

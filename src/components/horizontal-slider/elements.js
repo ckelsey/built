@@ -1,4 +1,4 @@
-import { SetStyleRules, ObserveEvent, Get } from '../..'
+import { ObserveEvent, Get } from '../..'
 import { goToNextPage, goToPreviousPage, autoplay } from './methods'
 
 const sliderItemSelectedClass = `active-horizontal-slider-item`
@@ -41,11 +41,6 @@ export const setItemEvents = (items, host) => {
             mouseup: ObserveEvent(item, `mouseup`).subscribe(() => handleItemUp(item))
         }
     })
-}
-
-export const setStyles = (el, host, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles || host.styles)
 }
 
 export const setSlot = (el, host) => {
@@ -175,20 +170,12 @@ const elements = {
             }
         }
     },
-    injectedStyles: {
-        selector: `style.injectedStyles`,
-        onChange: setStyles
-    },
     slot: {
         selector: `slot:not([name])`,
         onChange: setSlot
     },
-    inner: {
-        selector: `.horizontal-slider-inner`
-    },
-    itemContainer: {
-        selector: `.horizontal-slider-items`,
-    },
+    inner: { selector: `.horizontal-slider-inner` },
+    itemContainer: { selector: `.horizontal-slider-items`, },
     previous: {
         selector: `.horizontal-slider-previous`,
         onChange: setPrevious

@@ -1,7 +1,4 @@
-import {
-    WCConstructor, WCDefine, Pipe, IfInvalid, ComponentClassObject,
-    ToString, SetStyleRules, ToBool, WCwhenPropertyReady
-} from '../..'
+import { WCConstructor, WCDefine, CreateElement, Pipe, IfInvalid, ToString, WCwhenPropertyReady } from '../..'
 
 const template = require(`./index.html`)
 const componentName = `button-element`
@@ -9,32 +6,32 @@ const componentRoot = `.${componentName}-container`
 const style = require(`./style.scss`).toString()
 
 const properties = {
-    class: ComponentClassObject,
     name: {
         format: (val, host) => Pipe(ToString, IfInvalid(host.textContent))(val).value,
-        onChange: (_val, host) => WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`name`, `submit`))
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`name`, val))
     },
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.injectedStyles`).then(stylesElement => SetStyleRules(stylesElement, val))
-    },
-    theme: {
-        format: (val, host) => typeof val === `string` ? val : host.theme,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.theme`).then(themeElement => SetStyleRules(themeElement, val))
-    },
-    submit: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange(val, host) {
-            WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`type`, `submit`))
-        }
+    type: {
+        format: val => Pipe(ToString, IfInvalid(null))(val).value,
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.button`)
+            .then(btn => {
+                if (val) {
+                    btn.setAttribute(`type`, `submit`)
+                    btn.appendChild(CreateElement({
+                        tagName: `input`,
+                        type: `submit`
+                    }))
+                } else {
+                    btn.removeAttribute(`type`, `submit`)
+                    try { btn.removeChild(btn.querySelector(`input[type="submit"]`)) } catch (error) { }
+                }
+            })
     }
 }
 
 const elements = {
     root: { selector: componentRoot, },
     button: { selector: `${componentRoot} > button` },
-    injectedStyles: { selector: `${componentRoot} style.injectedStyles`, },
-    theme: { selector: `${componentRoot} style.themeStyles`, }
+    slot: { selector: `slot` }
 }
 
 export const ButtonElement = WCConstructor({

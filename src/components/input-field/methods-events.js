@@ -86,30 +86,16 @@ export const onDone = host => {
         error
     })
 
-    const form = Get(host, `internals_.form`)
+    const form = Get(host, `internals_.form`, host.closest(`form`))
 
     if (form) {
-        form.dispatchEvent(new Event(`submit`))
-        // const domEvent = document.createEvent(`Event`)
-        // domEvent.initEvent(`submit`, false, true)
-        // form.dispatchEvent(domEvent)
-
-        // const event = new InputEvent(``)
-
-        //     , {
-        //     view: window,
-        //     bubbles: true,
-        //     cancelable: true
-        // });
-        // var cb = document.getElementById('checkbox');
-        // var cancelled = !cb.dispatchEvent(event);
-        // if (cancelled) {
-        //     // A handler called preventDefault.
-        //     alert("cancelled");
-        // } else {
-        //     // None of the handlers called preventDefault.
-        //     alert("not cancelled");
-        // }
+        try {
+            const domEvent = document.createEvent(`Event`)
+            domEvent.initEvent(`submit`, false, true)
+            form.dispatchEvent(domEvent)
+        } catch (error) {
+            form.dispatchEvent(new Event(`submit`))
+        }
     }
 }
 

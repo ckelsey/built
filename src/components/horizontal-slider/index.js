@@ -12,9 +12,7 @@ import elements from './elements'
 import { observedAttributes, properties } from './properties'
 import { scrollToIndex } from './methods'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `horizontal-slider`
 const componentRoot = `.horizontal-slider-container`

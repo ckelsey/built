@@ -1,21 +1,13 @@
 import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool, IfInvalid, ToString,
+    WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToString,
     ObserveEvent, IndexOf, IfEmpty, EventName, OnNextFrame, WCwhenPropertyReady, iconInfo, iconCheck,
     iconError, iconWarning, iconClose
 } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `snack-bar`
 const componentRoot = `.${componentName}-container`
-
-const setStyles = (el, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles)
-}
 
 const setShown = host => {
     const root = host.elements.root
@@ -70,7 +62,6 @@ const showHideClose = (el, show) => {
 }
 
 const properties = {
-    class: ComponentClassObject,
     shown: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (_val, host) => OnNextFrame(() => setShown(host))
@@ -102,14 +93,6 @@ const properties = {
     hideclose: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (val, host) => OnNextFrame(() => showHideClose(host.elements.root, !val))
-    },
-    styles: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => OnNextFrame(() => setStyles(host.elements.injectedStyles, val))
-    },
-    theme: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => OnNextFrame(() => setStyles(host.elements.themeStyles, val))
     }
 }
 
@@ -132,14 +115,6 @@ const elements = {
 
             showHideClose(host.elements.root, !host.hideclose)
         })
-    },
-    injectedStyles: {
-        selector: `style.injectedStyles`,
-        onChange: (el, host) => setStyles(el, host.styles)
-    },
-    themeStyles: {
-        selector: `style.themeStyles`,
-        onChange: (el, host) => setStyles(el, host.theme)
     },
     infoicon: {
         selector: `.infoicon`,

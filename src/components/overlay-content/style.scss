@@ -1,24 +1,3 @@
-@mixin hostStyles {
-    display: block;
-    position: fixed;
-    height: 0px;
-    width: 0px;
-    top: 0px;
-    left: 0px;
-    z-index: 99999;
-    overflow: visible;
-    pointer-events: none;
-    outline: none !important;
-}
-
-:host(overlay-content) {
-    @include hostStyles;
-}
-
-overlay-content {
-    @include hostStyles;
-}
-
 .overlay-content-container {
     display: block;
     position: absolute;

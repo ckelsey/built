@@ -1,24 +1,7 @@
-import { Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, OnNextFrame } from '../..'
+import { Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, OnNextFrame } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-
-const setStyles = (el, styles) => {
-    OnNextFrame(() => {
-        if (!el) { return }
-        SetStyleRules(el, styles)
-    })
-}
-
-const setTheme = (value, host) => {
-    OnNextFrame(() => {
-        const themeElement = host.elements.theme
-        if (!themeElement || value === undefined) { return }
-        SetStyleRules(themeElement, value)
-    })
-}
-
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+const outerStyle = require(`./outer.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `spinner-element`
 const componentRoot = `.${componentName}-container`
@@ -96,16 +79,10 @@ const elements = {
         onChange: (_el, host) => doAllTheThings(host)
     },
     inner: { selector: `.spinner-element-inner` },
-    slot: { selector: `slot` },
-    injectedStyles: { selector: `style.injectedStyles`, onChange: (el, host) => setStyles(el, host.styles) },
-    theme: {
-        selector: `style.themeStyles`,
-        onChange: (_el, host) => setTheme(host.theme, host)
-    }
+    slot: { selector: `slot` }
 }
 
 const properties = {
-    class: ComponentClassObject,
     visible: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (_val, host) => toggleVisibility(host)
@@ -126,17 +103,9 @@ const properties = {
         format: val => Pipe(ToNumber, IfInvalid(1))(val).value,
         onChange: (_val, host) => doAllTheThings(host)
     },
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
-    },
     type: {
         format: val => typeof val === `string` ? val : `column`,
         onChange: (_val, host) => doAllTheThings(host)
-    },
-    theme: {
-        format: (val, host) => typeof val === `string` ? val : host.theme,
-        onChange: setTheme
     }
 }
 
@@ -145,6 +114,7 @@ export const SpinnerElement = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes: Object.keys(properties),
     properties,
     elements,

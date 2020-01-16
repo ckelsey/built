@@ -13,8 +13,10 @@ export function ObserveSlots(element, mustHaveSlotAttribute) {
         slotObserver.disconnect()
     }
 
-    const newSlots = (added, removed) => {
-        observer.next({ added, removed })
+    const newSlots = (added = [], removed = []) => {
+        if (added.length || removed.length) {
+            observer.next({ added, removed })
+        }
     }
 
     slotObserver = new MutationObserver(mutationsList => {
@@ -30,9 +32,7 @@ export function ObserveSlots(element, mustHaveSlotAttribute) {
                     mutation.addedNodes.forEach(a => a.getAttribute(`slot`) ? added.push(a) : undefined)
                     mutation.removedNodes.forEach(r => r.getAttribute(`slot`) ? removed.push(r) : undefined)
 
-                    if (added.length || removed.length) {
-                        newSlots(added, removed)
-                    }
+                    newSlots(added, removed)
                 } else {
                     return newSlots(mutation.addedNodes, mutation.removedNodes)
                 }
@@ -65,6 +65,8 @@ export function ObserveSlots(element, mustHaveSlotAttribute) {
 
         const parent = element.parentNode || element.host
         if (!parent) { return requestAnimationFrame(tryIt) }
+
+        newSlots(Array.from(element.children))
 
         mObserver.observe(parent, { childList: true })
         slotObserver.observe(element, { childList: true })

@@ -1,15 +1,8 @@
-import { ComponentClassObject, Pipe, ToArray, IfInvalid, Get, ToBool, ToNumber } from '../..'
-import { setStyles, unsetItemEvents, setItemEvents, setChicklets, setPrevious, setNext } from './elements'
+import { Pipe, ToArray, IfInvalid, Get, ToBool, ToNumber } from '../..'
+import { unsetItemEvents, setItemEvents, setChicklets, setPrevious, setNext } from './elements'
 import { autoplay, setLoop } from './methods'
 
 export const attributes = {
-    class: ComponentClassObject,
-
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, host, val)
-    },
-
     chicklets: {
         format: val => Pipe(ToBool, IfInvalid(true))(val).value,
         onChange: (_val, host) => setChicklets(host)

@@ -1,6 +1,5 @@
-import { Pipe, IfInvalid, ToNumber, ToString, SelectorArrayToElements, ComponentClassObject } from '../..'
+import { Pipe, IfInvalid, ToNumber, ToString, SelectorArrayToElements } from '../..'
 import { unloadTargets, loadTargets } from './methods'
-import { setStyles } from './elements'
 
 const resetTargets = host => {
     unloadTargets(host)
@@ -25,16 +24,11 @@ const attributes = {
         format: val => Pipe(ToString, IfInvalid(`mousedown`))(val).value,
         onChange: (_val, host) => resetTargets(host)
     },
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
-    },
     spring: { format: val => Pipe(ToNumber, IfInvalid(4))(val).value, },
     targets: {
         format: selectorsToDom,
         onChange: (_val, host) => resetTargets(host)
-    },
-    class: ComponentClassObject
+    }
 }
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization

@@ -1,10 +1,7 @@
-import {
-    Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, OnNextFrame,
-    ComponentClassObject, SetStyleRules, IndexOf, Timer, EaseInOut, Get
-} from '../..'
+import { Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, OnNextFrame, IndexOf, Timer, EaseInOut, Get } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
+const outerStyle = require(`./outer.scss`).toString()
 const positionPadding = 40
 const widths = [`content`, `target`]
 const alignments = [`center`, `left`, `right`, `top`, `bottom`, `center center`, `center top`, `center bottom`, `left center`, `left top`, `left bottom`, `right center`, `right top`, `right bottom`,]
@@ -17,38 +14,15 @@ const elements = {
     contentContainer: { selector: `.${componentName}-content-container` },
     contentInner: { selector: `.${componentName}-content-inner` },
     inner: { selector: `.${componentName}-container-inner` },
-    themeStyles: {
-        selector: `style.themeStyles`,
-        onChange: (el, host) => setStyles(el, host.styles)
-    },
-    injectedStyles: {
-        selector: `style.injectedStyles`,
-        onChange: (el, host) => setStyles(el, host.styles)
-    }
 }
 
 const attributes = {
-    class: ComponentClassObject,
     target: { format: val => val instanceof HTMLElement || val instanceof HTMLUnknownElement ? val : null },
     align: { format: val => Pipe(IndexOf(alignments), IfInvalid(`center`))(val).value },
     from: { format: val => Pipe(IndexOf(alignments), IfInvalid(`center`))(val).value },
     speed: { format: val => Pipe(ToNumber, IfInvalid(333))(val).value },
     widthbasis: { format: val => Pipe(IndexOf(widths), IfInvalid(`content`))(val).value },
-    theme: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.themeStyles, val)
-    },
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
-    },
 }
-
-const setStyles = (el, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles)
-}
-
 
 const setPositions = host => {
     cancelAnimationFrame(host.positionTimer)
@@ -109,8 +83,8 @@ export const OverlayContent = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes: Object.keys(attributes),
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
     properties: Object.assign({}, {
         showing: { format: val => ToBool(val).value, },
         width: {

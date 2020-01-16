@@ -1,13 +1,16 @@
-import {
-    IndexOf, CommasToArray, IfNot, ComponentClassObject, Pipe, IfInvalid,
-    ToNumber, ToBool, ToObject, ToArray, ToString, ValidateHtml,
-    ReplaceElementContents, SetAttribute, Get
-} from '../..'
-import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition, setInputTheme } from './methods-elements'
-import { setColors, setStyles } from './elements'
+import { IndexOf, CommasToArray, IfNot, Pipe, IfInvalid, ToNumber, ToBool, ToObject, ToArray, ToString, ValidateHtml, ReplaceElementContents, SetAttribute, Get } from '../..'
+import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition } from './methods-elements'
 import { processValue } from './methods-value'
 import { setDroppable } from './methods-events'
 import { labelPositions, resizeOptions } from './definitions'
+
+const setColors = (host, invalid) => {
+    const color = invalid ? host.warningcolor : host.accentcolor
+
+    if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
+        Set(host.elements.inputContainer, `style.color`, color)
+    }
+}
 
 const trueOrNull = val => Pipe(ToBool, IfNot(true, null))(val).value
 const addRemoveContainerClass = (val, host, clss) => Get(host, `elements.container.classList`, { add: () => { }, remove: () => { } })[val ? `add` : `remove`](clss)
@@ -137,7 +140,6 @@ const inputFieldProperties = {
         format: val => Pipe(CommasToArray, IfInvalid(null))(val).value,
         onChange
     },
-    class: ComponentClassObject,
     clearbutton: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
         onChange: (val, host) => {
@@ -230,21 +232,6 @@ const inputFieldProperties = {
     showcount: {
         format: trueOrNull,
         onChange: (val, host) => addRemoveContainerClass(val, host, `showcount`),
-    },
-
-    styles: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.injectedStyles, val)
-    },
-
-    theme: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setStyles(host.elements.themeStyles, val)
-    },
-
-    inputtheme: {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => setInputTheme(val, host)
     },
 
     warningcolor: {

@@ -2,18 +2,11 @@
  * add ripple and bounce to toggle container
  */
 
-import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, AppendStyleElement, ComponentClassObject, WCDefine,
-    ToNumber, ToString, IfInvalid, ToBool, Pipe, SetStyleRules, ObserveEvent
-    // ObserverUnsubscribe, ObserveSlots
-} from '../..'
+import { WCConstructor, AppendStyleElement, ComponentClassObject, WCDefine, ToNumber, ToString, IfInvalid, ToBool, Pipe, SetStyleRules, ObserveEvent } from '../..'
 import { iconTriangle } from '../..'
 import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `content-collapse`
 const componentRoot = `.${componentName}-container`

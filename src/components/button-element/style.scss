@@ -1,15 +1,16 @@
-:host(button-element) {
+@mixin hostin {
     font: inherit;
     line-height: inherit;
     display: inline-block;
     position: relative;
 }
 
+:host(button-element) {
+    @include hostin();
+}
+
 button-element {
-    font: inherit;
-    line-height: inherit;
-    display: inline-block;
-    position: relative;
+    @include hostin();
 }
 
 .button-element-container {
@@ -97,6 +98,21 @@ button-element {
             border: none;
             appearance: none;
             opacity: 0;
+        }
+
+        input {
+            position: absolute;
+            background: transparent;
+            border: none;
+            width: 100%;
+            height: 100%;
+            display: block;
+            color: transparent;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            cursor: pointer;
+            user-select: none;
         }
     }
 

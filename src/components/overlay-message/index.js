@@ -1,22 +1,14 @@
 import {
-    // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-    WCConstructor, WCDefine, ComponentClassObject, SetStyleRules, Pipe, ToBool,
+    WCConstructor, WCDefine, Pipe, ToBool,
     IfInvalid, ToString, IndexOf, Get, Set, ObserveEvent, EaseInOut,
     ObserverUnsubscribe, ObserveSlots, OnNextFrame, Timer
 } from '../..'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const template = require(`./index.html`)
 const componentName = `overlay-message`
 const componentRoot = `.${componentName}-container`
 const speed = 333
-
-const setStyles = (el, styles) => {
-    if (!el) { return }
-    SetStyleRules(el, styles)
-}
 
 const setShown = host => {
     const root = host.elements.root
@@ -55,7 +47,6 @@ const setCloseButton = host => {
 }
 
 const properties = {
-    class: ComponentClassObject,
     shown: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (_val, host) => OnNextFrame(() => setShown(host))
@@ -67,37 +58,17 @@ const properties = {
     closeselector: {
         format: val => Pipe(ToString, IfInvalid(`[overlay-message-close]`))(val).value,
         onChange: (_val, host) => OnNextFrame(() => setCloseButton(host))
-    },
-    styles: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => OnNextFrame(() => setStyles(host.elements.injectedStyles, val))
-    },
-    theme: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange: (val, host) => OnNextFrame(() => setStyles(host.elements.themeStyles, val))
     }
 }
 
-const observedAttributes = Object.keys(properties)
-
-const elements = {
-    root: { selector: componentRoot },
-    injectedStyles: {
-        selector: `style.injectedStyles`,
-        onChange: (el, host) => OnNextFrame(() => setStyles(el, host.styles))
-    },
-    themeStyles: {
-        selector: `style.themeStyles`,
-        onChange: (el, host) => OnNextFrame(() => setStyles(el, host.theme))
-    }
-}
+const elements = { root: { selector: componentRoot } }
 
 export const OverlayMessage = WCConstructor({
     componentName,
     componentRoot,
     template,
     style,
-    observedAttributes,
+    observedAttributes: Object.keys(properties),
     properties,
     elements,
     onDisconnected(host) { ObserverUnsubscribe(host) },

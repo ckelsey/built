@@ -1,33 +1,3 @@
-@mixin hostin {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    display: block;
-    pointer-events: none;
-    z-index: 999999999999999999;
-}
-
-@mixin hostin2 {
-    top: 0;
-    left: 0;
-}
-
-:host(spinner-element) {
-    @include hostin();
-}
-
-:host(spinner-element)[page="true"] {
-    @include hostin2();
-}
-
-spinner-element {
-    @include hostin();
-}
-
-spinner-element[page="true"] {
-    @include hostin2();
-}
-
 .spinner-element-container {
     width: 100%;
     height: 100%;
