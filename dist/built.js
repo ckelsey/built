@@ -502,7 +502,7 @@ var on_next_frame = __webpack_require__(2);
 // CONCATENATED MODULE: ./src/utils/wc-when-property-ready.js
 
 
-function WCwhenPropertyReady(host, path) {
+function WCwhenPropertyReady(host, path, isMethod) {
   var max = 1000;
   return new Promise(function (resolve, reject) {
     if (!host || !host.parentNode && !host.parentElement) {
@@ -523,7 +523,7 @@ function WCwhenPropertyReady(host, path) {
         });
       }
 
-      if (val === undefined) {
+      if (val === undefined || isMethod && typeof val !== "function") {
         return Object(on_next_frame["a" /* OnNextFrame */])(test);
       }
 
@@ -2041,7 +2041,8 @@ function WCConstructor(options) {
     return;
   }
 
-  options.observedAttributes = options.observedAttributes || [];
+  var propertyKeys = Object.keys(properties);
+  options.observedAttributes = options.observedAttributes || propertyKeys;
   properties["class"] = ComponentClassObject;
   properties["outertheme"] = {
     format: function format(val) {
@@ -5444,7 +5445,7 @@ var grid_layout_clear = function clear(host) {
 var grid_layout_wrap = function wrap(host) {
   return function () {
     return Array.from(host.children).forEach(function (el) {
-      return grid_layout_notSlottable(el) || el.container ? undefined : grid_layout_wrapItem(host.elements.itemsContainer, el);
+      return grid_layout_notSlottable(el) || el.getAttribute("wrapped") ? undefined : grid_layout_wrapItem(host.elements.itemsContainer, el);
     });
   };
 };
@@ -5460,6 +5461,7 @@ var grid_layout_wrapItem = function wrapItem(itemsContainer, el) {
   slotWrapper.appendChild(slot);
   el.slot = id;
   el.container = slotWrapper;
+  el.setAttribute("wrapped", id);
   return el;
 };
 
@@ -5491,10 +5493,6 @@ var GridLayout = WCConstructor({
   onConnected: function onConnected(host) {
     host.elements.innerStyles = AppendStyleElement(" ", host.shadowRoot, "innerStyles", "innerStyles");
 
-    var observeEl = function observeEl(el) {
-      return grid_layout_notSlottable(el) ? undefined : grid_layout_wrapItem(host.elements.itemsContainer, el);
-    };
-
     var disconnectEl = function disconnectEl(el) {
       var containerParent = Object(utils_get["a" /* Get */])(el, "container.parentElement");
       Object(utils_get["a" /* Get */])(el, "eventSubscriptions.span.disconnect()");
@@ -5506,15 +5504,16 @@ var GridLayout = WCConstructor({
 
     host.eventSubscriptions = {
       slot: ObserveSlots(host).subscribe(function (results) {
-        results.added.reverse().forEach(observeEl);
         results.removed.forEach(disconnectEl);
+        host.wrap();
       })
     };
-    Object(on_next_frame["a" /* OnNextFrame */])(function () {
-      return host.setAttribute("viewable", true);
-    });
     window.addEventListener("resize", function () {
       return grid_layout_setScale(host);
+    });
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      host.wrap();
+      host.setAttribute("viewable", true);
     });
   },
   onDisconnected: function onDisconnected(host) {
@@ -6071,9 +6070,6 @@ WCDefine(horizontal_slider_componentName, HorizontalSlider);
 var icon_element_style = __webpack_require__(59).toString();
 
 var icon_element_elements = {
-  root: {
-    selector: ".icon-element-container"
-  },
   svgContainer: {
     selector: ".svg-container"
   }
@@ -6093,7 +6089,9 @@ var icon_element_attributes = {
       }
 
       Object(on_next_frame["a" /* OnNextFrame */])(function () {
-        host.elements.svgContainer.innerHTML = value;
+        WCwhenPropertyReady(host, "elements.svgContainer").then(function (el) {
+          return el.innerHTML = value;
+        });
         host.dispatchEvent(new CustomEvent("iconloaded", {
           detail: host
         }));
@@ -6106,7 +6104,9 @@ var icon_element_attributes = {
     },
     onChange: function onChange(value, host) {
       return Object(on_next_frame["a" /* OnNextFrame */])(function () {
-        return host.elements.svgContainer.style.color = value;
+        return WCwhenPropertyReady(host, "elements.svgContainer").then(function (el) {
+          return el.style.color = value;
+        });
       });
     }
   },
@@ -6116,19 +6116,20 @@ var icon_element_attributes = {
     },
     onChange: function onChange(value, host) {
       return Object(on_next_frame["a" /* OnNextFrame */])(function () {
-        return host.elements.svgContainer.style.height = host.elements.svgContainer.style.width = value;
+        return WCwhenPropertyReady(host, "elements.svgContainer").then(function (el) {
+          return el.style.height = el.style.width = value;
+        });
       });
     }
   }
-}; // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-
+};
 var icon_element_properties = Object.assign({}, {
   subscription: {
     format: function format(val) {
       return val;
     }
   }
-}, icon_element_attributes); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+}, icon_element_attributes);
 
 var icon_element_template = __webpack_require__(60);
 
@@ -11272,13 +11273,16 @@ function UploadService(options, file) {
 window.UploadService = UploadService;
 // CONCATENATED MODULE: ./src/utils/append-children.js
 function AppendChildren(el, children) {
-  var i = children.length;
+  var documentFragment = document.createDocumentFragment();
+  var len = children.length;
+  var i = len;
 
   while (i) {
+    documentFragment.appendChild(children[len - i]);
     i = i - 1;
-    el.appendChild(children[i]);
   }
 
+  el.appendChild(documentFragment);
   return el;
 }
 // CONCATENATED MODULE: ./src/utils/between.js

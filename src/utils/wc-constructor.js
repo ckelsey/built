@@ -68,7 +68,8 @@ export function WCConstructor(options) {
 
     if (!componentName) { return }
 
-    options.observedAttributes = options.observedAttributes || []
+    const propertyKeys = Object.keys(properties)
+    options.observedAttributes = options.observedAttributes || propertyKeys
 
     properties[`class`] = ComponentClassObject
 

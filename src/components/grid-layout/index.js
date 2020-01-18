@@ -76,7 +76,8 @@ const properties = {
 const getComponentStyles = host => () => `${require(`./style.scss`).toString()}${host.theme || ``}${host.styles}`
 const notSlottable = el => Get(el, `nongrid`) || Get(el, `tagName.toLowerCase()`) === `style`
 const clear = host => () => Array.from(host.children).forEach(el => !notSlottable(el) ? Try(el => host.removeChild(el))(el) : undefined)
-const wrap = host => () => Array.from(host.children).forEach(el => notSlottable(el) || el.container ? undefined : wrapItem(host.elements.itemsContainer, el))
+const wrap = host => () => Array.from(host.children)
+    .forEach(el => notSlottable(el) || el.getAttribute(`wrapped`) ? undefined : wrapItem(host.elements.itemsContainer, el))
 
 const wrapItem = (itemsContainer, el) => {
     const id = ID()
@@ -90,6 +91,7 @@ const wrapItem = (itemsContainer, el) => {
     slotWrapper.appendChild(slot)
     el.slot = id
     el.container = slotWrapper
+    el.setAttribute(`wrapped`, id)
 
     return el
 }
@@ -104,11 +106,7 @@ export const GridLayout = WCConstructor({
     properties,
     elements,
     computed: {
-        items: host => ({
-            get() {
-                return Array.from(host.children).filter(el => el.tagName.toLowerCase() !== `style`)
-            }
-        })
+        items: host => ({ get() { return Array.from(host.children).filter(el => el.tagName.toLowerCase() !== `style`) } })
     },
     methods: {
         getComponentStyles,
@@ -118,7 +116,6 @@ export const GridLayout = WCConstructor({
     onConnected(host) {
         host.elements.innerStyles = AppendStyleElement(` `, host.shadowRoot, `innerStyles`, `innerStyles`)
 
-        const observeEl = el => notSlottable(el) ? undefined : wrapItem(host.elements.itemsContainer, el)
         const disconnectEl = el => {
             const containerParent = Get(el, `container.parentElement`)
             Get(el, `eventSubscriptions.span.disconnect()`)
@@ -127,14 +124,17 @@ export const GridLayout = WCConstructor({
 
         host.eventSubscriptions = {
             slot: ObserveSlots(host).subscribe(results => {
-                results.added.reverse().forEach(observeEl)
                 results.removed.forEach(disconnectEl)
+                host.wrap()
             })
         }
 
-        OnNextFrame(() => host.setAttribute(`viewable`, true))
-
         window.addEventListener(`resize`, () => setScale(host))
+
+        OnNextFrame(() => {
+            host.wrap()
+            host.setAttribute(`viewable`, true)
+        })
     },
     onDisconnected(host) { ObserverUnsubscribe(host) }
 })
