@@ -1,5 +1,5 @@
 import { Get } from '../..'
-import { processedNullValue } from './definitions'
+import { processedNullValue } from '../input-shared/definitions.js'
 import { sanitizeValue, isEmpty, InputFieldFormatValue, maxMin, pattern } from './methods-value'
 
 const processedErrorText = sanitized => sanitized && sanitized.reason ? sanitized.reason.join(`, `) : ``

@@ -1,5 +1,7 @@
+import parseUrl from "./parse-url"
+
 const getRouteByPath = routes => path => {
-    path = typeof path === `string` ? path.toLowerCase() : path
+    path = parseUrl(typeof path === `string` ? path.toLowerCase() : path)
 
     let r
     let i = 0

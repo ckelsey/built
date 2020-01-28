@@ -6,8 +6,7 @@ import {
     SetCaret, ToPhone, RemoveMeta, ToSlice, ToMatchAll, ToMatch, ToReplace,
     AfterEveryNth, BeforeEveryNth, ToUpperCase, ToLowerCase, ToCapitalize
 } from '../..'
-import { textareaHeight } from './methods-elements'
-import { processedFileValue } from './definitions'
+import { processedFileValue } from '../input-shared/definitions.js'
 
 const supportsInternals = `ElementInternals` in window && `setFormData` in window.ElementInternals
 
@@ -315,140 +314,9 @@ export const InputFieldFormatValue = (value, format) => {
     return Pipe.apply(null, functions)(value)
 }
 
-export const maxMin = (host, value) => {
-    const nonStringTypes = [`number`, `checkbox`, `radio`, `file`]
-    let valid = true
-    let errorText = ``
 
-    if (value === undefined || value === null) {
-        return { value, valid, errorText }
-    }
 
-    if (host.type === `number`) {
-        if (!!host.max && host.max < value) {
-            value = host.max
-        }
 
-        if (!!host.min && host.min > value) {
-            value = host.min
-        }
-    }
-
-    if (nonStringTypes.indexOf(host.type) === -1) {
-        if (!!host.max && host.max < value.length) {
-            value = value.slice(0, host.max)
-        }
-
-        if (!!host.min && !!value && host.min > value.length && !host.focused) {
-            errorText = `Must be at least ${host.min} characters`
-            valid = false
-        }
-    }
-
-    return { value, valid, errorText }
-}
-
-export const pattern = (host, value) => {
-    if (!host.pattern) { return value }
-    return RemoveMeta(value, host.pattern).value
-}
 
 export const getFileValue = input => !input || !input.files || input.files.length === 0 ? null : Array.from(input.files)
 const getDroppedFiles = value => Array.isArray(value) && value.filter(f => f instanceof File).length ? value : null
-
-export const processValue = host => {
-    const input = host.input
-
-    if (!input) { return }
-
-    const processed = host.processedValue
-    const sanitized = processed.sanitized
-
-    host.processedError = processed.reason.join(`, `)
-
-    const errors = host.validationMessage
-    const valid = (errors.length ? false : processed.valid) || (!host.focused && host.valid)
-    const autofilled = IsAutoFilled(input)
-    const stringEmpty = (isNaN(sanitized) || typeof sanitized === `string`) && !sanitized.length
-    const empty = stringEmpty && !autofilled
-
-    host.count = host.type === `number` ? sanitized : sanitized ? sanitized.length : 0
-    host.elements.container.classList[sanitized ? `add` : `remove`](`checked`)
-
-    if (host.type === `file`) {
-
-        const files = getDroppedFiles(sanitized) || getFileValue(input)
-        const filenames = !files ? [] : files.map(f => f.name)
-        SetAttribute(host.elements.inputContainer, `title`, filenames.join(`, `))
-
-        try {
-            input.files = (new ClipboardEvent(``).clipboardData || new DataTransfer).files
-        } catch (error) { }
-
-        if (!filenames.length && host.pathvalue) {
-            host.notempty = true
-            return
-        } else if (filenames.length) {
-            host.pathvalue = ``
-        }
-
-        if (supportsInternals) {
-            host.internals_.setFormValue(input.files)
-        }
-
-    } else {
-        try {
-            const selectionEnd = input.selectionEnd
-            let cursorPosition = selectionEnd
-
-            // masker(input, sanitized, [input.selectionStart, input.selectionEnd], countries)
-
-            const formatted = InputFieldFormatValue(sanitized, host.format || host.type)
-            const newValue = formatted.value || ``
-            const current = input.value
-
-            if (formatted.stringChanges && formatted.stringChanges.length) {
-                formatted.stringChanges.forEach(change => {
-                    if (!!change.added && !!change.removed && change.start < cursorPosition) {
-                        return cursorPosition = cursorPosition + (change.added.length - change.removed.length)
-                    }
-
-                    if (!!change.removed && change.start < cursorPosition) {
-                        return cursorPosition = cursorPosition - change.removed.length
-                    }
-
-                    if (!!change.added && change.start < cursorPosition) {
-                        return cursorPosition = cursorPosition + change.added.length
-                    }
-                })
-            }
-
-            input.cursorPosition = cursorPosition
-
-            if (current !== newValue || host.type === `intlphone`) {
-                input.value = newValue
-
-                if (formatted.stringChanges && formatted.stringChanges.length) {
-                    SetCaret(input, cursorPosition, host.shadowRoot)
-                }
-
-                if (supportsInternals) {
-                    host.internals_.setFormValue(newValue)
-                }
-            } else {
-                if (supportsInternals) {
-                    host.internals_.setFormValue(current)
-                }
-            }
-
-        } catch (error) { }
-    }
-
-    textareaHeight(host.resize, input)
-
-    host.notempty = !empty
-
-    if (valid) { return host.invalid = false }
-    if (empty) { return host.invalid = false }
-    if (!host.focused) { return host.invalid = true }
-}

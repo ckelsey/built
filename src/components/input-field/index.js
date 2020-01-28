@@ -1,34 +1,68 @@
-import { WCConstructor, WCDefine, ID, ObserveEvent, Set } from '../..'
-import { observedAttributes, properties } from './properties'
-import { processedValue, formattedValue, valid, validationMessage } from './computed'
-import { setError, clearInput } from './methods-value'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { ID } from '../../utils/id.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToString } from '../../utils/to-string.js'
+import { Get } from '../../utils/get.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { processedValue } from '../input-shared/processed-value.js'
+import { properties as Properties } from '../input-shared/properties.js'
+import { processValue } from '../input-shared/process-value.js'
+import { setCustomValidity } from '../input-shared/set-custom-validity.js'
+import { validationMessage } from '../input-shared/validation-message.js'
+import { valueValidation } from './value-validation.js'
+import { valueMaxMin } from './value-max-min.js'
+import { valueFormat } from './value-format.js'
+import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { SetAttribute } from '../../utils/set-attribute.js'
+import { validity } from '../input-shared/validity.js'
+import { checkValidity } from '../input-shared/check-validity.js'
 
-const outerStyle = require(`./input-style.scss`)
+const outerStyle = require(`../input-shared/outer.scss`).toString()
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `input-field`
-const componentRoot = `.input-field-container`
+const componentRoot = `.${componentName}-container`
 
-export const setColors = (host, invalid) => {
-    const color = invalid ? host.warningcolor : host.accentcolor
+const preProcessValue = host => value => {
+    const validated = valueValidation(value, host.type, host.allowhtml, host.disallowhtml)
+    const formatParsed = valueFormat(host.format, validated.sanitized)
+    const parsedValue = valueMaxMin(host, formatParsed.value)
 
-    if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
-        Set(host.elements.inputContainer, `style.color`, color)
+    /** TODO input format cursor position */
+
+    return {
+        valid: validated.valid && parsedValue.valid && formatParsed.valid,
+        reason: [
+            !formatParsed.valid ? `Value does not match pattern` : undefined,
+            parsedValue.errorText,
+        ]
+            .concat(validated.reason)
+            .filter(m => !!m),
+        value: parsedValue.value,
+        sanitized: parsedValue.value
     }
 }
 
-export const elements = {
-    checkIcon: {
-        selector: `.input-field-checkbox-icon`,
-        onChange(el) {
-            el.svg = `<svg xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;stroke-width:2px;" width="24" height="24" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`
-        }
-    },
+const postProcessValue = host => results => {
+    results.input.value = results.sanitized
+    host.count = host.type === `number` ? results.sanitized : results.sanitized ? results.sanitized.length : 0
+}
+
+const properties = Object.assign({}, Properties, {
+    pattern: {
+        format: val => Pipe(ToString, IfInvalid(null))(val).value,
+        onChange: (val, host) => WCwhenPropertyReady(host, `input`).then(input => SetAttribute(input, `pattern`, val))
+    }
+})
+
+const elements = {
     clearButton: {
         selector: `.input-field-clear`,
-        onChange: (el, host) => el.eventSubscriptions = {
-            click: ObserveEvent(el, `click`).subscribe(() => clearInput(host))
-        }
+        // onChange: (el, host) => el.eventSubscriptions = {
+        //     click: ObserveEvent(el, `click`).subscribe(() => clearInput(host))
+        // }
     },
     container: { selector: `.input-field-container-inner` },
     count: { selector: `.input-field-character-count` },
@@ -68,23 +102,22 @@ export const InputField = WCConstructor({
     template,
     style,
     outerStyle,
-    observedAttributes,
     properties,
+    observedAttributes: Object.keys(properties),
     elements,
-    methods: { setError },
+    methods: {
+        processValue,
+        setCustomValidity,
+        checkValidity,
+        preProcessValue,
+        postProcessValue,
+    },
     computed: {
         processedValue,
-        formattedValue,
-        valid,
-        validationMessage
+        validationMessage,
+        validity
     },
-    getters: {
-        value: host => host.formattedValue,
-        invalid: host => !host.valid
-    },
-    setters: {
-        value: host => value => host.state.value.next(value)
-    },
+    getters: { value: host => host.preProcessValue(Get(host, `state.value.value`, ``)).sanitized },
     onConnected: host => host.inputID = ID(),
     formElement: true
 })

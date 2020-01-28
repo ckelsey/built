@@ -9,23 +9,44 @@
 
     var username = document.createElement('input-field')
     username.name = username.label = username.id = 'username'
+    // username.pattern = '[A-Za-z0-9_]{1,5}'
+    username.format = '/^[A-Za-z0-9_]{1,5}/gm'
     username.required = true
-    username.autocomplete = 'off'
 
     var password = document.createElement('input-field')
     password.name = password.label = password.id = 'password'
     password.required = true
     password.type = 'password'
-    password.autocomplete = 'off'
+
+    var number = document.createElement('input-field')
+    number.name = number.label = number.id = 'number'
+    number.required = true
+    number.type = 'number'
+    number.pattern = '/[A-Za-z0-9_]{1,5}/gm'
+
+    var checkbox = document.createElement('input-bool')
+    checkbox.name = checkbox.label = checkbox.id = 'checkbox'
+    checkbox.label = 'Check box'
+
+    var select = document.createElement('input-select')
+    select.name = select.label = select.id = 'select'
+    select.label = 'A select'
+    select.options = 'one, two, three'
+    // select.emptyoption = false
+    select.emptyoption = `Select a number`
 
     var submit = document.createElement('button-element')
     submit.textContent = 'Submit'
     submit.type = 'submit'
     submit.id = 'button1'
 
+
     formWrap.appendChild(formthing)
     formthing.appendChild(username)
     formthing.appendChild(password)
+    formthing.appendChild(number)
+    formthing.appendChild(checkbox)
+    formthing.appendChild(select)
     formthing.appendChild(submit)
 
     formthing.addEventListener('submit', function (e) {

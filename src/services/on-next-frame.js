@@ -7,6 +7,8 @@ const hasOnNextFrame = (globalSymbols.indexOf(OnNextFrameKey) > -1)
 const OnNextFrameQueueObject = {}
 const OnNextFrameQueue = []
 let isRunning = false
+let frameTimer
+let timeout
 
 function RunOnNextFrame() {
     if (isRunning) { return }
@@ -14,21 +16,25 @@ function RunOnNextFrame() {
     isRunning = true
 
     const runTasks = startTime => {
-        let ids = []
+        cancelAnimationFrame(frameTimer)
+        clearTimeout(timeout)
 
         do {
             const id = OnNextFrameQueue.shift()
 
             if (OnNextFrameQueueObject[id]) {
                 OnNextFrameQueueObject[id].resolve(OnNextFrameQueueObject[id].task())
+                requestAnimationFrame(() => OnNextFrameQueueObject[id])
             }
 
         } while (performance.now() - startTime < 6 && OnNextFrameQueue.length)
 
-        requestAnimationFrame(() => setTimeout(() => ids.forEach(i => delete OnNextFrameQueueObject[i])))
-
         if (OnNextFrameQueue.length) {
-            return requestAnimationFrame(() => setTimeout(() => runTasks(performance.now())))
+            return frameTimer = requestAnimationFrame(() =>
+                timeout = setTimeout(
+                    () => runTasks(performance.now())
+                )
+            )
         } else {
             isRunning = false
         }

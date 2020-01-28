@@ -1,8 +1,7 @@
 import { IndexOf, CommasToArray, IfNot, Pipe, IfInvalid, ToNumber, ToBool, ToObject, ToArray, ToString, ValidateHtml, ReplaceElementContents, SetAttribute, Get } from '../..'
 import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition } from './methods-elements'
-import { processValue } from './methods-value'
 import { setDroppable } from './methods-events'
-import { labelPositions, resizeOptions } from './definitions'
+import { labelPositions, resizeOptions } from '../input-shared/definitions.js'
 
 const setColors = (host, invalid) => {
     const color = invalid ? host.warningcolor : host.accentcolor
@@ -22,7 +21,7 @@ const inputStates = {
         onChange: (val, host) => addRemoveContainerClass(val, host, `focused`),
     },
     notempty: {
-        format: trueOrNull,
+        format: val => ToBool(val).value,
         onChange: (val, host) => addRemoveContainerClass(val, SetAttribute(host, `has-value`, `${val}`), `notempty`),
     },
     invalid: {
@@ -72,7 +71,7 @@ const inputAttributes = {
         onChange: (val, host) => {
             ReplaceElementContents(host.elements.max, val || ``)
             addRemoveContainerClass(val, host, `maxlength`)
-            processValue(host)
+            host.processValue()
         },
     },
     max: {
@@ -80,14 +79,14 @@ const inputAttributes = {
         onChange: (val, host) => {
             ReplaceElementContents(host.elements.max, val || ``)
             addRemoveContainerClass(val, host, `max`)
-            processValue(host)
+            host.processValue()
         },
     },
     min: {
         format: val => Pipe(ToNumber, IfInvalid(null))(val).value,
         onChange: (val, host) => {
             addRemoveContainerClass(val, host, `min`)
-            processValue(host)
+            host.processValue()
         },
     },
     name: {
@@ -96,7 +95,7 @@ const inputAttributes = {
     },
     pattern: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange: (_val, host) => processValue(host),
+        onChange: (_val, host) => host.processValue(),
     },
     placeholder: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
@@ -127,7 +126,7 @@ const inputAttributes = {
     },
     value: {
         format: val => val,
-        onChange: (_val, host) => processValue(host),
+        onChange: (_val, host) => host.processValue()
     },
 }
 
@@ -162,7 +161,7 @@ const inputFieldProperties = {
 
     format: {
         format: val => Pipe(ToObject, IfInvalid(Pipe(ToString, IfInvalid(null))(val).value))(val).value,
-        onChange: (_val, host) => processValue(host),
+        onChange: (_val, host) => host.processValue()
     },
     helptext: {
         format: val => Pipe(ToString, IfInvalid(``))(val).value,
@@ -215,7 +214,7 @@ const inputFieldProperties = {
             if (!filePathInput || host.type !== `file`) { return }
 
             filePathInput.value = val.split(`/`).pop()
-            processValue(host)
+            host.processValue()
         }
     },
 

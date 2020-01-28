@@ -11,6 +11,14 @@ export const CreateElement = obj => {
             return el[key] = obj[key]
         }
 
+        if (key === `children`) {
+            if (Array.isArray(obj[key])) {
+                return obj[key].forEach(child => el.appendChild(CreateElement(child)))
+            } else {
+                return el.appendChild(CreateElement(obj[key]))
+            }
+        }
+
         if ([`string`, `number`, `boolean`].indexOf(typeof obj[key]) > -1) {
             el.setAttribute(key, obj[key])
         } else {
