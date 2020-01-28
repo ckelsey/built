@@ -116,6 +116,11 @@ button-element {
         }
     }
 
+    &.disabled {
+        opacity: 0.25;
+        pointer-events: none;
+    }
+
     slot {
         pointer-events: none;
     }

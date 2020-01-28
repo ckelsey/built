@@ -1,4 +1,5 @@
 import { WCConstructor, WCDefine, CreateElement, Pipe, IfInvalid, ToString, WCwhenPropertyReady } from '../..'
+import { ToBool } from '../../utils/to-bool'
 
 const template = require(`./index.html`)
 const componentName = `button-element`
@@ -9,6 +10,10 @@ const properties = {
     name: {
         format: (val, host) => Pipe(ToString, IfInvalid(host.textContent))(val).value,
         onChange: (val, host) => WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`name`, val))
+    },
+    disabled: {
+        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
+        onChange: (val, host) => WCwhenPropertyReady(host, `elements.root`).then(root => root.classList[val ? `add` : `remove`](`disabled`))
     },
     type: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
