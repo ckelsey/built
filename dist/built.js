@@ -12036,6 +12036,20 @@ function SuperFunction(fn) {
 }
 
 
+// CONCATENATED MODULE: ./src/utils/to-ascii.js
+
+function ToAscii(string) {
+  var result = TMonad(string);
+
+  try {
+    // eslint-disable-next-line no-control-regex
+    result.value = result.replace(/[^\x00-\x7F]/g, "");
+  } catch (error) {
+    result.valid = false;
+  }
+
+  return result;
+}
 // CONCATENATED MODULE: ./src/utils/to-capitalize.js
 
 function ToCapitalize(string) {
@@ -12655,6 +12669,7 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport TMonad */__webpack_require__.d(__webpack_exports__, "TMonad", function() { return TMonad; });
 /* concated harmony reexport TMonadUpdate */__webpack_require__.d(__webpack_exports__, "TMonadUpdate", function() { return TMonadUpdate; });
 /* concated harmony reexport ToArray */__webpack_require__.d(__webpack_exports__, "ToArray", function() { return ToArray; });
+/* concated harmony reexport ToAscii */__webpack_require__.d(__webpack_exports__, "ToAscii", function() { return ToAscii; });
 /* concated harmony reexport ToBool */__webpack_require__.d(__webpack_exports__, "ToBool", function() { return ToBool; });
 /* concated harmony reexport ToCapitalize */__webpack_require__.d(__webpack_exports__, "ToCapitalize", function() { return ToCapitalize; });
 /* concated harmony reexport ToDate */__webpack_require__.d(__webpack_exports__, "ToDate", function() { return ToDate; });
@@ -12749,6 +12764,7 @@ function TransduceMap(conversionFunction) {
 
 
 /** UTILS */
+
 
 
 
