@@ -1,9 +1,7 @@
 import { Observer, GetParent, OnNextFrame } from '..'
 
 export function ObserveExists(element) {
-    const initialParent = GetParent(element)
-
-    if (!initialParent) {
+    const returnEmpty = () => {
         const _observer = Observer(false)
         OnNextFrame(() => {
             _observer.next(false)
@@ -12,6 +10,10 @@ export function ObserveExists(element) {
 
         return _observer
     }
+
+    const initialParent = GetParent(element)
+
+    if (!initialParent) { return returnEmpty() }
 
     let isRunning = false
 

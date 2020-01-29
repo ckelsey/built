@@ -1,7 +1,18 @@
 import { Observer, ObserveExists } from '..'
+import { OnNextFrame } from '../services/on-next-frame'
 
-export function ObserveSlots(element, mustHaveSlotAttribute = false) {
-    if (!element) { return }
+export function ObserveSlots(element, mustHaveSlotAttribute = false, propsToWatch) {
+    const returnEmpty = () => {
+        const _observer = Observer(false)
+        OnNextFrame(() => {
+            _observer.next(false)
+            _observer.complete()
+        })
+
+        return _observer
+    }
+
+    if (!element) { return returnEmpty() }
 
     const observer = Observer()
     const exists = ObserveExists(element).subscribe(exists => exists ? undefined : dispose())
@@ -9,8 +20,11 @@ export function ObserveSlots(element, mustHaveSlotAttribute = false) {
     const slotObserver = new MutationObserver(mutationsList => {
         const added = []
         const removed = []
+        const props = {}
         const list = Array.from(mutationsList)
         let len = list.length
+
+        propsToWatch.forEach(prop => props[prop] = [])
 
         while (len--) {
             if (list[len].type === `childList` && (list[len].addedNodes.length || list[len].removedNodes.length)) {
@@ -33,7 +47,7 @@ export function ObserveSlots(element, mustHaveSlotAttribute = false) {
         slotObserver.disconnect()
     }
 
-    slotObserver.observe(element, { childList: true })
+    slotObserver.observe(element, Object.assign({ childList: true }, propsToWatch))
 
     return observer
 }

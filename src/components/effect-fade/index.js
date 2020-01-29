@@ -14,7 +14,7 @@ const defaultOff = `mouseup`
 const defaultSpeed = 600
 const defaultOpacity = [0, 1]
 const unloadTargets = host => Get(host, `_targets`, []).forEach(target => [Get(target, `observers.on()`), Get(target, `observers.off()`)])
-const validTarget = target => !!target.element
+const validTarget = target => target && !!target.element
 const animator = (points, speed, stepFn) => Timer(stepFn, GetCurve(points, 0.5, false, speed))
 const atStartPosition = object => parseFloat(window.getComputedStyle(object.element).getPropertyValue(`opacity`)) === parseFloat(object.opacity[0])
 
@@ -24,11 +24,11 @@ const loadTargets = (_val, host) => {
     host._targets = Get(host, `targets`, [])
         .map(target => {
             const object = {
-                element: Pipe(IsElement, IfInvalid(null))(target.element).value,
-                on: typeof target.on === `string` ? target.on : defaultOn,
-                off: typeof target.off === `string` ? target.off : defaultOff,
-                opacity: Pipe(CommasToArray, IfInvalid(defaultOpacity), ToMap(v => ToNumber(v).value))(target.opacity).value,
-                speed: Pipe(ToNumber, IfInvalid(defaultSpeed))(target.speed).value,
+                element: Pipe(IsElement, IfInvalid(null))(Get(target, `element`)).value,
+                on: Get(target, `on`) && typeof target.on === `string` ? target.on : defaultOn,
+                off: Get(target, `off`) && typeof target.off === `string` ? target.off : defaultOff,
+                opacity: Pipe(CommasToArray, IfInvalid(defaultOpacity), ToMap(v => ToNumber(v).value))(Get(target, `opacity`)).value,
+                speed: Pipe(ToNumber, IfInvalid(defaultSpeed))(Get(target, `speed`)).value,
             }
 
 

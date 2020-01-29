@@ -1,0 +1,44 @@
+<div class="input-field-container">
+    <div class="input-field-container-inner">
+        <div class="input-field-top-section">
+            <div class="input-field-label-top">
+                <slot name="label-top"></slot>
+            </div>
+        </div>
+        <div class="input-field-middle-section">
+            <div class="input-field-label-left">
+                <slot name="label-left"></slot>
+            </div>
+            <div class="input-field-input-section">
+                <div class="input-field-label-inside">
+                    <slot name="label-inside"></slot>
+                </div>
+                <div class="input-field-input-container">
+                    <div class="input-field-input-container-inner">
+                        <slot name="input"></slot>
+                    </div>
+                    <div class="input-field-input-overlay">
+                        <div class="input-field-checkbox-overlay">
+                            <icon-element class="input-field-checkbox-icon" size="0.7em"></icon-element>
+                        </div>
+                    </div>
+                    <div class="input-field-border"></div>
+                </div>
+            </div>
+            <div class="input-field-label-right">
+                <slot name="label-right"></slot>
+            </div>
+        </div>
+        <div class="input-field-bottom-section">
+            <div class="input-field-label-bottom">
+                <slot name="label-bottom"></slot>
+            </div>
+            <div class="input-field-bottom-content">
+                <div class="input-field-messages">
+                    <div class="input-field-message-help"></div>
+                    <div class="input-field-message-error"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

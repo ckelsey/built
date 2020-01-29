@@ -71,6 +71,9 @@ export const OverlayMessage = WCConstructor({
     observedAttributes: Object.keys(properties),
     properties,
     elements,
+    methods: {
+        clear: host => () => Array.from(host.children).forEach(c => c.slot ? host.removeChild(c) : undefined)
+    },
     onDisconnected(host) { ObserverUnsubscribe(host) },
     onConnected(host) {
         host.subscriptions = {

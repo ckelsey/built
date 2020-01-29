@@ -116,7 +116,9 @@ export const setOrigin = (val, host) => {
             return target.forEach(element => element.style.transformOrigin = origin)
         }
 
-        target.style.transformOrigin = origin
+        if (target) {
+            target.style.transformOrigin = origin
+        }
     })
 }
 

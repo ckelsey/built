@@ -67,16 +67,16 @@ const startTransition = (host, current, child) => {
     } catch (error) { }
 }
 
-const switchHeights = (root, child, speed) => new Promise(resolve =>
-    OnNextFrame(() => {
-        const endHeight = Get(child, `offsetHeight`, 0)
-        const startHeight = Get(root, `offsetHeight`, endHeight)
+const switchHeights = (root, child, speed) => new Promise(resolve => {
+    // OnNextFrame(() => {
+    const endHeight = Get(child, `offsetHeight`, 0)
+    const startHeight = Get(root, `offsetHeight`, endHeight)
 
-        return endHeight === startHeight ?
-            setTimeout(resolve, speed) :
-            animateHeight(startHeight, endHeight, root, speed).then(resolve)
-    })
-)
+    return endHeight === startHeight ?
+        setTimeout(resolve, speed) :
+        animateHeight(startHeight, endHeight, root, speed).then(resolve)
+    // })
+})
 
 const transitionFade = (current, next, speed) => Promise.all([
     animateOpacity(elementOpacity(current), 0, current, speed * 0.75),

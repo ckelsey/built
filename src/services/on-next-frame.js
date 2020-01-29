@@ -27,7 +27,7 @@ function RunOnNextFrame() {
                 requestAnimationFrame(() => OnNextFrameQueueObject[id])
             }
 
-        } while (performance.now() - startTime < 6 && OnNextFrameQueue.length)
+        } while (performance.now() - startTime < 5 && OnNextFrameQueue.length)
 
         if (OnNextFrameQueue.length) {
             return frameTimer = requestAnimationFrame(() =>

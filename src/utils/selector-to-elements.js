@@ -19,7 +19,7 @@ export function SelectorToElements(parent, value) {
         result.value = [result.value]
     }
 
-    result.valid = result.value.length && result.value.filter(e => IsElement(e).valid).length
+    result.valid = result.value && result.value.length && result.value.filter(e => IsElement(e).valid).length
 
     return result
 }

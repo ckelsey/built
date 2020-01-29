@@ -3,14 +3,14 @@
  */
 
 import { WCConstructor, AppendStyleElement, ComponentClassObject, WCDefine, ToNumber, ToString, IfInvalid, ToBool, Pipe, SetStyleRules, ObserveEvent } from '../..'
-import { iconTriangle } from '../..'
-import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready'
+import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { GetParent } from '../../utils/get-parent.js'
+import { iconChevron } from '../../services/icons.js'
 
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `content-collapse`
 const componentRoot = `.${componentName}-container`
-
 const setStyles = (el, styles) => el ? SetStyleRules(el, styles) : undefined
 
 export const setStyleElement = host => {
@@ -36,11 +36,30 @@ const properties = {
     class: ComponentClassObject,
     expanded: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.transition.transition`)
-            .then(transition => {
-                transition(val ? 1 : 0)
-                host.elements.icon.setAttribute(`rotation`, val ? `down` : `right`)
-            })
+        onChange: (val, host) => {
+            host.setAttribute(`expanded`, val)
+
+            if (host.group && val) {
+                const parent = GetParent(host)
+
+                Array
+                    .from(parent ? parent.children : [])
+                    .forEach(s => s !== host && s.group === host.group && s.expanded === true ? s.expanded = false : undefined)
+            }
+
+            WCwhenPropertyReady(host, `elements.transition.transition`)
+                .then(transition => {
+                    transition(val ? 1 : 0)
+                    host.elements.icon.setAttribute(`rotation`, val ? `down` : `right`)
+                })
+        }
+    },
+    arrow: {
+        format: val => Pipe(ToString, IfInvalid(iconChevron))(val).value,
+        onChange(val, host) { WCwhenPropertyReady(host, `elements.icon`).then(el => el.svg = val) }
+    },
+    group: {
+        format: val => Pipe(ToString, IfInvalid(null))(val).value,
     },
     speed: {
         format: val => Pipe(ToNumber, IfInvalid(333))(val).value,
@@ -62,10 +81,7 @@ const observedAttributes = Object.keys(properties)
 const elements = {
     root: { selector: componentRoot, },
     transition: { selector: `.${componentName}-transition` },
-    icon: {
-        selector: `.${componentName}-toggler-icon`,
-        onChange(el) { el.svg = iconTriangle }
-    },
+    icon: { selector: `.${componentName}-toggler-icon` },
     toggler: {
         selector: `.${componentName}-toggler`,
         onChange(el, host) {

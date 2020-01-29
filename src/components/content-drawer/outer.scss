@@ -1,0 +1,17 @@
+@mixin hostin {
+    display: block;
+    width: 100%;
+    position: relative;
+    height: auto;
+    left: 0%;
+    top: 0px;
+}
+
+
+:host(content-drawer) {
+    @include hostin();
+}
+
+content-drawer {
+    @include hostin();
+}

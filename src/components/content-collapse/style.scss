@@ -15,11 +15,11 @@
 
     icon-element.content-collapse-toggler-icon {
         margin-left: -0.33em;
-        transform: rotate(-90deg);
+        transform: rotate(0deg);
         transition: transform 0.2s;
 
         &[rotation="down"] {
-            transform: rotate(0deg);
+            transform: rotate(90deg);
         }
     }
 }

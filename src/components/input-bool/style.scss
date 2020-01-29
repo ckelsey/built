@@ -1,0 +1,139 @@
+@import '../input-shared/style.scss';
+
+.input-field-container {
+    .input-field-container-inner {
+
+        &[input-kind="checkbox"],
+        &[input-kind="radio"] {
+            min-height: 5.25em;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .input-field-input-container-inner {
+                width: 1.7em;
+                height: 1.7em;
+                left: -0.25em;
+                top: -0.17em;
+                position: relative;
+                margin-right: -0.5em;
+                margin-bottom: -0.25em;
+                cursor: pointer;
+                pointer-events: all;
+            }
+
+            .input-field-border {
+                box-shadow: none;
+            }
+
+            effect-underline {
+                display: none;
+            }
+
+            .input-field-middle-section,
+            .input-field-input-section {
+                width: auto;
+                flex-grow: 0;
+            }
+
+            .input-field-middle-section {
+                align-items: flex-start;
+            }
+        }
+
+        &[input-kind="checkbox"] {
+            .input-field-input-container-inner {
+                &:after {
+                    content: "";
+                    display: block;
+                    position: absolute;
+                    top: 0.24em;
+                    left: 0.24em;
+                    width: 1.2em;
+                    height: 1.2em;
+                    pointer-events: none;
+                    background: rgba(255, 255, 255, .4);
+                    box-shadow: inset 0px 0px 0px 1px;
+                    transition: background-color .4s, box-shadow .4s;
+                }
+            }
+
+            &.checked .input-field-input-container-inner:after {
+                background: currentColor;
+            }
+        }
+
+        &[input-kind="radio"] {
+            .input-field-input-overlay {
+                border-radius: 50%;
+            }
+
+            .input-field-input-container-inner:before {
+                content: "";
+                display: block;
+                position: absolute;
+                top: 0.235em;
+                left: 0.235em;
+                width: 1.2em;
+                height: 1.2em;
+                pointer-events: none;
+                background: rgba(255, 255, 255, .4);
+                border-radius: 50%;
+                box-shadow: inset 0px 0px 0px 1px;
+                transition: background-color .4s, box-shadow .4s;
+            }
+
+            &.checked {
+                .input-field-input-container-inner {
+                    &:before {
+                        background: currentColor;
+                    }
+
+                    &:after {
+                        content: "\00b7";
+                        color: #fff;
+                        display: flex;
+                        position: absolute;
+                        pointer-events: none;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 2.3em;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        line-height: 2.3em;
+                    }
+                }
+            }
+        }
+
+        &.notempty.checked[input-kind="checkbox"] {
+            .input-field-checkbox-overlay {
+                opacity: 1;
+            }
+        }
+
+    }
+
+    .input-field-checkbox-overlay {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        width: 1.2em;
+        height: 1.2em;
+        top: 0px;
+        left: 0px;
+        pointer-events: none;
+        color: #fff;
+        opacity: 0;
+        margin-left: 0.009em;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .input-field-input-container {
+        position: relative;
+        left: -50%;
+    }
+}

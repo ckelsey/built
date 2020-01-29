@@ -311,7 +311,7 @@ function RunOnNextFrame() {
 
     do {
       _loop();
-    } while (performance.now() - startTime < 6 && OnNextFrameQueue.length);
+    } while (performance.now() - startTime < 5 && OnNextFrameQueue.length);
 
     if (OnNextFrameQueue.length) {
       return frameTimer = requestAnimationFrame(function () {
@@ -613,7 +613,16 @@ function WCwhenPropertyReady(host, path, isMethod) {
 var helpers_typeof = __webpack_require__(2);
 var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
 
+// CONCATENATED MODULE: ./src/utils/get-parent.js
+
+function GetParent(element) {
+  return Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")), function (p) {
+    return !!p & p.nodeName === "#document-fragment" ? Object(utils_get["a" /* Get */])(p, "host") : p;
+  });
+}
 // CONCATENATED MODULE: ./src/utils/create-element.js
+
+
 
 var fragment = document.createDocumentFragment();
 var create_element_CreateElement = function CreateElement(obj) {
@@ -622,6 +631,34 @@ var create_element_CreateElement = function CreateElement(obj) {
   Object.keys(obj).forEach(function (key) {
     if (key === "tagName") {
       return;
+    }
+
+    if (key === "eventSubscriptions") {
+      var max = 1000;
+      var events = obj.eventSubscriptions;
+
+      var tryParent = function tryParent() {
+        max = max - 1;
+        var parent = GetParent(el);
+
+        if (!parent && max) {
+          if (max) {
+            return Object(on_next_frame["a" /* OnNextFrame */])(tryParent);
+          }
+        }
+
+        if (!el.eventSubscriptions) {
+          el.eventSubscriptions = {};
+        }
+
+        Object.keys(events).forEach(function (eventKey) {
+          if (typeof events[eventKey] === "function") {
+            el.eventSubscriptions[eventKey] = events[eventKey]();
+          }
+        });
+      };
+
+      return tryParent();
     }
 
     if (["textContent", "innerHTML"].indexOf(key) > -1) {
@@ -799,19 +836,10 @@ function Observer(initialValue) {
 }
 
 
-// CONCATENATED MODULE: ./src/utils/get-parent.js
-
-function GetParent(element) {
-  return Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")), function (p) {
-    return !!p & p.nodeName === "#document-fragment" ? Object(utils_get["a" /* Get */])(p, "host") : p;
-  });
-}
 // CONCATENATED MODULE: ./src/utils/observe-exists.js
 
 function ObserveExists(element) {
-  var initialParent = GetParent(element);
-
-  if (!initialParent) {
+  var returnEmpty = function returnEmpty() {
     var _observer = Observer(false);
 
     Object(on_next_frame["a" /* OnNextFrame */])(function () {
@@ -820,6 +848,12 @@ function ObserveExists(element) {
       _observer.complete();
     });
     return _observer;
+  };
+
+  var initialParent = GetParent(element);
+
+  if (!initialParent) {
+    return returnEmpty();
   }
 
   var isRunning = false;
@@ -2273,11 +2307,24 @@ function Try(fn) {
 }
 // CONCATENATED MODULE: ./src/utils/observe-slots.js
 
+
 function ObserveSlots(element) {
   var mustHaveSlotAttribute = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  var propsToWatch = arguments.length > 2 ? arguments[2] : undefined;
+
+  var returnEmpty = function returnEmpty() {
+    var _observer = Observer(false);
+
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      _observer.next(false);
+
+      _observer.complete();
+    });
+    return _observer;
+  };
 
   if (!element) {
-    return;
+    return returnEmpty();
   }
 
   var observer = Observer();
@@ -2297,8 +2344,12 @@ function ObserveSlots(element) {
   var slotObserver = new MutationObserver(function (mutationsList) {
     var added = [];
     var removed = [];
+    var props = {};
     var list = Array.from(mutationsList);
     var len = list.length;
+    propsToWatch.forEach(function (prop) {
+      return props[prop] = [];
+    });
 
     while (len--) {
       if (list[len].type === "childList" && (list[len].addedNodes.length || list[len].removedNodes.length)) {
@@ -2332,9 +2383,9 @@ function ObserveSlots(element) {
     slotObserver.disconnect();
   };
 
-  slotObserver.observe(element, {
+  slotObserver.observe(element, Object.assign({
     childList: true
-  });
+  }, propsToWatch));
   return observer;
 }
 // CONCATENATED MODULE: ./src/utils/polyfill-object-assign.js
@@ -3177,6 +3228,7 @@ var Icons = {
 
 
 
+
 var content_collapse_style = __webpack_require__(36).toString();
 
 var content_collapse_template = __webpack_require__(37);
@@ -3208,10 +3260,34 @@ var content_collapse_properties = {
       return Pipe(ToBool, IfInvalid(false))(val).value;
     },
     onChange: function onChange(val, host) {
-      return WCwhenPropertyReady(host, "elements.transition.transition").then(function (transition) {
+      host.setAttribute("expanded", val);
+
+      if (host.group && val) {
+        var parent = GetParent(host);
+        Array.from(parent ? parent.children : []).forEach(function (s) {
+          return s !== host && s.group === host.group && s.expanded === true ? s.expanded = false : undefined;
+        });
+      }
+
+      WCwhenPropertyReady(host, "elements.transition.transition").then(function (transition) {
         transition(val ? 1 : 0);
         host.elements.icon.setAttribute("rotation", val ? "down" : "right");
       });
+    }
+  },
+  arrow: {
+    format: function format(val) {
+      return Pipe(ToString, IfInvalid(iconChevron))(val).value;
+    },
+    onChange: function onChange(val, host) {
+      WCwhenPropertyReady(host, "elements.icon").then(function (el) {
+        return el.svg = val;
+      });
+    }
+  },
+  group: {
+    format: function format(val) {
+      return Pipe(ToString, IfInvalid(null))(val).value;
     }
   },
   speed: {
@@ -3250,10 +3326,7 @@ var content_collapse_elements = {
     selector: ".".concat(content_collapse_componentName, "-transition")
   },
   icon: {
-    selector: ".".concat(content_collapse_componentName, "-toggler-icon"),
-    onChange: function onChange(el) {
-      el.svg = iconTriangle;
-    }
+    selector: ".".concat(content_collapse_componentName, "-toggler-icon")
   },
   toggler: {
     selector: ".".concat(content_collapse_componentName, "-toggler"),
@@ -3285,26 +3358,8 @@ var ContentCollapse = WCConstructor({
   }
 });
 WCDefine(content_collapse_componentName, ContentCollapse);
-// CONCATENATED MODULE: ./src/components/content-drawer/index.js
-
-
-var content_drawer_style = __webpack_require__(38).toString();
-
-var content_drawer_template = __webpack_require__(39);
-
-var content_drawer_componentName = "content-drawer";
-var content_drawer_componentRoot = ".content-drawer-container";
-var content_drawer_directions = ["auto", "left", "right", "top", "bottom"];
-var toEffectStartFrom = function toEffectStartFrom(val) {
-  return val === "auto" ? "auto" : val === "top" ? "center top" : val === "bottom" ? "center bottom" : val === "left" ? "left center" : "right center";
-};
-
-var setHeaderIcon = function setHeaderIcon(host) {
-  var prop = host.headericon.slice(0, 4) === "<svg" ? "svg" : "type";
-  host.elements.headerIcon[prop] = host.headericon;
-};
-
-var content_drawer_toggle = function toggle(host, open) {
+// CONCATENATED MODULE: ./src/components/content-drawer/toggle.js
+var toggle_toggle = function toggle(host, open) {
   if (!host.ready) {
     return;
   }
@@ -3314,6 +3369,81 @@ var content_drawer_toggle = function toggle(host, open) {
   if (root) {
     root.classList[open ? "add" : "remove"]("open");
   }
+
+  var header = host.elements.header;
+  var scaler = host.elements.scaler;
+  var underline = host.elements.underline;
+  scaler.scaled = !open;
+
+  if (underline) {
+    if (!host.underline && underline.targets.length) {
+      underline.targets = [];
+    }
+
+    if (host.underline && !underline.targets.length && header) {
+      underline.targets = [header];
+    }
+
+    if (host.underline && underline.opacity !== host.underlineamount) {
+      underline.opacity = host.underlineamount;
+    }
+
+    if (host.underline && underline.speed !== host.underlinespeed) {
+      underline.speed = host.underlinespeed;
+    }
+
+    if (host.underline && underline.color !== host.accentcolor) {
+      underline.color = host.underlinecolor || host.accentcolor;
+    }
+
+    if (!!host.underline && underline.direction !== host.underline) {
+      underline.direction = host.underline;
+    }
+  }
+
+  var others = [];
+
+  if (host.drawergroup) {
+    others = Array.from(document.querySelectorAll("content-drawer[drawergroup=\"".concat(host.drawergroup, "\"]")));
+  }
+
+  if (open) {
+    underline.open();
+    others.forEach(function (other) {
+      if (other !== host) {
+        other.open = false;
+      }
+    });
+  } else {
+    underline.close();
+  }
+};
+// CONCATENATED MODULE: ./src/components/content-drawer/index.js
+
+
+
+
+var content_drawer_style = __webpack_require__(38).toString();
+
+var content_drawer_outerStyle = __webpack_require__(84).toString();
+
+var content_drawer_template = __webpack_require__(39);
+
+var content_drawer_componentName = "content-drawer";
+var content_drawer_componentRoot = ".".concat(content_drawer_componentName, "-container");
+var content_drawer_directions = ["auto", "left", "right", "top", "bottom"];
+
+var setElementParam = function setElementParam(el, key, value) {
+  return !el ? undefined : el[key] = value;
+};
+
+var toEffectStartFrom = function toEffectStartFrom(val) {
+  return val === "auto" ? "auto" : val === "top" ? "center top" : val === "bottom" ? "center bottom" : val === "left" ? "left center" : "right center";
+};
+
+var setHeaderIcon = function setHeaderIcon(host) {
+  var prop = host.headericon.slice(0, 4) === "<svg" ? "svg" : "type";
+  host.elements.headerIcon[prop] = host.headericon;
 };
 
 var content_drawer_properties = {
@@ -3325,11 +3455,19 @@ var content_drawer_properties = {
   headericon: {
     format: function format(val) {
       return val === "true" || val === undefined || val === null ? iconArrow : val === "false" ? false : val;
+    },
+    onChange: function onChange(_val, host) {
+      return setHeaderIcon(host);
     }
   },
   openfrom: {
     format: function format(val) {
       return Pipe(IndexOf(content_drawer_directions), IfInvalid("top"))(val).value;
+    },
+    onChange: function onChange(val, host) {
+      setElementParam(host.elements.scaler, "startfrom", toEffectStartFrom(val));
+      setElementParam(host.elements.scaler, "x", ["left", "right"].indexOf(val) > -1);
+      setElementParam(host.elements.scaler, "y", ["top", "bottom"].indexOf(val) > -1);
     }
   },
   open: {
@@ -3337,21 +3475,44 @@ var content_drawer_properties = {
       return ToBool(val).value;
     },
     onChange: function onChange(val, host) {
-      return content_drawer_toggle(host, val);
+      return toggle_toggle(host, val);
     }
   },
   speed: {
     format: function format(val) {
       return Pipe(ToNumber, IfInvalid(333))(val).value;
+    },
+    onChange: function onChange(val, host) {
+      return setElementParam(host.elements.scaler, "speed", val);
+    }
+  },
+  underline: {
+    format: function format(val) {
+      return val;
+    }
+  },
+  underlineamount: {
+    format: function format(val) {
+      return Pipe(ToNumber, IfInvalid(undefined))(val).value;
+    }
+  },
+  underlinecolor: {
+    format: function format(val) {
+      return Pipe(ToString, IfInvalid(undefined))(val).value;
+    }
+  },
+  underlinespeed: {
+    format: function format(val) {
+      return Pipe(ToNumber, IfInvalid(undefined))(val).value;
     }
   }
 };
 var content_drawer_elements = {
   root: {
-    selector: ".content-drawer-container"
+    selector: ".".concat(content_drawer_componentName, "-container")
   },
   header: {
-    selector: ".content-drawer-header",
+    selector: ".".concat(content_drawer_componentName, "-header"),
     onChange: function onChange(el, host) {
       return el.eventSubscriptions = {
         click: ObserveEvent(el, "click").subscribe(function () {
@@ -3361,13 +3522,41 @@ var content_drawer_elements = {
     }
   },
   content: {
-    selector: ".content-drawer-content"
+    selector: ".".concat(content_drawer_componentName, "-content")
   },
   contentInner: {
-    selector: ".content-drawer-content-inner"
+    selector: ".".concat(content_drawer_componentName, "-content-inner")
   },
   headerIcon: {
     selector: "icon-element"
+  },
+  scaler: {
+    selector: "effect-scale",
+    onChange: function onChange(scaler, host) {
+      scaler.targets = [host.elements.contentInner];
+      scaler.x = ["left", "right"].indexOf(host.openfrom) > -1;
+      scaler.y = ["top", "bottom"].indexOf(host.openfrom) > -1;
+      scaler.startfrom = toEffectStartFrom(host.openfrom);
+      scaler.scaled = !host.open;
+    }
+  },
+  underline: {
+    selector: "effect-underline",
+    onChange: function onChange(underline, host) {
+      underline.color = host.accentcolor;
+      underline.direction = host.underline;
+      underline.targets = [host.elements.header];
+
+      if (typeof underline.open !== "function") {
+        return;
+      }
+
+      if (host.open) {
+        underline.open();
+      } else {
+        underline.close();
+      }
+    }
   }
 };
 var ContentDrawer = WCConstructor({
@@ -3375,6 +3564,7 @@ var ContentDrawer = WCConstructor({
   componentRoot: content_drawer_componentRoot,
   template: content_drawer_template,
   style: content_drawer_style,
+  outerStyle: content_drawer_outerStyle,
   observedAttributes: Object.keys(content_drawer_properties),
   properties: content_drawer_properties,
   elements: content_drawer_elements,
@@ -3570,11 +3760,10 @@ var startTransition = function startTransition(host, current, child) {
 
 var methods_switchHeights = function switchHeights(root, child, speed) {
   return new Promise(function (resolve) {
-    return Object(on_next_frame["a" /* OnNextFrame */])(function () {
-      var endHeight = Object(utils_get["a" /* Get */])(child, "offsetHeight", 0);
-      var startHeight = Object(utils_get["a" /* Get */])(root, "offsetHeight", endHeight);
-      return endHeight === startHeight ? setTimeout(resolve, speed) : animateHeight(startHeight, endHeight, root, speed).then(resolve);
-    });
+    // OnNextFrame(() => {
+    var endHeight = Object(utils_get["a" /* Get */])(child, "offsetHeight", 0);
+    var startHeight = Object(utils_get["a" /* Get */])(root, "offsetHeight", endHeight);
+    return endHeight === startHeight ? setTimeout(resolve, speed) : animateHeight(startHeight, endHeight, root, speed).then(resolve); // })
   });
 };
 
@@ -4276,7 +4465,7 @@ var effect_fade_unloadTargets = function unloadTargets(host) {
 };
 
 var effect_fade_validTarget = function validTarget(target) {
-  return !!target.element;
+  return target && !!target.element;
 };
 
 var effect_fade_animator = function animator(points, speed, stepFn) {
@@ -4291,13 +4480,13 @@ var effect_fade_loadTargets = function loadTargets(_val, host) {
   effect_fade_unloadTargets(host);
   host._targets = Object(utils_get["a" /* Get */])(host, "targets", []).map(function (target) {
     var object = {
-      element: Pipe(IsElement, IfInvalid(null))(target.element).value,
-      on: typeof target.on === "string" ? target.on : effect_fade_defaultOn,
-      off: typeof target.off === "string" ? target.off : defaultOff,
+      element: Pipe(IsElement, IfInvalid(null))(Object(utils_get["a" /* Get */])(target, "element")).value,
+      on: Object(utils_get["a" /* Get */])(target, "on") && typeof target.on === "string" ? target.on : effect_fade_defaultOn,
+      off: Object(utils_get["a" /* Get */])(target, "off") && typeof target.off === "string" ? target.off : defaultOff,
       opacity: Pipe(CommasToArray, IfInvalid(effect_fade_defaultOpacity), ToMap(function (v) {
         return ToNumber(v).value;
-      }))(target.opacity).value,
-      speed: Pipe(ToNumber, IfInvalid(effect_fade_defaultSpeed))(target.speed).value
+      }))(Object(utils_get["a" /* Get */])(target, "opacity")).value,
+      speed: Pipe(ToNumber, IfInvalid(effect_fade_defaultSpeed))(Object(utils_get["a" /* Get */])(target, "speed")).value
     };
 
     if (effect_fade_validTarget(target)) {
@@ -4704,7 +4893,7 @@ function SelectorToElements(parent, value) {
     result.value = [result.value];
   }
 
-  result.valid = result.value.length && result.value.filter(function (e) {
+  result.valid = result.value && result.value.length && result.value.filter(function (e) {
     return IsElement(e).valid;
   }).length;
   return result;
@@ -4877,7 +5066,9 @@ var methods_setOrigin = function setOrigin(val, host) {
       });
     }
 
-    target.style.transformOrigin = origin;
+    if (target) {
+      target.style.transformOrigin = origin;
+    }
   });
 };
 var methods_dispose = function dispose(host) {
@@ -5406,7 +5597,70 @@ WCConstructor({
   }
 });
 WCDefine(effect_underline_componentName, EffectUnderline);
+// CONCATENATED MODULE: ./src/utils/observe-visibility.js
+
+
+function ObserveVisibility(element) {
+  var returnEmpty = function returnEmpty() {
+    var _observer = Observer(false);
+
+    Object(on_next_frame["a" /* OnNextFrame */])(function () {
+      _observer.next(false);
+
+      _observer.complete();
+    });
+    return _observer;
+  };
+
+  if (!element) {
+    return returnEmpty();
+  }
+
+  var isRunning = false;
+  var intersectionObserver;
+
+  var callback = function callback(e) {
+    return !observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0 ? shutDown() : observer.next(e);
+  };
+
+  var startup = function startup() {
+    if (isRunning || intersectionObserver) {
+      return;
+    }
+
+    isRunning = true;
+    intersectionObserver = new IntersectionObserver(callback);
+    intersectionObserver.observe(element);
+  };
+
+  var observer = Observer(undefined, undefined, startup);
+
+  var shutDown = function shutDown() {
+    try {
+      intersectionObserver.disconnect();
+    } catch (error) {}
+
+    intersectionObserver = undefined;
+    isRunning = false;
+  };
+
+  var dispose = function dispose() {
+    shutDown();
+    observer.complete();
+
+    try {
+      exists();
+    } catch (error) {}
+  };
+
+  var exists = ObserveExists(element).subscribe(function (exists) {
+    return exists ? undefined : dispose();
+  });
+  startup();
+  return observer;
+}
 // CONCATENATED MODULE: ./src/components/grid-layout/index.js
+
 
 
 
@@ -5423,6 +5677,10 @@ var grid_layout_defaultGap = [16, 16];
 
 var unsupportedCSS = function unsupportedCSS(host, gap, columnwidth) {
   return typeof host.style.grid === "string" ? "" : ".grid-layout-items{margin-left:-".concat(gap, "px;margin-right:-").concat(gap, "px;}.grid-layout-items .grid-layout-item{max-width:").concat(columnwidth, "px;margin:").concat(gap, "px;}");
+};
+
+var cancelTimer = function cancelTimer(host) {
+  return host.timer ? host.timer.cancel() : undefined;
 };
 
 var grid_layout_setScale = function setScale(host) {
@@ -5460,10 +5718,6 @@ var grid_layout_setScale = function setScale(host) {
 
 var grid_layout_setDimensions = function setDimensions(host) {
   return Object(on_next_frame["a" /* OnNextFrame */])(function () {
-    if (host.scaletofit) {
-      return grid_layout_setScale(host);
-    }
-
     var gap = host.gap || grid_layout_defaultGap;
     var gapValues = Array.isArray(gap) ? [gap[0], gap[1]] : [gap, gap];
     var gapMedian = gapValues.reduce(function (t, c) {
@@ -5487,13 +5741,24 @@ var grid_layout_elements = {
     selector: "style.innerStyles"
   }
 };
+
+var runDimensions = function runDimensions(host) {
+  cancelTimer(host);
+  host.timer = grid_layout_setDimensions(host);
+};
+
+var runScale = function runScale(host) {
+  cancelTimer(host);
+  host.timer = grid_layout_setScale(host);
+};
+
 var grid_layout_properties = {
   columnwidth: {
     format: function format(val) {
       return val === "100%" ? val : Pipe(ToNumber, IfInvalid(grid_layout_defaultWidth))(val).value;
     },
     onChange: function onChange(_val, host) {
-      return grid_layout_setDimensions(host);
+      return host.scaletofit ? runScale(host) : runDimensions(host);
     }
   },
   gap: {
@@ -5509,12 +5774,20 @@ var grid_layout_properties = {
       }))(val).value;
     },
     onChange: function onChange(_val, host) {
-      return grid_layout_setDimensions(host);
+      return host.scaletofit ? runScale(host) : runDimensions(host);
     }
   },
   scaletofit: {
     format: function format(val) {
       return Pipe(ToBool, IfInvalid(false))(val).value;
+    }
+  },
+  watchhidden: {
+    format: function format(val) {
+      return Pipe(ToBool, IfInvalid(true))(val).value;
+    },
+    onChange: function onChange(_val, host) {
+      return host.wrap();
     }
   }
 };
@@ -5542,9 +5815,47 @@ var grid_layout_clear = function clear(host) {
 var grid_layout_wrap = function wrap(host) {
   return function () {
     return Array.from(host.children).forEach(function (el) {
-      return grid_layout_notSlottable(el) || el.getAttribute("wrapped") ? undefined : grid_layout_wrapItem(host.elements.itemsContainer, el);
+      if (grid_layout_notSlottable(el)) {
+        return;
+      }
+
+      if (host.watchhidden) {
+        grid_layout_watchItemVisibility(el);
+      }
+
+      if (el.getAttribute("wrapped")) {
+        return;
+      }
+
+      grid_layout_wrapItem(host.elements.itemsContainer, el);
     });
   };
+};
+
+var grid_layout_watchItemVisibility = function watchItemVisibility(el) {
+  if (!el.eventSubscriptions) {
+    el.eventSubscriptions = {};
+  }
+
+  if (el.eventSubscriptions.visibility) {
+    return;
+  }
+
+  el.eventSubscriptions.visibility = ObserveVisibility(el).subscribe(function (e) {
+    var container = el.container;
+
+    if (!container) {
+      return;
+    }
+
+    var bounds = e[e.length - 1].boundingClientRect;
+    var hidden = bounds.width === 0 && bounds.height === 0;
+    var currentlyHidden = container.classList.contains("hidden");
+
+    if (hidden !== currentlyHidden) {
+      container.classList[hidden ? "add" : "remove"]("hidden");
+    }
+  });
 };
 
 var grid_layout_wrapItem = function wrapItem(itemsContainer, el) {
@@ -5592,7 +5903,7 @@ var GridLayout = WCConstructor({
 
     var disconnectEl = function disconnectEl(el) {
       var containerParent = Object(utils_get["a" /* Get */])(el, "container.parentElement");
-      Object(utils_get["a" /* Get */])(el, "eventSubscriptions.span.disconnect()");
+      ObserverUnsubscribe(el);
 
       if (containerParent) {
         containerParent.removeChild(el.container);
@@ -5601,16 +5912,17 @@ var GridLayout = WCConstructor({
 
     host.eventSubscriptions = {
       slot: ObserveSlots(host).subscribe(function (results) {
+        console.log("yep");
         results.removed.forEach(disconnectEl);
         host.wrap();
       })
     };
     window.addEventListener("resize", function () {
-      return grid_layout_setScale(host);
+      return host.scaletofit ? runScale(host) : undefined;
     });
+    host.wrap();
     Object(on_next_frame["a" /* OnNextFrame */])(function () {
-      host.wrap();
-      host.setAttribute("viewable", true);
+      return host.setAttribute("viewable", true);
     });
   },
   onDisconnected: function onDisconnected(host) {
@@ -6747,23 +7059,19 @@ function setInputID(host) {
     })]);
   });
 }
-// CONCATENATED MODULE: ./src/components/input-shared/dispatch.js
-function dispatch_dispatch(host, type, data) {
-  return host.dispatchEvent(new CustomEvent(type, {
-    detail: data ? data : data === false ? false : host.state
-  }));
-}
 // CONCATENATED MODULE: ./src/components/input-shared/on-focus.js
-
 function onFocus(host) {
   if (host.focused) {
     return;
   }
 
   host.focused = true;
-  host.setAttribute("focused", "true");
-  host.processValue();
-  dispatch_dispatch(host, "focus", host);
+}
+// CONCATENATED MODULE: ./src/components/input-shared/dispatch.js
+function dispatch_dispatch(host, type, data) {
+  return host.dispatchEvent(new CustomEvent(type, {
+    detail: data ? data : data === false ? false : host.state
+  }));
 }
 // CONCATENATED MODULE: ./src/utils/get-input-value.js
 function GetInputValue(input) {
@@ -6855,7 +7163,11 @@ function onKeyDown(e, host) {
 
 function onInput(host) {
   return WCwhenPropertyReady(host, "input").then(function (input) {
-    return host.value = GetInputValue(input);
+    host.value = GetInputValue(input);
+
+    if (host.value !== input.value) {
+      input.value = host.value;
+    }
   })["catch"](console.error);
 }
 // CONCATENATED MODULE: ./src/components/input-shared/set-input.js
@@ -6955,25 +7267,24 @@ function setInput(host) {
       }),
       onKeyDown: ObserveEvent(input, "keydown").subscribe(function (e) {
         return onKeyDown(e, host);
+      }),
+      onInput: ObserveEvent(input, "input", {
+        preventDefault: true
+      }).subscribe(function () {
+        return onInput(host);
       })
-    };
-
-    if (["checkbox", "radio"].indexOf(host.type) > -1) {
-      // input.eventSubscriptions.inputContainerClick = ObserveEvent(host.elements.inputContainer, `click`, { stopPropagation: true, preventDefault: true }).subscribe(() => {
-      //     const newVal = !host.value
-      //     host.value = newVal
-      //     dispatch(host, `input`, newVal)
-      //     dispatch(host, `inputchange`, newVal)
-      // })
-      input.eventSubscriptions.onInput = ObserveEvent(input, "input").subscribe(function () {
-        return onInput(host);
-      });
-    } else {
-      input.eventSubscriptions.onInput = ObserveEvent(input, "input").subscribe(function () {
-        return onInput(host);
-      });
-    } // setDroppable(host)
-
+    }; // if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
+    //     // input.eventSubscriptions.inputContainerClick = ObserveEvent(host.elements.inputContainer, `click`, { stopPropagation: true, preventDefault: true }).subscribe(() => {
+    //     //     const newVal = !host.value
+    //     //     host.value = newVal
+    //     //     dispatch(host, `input`, newVal)
+    //     //     dispatch(host, `inputchange`, newVal)
+    //     // })
+    //     input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => onInput(host))
+    // } else {
+    //     input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => onInput(host))
+    // }
+    // setDroppable(host)
   });
 }
 // CONCATENATED MODULE: ./src/components/input-shared/set-label.js
@@ -7020,7 +7331,16 @@ function setLabel(host) {
 function getDefaultLabelPosition(host) {
   return Object(utils_get["a" /* Get */])(host, "state.labelposition.value", ["input-bool"].indexOf(host.tagName.toLowerCase()) === -1 ? "inside" : "left");
 }
+// CONCATENATED MODULE: ./src/components/input-shared/on-invalid.js
+
+function onInvalid(host) {
+  return dispatch_dispatch(host, "invalid", {
+    value: host.value,
+    error: host.validationMessage
+  });
+}
 // CONCATENATED MODULE: ./src/components/input-shared/properties.js
+
 
 
 
@@ -7086,6 +7406,8 @@ var input_shared_properties_properties = {
     onChange: function onChange(val, host) {
       properties_addRemoveContainerClass(val, host, "focused");
       host.setAttribute("focused", val ? val : "false");
+      host.processValue();
+      dispatch_dispatch(host, "focus", host);
     }
   },
   format: {
@@ -7120,6 +7442,7 @@ var input_shared_properties_properties = {
       WCwhenPropertyReady(host, "elements.error").then(function (el) {
         return el.innerHTML = ValidateHtml(host.validationMessage, [], ["script"]).sanitized || "";
       });
+      onInvalid(host);
     }
   },
   labelposition: {
@@ -7204,8 +7527,9 @@ var input_shared_properties_properties = {
       return val;
     },
     onChange: function onChange(_val, host) {
-      dispatch_dispatch(host, "inputchange", host.value);
       host.processValue();
+      dispatch_dispatch(host, "inputchange", host.value);
+      dispatch_dispatch(host, "input", host.value);
     }
   } // clearbutton: {
   //     format: val => Pipe(ToString, IfInvalid(null))(val).value,
@@ -7217,7 +7541,9 @@ var input_shared_properties_properties = {
 
 };
 var input_shared_properties_observedAttributes = Object.keys(input_shared_properties_properties);
-// CONCATENATED MODULE: ./src/components/input-shared/get-value-metadata.js
+// CONCATENATED MODULE: ./src/components/input-shared/processed-value.js
+
+
 function isEmpty(value) {
   return value === "" || value === null || value === undefined;
 }
@@ -7274,8 +7600,6 @@ function getValueMetadata(host, value) {
     validity: validity
   };
 }
-// CONCATENATED MODULE: ./src/components/input-shared/processed-value.js
-
 
 function processedValue(host) {
   return {
@@ -7332,7 +7656,6 @@ function processValue(host) {
       }
 
       if (supportsInternals) {
-        input.click();
         host.internals_.setFormValue(sanitized);
       }
 
@@ -8037,7 +8360,10 @@ function valueMaxMin(host, value) {
   };
 }
 // CONCATENATED MODULE: ./src/components/input-field/value-format.js
-/** TODO give human readable errors */
+/** TODO 
+ * give human readable errors 
+ * Called way too many times
+ * */
 
 function valueFormat(pattern, value) {
   if (typeof value !== "string" || !pattern) {
@@ -8196,22 +8522,20 @@ var input_field_elements = {
   },
   root: {
     selector: ".input-field-container"
-  },
-  filePathInput: {
-    selector: ".input-field-file-path-overlay",
-    onChange: function onChange(el, host) {
-      if (host.type === "file" && host.pathvalue) {
-        el.value = host.pathvalue;
-        return;
-      }
+  } // filePathInput: {
+  //     selector: `.input-field-file-path-overlay`,
+  //     onChange: (el, host) => {
+  //         if (host.type === `file` && host.pathvalue) {
+  //             el.value = host.pathvalue
+  //             return
+  //         }
+  //         el.value = ``
+  //         if (host.type !== `file`) {
+  //             el.style.display = `none`
+  //         }
+  //     }
+  // },
 
-      el.value = "";
-
-      if (host.type !== "file") {
-        el.style.display = "none";
-      }
-    }
-  }
 };
 var InputField = WCConstructor({
   componentName: input_field_componentName,
@@ -8376,6 +8700,11 @@ var InputSelect = WCConstructor({
           return Array.from(Object(utils_get["a" /* Get */])(host, "input.options", []));
         }
       };
+    }
+  },
+  getters: {
+    value: function value(host) {
+      return Object(utils_get["a" /* Get */])(host, "state.value.value", "");
     }
   },
   onConnected: function onConnected(host) {
@@ -8786,6 +9115,15 @@ var OverlayMessage = WCConstructor({
   observedAttributes: Object.keys(overlay_message_properties),
   properties: overlay_message_properties,
   elements: overlay_message_elements,
+  methods: {
+    clear: function clear(host) {
+      return function () {
+        return Array.from(host.children).forEach(function (c) {
+          return c.slot ? host.removeChild(c) : undefined;
+        });
+      };
+    }
+  },
   onDisconnected: function onDisconnected(host) {
     ObserverUnsubscribe(host);
   },
@@ -9113,7 +9451,7 @@ var ProgressBar = WCConstructor({
 });
 WCDefine(progress_bar_componentName, ProgressBar);
 // CONCATENATED MODULE: ./src/utils/event-name.js
-var events = {
+var event_name_events = {
   transitionend: {
     transition: "transitionend",
     OTransition: "oTransitionEnd",
@@ -9131,15 +9469,15 @@ var events = {
 };
 var event_name_el = document.createElement("fake-element");
 function EventName(key) {
-  if (!events[key]) {
+  if (!event_name_events[key]) {
     return "";
   }
 
   var e;
 
-  for (e in events[key]) {
+  for (e in event_name_events[key]) {
     if (event_name_el.style[e] !== undefined) {
-      return events[key][e];
+      return event_name_events[key][e];
     }
   }
 
@@ -9162,6 +9500,8 @@ function IfEmpty(newValue) {
 
 
 var snack_bar_style = __webpack_require__(78).toString();
+
+var snack_bar_outerStyle = __webpack_require__(83).toString();
 
 var snack_bar_template = __webpack_require__(79);
 
@@ -9385,9 +9725,19 @@ var SnackBar = WCConstructor({
   componentRoot: snack_bar_componentRoot,
   template: snack_bar_template,
   style: snack_bar_style,
+  outerStyle: snack_bar_outerStyle,
   observedAttributes: snack_bar_observedAttributes,
   properties: snack_bar_properties,
-  elements: snack_bar_elements
+  elements: snack_bar_elements,
+  methods: {
+    clear: function clear(host) {
+      return function () {
+        return Array.from(host.children).forEach(function (c) {
+          return c.slot ? host.removeChild(c) : undefined;
+        });
+      };
+    }
+  }
 });
 WCDefine(snack_bar_componentName, SnackBar);
 // CONCATENATED MODULE: ./src/components/spinner-element/index.js
@@ -12271,6 +12621,7 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport ObserveEvent */__webpack_require__.d(__webpack_exports__, "ObserveEvent", function() { return ObserveEvent; });
 /* concated harmony reexport ObserveSlots */__webpack_require__.d(__webpack_exports__, "ObserveSlots", function() { return ObserveSlots; });
 /* concated harmony reexport ObserveWorker */__webpack_require__.d(__webpack_exports__, "ObserveWorker", function() { return ObserveWorker; });
+/* concated harmony reexport ObserveVisibility */__webpack_require__.d(__webpack_exports__, "ObserveVisibility", function() { return ObserveVisibility; });
 /* concated harmony reexport Observer */__webpack_require__.d(__webpack_exports__, "Observer", function() { return Observer; });
 /* concated harmony reexport ObserverUnsubscribe */__webpack_require__.d(__webpack_exports__, "ObserverUnsubscribe", function() { return ObserverUnsubscribe; });
 /* concated harmony reexport Pipe */__webpack_require__.d(__webpack_exports__, "Pipe", function() { return Pipe; });
@@ -12536,6 +12887,7 @@ function TransduceMap(conversionFunction) {
 
 
 
+
 /***/ }),
 /* 8 */
 /***/ (function(module, exports) {
@@ -12614,7 +12966,7 @@ module.exports = _setPrototypeOf;
 
 exports = module.exports = __webpack_require__(1)(false);
 // Module
-exports.push([module.i, ":host(input-field){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}:host(input-bool){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}:host(input-file){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}:host(input-select){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}input-field,input-bool,input-file,input-select{display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}input-field[resize=\"auto\"] .input-field-input,input-field[resize=\"none\"] .input-field-input,input-bool[resize=\"auto\"] .input-field-input,input-bool[resize=\"none\"] .input-field-input,input-file[resize=\"auto\"] .input-field-input,input-file[resize=\"none\"] .input-field-input,input-select[resize=\"auto\"] .input-field-input,input-select[resize=\"none\"] .input-field-input{resize:none}input-field[resize=\"horizontal\"] .input-field-input,input-bool[resize=\"horizontal\"] .input-field-input,input-file[resize=\"horizontal\"] .input-field-input,input-select[resize=\"horizontal\"] .input-field-input{resize:horizontal}input-field[resize=\"vertical\"] .input-field-input,input-bool[resize=\"vertical\"] .input-field-input,input-file[resize=\"vertical\"] .input-field-input,input-select[resize=\"vertical\"] .input-field-input{resize:vertical}input-field .input-field-input,input-bool .input-field-input,input-file .input-field-input,input-select .input-field-input{background:rgba(255,255,255,0.4);position:relative;border:none;border-radius:2px;display:block;margin:0em;height:100%;width:100%;padding:1em;opacity:1;font:inherit;color:inherit;outline:none !important;-webkit-appearance:none;-moz-appearance:none;appearance:none;box-sizing:border-box;text-overflow:ellipsis;-webkit-hyphens:auto;-ms-hyphens:auto;hyphens:auto;box-shadow:none;-webkit-transition:color 0.4s, background-color 0.4s, opacity 0.2s, box-shadow 0.3s;transition:color 0.4s, background-color 0.4s, opacity 0.2s, box-shadow 0.3s}input-field .input-field-input[disabled],input-bool .input-field-input[disabled],input-file .input-field-input[disabled],input-select .input-field-input[disabled]{pointer-events:none;cursor:not-allowed;opacity:0.6;background:rgba(200,200,200,0.6)}input-field .input-field-input[readonly],input-bool .input-field-input[readonly],input-file .input-field-input[readonly],input-select .input-field-input[readonly]{cursor:not-allowed;pointer-events:none}input-field .input-field-input.intl-phone-input,input-bool .input-field-input.intl-phone-input,input-file .input-field-input.intl-phone-input,input-select .input-field-input.intl-phone-input{padding:0;display:-webkit-box;display:flex;flex-wrap:nowrap;-webkit-box-align:center;align-items:center}input-field .input-field-input.intl-phone-input input,input-bool .input-field-input.intl-phone-input input,input-file .input-field-input.intl-phone-input input,input-select .input-field-input.intl-phone-input input{-webkit-box-flex:1;flex-grow:1;width:100%;padding:1em 1em 1em 0.25em;margin:0;border:none;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:transparent;outline:none !important;font:inherit;line-height:inherit}input-field .input-field-input::-webkit-input-placeholder,input-bool .input-field-input::-webkit-input-placeholder,input-file .input-field-input::-webkit-input-placeholder,input-select .input-field-input::-webkit-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input:-webkit-input-placeholder,input-bool .input-field-input:-webkit-input-placeholder,input-file .input-field-input:-webkit-input-placeholder,input-select .input-field-input:-webkit-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input:-ms-input-placeholder,input-bool .input-field-input:-ms-input-placeholder,input-file .input-field-input:-ms-input-placeholder,input-select .input-field-input:-ms-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input::-webkit-input-placeholder,input-bool .input-field-input::-webkit-input-placeholder,input-file .input-field-input::-webkit-input-placeholder,input-select .input-field-input::-webkit-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input::-moz-placeholder,input-bool .input-field-input::-moz-placeholder,input-file .input-field-input::-moz-placeholder,input-select .input-field-input::-moz-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input::-ms-input-placeholder,input-bool .input-field-input::-ms-input-placeholder,input-file .input-field-input::-ms-input-placeholder,input-select .input-field-input::-ms-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input::placeholder,input-bool .input-field-input::placeholder,input-file .input-field-input::placeholder,input-select .input-field-input::placeholder{color:currentColor;opacity:0.62}input-field input,input-field textarea,input-bool input,input-bool textarea,input-file input,input-file textarea,input-select input,input-select textarea{cursor:text}input-field input::-ms-clear,input-bool input::-ms-clear,input-file input::-ms-clear,input-select input::-ms-clear{display:none}@supports (-webkit-overflow-scrolling: touch){input-field input.input-field-input:focus,input-field textarea.input-field-input:focus,input-bool input.input-field-input:focus,input-bool textarea.input-field-input:focus,input-file input.input-field-input:focus,input-file textarea.input-field-input:focus,input-select input.input-field-input:focus,input-select textarea.input-field-input:focus{font-size:16px !important}}input-field label,input-bool label,input-file label,input-select label{padding:0.1em;font-weight:bold;min-height:1.6em;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;outline:none !important;opacity:1;cursor:pointer;-webkit-transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}input-field label.input-field-left-label,input-bool label.input-field-left-label,input-file label.input-field-left-label,input-select label.input-field-left-label{padding-right:1em}input-field label.input-field-right-label,input-bool label.input-field-right-label,input-file label.input-field-right-label,input-select label.input-field-right-label{padding-left:1em}input-field label.input-field-inside-label,input-bool label.input-field-inside-label,input-file label.input-field-inside-label,input-select label.input-field-inside-label{position:relative;pointer-events:none;padding:0;font-weight:normal;opacity:0.5;font-size:85%;-webkit-transform:scale(1.1) translateY(2.5em) translateX(1em);transform:scale(1.1) translateY(2.5em) translateX(1em);-webkit-transform-origin:left center;transform-origin:left center;min-height:1.6em;max-width:calc(100% - 4em)}input-field[has-value=\"true\"] label.input-field-inside-label,input-field[focused=\"true\"] label.input-field-inside-label,input-field[icon][has-value=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-field[icon][has-value=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-field[icon][focused=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-field[icon][focused=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-field[icon][has-value=\"true\"][clearbutton] label.input-field-inside-label,input-field[icon][focused=\"true\"][clearbutton] label.input-field-inside-label,input-bool[has-value=\"true\"] label.input-field-inside-label,input-bool[focused=\"true\"] label.input-field-inside-label,input-bool[icon][has-value=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-bool[icon][has-value=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-bool[icon][focused=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-bool[icon][focused=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-bool[icon][has-value=\"true\"][clearbutton] label.input-field-inside-label,input-bool[icon][focused=\"true\"][clearbutton] label.input-field-inside-label,input-file[has-value=\"true\"] label.input-field-inside-label,input-file[focused=\"true\"] label.input-field-inside-label,input-file[icon][has-value=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-file[icon][has-value=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-file[icon][focused=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-file[icon][focused=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-file[icon][has-value=\"true\"][clearbutton] label.input-field-inside-label,input-file[icon][focused=\"true\"][clearbutton] label.input-field-inside-label,input-select[has-value=\"true\"] label.input-field-inside-label,input-select[focused=\"true\"] label.input-field-inside-label,input-select[icon][has-value=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-select[icon][has-value=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-select[icon][focused=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-select[icon][focused=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-select[icon][has-value=\"true\"][clearbutton] label.input-field-inside-label,input-select[icon][focused=\"true\"][clearbutton] label.input-field-inside-label{pointer-events:all;padding:0;font-weight:bold;opacity:1;font-size:85%;-webkit-transform:scale(1) translateY(0em) translateX(0em);transform:scale(1) translateY(0em) translateX(0em);max-width:100%}input-field:not([focused=\"true\"]),input-bool:not([focused=\"true\"]),input-file:not([focused=\"true\"]),input-select:not([focused=\"true\"]){-webkit-transform-style:preserve-3d;transform-style:preserve-3d}input-field:not([focused=\"true\"]) .input-field-label-inside,input-bool:not([focused=\"true\"]) .input-field-label-inside,input-file:not([focused=\"true\"]) .input-field-label-inside,input-select:not([focused=\"true\"]) .input-field-label-inside{-webkit-transform:translate3d(0, 0, 1px);transform:translate3d(0, 0, 1px)}input-field[icon][iconalign=\"left\"] label.input-field-inside-label,input-field[icon][clearbutton] label.input-field-inside-label,input-bool[icon][iconalign=\"left\"] label.input-field-inside-label,input-bool[icon][clearbutton] label.input-field-inside-label,input-file[icon][iconalign=\"left\"] label.input-field-inside-label,input-file[icon][clearbutton] label.input-field-inside-label,input-select[icon][iconalign=\"left\"] label.input-field-inside-label,input-select[icon][clearbutton] label.input-field-inside-label{padding-left:1.2em}input-bool input.input-field-input{cursor:pointer;opacity:0;-webkit-transition:none;transition:none}input-bool label.input-field-left-label,input-bool label.input-field-right-label{margin-top:-0.2em}input-select select.input-field-input{padding:1em 2em 1em 1em}\n", ""]);
+exports.push([module.i, ":host(input-field){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}:host(input-bool){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}:host(input-file){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}:host(input-select){display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}input-field,input-bool,input-file,input-select{display:inline-block;width:300px;max-width:100%;vertical-align:top;position:relative;color:inherit}input-field[resize=\"auto\"] .input-field-input,input-field[resize=\"none\"] .input-field-input,input-bool[resize=\"auto\"] .input-field-input,input-bool[resize=\"none\"] .input-field-input,input-file[resize=\"auto\"] .input-field-input,input-file[resize=\"none\"] .input-field-input,input-select[resize=\"auto\"] .input-field-input,input-select[resize=\"none\"] .input-field-input{resize:none}input-field[resize=\"horizontal\"] .input-field-input,input-bool[resize=\"horizontal\"] .input-field-input,input-file[resize=\"horizontal\"] .input-field-input,input-select[resize=\"horizontal\"] .input-field-input{resize:horizontal}input-field[resize=\"vertical\"] .input-field-input,input-bool[resize=\"vertical\"] .input-field-input,input-file[resize=\"vertical\"] .input-field-input,input-select[resize=\"vertical\"] .input-field-input{resize:vertical}input-field .input-field-input,input-bool .input-field-input,input-file .input-field-input,input-select .input-field-input{background:rgba(255,255,255,0.4);position:relative;border:none;border-radius:2px;display:block;margin:0em;height:100%;width:100%;padding:1em;opacity:1;font:inherit;color:inherit;outline:none !important;-webkit-appearance:none;-moz-appearance:none;appearance:none;box-sizing:border-box;text-overflow:ellipsis;-webkit-hyphens:auto;-ms-hyphens:auto;hyphens:auto;box-shadow:none;-webkit-transition:color 0.4s, background-color 0.4s, box-shadow 0.3s;transition:color 0.4s, background-color 0.4s, box-shadow 0.3s}input-field .input-field-input[disabled],input-bool .input-field-input[disabled],input-file .input-field-input[disabled],input-select .input-field-input[disabled]{pointer-events:none;cursor:not-allowed;opacity:0.6;background:rgba(200,200,200,0.6)}input-field .input-field-input[readonly],input-bool .input-field-input[readonly],input-file .input-field-input[readonly],input-select .input-field-input[readonly]{cursor:not-allowed;pointer-events:none}input-field .input-field-input.intl-phone-input,input-bool .input-field-input.intl-phone-input,input-file .input-field-input.intl-phone-input,input-select .input-field-input.intl-phone-input{padding:0;display:-webkit-box;display:flex;flex-wrap:nowrap;-webkit-box-align:center;align-items:center}input-field .input-field-input.intl-phone-input input,input-bool .input-field-input.intl-phone-input input,input-file .input-field-input.intl-phone-input input,input-select .input-field-input.intl-phone-input input{-webkit-box-flex:1;flex-grow:1;width:100%;padding:1em 1em 1em 0.25em;margin:0;border:none;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:transparent;outline:none !important;font:inherit;line-height:inherit}input-field .input-field-input::-webkit-input-placeholder,input-bool .input-field-input::-webkit-input-placeholder,input-file .input-field-input::-webkit-input-placeholder,input-select .input-field-input::-webkit-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input:-webkit-input-placeholder,input-bool .input-field-input:-webkit-input-placeholder,input-file .input-field-input:-webkit-input-placeholder,input-select .input-field-input:-webkit-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input:-ms-input-placeholder,input-bool .input-field-input:-ms-input-placeholder,input-file .input-field-input:-ms-input-placeholder,input-select .input-field-input:-ms-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input::-webkit-input-placeholder,input-bool .input-field-input::-webkit-input-placeholder,input-file .input-field-input::-webkit-input-placeholder,input-select .input-field-input::-webkit-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input::-moz-placeholder,input-bool .input-field-input::-moz-placeholder,input-file .input-field-input::-moz-placeholder,input-select .input-field-input::-moz-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input::-ms-input-placeholder,input-bool .input-field-input::-ms-input-placeholder,input-file .input-field-input::-ms-input-placeholder,input-select .input-field-input::-ms-input-placeholder{color:currentColor;opacity:0.62}input-field .input-field-input::placeholder,input-bool .input-field-input::placeholder,input-file .input-field-input::placeholder,input-select .input-field-input::placeholder{color:currentColor;opacity:0.62}input-field input,input-field textarea,input-bool input,input-bool textarea,input-file input,input-file textarea,input-select input,input-select textarea{cursor:text}input-field input::-ms-clear,input-bool input::-ms-clear,input-file input::-ms-clear,input-select input::-ms-clear{display:none}@supports (-webkit-overflow-scrolling: touch){input-field input.input-field-input:focus,input-field textarea.input-field-input:focus,input-bool input.input-field-input:focus,input-bool textarea.input-field-input:focus,input-file input.input-field-input:focus,input-file textarea.input-field-input:focus,input-select input.input-field-input:focus,input-select textarea.input-field-input:focus{font-size:16px !important}}input-field label,input-bool label,input-file label,input-select label{padding:0.1em;font-weight:bold;min-height:1.6em;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;outline:none !important;opacity:1;cursor:pointer;-webkit-transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, -webkit-transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out;transition:opacity 0.2s ease-in-out 0.1s, transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}input-field label.input-field-left-label,input-bool label.input-field-left-label,input-file label.input-field-left-label,input-select label.input-field-left-label{padding-right:1em}input-field label.input-field-right-label,input-bool label.input-field-right-label,input-file label.input-field-right-label,input-select label.input-field-right-label{padding-left:1em}input-field label.input-field-inside-label,input-bool label.input-field-inside-label,input-file label.input-field-inside-label,input-select label.input-field-inside-label{position:relative;pointer-events:none;padding:0;font-weight:normal;opacity:0.5;font-size:85%;-webkit-transform:scale(1.1) translateY(2.5em) translateX(1em);transform:scale(1.1) translateY(2.5em) translateX(1em);-webkit-transform-origin:left center;transform-origin:left center;min-height:1.6em;max-width:calc(100% - 4em)}input-field[has-value=\"true\"] label.input-field-inside-label,input-field[focused=\"true\"] label.input-field-inside-label,input-field[icon][has-value=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-field[icon][has-value=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-field[icon][focused=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-field[icon][focused=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-field[icon][has-value=\"true\"][clearbutton] label.input-field-inside-label,input-field[icon][focused=\"true\"][clearbutton] label.input-field-inside-label,input-bool[has-value=\"true\"] label.input-field-inside-label,input-bool[focused=\"true\"] label.input-field-inside-label,input-bool[icon][has-value=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-bool[icon][has-value=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-bool[icon][focused=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-bool[icon][focused=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-bool[icon][has-value=\"true\"][clearbutton] label.input-field-inside-label,input-bool[icon][focused=\"true\"][clearbutton] label.input-field-inside-label,input-file[has-value=\"true\"] label.input-field-inside-label,input-file[focused=\"true\"] label.input-field-inside-label,input-file[icon][has-value=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-file[icon][has-value=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-file[icon][focused=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-file[icon][focused=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-file[icon][has-value=\"true\"][clearbutton] label.input-field-inside-label,input-file[icon][focused=\"true\"][clearbutton] label.input-field-inside-label,input-select[has-value=\"true\"] label.input-field-inside-label,input-select[focused=\"true\"] label.input-field-inside-label,input-select[icon][has-value=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-select[icon][has-value=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-select[icon][focused=\"true\"][iconalign=\"left\"] label.input-field-inside-label,input-select[icon][focused=\"true\"][iconalign=\"right\"] label.input-field-inside-label,input-select[icon][has-value=\"true\"][clearbutton] label.input-field-inside-label,input-select[icon][focused=\"true\"][clearbutton] label.input-field-inside-label{pointer-events:all;padding:0;font-weight:bold;opacity:1;font-size:85%;-webkit-transform:scale(1) translateY(0em) translateX(0em);transform:scale(1) translateY(0em) translateX(0em);max-width:100%}input-field:not([focused=\"true\"]),input-bool:not([focused=\"true\"]),input-file:not([focused=\"true\"]),input-select:not([focused=\"true\"]){-webkit-transform-style:preserve-3d;transform-style:preserve-3d}input-field:not([focused=\"true\"]) .input-field-label-inside,input-bool:not([focused=\"true\"]) .input-field-label-inside,input-file:not([focused=\"true\"]) .input-field-label-inside,input-select:not([focused=\"true\"]) .input-field-label-inside{-webkit-transform:translate3d(0, 0, 1px);transform:translate3d(0, 0, 1px)}input-field[icon][iconalign=\"left\"] label.input-field-inside-label,input-field[icon][clearbutton] label.input-field-inside-label,input-bool[icon][iconalign=\"left\"] label.input-field-inside-label,input-bool[icon][clearbutton] label.input-field-inside-label,input-file[icon][iconalign=\"left\"] label.input-field-inside-label,input-file[icon][clearbutton] label.input-field-inside-label,input-select[icon][iconalign=\"left\"] label.input-field-inside-label,input-select[icon][clearbutton] label.input-field-inside-label{padding-left:1.2em}input-bool input.input-field-input{cursor:pointer;opacity:0;-webkit-transition:none;transition:none}input-bool label.input-field-left-label,input-bool label.input-field-right-label{margin-top:-0.2em}input-select select.input-field-input{padding:1em 2em 1em 1em}\n", ""]);
 
 
 /***/ }),
@@ -12811,7 +13163,7 @@ var Timer = Object.freeze(global[TimerKey]);
 
 exports = module.exports = __webpack_require__(1)(false);
 // Module
-exports.push([module.i, ".grid-layout-items{display:-webkit-box;display:flex;display:grid;justify-items:center;grid-auto-flow:dense;width:100%;flex-wrap:wrap}.grid-layout-items>*,.grid-layout-items ::slotted(*){width:100%}\n", ""]);
+exports.push([module.i, ".grid-layout-items{display:-webkit-box;display:flex;display:grid;justify-items:center;grid-auto-flow:dense;width:100%;flex-wrap:wrap}.grid-layout-items>*,.grid-layout-items ::slotted(*){width:100%}.grid-layout-items .grid-layout-item.hidden{position:absolute;z-index:-1;opacity:0;pointer-events:none}\n", ""]);
 
 
 /***/ }),
@@ -13773,7 +14125,7 @@ module.exports = "<div class=collapse-menu-container expanded=false expandable=f
 
 exports = module.exports = __webpack_require__(1)(false);
 // Module
-exports.push([module.i, ":host(content-collapse){display:block}.content-collapse-toggler{cursor:pointer;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;width:100%}.content-collapse-toggler .content-collapse-toggler-content{-webkit-box-flex:1;flex-grow:1}.content-collapse-toggler icon-element.content-collapse-toggler-icon{margin-left:-0.33em;-webkit-transform:rotate(-90deg);transform:rotate(-90deg);-webkit-transition:-webkit-transform 0.2s;transition:-webkit-transform 0.2s;transition:transform 0.2s;transition:transform 0.2s, -webkit-transform 0.2s}.content-collapse-toggler icon-element.content-collapse-toggler-icon[rotation=\"down\"]{-webkit-transform:rotate(0deg);transform:rotate(0deg)}\n", ""]);
+exports.push([module.i, ":host(content-collapse){display:block}.content-collapse-toggler{cursor:pointer;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;width:100%}.content-collapse-toggler .content-collapse-toggler-content{-webkit-box-flex:1;flex-grow:1}.content-collapse-toggler icon-element.content-collapse-toggler-icon{margin-left:-0.33em;-webkit-transform:rotate(0deg);transform:rotate(0deg);-webkit-transition:-webkit-transform 0.2s;transition:-webkit-transform 0.2s;transition:transform 0.2s;transition:transform 0.2s, -webkit-transform 0.2s}.content-collapse-toggler icon-element.content-collapse-toggler-icon[rotation=\"down\"]{-webkit-transform:rotate(90deg);transform:rotate(90deg)}\n", ""]);
 
 
 /***/ }),
@@ -13788,14 +14140,14 @@ module.exports = "<div class=content-collapse-container> <div class=content-coll
 
 exports = module.exports = __webpack_require__(1)(false);
 // Module
-exports.push([module.i, ":host(content-drawer){display:block;width:100%;position:relative;height:auto;left:0%;top:0px}content-drawer{display:block;width:100%;position:relative;height:auto;left:0%;top:0px}.content-drawer-container{display:block;width:100%;position:relative;height:auto;left:0%;top:0px}.content-drawer-container.open icon-element.content-drawer-header-icon{-webkit-transform:translateZ(0) translateX(-0.3em) translateY(0.05em) rotate(90deg);transform:translateZ(0) translateX(-0.3em) translateY(0.05em) rotate(90deg)}.content-drawer-container .content-drawer-header,.content-drawer-container .content-drawer-content,.content-drawer-container .content-drawer-content-inner,.content-drawer-container .content-drawer-content-inner-inner{position:relative;width:100%;padding:1em 1em 1em 1.5em;box-sizing:border-box}.content-drawer-container .content-drawer-content-inner-inner{padding:0em 1em 1em 1.5em}.content-drawer-container .content-drawer-header{cursor:pointer;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;flex-wrap:nowrap}.content-drawer-container icon-element.content-drawer-header-icon{position:absolute;-webkit-transform:translateZ(0) translateX(-0.4em) translateY(0em) rotate(0deg);transform:translateZ(0) translateX(-0.4em) translateY(0em) rotate(0deg);left:0;-webkit-transition:-webkit-transform 0.2s ease-in-out;transition:-webkit-transform 0.2s ease-in-out;transition:transform 0.2s ease-in-out;transition:transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}.content-drawer-container .content-drawer-content{overflow:hidden;padding:0em}.content-drawer-container .content-drawer-content-inner{padding:1px}\n", ""]);
+exports.push([module.i, ".content-drawer-container{display:block;width:100%;position:relative;height:auto;left:0%;top:0px}.content-drawer-container.open icon-element.content-drawer-header-icon{-webkit-transform:translateZ(0) translateX(-0.3em) translateY(0.05em) rotate(90deg);transform:translateZ(0) translateX(-0.3em) translateY(0.05em) rotate(90deg)}.content-drawer-container .content-drawer-header,.content-drawer-container .content-drawer-content,.content-drawer-container .content-drawer-content-inner,.content-drawer-container .content-drawer-content-inner-inner{position:relative;width:100%;padding:1em 1em 1em 1.5em;box-sizing:border-box}.content-drawer-container .content-drawer-content-inner-inner{padding:0em 1em 1em 1.5em}.content-drawer-container .content-drawer-header{cursor:pointer;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;flex-wrap:nowrap}.content-drawer-container icon-element.content-drawer-header-icon{position:absolute;-webkit-transform:translateZ(0) translateX(-0.4em) translateY(0em) rotate(0deg);transform:translateZ(0) translateX(-0.4em) translateY(0em) rotate(0deg);left:0;-webkit-transition:-webkit-transform 0.2s ease-in-out;transition:-webkit-transform 0.2s ease-in-out;transition:transform 0.2s ease-in-out;transition:transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out}.content-drawer-container .content-drawer-content{overflow:hidden;padding:0em}.content-drawer-container .content-drawer-content-inner{padding:1px}\n", ""]);
 
 
 /***/ }),
 /* 39 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=content-drawer-container> <div class=content-drawer-header> <icon-element class=content-drawer-header-icon size=1.38em></icon-element> <slot name=header></slot> <effect-underline start=none opacity=1 speed=700></effect-underline> <effect-ripple start=none speed=600></effect-ripple> <effect-fade start=none speed=600 opacity=0,1></effect-fade> </div> <div class=content-drawer-content> <div class=content-drawer-content-inner> <div class=content-drawer-content-inner-inner> <slot name=content></slot> </div> </div> </div> </div> ";
+module.exports = "<div class=content-drawer-container> <div class=content-drawer-header> <icon-element class=content-drawer-header-icon size=1.38em></icon-element> <slot name=header></slot> <effect-underline start=none opacity=1 speed=700></effect-underline> </div> <div class=content-drawer-content> <div class=content-drawer-content-inner> <div class=content-drawer-content-inner-inner> <slot name=content></slot> </div> </div> </div> <effect-scale start=click></effect-scale> </div> ";
 
 /***/ }),
 /* 40 */
@@ -14123,6 +14475,24 @@ exports.push([module.i, ":host(spinner-element){position:absolute;height:100%;wi
 /***/ (function(module, exports) {
 
 module.exports = "<div class=spinner-element-container> <div class=spinner-element-scrim></div> <div class=spinner-element-inner> <slot> <div class=spin></div> </slot> </div> </div> ";
+
+/***/ }),
+/* 83 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(1)(false);
+// Module
+exports.push([module.i, "snack-bar [slot=\"body\"]{padding:1em;box-sizing:border-box;-webkit-box-align:center;align-items:center;display:block;width:100%;word-break:break-word}snack-bar ::slotted(*){padding:1em;box-sizing:border-box;-webkit-box-align:center;align-items:center;display:block;width:100%;word-break:break-word}\n", ""]);
+
+
+/***/ }),
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(1)(false);
+// Module
+exports.push([module.i, ":host(content-drawer){display:block;width:100%;position:relative;height:auto;left:0%;top:0px}content-drawer{display:block;width:100%;position:relative;height:auto;left:0%;top:0px}\n", ""]);
+
 
 /***/ })
 /******/ ]);

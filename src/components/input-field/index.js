@@ -79,21 +79,21 @@ const elements = {
     inputContainer: { selector: `.input-field-input-container-inner` },
     max: { selector: `.input-field-character-count-max` },
     root: { selector: `.input-field-container` },
-    filePathInput: {
-        selector: `.input-field-file-path-overlay`,
-        onChange: (el, host) => {
-            if (host.type === `file` && host.pathvalue) {
-                el.value = host.pathvalue
-                return
-            }
+    // filePathInput: {
+    //     selector: `.input-field-file-path-overlay`,
+    //     onChange: (el, host) => {
+    //         if (host.type === `file` && host.pathvalue) {
+    //             el.value = host.pathvalue
+    //             return
+    //         }
 
-            el.value = ``
+    //         el.value = ``
 
-            if (host.type !== `file`) {
-                el.style.display = `none`
-            }
-        }
-    },
+    //         if (host.type !== `file`) {
+    //             el.style.display = `none`
+    //         }
+    //     }
+    // },
 }
 
 export const InputField = WCConstructor({

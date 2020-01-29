@@ -5,6 +5,7 @@ import {
 } from '../..'
 
 const style = require(`./style.scss`).toString()
+const outerStyle = require(`./outer.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `snack-bar`
 const componentRoot = `.${componentName}-container`
@@ -143,9 +144,13 @@ export const SnackBar = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes,
     properties,
-    elements
+    elements,
+    methods: {
+        clear: host => () => Array.from(host.children).forEach(c => c.slot ? host.removeChild(c) : undefined)
+    },
 })
 
 WCDefine(componentName, SnackBar)
