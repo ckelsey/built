@@ -12042,7 +12042,7 @@ function ToAscii(string) {
   var result = TMonad(string);
 
   try {
-    result.value = result.replace(new RegExp("[^\0-\x7F]", "gm"), "");
+    result.value = result.value.replace(new RegExp("[^\0-\x7F]", "gm"), "");
   } catch (error) {
     result.valid = false;
   }
