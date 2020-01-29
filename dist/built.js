@@ -250,28 +250,6 @@ function toComment(sourceMap) {
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
-
-function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
-
-function _typeof(obj) {
-  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
-    module.exports = _typeof = function _typeof(obj) {
-      return _typeof2(obj);
-    };
-  } else {
-    module.exports = _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
-    };
-  }
-
-  return _typeof(obj);
-}
-
-module.exports = _typeof;
-
-/***/ }),
-/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -354,6 +332,28 @@ if (!hasOnNextFrame) {
 
 var OnNextFrame = Object.freeze(global[OnNextFrameKey]);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10)))
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
+
+function _typeof(obj) {
+  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
+    module.exports = _typeof = function _typeof(obj) {
+      return _typeof2(obj);
+    };
+  } else {
+    module.exports = _typeof = function _typeof(obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
+    };
+  }
+
+  return _typeof(obj);
+}
+
+module.exports = _typeof;
 
 /***/ }),
 /* 4 */
@@ -573,7 +573,7 @@ __webpack_require__.r(__webpack_exports__);
 var utils_get = __webpack_require__(0);
 
 // EXTERNAL MODULE: ./src/services/on-next-frame.js
-var on_next_frame = __webpack_require__(3);
+var on_next_frame = __webpack_require__(2);
 
 // CONCATENATED MODULE: ./src/utils/wc-when-property-ready.js
 
@@ -610,7 +610,7 @@ function WCwhenPropertyReady(host, path, isMethod) {
   });
 }
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/typeof.js
-var helpers_typeof = __webpack_require__(2);
+var helpers_typeof = __webpack_require__(3);
 var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
 
 // CONCATENATED MODULE: ./src/utils/get-parent.js
@@ -3425,9 +3425,9 @@ var toggle_toggle = function toggle(host, open) {
 
 var content_drawer_style = __webpack_require__(38).toString();
 
-var content_drawer_outerStyle = __webpack_require__(84).toString();
+var content_drawer_outerStyle = __webpack_require__(39).toString();
 
-var content_drawer_template = __webpack_require__(39);
+var content_drawer_template = __webpack_require__(40);
 
 var content_drawer_componentName = "content-drawer";
 var content_drawer_componentRoot = ".".concat(content_drawer_componentName, "-container");
@@ -3836,9 +3836,9 @@ var setCurrent = function setCurrent(host) {
 
 var content_transition_style = __webpack_require__(17).toString();
 
-var content_transition_outerStyle = __webpack_require__(40).toString();
+var content_transition_outerStyle = __webpack_require__(41).toString();
 
-var content_transition_template = __webpack_require__(41);
+var content_transition_template = __webpack_require__(42);
 
 var content_transition_componentName = "content-transition";
 var content_transition_componentRoot = ".content-transition-container";
@@ -3942,9 +3942,9 @@ WCDefine(content_transition_componentName, ContentTransition);
 // CONCATENATED MODULE: ./src/components/cookie-message/index.js
 
 
-var cookie_message_style = __webpack_require__(42).toString();
+var cookie_message_style = __webpack_require__(43).toString();
 
-var cookie_message_template = __webpack_require__(43);
+var cookie_message_template = __webpack_require__(44);
 
 var cookie_message_componentName = "cookie-message";
 var cookie_message_componentRoot = ".cookie-message-container";
@@ -4093,9 +4093,9 @@ WCDefine(cookie_message_componentName, CookieMessage);
 // CONCATENATED MODULE: ./src/components/drop-down/index.js
 
 
-var drop_down_style = __webpack_require__(44).toString();
+var drop_down_style = __webpack_require__(45).toString();
 
-var drop_down_outerStyle = __webpack_require__(45).toString();
+var drop_down_outerStyle = __webpack_require__(46).toString();
 
 var drop_down_toggleOptions = function toggleOptions(show, host) {
   var overlay = host.elements.overlay;
@@ -4140,7 +4140,7 @@ var drop_down_properties = {
   }
 };
 
-var drop_down_template = __webpack_require__(46);
+var drop_down_template = __webpack_require__(47);
 
 var drop_down_componentName = "drop-down";
 var drop_down_componentRoot = ".".concat(drop_down_componentName, "-container");
@@ -4341,7 +4341,7 @@ function IsElement(value) {
 // CONCATENATED MODULE: ./src/components/effect-bounce-z/index.js
 
 
-var effect_bounce_z_template = __webpack_require__(47);
+var effect_bounce_z_template = __webpack_require__(48);
 
 var effect_bounce_z_componentName = "effect-bounce-z";
 var effect_bounce_z_componentRoot = ".effect-push-container";
@@ -4442,9 +4442,9 @@ WCDefine(effect_bounce_z_componentName, EffectBounceZ);
 // CONCATENATED MODULE: ./src/components/effect-fade/index.js
 
 
-var effect_fade_style = __webpack_require__(48).toString();
+var effect_fade_style = __webpack_require__(49).toString();
 
-var effect_fade_template = __webpack_require__(49);
+var effect_fade_template = __webpack_require__(50);
 
 var effect_fade_componentName = "effect-fade";
 var effect_fade_componentRoot = ".effect-fade-container";
@@ -4641,9 +4641,9 @@ function SelectorArrayToElements(parent, value) {
 // CONCATENATED MODULE: ./src/components/effect-ripple/index.js
 
 
-var effect_ripple_style = __webpack_require__(50).toString();
+var effect_ripple_style = __webpack_require__(51).toString();
 
-var effect_ripple_template = __webpack_require__(51);
+var effect_ripple_template = __webpack_require__(52);
 
 var effect_ripple_componentName = "effect-ripple";
 var effect_ripple_componentRoot = ".effect-ripple-container";
@@ -5249,10 +5249,10 @@ var elements_elements = {
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var effect_scale_style = __webpack_require__(52).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var effect_scale_style = __webpack_require__(53).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var effect_scale_template = __webpack_require__(53);
+var effect_scale_template = __webpack_require__(54);
 
 var effect_scale_componentName = "effect-scale";
 var effect_scale_componentRoot = ".effect-scale-container";
@@ -5560,9 +5560,9 @@ var effect_underline_elements = {
   }
 };
 
-var effect_underline_style = __webpack_require__(54).toString();
+var effect_underline_style = __webpack_require__(55).toString();
 
-var effect_underline_template = __webpack_require__(55);
+var effect_underline_template = __webpack_require__(56);
 
 var effect_underline_componentName = "effect-underline";
 var effect_underline_componentRoot = ".effect-underline-container";
@@ -5666,9 +5666,9 @@ function ObserveVisibility(element) {
 
 var grid_layout_style = __webpack_require__(19).toString();
 
-var grid_layout_outerStyle = __webpack_require__(56).toString();
+var grid_layout_outerStyle = __webpack_require__(57).toString();
 
-var grid_layout_template = __webpack_require__(57);
+var grid_layout_template = __webpack_require__(58);
 
 var grid_layout_componentName = "grid-layout";
 var grid_layout_componentRoot = ".".concat(grid_layout_componentName, "-container");
@@ -5912,7 +5912,6 @@ var GridLayout = WCConstructor({
 
     host.eventSubscriptions = {
       slot: ObserveSlots(host).subscribe(function (results) {
-        console.log("yep");
         results.removed.forEach(disconnectEl);
         host.wrap();
       })
@@ -6443,9 +6442,9 @@ var horizontal_slider_properties_observedAttributes = Object.keys(horizontal_sli
 
 
 
-var horizontal_slider_style = __webpack_require__(58).toString();
+var horizontal_slider_style = __webpack_require__(59).toString();
 
-var horizontal_slider_template = __webpack_require__(59);
+var horizontal_slider_template = __webpack_require__(60);
 
 var horizontal_slider_componentName = "horizontal-slider";
 var horizontal_slider_componentRoot = ".horizontal-slider-container";
@@ -6476,7 +6475,7 @@ WCDefine(horizontal_slider_componentName, HorizontalSlider);
 // CONCATENATED MODULE: ./src/components/icon-element/index.js
 
 
-var icon_element_style = __webpack_require__(60).toString();
+var icon_element_style = __webpack_require__(61).toString();
 
 var icon_element_elements = {
   svgContainer: {
@@ -6540,7 +6539,7 @@ var icon_element_properties = Object.assign({}, {
   }
 }, icon_element_attributes);
 
-var icon_element_template = __webpack_require__(61);
+var icon_element_template = __webpack_require__(62);
 
 var icon_element_componentName = "icon-element";
 var icon_element_componentRoot = ".icon-element-container";
@@ -6643,11 +6642,11 @@ function ValidateHtml(str, allowedHtmlTags, disallowedHtmlTags) {
 // CONCATENATED MODULE: ./src/components/image-loader/index.js
 
 
-var image_loader_style = __webpack_require__(62).toString();
+var image_loader_style = __webpack_require__(63).toString();
 
-var image_loader_outerStyle = __webpack_require__(63).toString();
+var image_loader_outerStyle = __webpack_require__(64).toString();
 
-var image_loader_template = __webpack_require__(64);
+var image_loader_template = __webpack_require__(65);
 
 var image_loader_componentName = "image-loader";
 var image_loader_componentRoot = ".image-loader-container";
@@ -7843,8 +7842,10 @@ var validity_validity = function validity(host) {
             badInput = _ref.badInput,
             customError = _ref.customError,
             valid = _ref.valid;
+        var value = host.value;
+        var valueAsAstring = value !== undefined && value !== null ? "".concat(value) : value;
         var notMatchingInput = matchInputMessage(host) !== "";
-        var badFormat = host.value !== Object(utils_get["a" /* Get */])(host, "input.value");
+        var badFormat = valueAsAstring !== Object(utils_get["a" /* Get */])(host, "input.value");
         return {
           valueMissing: valueMissing,
           typeMismatch: typeMismatch,
@@ -7886,9 +7887,9 @@ function checkValidity(host) {
 
 var input_bool_outerStyle = __webpack_require__(12).toString();
 
-var input_bool_style = __webpack_require__(65).toString();
+var input_bool_style = __webpack_require__(66).toString();
 
-var input_bool_template = __webpack_require__(66);
+var input_bool_template = __webpack_require__(67);
 
 var input_bool_componentName = "input-bool";
 var input_bool_componentRoot = ".".concat(input_bool_componentName, "-container");
@@ -8292,6 +8293,8 @@ function parseNoValue(validated) {
 
 function valueValidation(val, type, allowhtml, disallowhtml) {
   if (type === "number" || type === "month") {
+    var validated = ValidateNumber(val);
+    validated.sanitized = validated.sanitized === undefined || validated.sanitized === null || validated.sanitized === "" ? validated.sanitized : "".concat(validated.sanitized);
     return parseNoValue(ValidateNumber(val));
   }
 
@@ -8439,9 +8442,9 @@ function valueFormat(pattern, value) {
 
 var input_field_outerStyle = __webpack_require__(12).toString();
 
-var input_field_style = __webpack_require__(67).toString();
+var input_field_style = __webpack_require__(68).toString();
 
-var input_field_template = __webpack_require__(68);
+var input_field_template = __webpack_require__(69);
 
 var input_field_componentName = "input-field";
 var input_field_componentRoot = ".".concat(input_field_componentName, "-container");
@@ -8452,6 +8455,8 @@ var input_field_preProcessValue = function preProcessValue(host) {
     var formatParsed = valueFormat(host.format, validated.sanitized);
     var parsedValue = valueMaxMin(host, formatParsed.value);
     /** TODO input format cursor position */
+
+    /** TODO i think this is called on every input on the page */
 
     return {
       valid: validated.valid && parsedValue.valid && formatParsed.valid,
@@ -8591,9 +8596,9 @@ WCDefine(input_field_componentName, InputField, "input");
 
 var input_select_outerStyle = __webpack_require__(12).toString();
 
-var input_select_style = __webpack_require__(69).toString();
+var input_select_style = __webpack_require__(70).toString();
 
-var input_select_template = __webpack_require__(70);
+var input_select_template = __webpack_require__(71);
 
 var input_select_componentName = "input-select";
 var input_select_componentRoot = ".".concat(input_select_componentName, "-container");
@@ -8717,9 +8722,9 @@ WCDefine(input_select_componentName, InputSelect);
 // CONCATENATED MODULE: ./src/components/overlay-content/index.js
 
 
-var overlay_content_style = __webpack_require__(71).toString();
+var overlay_content_style = __webpack_require__(72).toString();
 
-var overlay_content_outerStyle = __webpack_require__(72).toString();
+var overlay_content_outerStyle = __webpack_require__(73).toString();
 
 var positionPadding = 40;
 var widths = ["content", "target"];
@@ -8735,7 +8740,7 @@ var emptyBox = {
   height: 0
 };
 
-var overlay_content_template = __webpack_require__(73);
+var overlay_content_template = __webpack_require__(74);
 
 var overlay_content_componentName = "overlay-content";
 var overlay_content_componentRoot = ".overlay-content-container";
@@ -9017,9 +9022,9 @@ function Set(source, path, value) {
 // CONCATENATED MODULE: ./src/components/overlay-message/index.js
 
 
-var overlay_message_style = __webpack_require__(74).toString();
+var overlay_message_style = __webpack_require__(75).toString();
 
-var overlay_message_template = __webpack_require__(75);
+var overlay_message_template = __webpack_require__(76);
 
 var overlay_message_componentName = "overlay-message";
 var overlay_message_componentRoot = ".".concat(overlay_message_componentName, "-container");
@@ -9142,10 +9147,10 @@ WCDefine(overlay_message_componentName, OverlayMessage);
 
  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
-var progress_bar_style = __webpack_require__(76).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+var progress_bar_style = __webpack_require__(77).toString(); // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 
 
-var progress_bar_template = __webpack_require__(77);
+var progress_bar_template = __webpack_require__(78);
 
 var progress_bar_componentName = "progress-bar";
 var progress_bar_componentRoot = ".".concat(progress_bar_componentName, "-container");
@@ -9499,11 +9504,11 @@ function IfEmpty(newValue) {
 // CONCATENATED MODULE: ./src/components/snack-bar/index.js
 
 
-var snack_bar_style = __webpack_require__(78).toString();
+var snack_bar_style = __webpack_require__(79).toString();
 
-var snack_bar_outerStyle = __webpack_require__(83).toString();
+var snack_bar_outerStyle = __webpack_require__(80).toString();
 
-var snack_bar_template = __webpack_require__(79);
+var snack_bar_template = __webpack_require__(81);
 
 var snack_bar_componentName = "snack-bar";
 var snack_bar_componentRoot = ".".concat(snack_bar_componentName, "-container");
@@ -9743,11 +9748,11 @@ WCDefine(snack_bar_componentName, SnackBar);
 // CONCATENATED MODULE: ./src/components/spinner-element/index.js
 
 
-var spinner_element_style = __webpack_require__(80).toString();
+var spinner_element_style = __webpack_require__(82).toString();
 
-var spinner_element_outerStyle = __webpack_require__(81).toString();
+var spinner_element_outerStyle = __webpack_require__(83).toString();
 
-var spinner_element_template = __webpack_require__(82);
+var spinner_element_template = __webpack_require__(84);
 
 var spinner_element_componentName = "spinner-element";
 var spinner_element_componentRoot = ".".concat(spinner_element_componentName, "-container");
@@ -12905,7 +12910,7 @@ module.exports = _getPrototypeOf;
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _typeof = __webpack_require__(2);
+var _typeof = __webpack_require__(3);
 
 var assertThisInitialized = __webpack_require__(28);
 
@@ -13048,7 +13053,7 @@ exports.push([module.i, ".content-transition-container{position:relative}.conten
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Timer; });
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var ___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 
 var TimerKey = Symbol["for"]("builtjs.TimerKey");
@@ -14145,12 +14150,21 @@ exports.push([module.i, ".content-drawer-container{display:block;width:100%;posi
 
 /***/ }),
 /* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(1)(false);
+// Module
+exports.push([module.i, ":host(content-drawer){display:block;width:100%;position:relative;height:auto;left:0%;top:0px}content-drawer{display:block;width:100%;position:relative;height:auto;left:0%;top:0px}\n", ""]);
+
+
+/***/ }),
+/* 40 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=content-drawer-container> <div class=content-drawer-header> <icon-element class=content-drawer-header-icon size=1.38em></icon-element> <slot name=header></slot> <effect-underline start=none opacity=1 speed=700></effect-underline> </div> <div class=content-drawer-content> <div class=content-drawer-content-inner> <div class=content-drawer-content-inner-inner> <slot name=content></slot> </div> </div> </div> <effect-scale start=click></effect-scale> </div> ";
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14159,13 +14173,13 @@ exports.push([module.i, ":host(content-transition){display:block;width:100%;posi
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=content-transition-container> <div class=content-transition-inner> <div class=next-slot> <slot name=next></slot> </div> <div class=current-slot> <slot current=true name=current></slot> </div> <div class=hidden-slot> <div class=hidden-slot-inner> <slot name=hidden></slot> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14174,13 +14188,13 @@ exports.push([module.i, ":host(cookie-message){font:inherit;line-height:inherit;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=cookie-message-container> <div class=cookie-message-inner> <div class=cookie-message-text></div> <button-element class=cookie-message-button></button-element> </div> </div> ";
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14189,7 +14203,7 @@ exports.push([module.i, ".drop-down-container{display:-webkit-box;display:flex;f
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14198,19 +14212,19 @@ exports.push([module.i, ":host(drop-down){outline:none !important;display:inline
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=drop-down-container> <div class=drop-down-heading> <div class=drop-down-label> <slot name=label></slot> </div> <div class=drop-down-arrow> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\"> <path d=\"M7 10l5 5 5-5z\"/></svg> </div> </div> <overlay-content align=\"center bottom\" class=drop-down-overlay> <slot name=option></slot> </overlay-content> <slot name=nonitem></slot> </div> ";
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-push-container></div> ";
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14219,13 +14233,13 @@ exports.push([module.i, ":host(effect-fade){pointer-events:none;box-sizing:borde
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-fade-container></div> ";
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14234,13 +14248,13 @@ exports.push([module.i, ".effect-ripple-container,.effect-ripple-container *{poi
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-ripple-container> <span class=ripple></span> </div> ";
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14249,13 +14263,13 @@ exports.push([module.i, ":host(effect-scale){pointer-events:none;box-sizing:bord
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-scale-container></div> ";
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14264,13 +14278,13 @@ exports.push([module.i, ":host(effect-underline){pointer-events:none;box-sizing:
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=effect-underline-container> <span class=underline></span> </div> ";
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14279,13 +14293,13 @@ exports.push([module.i, ":host(grid-layout){display:block;opacity:0;-webkit-tran
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=grid-layout-container> <div class=grid-layout-items></div> </div> ";
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14294,13 +14308,13 @@ exports.push([module.i, ":host(horizontal-slider){display:-webkit-box;display:fl
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=horizontal-slider-container> <div class=horizontal-slider-chicklets></div> <div class=horizontal-slider-previous> <slot name=previous-button> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\" class=horizontal-slider-default-arrow> <path d=\"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z\"/></svg> </slot> </div> <div class=horizontal-slider-inner> <div class=horizontal-slider-items> <slot></slot> </div> </div> <div class=horizontal-slider-next> <slot name=next-button> <svg xmlns=http://www.w3.org/2000/svg width=24 height=24 viewBox=\"0 0 24 24\" class=horizontal-slider-default-arrow> <path d=\"M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z\"/></svg> </slot> </div> </div> ";
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14309,13 +14323,13 @@ exports.push([module.i, ":host(icon-element){display:-webkit-inline-box;display:
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=icon-element-container> <div class=svg-container></div> </div> ";
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14324,7 +14338,7 @@ exports.push([module.i, ".image-loader-container{position:relative;width:0%;heig
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14333,13 +14347,13 @@ exports.push([module.i, ":host(image-loader){display:inline-block;outline:none !
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=\"image-loader-container notready\" style=opacity:0> <img class=image-loader-image> <div class=image-loader-text></div> <spinner-element scrim=true page=false type=circle visible=false style=opacity:0></spinner-element> <style type=text/css rel=stylesheet style=display:none class=internalStyles></style> </div> ";
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14348,13 +14362,13 @@ exports.push([module.i, ".input-field-container{display:inline-block;width:100%;
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=input-field-container> <div class=input-field-container-inner> <div class=input-field-top-section> <div class=input-field-label-top> <slot name=label-top></slot> </div> </div> <div class=input-field-middle-section> <div class=input-field-label-left> <slot name=label-left></slot> </div> <div class=input-field-input-section> <div class=input-field-label-inside> <slot name=label-inside></slot> </div> <div class=input-field-input-container> <div class=input-field-input-container-inner> <slot name=input></slot> </div> <div class=input-field-input-overlay> <div class=input-field-checkbox-overlay> <icon-element class=input-field-checkbox-icon size=0.7em></icon-element> </div> </div> <div class=input-field-border></div> </div> </div> <div class=input-field-label-right> <slot name=label-right></slot> </div> </div> <div class=input-field-bottom-section> <div class=input-field-label-bottom> <slot name=label-bottom></slot> </div> <div class=input-field-bottom-content> <div class=input-field-messages> <div class=input-field-message-help></div> <div class=input-field-message-error></div> </div> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14363,13 +14377,13 @@ exports.push([module.i, ".input-field-container{display:inline-block;width:100%;
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=input-field-container> <div class=input-field-container-inner> <div class=input-field-top-section> <div class=input-field-label-top> <slot name=label-top></slot> </div> </div> <div class=input-field-middle-section> <div class=input-field-label-left> <slot name=label-left></slot> </div> <div class=input-field-input-section> <div class=input-field-label-inside> <slot name=label-inside></slot> </div> <div class=input-field-input-container> <div class=input-field-input-container-inner> <slot name=input></slot> </div> <div class=input-field-input-overlay> <icon-element class=input-field-icon size=1.25em></icon-element> <icon-element class=input-field-clear size=1.25em></icon-element> </div> <div class=input-field-border></div> </div> </div> <div class=input-field-label-right> <slot name=label-right></slot> </div> </div> <div class=input-field-bottom-section> <div class=input-field-label-bottom> <slot name=label-bottom></slot> </div> <div class=input-field-bottom-content> <div class=input-field-messages> <div class=input-field-message-help></div> <div class=input-field-message-error></div> </div> <div class=input-field-character-count-container> <div class=input-field-character-count-inner> <div class=input-field-character-count></div> <div class=input-field-character-count-max-divider>/</div> <div class=input-field-character-count-max></div> </div> </div> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14378,13 +14392,13 @@ exports.push([module.i, ".input-field-container{display:inline-block;width:100%;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=input-field-container> <div class=input-field-container-inner> <div class=input-field-top-section> <div class=input-field-label-top> <slot name=label-top></slot> </div> </div> <div class=input-field-middle-section> <div class=input-field-label-left> <slot name=label-left></slot> </div> <div class=input-field-input-section> <div class=input-field-label-inside> <slot name=label-inside></slot> </div> <div class=input-field-input-container> <div class=input-field-input-container-inner> <slot name=input></slot> </div> <div class=input-field-input-overlay> <icon-element class=input-field-icon size=1.25em></icon-element> <icon-element class=input-field-arrow size=1.5em></icon-element> </div> <div class=input-field-border></div> </div> </div> <div class=input-field-label-right> <slot name=label-right></slot> </div> </div> <div class=input-field-bottom-section> <div class=input-field-label-bottom> <slot name=label-bottom></slot> </div> <div class=input-field-bottom-content> <div class=input-field-messages> <div class=input-field-message-help></div> <div class=input-field-message-error></div> </div> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14393,7 +14407,7 @@ exports.push([module.i, ".overlay-content-container{display:block;position:absol
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14402,13 +14416,13 @@ exports.push([module.i, ":host(overlay-content){display:block;position:fixed;hei
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=overlay-content-container> <div class=overlay-content-container-inner> <div class=overlay-content-content-container> <div class=overlay-content-content-inner> <slot></slot> </div> </div> </div> </div> ";
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14417,13 +14431,13 @@ exports.push([module.i, ".overlay-message-container{position:fixed;width:100%;he
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=overlay-message-container> <div class=overlay-message-scrim></div> <div class=overlay-message-content-container> <div class=overlay-message-header> <slot name=header></slot> </div> <div class=overlay-message-body> <slot name=body></slot> </div> <div class=overlay-message-buttons> <slot name=button></slot> </div> </div> </div> ";
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14432,13 +14446,13 @@ exports.push([module.i, "@-webkit-keyframes indeterminate{0%{-webkit-transform-o
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports) {
 
 module.exports = "<div class=progress-bar-container> <div class=progress-bar-heading> <div class=progress-bar-header></div> <div class=progress-bar-percentage></div> </div> <div class=progress-bar-inner> <div class=progress-bar-track> <div class=progress-bar-track-inner> <div class=progress-bar-bottom></div> <div class=progress-bar-top></div> </div> </div> </div> <div class=progress-bar-bottom-container> <div class=progress-bar-text></div> <button-element class=progress-bar-button></button-element> </div> </div> ";
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14447,37 +14461,7 @@ exports.push([module.i, ".snack-bar-container{pointer-events:none;opacity:0;posi
 
 
 /***/ }),
-/* 79 */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=snack-bar-container> <div class=snack-bar-inner> <div class=snack-bar-icon> <div class=snack-bar-icon-inner> <icon-element size=1.5em class=infoicon></icon-element> <icon-element size=1.5em class=successicon></icon-element> <icon-element size=1.5em class=erroricon></icon-element> <icon-element size=1.5em class=warningicon></icon-element> </div> </div> <div class=snack-bar-text> <div class=snack-bar-text-inner> <slot name=body></slot> </div> </div> <div class=snack-bar-close> <div class=snack-bar-close-inner> <button-element class=\"snack-bar-default-button nomargin slim nobackground noshadow\"> <icon-element size=1.5em class=snack-bar-close-icon></icon-element> </button-element> </div> </div> <div class=snack-bar-type-bar></div> </div> </div> ";
-
-/***/ }),
 /* 80 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(1)(false);
-// Module
-exports.push([module.i, ".spinner-element-container{width:100%;height:100%;top:0;left:0;opacity:0;pointer-events:none;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;-webkit-transition:opacity 0.3s;transition:opacity 0.3s}.spinner-element-container.fullpage{position:fixed}.spinner-element-container.shown{opacity:1;pointer-events:all}.spinner-element-container.shown[type=\"column\"] .spin,.spinner-element-container.shown[type=\"column\"] .spin:before,.spinner-element-container.shown[type=\"column\"] .spin:after{background:currentColor;width:1em;height:4em;position:relative;box-shadow:0 0px;-webkit-animation:column 1s infinite ease-in-out;animation:column 1s infinite ease-in-out}.spinner-element-container.shown[type=\"column\"] .spin:before,.spinner-element-container.shown[type=\"column\"] .spin:after{content:\"\";position:absolute;top:0}.spinner-element-container.shown[type=\"column\"] .spin{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}.spinner-element-container.shown[type=\"column\"] .spin:before{left:-1.38em;-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner-element-container.shown[type=\"column\"] .spin:after{left:1.38em}@-webkit-keyframes column{0%,80%,100%{box-shadow:0 0;height:4em}40%{box-shadow:0 -2em;height:5em}}@keyframes column{0%,80%,100%{box-shadow:0 0;height:4em}40%{box-shadow:0 -2em;height:5em}}.spinner-element-container.shown[type=\"circle\"] .spin,.spinner-element-container.shown[type=\"circle\"] .spin:after{border-radius:50%;box-sizing:content-box}.spinner-element-container.shown[type=\"circle\"] .spin{position:relative;border:0.5em solid transparent;border-top-color:inherit;width:4em;height:4em;-webkit-animation:circle 1s infinite linear;animation:circle 1s infinite linear}.spinner-element-container.shown[type=\"circle\"] .spin:after{content:\"\";position:absolute;border:0.5em solid currentColor;opacity:0.19;top:-0.5em;left:-0.5em;width:100%;height:100%}@-webkit-keyframes circle{0%{-webkit-transform:translateZ(0) rotate(0deg);transform:translateZ(0) rotate(0deg)}100%{-webkit-transform:translateZ(0) rotate(360deg);transform:translateZ(0) rotate(360deg)}}@keyframes circle{0%{-webkit-transform:translateZ(0) rotate(0deg);transform:translateZ(0) rotate(0deg)}100%{-webkit-transform:translateZ(0) rotate(360deg);transform:translateZ(0) rotate(360deg)}}.spinner-element-container.shown[type=\"ripple\"] .spin,.spinner-element-container.shown[type=\"ripple\"] .spin:after,.spinner-element-container.shown[type=\"ripple\"] .spin:before{border-radius:50%;box-sizing:content-box}.spinner-element-container.shown[type=\"ripple\"] .spin{position:relative;width:5em;height:5em}.spinner-element-container.shown[type=\"ripple\"] .spin:after,.spinner-element-container.shown[type=\"ripple\"] .spin:before{content:\"\";position:absolute;width:100%;height:100%;border:0.5em solid;opacity:0;-webkit-transform:translateZ(0) scale(0);transform:translateZ(0) scale(0);-webkit-animation:ripple 1s infinite ease-in-out;animation:ripple 1s infinite ease-in-out}.spinner-element-container.shown[type=\"ripple\"] .spin:after{-webkit-animation-delay:0.33s;animation-delay:0.33s}@-webkit-keyframes ripple{0%{opacity:0;-webkit-transform:translateZ(0) scale(0);transform:translateZ(0) scale(0)}7%{opacity:0.38}100%{opacity:0;-webkit-transform:translateZ(0) scale(1);transform:translateZ(0) scale(1)}}@keyframes ripple{0%{opacity:0;-webkit-transform:translateZ(0) scale(0);transform:translateZ(0) scale(0)}7%{opacity:0.38}100%{opacity:0;-webkit-transform:translateZ(0) scale(1);transform:translateZ(0) scale(1)}}.spinner-element-container.shown[type=\"boading\"] .spin,.spinner-element-container.shown[type=\"boading\"] .spin:after,.spinner-element-container.shown[type=\"boading\"] .spin:before{border-radius:50%;box-sizing:content-box}.spinner-element-container.shown[type=\"boading\"] .spin{position:relative;width:5em;height:5em;margin-left:2em}.spinner-element-container.shown[type=\"boading\"] .spin:after,.spinner-element-container.shown[type=\"boading\"] .spin:before{content:\"\";position:absolute;width:50%;height:50%;background:currentColor;opacity:1;-webkit-transform:translateZ(0) translateX(0) scale(0);transform:translateZ(0) translateX(0) scale(0);-webkit-animation:boading 1s infinite linear;animation:boading 1s infinite linear}.spinner-element-container.shown[type=\"boading\"] .spin:after{opacity:0.75;-webkit-animation-delay:0.5s;animation-delay:0.5s}@-webkit-keyframes boading{0%{-webkit-transform:translateZ(0) translateX(25%) scale(0);transform:translateZ(0) translateX(25%) scale(0)}25%{-webkit-transform:translateZ(0) translateX(75%) scale(0.5);transform:translateZ(0) translateX(75%) scale(0.5)}50%{-webkit-transform:translateZ(0) translateX(0%) scale(1);transform:translateZ(0) translateX(0%) scale(1)}75%{-webkit-transform:translateZ(0) translateX(-75%) scale(0.5);transform:translateZ(0) translateX(-75%) scale(0.5)}100%{-webkit-transform:translateZ(0) translateX(-25%) scale(0);transform:translateZ(0) translateX(-25%) scale(0)}}@keyframes boading{0%{-webkit-transform:translateZ(0) translateX(25%) scale(0);transform:translateZ(0) translateX(25%) scale(0)}25%{-webkit-transform:translateZ(0) translateX(75%) scale(0.5);transform:translateZ(0) translateX(75%) scale(0.5)}50%{-webkit-transform:translateZ(0) translateX(0%) scale(1);transform:translateZ(0) translateX(0%) scale(1)}75%{-webkit-transform:translateZ(0) translateX(-75%) scale(0.5);transform:translateZ(0) translateX(-75%) scale(0.5)}100%{-webkit-transform:translateZ(0) translateX(-25%) scale(0);transform:translateZ(0) translateX(-25%) scale(0)}}.spinner-element-container.shown[type=\"tail\"] .spin{font-size:300%;overflow:hidden;width:1em;height:1em;border-radius:50%;position:relative;-webkit-transform:translateZ(0);transform:translateZ(0);-webkit-animation:tail 1.2s infinite ease, tail-round 1.2s infinite ease;animation:tail 1.2s infinite ease, tail-round 1.2s infinite ease}@-webkit-keyframes tail{0%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}5%,95%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}10%,59%{box-shadow:0 -.83em 0 -.3em,-.10292em -.80842em 0 -.34em,-.18924em -.79514em 0 -.37em,-.27224em -.7719em 0 -.41em,-.31291em -.75779em 0 -.44em}20%{box-shadow:0 -.83em 0 -.3em,-.20501em -.73289em 0 -.34em,-.48804em -.58349em 0 -.37em,-.63744em -.42081em 0 -.41em,-.73206em -.20667em 0 -.44em}38%{box-shadow:0 -.83em 0 -.3em,-.24402em -.72293em 0 -.34em,-.57851em -.48804em 0 -.37em,-.74119em -.22991em 0 -.41em,-.80261em -.00664em 0 -.44em}100%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}}@keyframes tail{0%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}5%,95%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}10%,59%{box-shadow:0 -.83em 0 -.3em,-.10292em -.80842em 0 -.34em,-.18924em -.79514em 0 -.37em,-.27224em -.7719em 0 -.41em,-.31291em -.75779em 0 -.44em}20%{box-shadow:0 -.83em 0 -.3em,-.20501em -.73289em 0 -.34em,-.48804em -.58349em 0 -.37em,-.63744em -.42081em 0 -.41em,-.73206em -.20667em 0 -.44em}38%{box-shadow:0 -.83em 0 -.3em,-.24402em -.72293em 0 -.34em,-.57851em -.48804em 0 -.37em,-.74119em -.22991em 0 -.41em,-.80261em -.00664em 0 -.44em}100%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}}@-webkit-keyframes tail-round{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes tail-round{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.spinner-element-container.showscrim .spinner-element-scrim{opacity:1}.spinner-element-container .spinner-element-scrim{position:absolute;width:100%;height:100%;top:0;left:0;opacity:0;pointer-events:none;background:rgba(0,0,0,0.38);-webkit-transition:opacity 0.3s;transition:opacity 0.3s}.spinner-element-container .spinner-element-inner{width:100%;height:100%;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;max-height:100vh;max-width:100vw;position:absolute;top:0;left:0}\n", ""]);
-
-
-/***/ }),
-/* 81 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(1)(false);
-// Module
-exports.push([module.i, ":host(spinner-element){position:absolute;height:100%;width:100%;display:block;pointer-events:none;z-index:999999999999999999}:host(spinner-element)[page=\"true\"]{top:0;left:0}spinner-element{position:absolute;height:100%;width:100%;display:block;pointer-events:none;z-index:999999999999999999}spinner-element[page=\"true\"]{top:0;left:0}\n", ""]);
-
-
-/***/ }),
-/* 82 */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=spinner-element-container> <div class=spinner-element-scrim></div> <div class=spinner-element-inner> <slot> <div class=spin></div> </slot> </div> </div> ";
-
-/***/ }),
-/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
@@ -14486,13 +14470,34 @@ exports.push([module.i, "snack-bar [slot=\"body\"]{padding:1em;box-sizing:border
 
 
 /***/ }),
-/* 84 */
+/* 81 */
+/***/ (function(module, exports) {
+
+module.exports = "<div class=snack-bar-container> <div class=snack-bar-inner> <div class=snack-bar-icon> <div class=snack-bar-icon-inner> <icon-element size=1.5em class=infoicon></icon-element> <icon-element size=1.5em class=successicon></icon-element> <icon-element size=1.5em class=erroricon></icon-element> <icon-element size=1.5em class=warningicon></icon-element> </div> </div> <div class=snack-bar-text> <div class=snack-bar-text-inner> <slot name=body></slot> </div> </div> <div class=snack-bar-close> <div class=snack-bar-close-inner> <button-element class=\"snack-bar-default-button nomargin slim nobackground noshadow\"> <icon-element size=1.5em class=snack-bar-close-icon></icon-element> </button-element> </div> </div> <div class=snack-bar-type-bar></div> </div> </div> ";
+
+/***/ }),
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(false);
 // Module
-exports.push([module.i, ":host(content-drawer){display:block;width:100%;position:relative;height:auto;left:0%;top:0px}content-drawer{display:block;width:100%;position:relative;height:auto;left:0%;top:0px}\n", ""]);
+exports.push([module.i, ".spinner-element-container{width:100%;height:100%;top:0;left:0;opacity:0;pointer-events:none;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;-webkit-transition:opacity 0.3s;transition:opacity 0.3s}.spinner-element-container.fullpage{position:fixed}.spinner-element-container.shown{opacity:1;pointer-events:all}.spinner-element-container.shown[type=\"column\"] .spin,.spinner-element-container.shown[type=\"column\"] .spin:before,.spinner-element-container.shown[type=\"column\"] .spin:after{background:currentColor;width:1em;height:4em;position:relative;box-shadow:0 0px;-webkit-animation:column 1s infinite ease-in-out;animation:column 1s infinite ease-in-out}.spinner-element-container.shown[type=\"column\"] .spin:before,.spinner-element-container.shown[type=\"column\"] .spin:after{content:\"\";position:absolute;top:0}.spinner-element-container.shown[type=\"column\"] .spin{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}.spinner-element-container.shown[type=\"column\"] .spin:before{left:-1.38em;-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner-element-container.shown[type=\"column\"] .spin:after{left:1.38em}@-webkit-keyframes column{0%,80%,100%{box-shadow:0 0;height:4em}40%{box-shadow:0 -2em;height:5em}}@keyframes column{0%,80%,100%{box-shadow:0 0;height:4em}40%{box-shadow:0 -2em;height:5em}}.spinner-element-container.shown[type=\"circle\"] .spin,.spinner-element-container.shown[type=\"circle\"] .spin:after{border-radius:50%;box-sizing:content-box}.spinner-element-container.shown[type=\"circle\"] .spin{position:relative;border:0.5em solid transparent;border-top-color:inherit;width:4em;height:4em;-webkit-animation:circle 1s infinite linear;animation:circle 1s infinite linear}.spinner-element-container.shown[type=\"circle\"] .spin:after{content:\"\";position:absolute;border:0.5em solid currentColor;opacity:0.19;top:-0.5em;left:-0.5em;width:100%;height:100%}@-webkit-keyframes circle{0%{-webkit-transform:translateZ(0) rotate(0deg);transform:translateZ(0) rotate(0deg)}100%{-webkit-transform:translateZ(0) rotate(360deg);transform:translateZ(0) rotate(360deg)}}@keyframes circle{0%{-webkit-transform:translateZ(0) rotate(0deg);transform:translateZ(0) rotate(0deg)}100%{-webkit-transform:translateZ(0) rotate(360deg);transform:translateZ(0) rotate(360deg)}}.spinner-element-container.shown[type=\"ripple\"] .spin,.spinner-element-container.shown[type=\"ripple\"] .spin:after,.spinner-element-container.shown[type=\"ripple\"] .spin:before{border-radius:50%;box-sizing:content-box}.spinner-element-container.shown[type=\"ripple\"] .spin{position:relative;width:5em;height:5em}.spinner-element-container.shown[type=\"ripple\"] .spin:after,.spinner-element-container.shown[type=\"ripple\"] .spin:before{content:\"\";position:absolute;width:100%;height:100%;border:0.5em solid;opacity:0;-webkit-transform:translateZ(0) scale(0);transform:translateZ(0) scale(0);-webkit-animation:ripple 1s infinite ease-in-out;animation:ripple 1s infinite ease-in-out}.spinner-element-container.shown[type=\"ripple\"] .spin:after{-webkit-animation-delay:0.33s;animation-delay:0.33s}@-webkit-keyframes ripple{0%{opacity:0;-webkit-transform:translateZ(0) scale(0);transform:translateZ(0) scale(0)}7%{opacity:0.38}100%{opacity:0;-webkit-transform:translateZ(0) scale(1);transform:translateZ(0) scale(1)}}@keyframes ripple{0%{opacity:0;-webkit-transform:translateZ(0) scale(0);transform:translateZ(0) scale(0)}7%{opacity:0.38}100%{opacity:0;-webkit-transform:translateZ(0) scale(1);transform:translateZ(0) scale(1)}}.spinner-element-container.shown[type=\"boading\"] .spin,.spinner-element-container.shown[type=\"boading\"] .spin:after,.spinner-element-container.shown[type=\"boading\"] .spin:before{border-radius:50%;box-sizing:content-box}.spinner-element-container.shown[type=\"boading\"] .spin{position:relative;width:5em;height:5em;margin-left:2em}.spinner-element-container.shown[type=\"boading\"] .spin:after,.spinner-element-container.shown[type=\"boading\"] .spin:before{content:\"\";position:absolute;width:50%;height:50%;background:currentColor;opacity:1;-webkit-transform:translateZ(0) translateX(0) scale(0);transform:translateZ(0) translateX(0) scale(0);-webkit-animation:boading 1s infinite linear;animation:boading 1s infinite linear}.spinner-element-container.shown[type=\"boading\"] .spin:after{opacity:0.75;-webkit-animation-delay:0.5s;animation-delay:0.5s}@-webkit-keyframes boading{0%{-webkit-transform:translateZ(0) translateX(25%) scale(0);transform:translateZ(0) translateX(25%) scale(0)}25%{-webkit-transform:translateZ(0) translateX(75%) scale(0.5);transform:translateZ(0) translateX(75%) scale(0.5)}50%{-webkit-transform:translateZ(0) translateX(0%) scale(1);transform:translateZ(0) translateX(0%) scale(1)}75%{-webkit-transform:translateZ(0) translateX(-75%) scale(0.5);transform:translateZ(0) translateX(-75%) scale(0.5)}100%{-webkit-transform:translateZ(0) translateX(-25%) scale(0);transform:translateZ(0) translateX(-25%) scale(0)}}@keyframes boading{0%{-webkit-transform:translateZ(0) translateX(25%) scale(0);transform:translateZ(0) translateX(25%) scale(0)}25%{-webkit-transform:translateZ(0) translateX(75%) scale(0.5);transform:translateZ(0) translateX(75%) scale(0.5)}50%{-webkit-transform:translateZ(0) translateX(0%) scale(1);transform:translateZ(0) translateX(0%) scale(1)}75%{-webkit-transform:translateZ(0) translateX(-75%) scale(0.5);transform:translateZ(0) translateX(-75%) scale(0.5)}100%{-webkit-transform:translateZ(0) translateX(-25%) scale(0);transform:translateZ(0) translateX(-25%) scale(0)}}.spinner-element-container.shown[type=\"tail\"] .spin{font-size:300%;overflow:hidden;width:1em;height:1em;border-radius:50%;position:relative;-webkit-transform:translateZ(0);transform:translateZ(0);-webkit-animation:tail 1.2s infinite ease, tail-round 1.2s infinite ease;animation:tail 1.2s infinite ease, tail-round 1.2s infinite ease}@-webkit-keyframes tail{0%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}5%,95%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}10%,59%{box-shadow:0 -.83em 0 -.3em,-.10292em -.80842em 0 -.34em,-.18924em -.79514em 0 -.37em,-.27224em -.7719em 0 -.41em,-.31291em -.75779em 0 -.44em}20%{box-shadow:0 -.83em 0 -.3em,-.20501em -.73289em 0 -.34em,-.48804em -.58349em 0 -.37em,-.63744em -.42081em 0 -.41em,-.73206em -.20667em 0 -.44em}38%{box-shadow:0 -.83em 0 -.3em,-.24402em -.72293em 0 -.34em,-.57851em -.48804em 0 -.37em,-.74119em -.22991em 0 -.41em,-.80261em -.00664em 0 -.44em}100%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}}@keyframes tail{0%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}5%,95%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}10%,59%{box-shadow:0 -.83em 0 -.3em,-.10292em -.80842em 0 -.34em,-.18924em -.79514em 0 -.37em,-.27224em -.7719em 0 -.41em,-.31291em -.75779em 0 -.44em}20%{box-shadow:0 -.83em 0 -.3em,-.20501em -.73289em 0 -.34em,-.48804em -.58349em 0 -.37em,-.63744em -.42081em 0 -.41em,-.73206em -.20667em 0 -.44em}38%{box-shadow:0 -.83em 0 -.3em,-.24402em -.72293em 0 -.34em,-.57851em -.48804em 0 -.37em,-.74119em -.22991em 0 -.41em,-.80261em -.00664em 0 -.44em}100%{box-shadow:0 -.83em 0 -.3em,0 -.83em 0 -.34em,0 -.83em 0 -.37em,0 -.83em 0 -.41em,0 -.83em 0 -.44em}}@-webkit-keyframes tail-round{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes tail-round{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.spinner-element-container.showscrim .spinner-element-scrim{opacity:1}.spinner-element-container .spinner-element-scrim{position:absolute;width:100%;height:100%;top:0;left:0;opacity:0;pointer-events:none;background:rgba(0,0,0,0.38);-webkit-transition:opacity 0.3s;transition:opacity 0.3s}.spinner-element-container .spinner-element-inner{width:100%;height:100%;display:-webkit-box;display:flex;-webkit-box-align:center;align-items:center;-webkit-box-pack:center;justify-content:center;max-height:100vh;max-width:100vw;position:absolute;top:0;left:0}\n", ""]);
 
+
+/***/ }),
+/* 83 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(1)(false);
+// Module
+exports.push([module.i, ":host(spinner-element){position:absolute;height:100%;width:100%;display:block;pointer-events:none;z-index:999999999999999999}:host(spinner-element)[page=\"true\"]{top:0;left:0}spinner-element{position:absolute;height:100%;width:100%;display:block;pointer-events:none;z-index:999999999999999999}spinner-element[page=\"true\"]{top:0;left:0}\n", ""]);
+
+
+/***/ }),
+/* 84 */
+/***/ (function(module, exports) {
+
+module.exports = "<div class=spinner-element-container> <div class=spinner-element-scrim></div> <div class=spinner-element-inner> <slot> <div class=spin></div> </slot> </div> </div> ";
 
 /***/ })
 /******/ ]);

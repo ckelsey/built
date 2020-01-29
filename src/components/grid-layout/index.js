@@ -164,7 +164,6 @@ export const GridLayout = WCConstructor({
 
         host.eventSubscriptions = {
             slot: ObserveSlots(host).subscribe(results => {
-                console.log(`yep`)
                 results.removed.forEach(disconnectEl)
                 host.wrap()
             })

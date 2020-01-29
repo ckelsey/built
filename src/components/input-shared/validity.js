@@ -20,8 +20,10 @@ export const validity = host => ({
                 valid
             }) => {
 
+                const value = host.value
+                const valueAsAstring = value !== undefined && value !== null ? `${value}` : value
                 const notMatchingInput = matchInputMessage(host) !== ``
-                const badFormat = host.value !== Get(host, `input.value`)
+                const badFormat = valueAsAstring !== Get(host, `input.value`)
 
                 return {
                     valueMissing, typeMismatch, patternMismatch, tooLong, tooShort, rangeUnderflow, rangeOverflow, stepMismatch, badInput, customError,

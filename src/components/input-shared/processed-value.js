@@ -33,7 +33,11 @@ function getValueMetadata(host, value) {
     const invalids = []
     const keysToSkip = [`valid`, `customError`, `message`]
 
-    Object.keys(validity).forEach(key => keysToSkip.indexOf(key) === -1 && validity[key] === true ? invalids.push(key) : undefined)
+    Object.keys(validity).forEach(key =>
+        keysToSkip.indexOf(key) === -1 && validity[key] === true ?
+            invalids.push(key) :
+            undefined
+    )
 
     return {
         original: value,

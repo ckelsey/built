@@ -31,6 +31,7 @@ const preProcessValue = host => value => {
     const parsedValue = valueMaxMin(host, formatParsed.value)
 
     /** TODO input format cursor position */
+    /** TODO i think this is called on every input on the page */
 
     return {
         valid: validated.valid && parsedValue.valid && formatParsed.valid,

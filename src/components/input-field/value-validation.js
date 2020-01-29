@@ -18,6 +18,8 @@ function parseNoValue(validated) {
 
 export function valueValidation(val, type, allowhtml, disallowhtml) {
     if (type === `number` || type === `month`) {
+        const validated = ValidateNumber(val)
+        validated.sanitized = validated.sanitized === undefined || validated.sanitized === null || validated.sanitized === `` ? validated.sanitized : `${validated.sanitized}`
         return parseNoValue(ValidateNumber(val))
     }
 
