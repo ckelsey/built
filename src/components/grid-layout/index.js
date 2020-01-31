@@ -105,12 +105,10 @@ const watchItemVisibility = el => {
     if (el.eventSubscriptions.visibility) { return }
 
     el.eventSubscriptions.visibility = ObserveVisibility(el)
-        .subscribe(e => {
+        .subscribe(hidden => {
             const container = el.container
             if (!container) { return }
 
-            const bounds = e[e.length - 1].boundingClientRect
-            const hidden = bounds.width === 0 && bounds.height === 0
             const currentlyHidden = container.classList.contains(`hidden`)
 
             if (hidden !== currentlyHidden) {

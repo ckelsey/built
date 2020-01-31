@@ -718,7 +718,7 @@ var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
 
 function GetParent(element) {
   return Object(utils_get["a" /* Get */])(element, "parentNode", Object(utils_get["a" /* Get */])(element, "host", Object(utils_get["a" /* Get */])(element, "__shady_parent.host")), function (p) {
-    return !!p & p.nodeName === "#document-fragment" ? Object(utils_get["a" /* Get */])(p, "host") : p;
+    return !!p && p.nodeName === "#document-fragment" ? Object(utils_get["a" /* Get */])(p, "host", p) : !!p && p.assignedSlot ? Object(utils_get["a" /* Get */])(p, "assignedSlot.parentNode", p) : p;
   });
 }
 // CONCATENATED MODULE: ./src/utils/is-empty.js
@@ -3770,7 +3770,7 @@ var ContentDrawer = WCConstructor({
 });
 WCDefine(content_drawer_componentName, ContentDrawer);
 // EXTERNAL MODULE: ./src/services/timer.js
-var timer = __webpack_require__(18);
+var services_timer = __webpack_require__(18);
 
 // CONCATENATED MODULE: ./src/utils/get-ease.js
 var distance = function distance(v) {
@@ -3811,7 +3811,7 @@ var methods_style = __webpack_require__(17).toString();
 var methods_animator = function animator(from, to, speed, stepFn) {
   return new Promise(function (resolve) {
     try {
-      Object(timer["a" /* Timer */])(stepFn, EaseInOut([from, to], speed)).then(resolve);
+      Object(services_timer["a" /* Timer */])(stepFn, EaseInOut([from, to], speed)).then(resolve);
     } catch (error) {
       resolve();
     }
@@ -4543,7 +4543,7 @@ var validTarget = function validTarget(target) {
 };
 
 var effect_bounce_z_animator = function animator(points, speed, stepFn) {
-  return Object(timer["a" /* Timer */])(stepFn, GetCurve(points, 0.5, false, speed));
+  return Object(services_timer["a" /* Timer */])(stepFn, GetCurve(points, 0.5, false, speed));
 };
 
 var effect_bounce_z_loadTargets = function loadTargets(_val, host) {
@@ -4652,7 +4652,7 @@ var effect_fade_validTarget = function validTarget(target) {
 };
 
 var effect_fade_animator = function animator(points, speed, stepFn) {
-  return Object(timer["a" /* Timer */])(stepFn, GetCurve(points, 0.5, false, speed));
+  return Object(services_timer["a" /* Timer */])(stepFn, GetCurve(points, 0.5, false, speed));
 };
 
 var atStartPosition = function atStartPosition(object) {
@@ -4834,7 +4834,7 @@ var maxScale = 1.3;
 
 var effect_ripple_animator = function animator(points, speed, stepFn) {
   return new Promise(function (resolve) {
-    return Object(timer["a" /* Timer */])(stepFn, EaseInOut(points, speed)).then(resolve);
+    return Object(services_timer["a" /* Timer */])(stepFn, EaseInOut(points, speed)).then(resolve);
   });
 };
 
@@ -5487,7 +5487,7 @@ var signalEnd = function signalEnd(host) {
 
 var effect_underline_methods_animator = function animator(points, speed, stepFn) {
   return new Promise(function (resolve) {
-    return Object(timer["a" /* Timer */])(stepFn, EaseInOut(points, speed)).then(resolve);
+    return Object(services_timer["a" /* Timer */])(stepFn, EaseInOut(points, speed)).then(resolve);
   });
 };
 
@@ -5783,6 +5783,70 @@ WCDefine(effect_underline_componentName, EffectUnderline);
 // CONCATENATED MODULE: ./src/utils/observe-visibility.js
 
 
+
+function isVisible(e) {
+  var instance = e[e.length - 1];
+  var isNotDisplayed = instance.target ? window.getComputedStyle(instance.target).display === "none" : instance.isNotDisplayed;
+  return instance.boundingClientRect.width === 0 && instance.boundingClientRect.height === 0 || isNotDisplayed;
+}
+
+var observe_visibility_IObserver = function IObserver(callback) {
+  if ("IntersectionObserver" in window) {
+    return new IntersectionObserver(callback);
+  }
+
+  var timer;
+  var isRunning = false;
+  return {
+    observe: function observe(element) {
+      isRunning = true;
+      var history = {
+        isNotDisplayed: false,
+        boundingClientRect: {
+          width: 10000,
+          height: 10000
+        }
+      };
+
+      var runIObserver = function runIObserver() {
+        if (!isRunning) {
+          return;
+        }
+
+        var isNotDisplayed = window.getComputedStyle(element).display === "none";
+        var rect = element.getBoundingClientRect();
+
+        if (history.isNotDisplayed !== isNotDisplayed || history.boundingClientRect.width !== rect.width || history.boundingClientRect.height !== rect.height) {
+          history.isNotDisplayed = isNotDisplayed;
+          history.boundingClientRect.width = rect.width;
+          history.boundingClientRect.height = rect.height;
+
+          if (isNotDisplayed || rect.width === 0 || rect.height === 0) {
+            callback([{
+              isNotDisplayed: isNotDisplayed,
+              boundingClientRect: {
+                width: rect.width,
+                height: rect.height
+              }
+            }]);
+          }
+        }
+
+        timer = Object(on_next_frame["a" /* OnNextFrame */])(runIObserver);
+      };
+
+      runIObserver();
+    },
+    disconnect: function disconnect() {
+      isRunning = false;
+
+      if (timer) {
+        timer.cancel();
+      }
+    }
+  };
+};
+
 function ObserveVisibility(element) {
   var returnEmpty = function returnEmpty() {
     var _observer = Observer(false);
@@ -5803,7 +5867,7 @@ function ObserveVisibility(element) {
   var intersectionObserver;
 
   var callback = function callback(e) {
-    return !observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0 ? shutDown() : observer.next(e);
+    return !observer || !observer.subscriptions || Object.keys(observer.subscriptions).length === 0 ? shutDown() : observer.next(isVisible(e));
   };
 
   var startup = function startup() {
@@ -5812,7 +5876,7 @@ function ObserveVisibility(element) {
     }
 
     isRunning = true;
-    intersectionObserver = new IntersectionObserver(callback);
+    intersectionObserver = observe_visibility_IObserver(callback);
     intersectionObserver.observe(element);
   };
 
@@ -6024,15 +6088,13 @@ var grid_layout_watchItemVisibility = function watchItemVisibility(el) {
     return;
   }
 
-  el.eventSubscriptions.visibility = ObserveVisibility(el).subscribe(function (e) {
+  el.eventSubscriptions.visibility = ObserveVisibility(el).subscribe(function (hidden) {
     var container = el.container;
 
     if (!container) {
       return;
     }
 
-    var bounds = e[e.length - 1].boundingClientRect;
-    var hidden = bounds.width === 0 && bounds.height === 0;
     var currentlyHidden = container.classList.contains("hidden");
 
     if (hidden !== currentlyHidden) {
@@ -9054,7 +9116,7 @@ var overlay_content_setPositions = function setPositions(host) {
 
 var overlay_content_animator = function animator(points, speed, stepFn) {
   return new Promise(function (resolve) {
-    return Object(timer["a" /* Timer */])(stepFn, EaseInOut(points, speed)).then(resolve);
+    return Object(services_timer["a" /* Timer */])(stepFn, EaseInOut(points, speed)).then(resolve);
   });
 };
 
@@ -9254,7 +9316,7 @@ var overlay_message_setShown = function setShown(host) {
     return;
   }
 
-  Object(timer["a" /* Timer */])(function (opacityStep) {
+  Object(services_timer["a" /* Timer */])(function (opacityStep) {
     return root.style.opacity = opacityStep;
   }, EaseInOut(host.shown ? [0, 1] : [1, 0], overlay_message_speed)).then(function () {
     root.classList[host.shown ? "add" : "remove"]("shown");
@@ -12024,7 +12086,7 @@ function ReplaceElementContents(element, contents) {
 
 var scroll_to_animator = function animator(from, to, speed, stepFn) {
   return new Promise(function (resolve) {
-    return Object(timer["a" /* Timer */])(stepFn, EaseInOut([from, to], speed)).then(resolve);
+    return Object(services_timer["a" /* Timer */])(stepFn, EaseInOut([from, to], speed)).then(resolve);
   });
 };
 
@@ -12838,7 +12900,7 @@ function TransduceMap(conversionFunction) {
 /* concated harmony reexport OnNextFrame */__webpack_require__.d(__webpack_exports__, "OnNextFrame", function() { return on_next_frame["a" /* OnNextFrame */]; });
 /* concated harmony reexport Request */__webpack_require__.d(__webpack_exports__, "Request", function() { return Request; });
 /* concated harmony reexport Router */__webpack_require__.d(__webpack_exports__, "Router", function() { return Router; });
-/* concated harmony reexport Timer */__webpack_require__.d(__webpack_exports__, "Timer", function() { return timer["a" /* Timer */]; });
+/* concated harmony reexport Timer */__webpack_require__.d(__webpack_exports__, "Timer", function() { return services_timer["a" /* Timer */]; });
 /* concated harmony reexport UploadService */__webpack_require__.d(__webpack_exports__, "UploadService", function() { return UploadService; });
 /* concated harmony reexport WCSupportClass */__webpack_require__.d(__webpack_exports__, "WCSupportClass", function() { return WCSupportClass; });
 /* concated harmony reexport iconArrow */__webpack_require__.d(__webpack_exports__, "iconArrow", function() { return iconArrow; });
