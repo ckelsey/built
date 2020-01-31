@@ -1,4 +1,4 @@
-import { ID } from '..'
+import { ID } from '../services/id.js'
 
 function Observer(initialValue, noInit = false, onSubscribe = () => { }) {
     let values = Object.assign({}, {

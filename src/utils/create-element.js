@@ -1,5 +1,6 @@
 import { OnNextFrame } from '../services/on-next-frame.js'
 import { GetParent } from './get-parent.js'
+import { IsElement } from './is-element.js'
 
 const fragment = document.createDocumentFragment()
 
@@ -45,9 +46,15 @@ export const CreateElement = obj => {
 
         if (key === `children`) {
             if (Array.isArray(obj[key])) {
-                return obj[key].forEach(child => el.appendChild(CreateElement(child)))
+                return obj[key].forEach(
+                    child => IsElement(child) ?
+                        el.appendChild(child) :
+                        el.appendChild(CreateElement(child))
+                )
             } else {
-                return el.appendChild(CreateElement(obj[key]))
+                return IsElement(obj[key]) ?
+                    el.appendChild(obj[key]) :
+                    el.appendChild(CreateElement(obj[key]))
             }
         }
 

@@ -51,6 +51,7 @@ function getValueMetadata(host, value) {
 export function processedValue(host) {
     return {
         get() {
+            if (!host.cacheNeedsUpdate) { return host.cachedValue }
             return getValueMetadata(host, Get(host, `state.value.value`))
         }
     }

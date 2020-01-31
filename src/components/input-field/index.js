@@ -1,23 +1,26 @@
 import { ObserveEvent } from '../../utils/observe-event.js'
 import { WCConstructor } from '../../utils/wc-constructor.js'
-import { ID } from '../../utils/id.js'
+import { ID } from '../../services/id.js'
 import { WCDefine } from '../../utils/wc-define.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToString } from '../../utils/to-string.js'
 import { Get } from '../../utils/get.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { SetAttribute } from '../../utils/set-attribute.js'
+
 import { processedValue } from '../input-shared/processed-value.js'
 import { properties as Properties } from '../input-shared/properties.js'
 import { processValue } from '../input-shared/process-value.js'
 import { setCustomValidity } from '../input-shared/set-custom-validity.js'
 import { validationMessage } from '../input-shared/validation-message.js'
+import { validity } from '../input-shared/validity.js'
+import { checkValidity } from '../input-shared/check-validity.js'
+
 import { valueValidation } from './value-validation.js'
 import { valueMaxMin } from './value-max-min.js'
 import { valueFormat } from './value-format.js'
-import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
-import { SetAttribute } from '../../utils/set-attribute.js'
-import { validity } from '../input-shared/validity.js'
-import { checkValidity } from '../input-shared/check-validity.js'
+import { ToBool } from '../../utils/to-bool.js'
 
 const outerStyle = require(`../input-shared/outer.scss`).toString()
 const style = require(`./style.scss`).toString()
@@ -26,14 +29,15 @@ const componentName = `input-field`
 const componentRoot = `.${componentName}-container`
 
 const preProcessValue = host => value => {
+    if (!host.cachedPreProcessValueNeedsUpdate) {
+        return host.cachedPreProcessValue
+    }
+
     const validated = valueValidation(value, host.type, host.allowhtml, host.disallowhtml)
     const formatParsed = valueFormat(host.format, validated.sanitized)
     const parsedValue = valueMaxMin(host, formatParsed.value)
 
-    /** TODO input format cursor position */
-    /** TODO i think this is called on every input on the page */
-
-    return {
+    const data = {
         valid: validated.valid && parsedValue.valid && formatParsed.valid,
         reason: [
             !formatParsed.valid ? `Value does not match pattern` : undefined,
@@ -44,6 +48,10 @@ const preProcessValue = host => value => {
         value: parsedValue.value,
         sanitized: parsedValue.value
     }
+
+    host.cachedPreProcessValue = data
+
+    return data
 }
 
 const postProcessValue = host => results => {
@@ -54,16 +62,19 @@ const postProcessValue = host => results => {
 const properties = Object.assign({}, Properties, {
     pattern: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange: (val, host) => WCwhenPropertyReady(host, `input`).then(input => SetAttribute(input, `pattern`, val))
+        onChange: (val, host) => WCWhenPropertyReady(host, `input`).then(input => SetAttribute(input, `pattern`, val))
+    },
+    cachedPreProcessValueNeedsUpdate: { format: val => Pipe(ToBool, IfInvalid(true))(val).value },
+    cachedPreProcessValue: {
+        format: val => val,
+        onChange: (_val, host) => host.cachedPreProcessValueNeedsUpdate = false
     }
 })
 
 const elements = {
     clearButton: {
         selector: `.input-field-clear`,
-        // onChange: (el, host) => el.eventSubscriptions = {
-        //     click: ObserveEvent(el, `click`).subscribe(() => clearInput(host))
-        // }
+        /** TODO needs to add back functionality */
     },
     container: { selector: `.input-field-container-inner` },
     count: { selector: `.input-field-character-count` },
@@ -79,22 +90,7 @@ const elements = {
     },
     inputContainer: { selector: `.input-field-input-container-inner` },
     max: { selector: `.input-field-character-count-max` },
-    root: { selector: `.input-field-container` },
-    // filePathInput: {
-    //     selector: `.input-field-file-path-overlay`,
-    //     onChange: (el, host) => {
-    //         if (host.type === `file` && host.pathvalue) {
-    //             el.value = host.pathvalue
-    //             return
-    //         }
-
-    //         el.value = ``
-
-    //         if (host.type !== `file`) {
-    //             el.style.display = `none`
-    //         }
-    //     }
-    // },
+    root: { selector: `.input-field-container` }
 }
 
 export const InputField = WCConstructor({
@@ -118,7 +114,12 @@ export const InputField = WCConstructor({
         validationMessage,
         validity
     },
-    getters: { value: host => host.preProcessValue(Get(host, `state.value.value`, ``)).sanitized },
+    getters: {
+        value: host => {
+            if (!host.cacheNeedsUpdate) { return host.cachedValue.sanitized }
+            return host.preProcessValue(Get(host, `state.value.value`, ``)).sanitized
+        }
+    },
     onConnected: host => host.inputID = ID(),
     formElement: true
 })

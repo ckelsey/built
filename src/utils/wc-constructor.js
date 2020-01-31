@@ -1,8 +1,18 @@
-import {
-    Equals, Pipe, IfInvalid, ID, ToBool, Observer, WCElements, SetShadowRoot, WCwhenPropertyReady,
-    ObserverUnsubscribe, OnNextFrame, WCClass, ComponentClassObject, SetStyleRules
-} from '..'
-import { CreateElement } from './create-element'
+import { Equals } from './equals.js'
+import { Pipe } from './pipe.js'
+import { IfInvalid } from './if-invalid.js'
+import { ID } from '../services/id.js'
+import { ToBool } from './to-bool.js'
+import { Observer } from './observer.js'
+import { WCElements } from './wc-elements.js'
+import { SetShadowRoot } from './set-shadow-root.js'
+import { WCWhenPropertyReady } from './wc-when-property-ready.js'
+import { ObserverUnsubscribe } from './observer-unsubscribe.js'
+import { OnNextFrame } from '../services/on-next-frame.js'
+import { WCClass } from './wc-class.js'
+import { ComponentClassObject } from './component-class-object.js'
+import { SetStyleRules } from './set-style-rules.js'
+import { WCOuterStyle } from './wc-outer-style.js'
 
 /** Does not actually mutate anything, tho itself gets mutated across setting styles, properties, etc */
 
@@ -75,34 +85,19 @@ export function WCConstructor(options) {
 
     properties[`outertheme`] = {
         format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => {
-            let styleEl = host.querySelector(`style.outertheme`)
-
-            if (!styleEl) {
-                styleEl = CreateElement({
-                    tagName: `style`,
-                    class: `outertheme`,
-                    name: `outertheme`,
-                    style: `display:none;`
-                })
-
-                host.appendChild(styleEl)
-            }
-
-            SetStyleRules(styleEl, val)
-        }
+        onChange: (val, host) => WCOuterStyle(componentName, host, val, `outertheme`)
     }
 
     properties[`styles`] = {
         format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.injectedStyles`)
+        onChange: (val, host) => WCWhenPropertyReady(host, `elements.injectedStyles`)
             .then(stylesElement => SetStyleRules(stylesElement, val))
             .catch(() => { })
     }
 
     properties[`theme`] = {
         format: (val, host) => typeof val === `string` ? val : host.theme,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.theme`)
+        onChange: (val, host) => WCWhenPropertyReady(host, `elements.theme`)
             .then(themeElement => SetStyleRules(themeElement, val))
             .catch(() => { })
     }
@@ -186,7 +181,7 @@ export function WCConstructor(options) {
             element.disconnectElements = () => { }
             element.attributeChangedCallback = () => { }
             element.disconnectedCallback = () => { }
-            SetShadowRoot({ componentName, template, style, outerStyle, element })
+            SetShadowRoot({ componentName, template, style, element })
             ConnectedFn(element)
             return element
         }

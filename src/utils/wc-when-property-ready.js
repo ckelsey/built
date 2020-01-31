@@ -1,7 +1,7 @@
 import { Get } from "./get"
 import { OnNextFrame } from "../services/on-next-frame"
 
-export function WCwhenPropertyReady(host, path, isMethod) {
+export function WCWhenPropertyReady(host, path, isMethod) {
     let max = 1000
     return new Promise((resolve, reject) => {
         if (!host || (!host.parentNode && !host.parentElement)) {

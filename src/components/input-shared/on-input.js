@@ -1,11 +1,14 @@
 import { GetInputValue } from '../../utils/get-input-value.js'
-import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
 
 export function onInput(host) {
-    return WCwhenPropertyReady(host, `input`)
+    return WCWhenPropertyReady(host, `input`)
         .then(input => {
             host.value = GetInputValue(input)
-            if (host.value !== input.value) { input.value = host.value }
+
+            const val = host.value
+
+            if (val !== input.value) { input.value = val }
         })
         .catch(console.error)
 }

@@ -1,4 +1,4 @@
-import { WCConstructor, WCDefine, OnNextFrame, WCwhenPropertyReady } from '../..'
+import { WCConstructor, WCDefine, OnNextFrame, WCWhenPropertyReady } from '../..'
 
 const style = require(`./style.scss`).toString()
 const elements = { svgContainer: { selector: `.svg-container` }, }
@@ -10,18 +10,18 @@ const attributes = {
             if (!value) { return }
             if (host.subscription) { host.subscription() }
             OnNextFrame(() => {
-                WCwhenPropertyReady(host, `elements.svgContainer`).then(el => el.innerHTML = value)
+                WCWhenPropertyReady(host, `elements.svgContainer`).then(el => el.innerHTML = value)
                 host.dispatchEvent(new CustomEvent(`iconloaded`, { detail: host }))
             })
         }
     },
     color: {
         format: val => typeof val === `string` ? val : null,
-        onChange: (value, host) => OnNextFrame(() => WCwhenPropertyReady(host, `elements.svgContainer`).then(el => el.style.color = value))
+        onChange: (value, host) => OnNextFrame(() => WCWhenPropertyReady(host, `elements.svgContainer`).then(el => el.style.color = value))
     },
     size: {
         format: val => typeof val === `string` ? val : `1.5em`,
-        onChange: (value, host) => OnNextFrame(() => WCwhenPropertyReady(host, `elements.svgContainer`).then(el => el.style.height = el.style.width = value))
+        onChange: (value, host) => OnNextFrame(() => WCWhenPropertyReady(host, `elements.svgContainer`).then(el => el.style.height = el.style.width = value))
     }
 }
 

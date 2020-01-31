@@ -1,4 +1,4 @@
-import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
 import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
 import { SetAttribute } from '../../utils/set-attribute.js'
 import { CreateElement } from '../../utils/create-element.js'
@@ -42,7 +42,7 @@ export function setInput(host) {
     OnNextFrame(() => {
         if (host.input) { host.removeChild(host.input) }
 
-        WCwhenPropertyReady(host, `elements.container`).then(container => SetAttribute(container, `input-kind`, host.type))
+        WCWhenPropertyReady(host, `elements.container`).then(container => SetAttribute(container, `input-kind`, host.type))
 
         const tagName = tagType(host.type)
         const type = tagName === `input` ? asIsTypes.indexOf(host.type) > -1 ? host.type : `text` : undefined
@@ -102,20 +102,5 @@ export function setInput(host) {
             onKeyDown: ObserveEvent(input, `keydown`).subscribe(e => onKeyDown(e, host)),
             onInput: ObserveEvent(input, `input`, { preventDefault: true }).subscribe(() => onInput(host))
         }
-
-        // if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
-        //     // input.eventSubscriptions.inputContainerClick = ObserveEvent(host.elements.inputContainer, `click`, { stopPropagation: true, preventDefault: true }).subscribe(() => {
-        //     //     const newVal = !host.value
-        //     //     host.value = newVal
-        //     //     dispatch(host, `input`, newVal)
-        //     //     dispatch(host, `inputchange`, newVal)
-        //     // })
-        //     input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => onInput(host))
-        // } else {
-        //     input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => onInput(host))
-        // }
-
-
-        // setDroppable(host)
     })
 }

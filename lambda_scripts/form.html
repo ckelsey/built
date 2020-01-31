@@ -12,6 +12,7 @@
     // username.pattern = '[A-Za-z0-9_]{1,5}'
     username.format = '/^[A-Za-z0-9_]{1,5}/gm'
     username.required = true
+    username.value = 's'
 
     var password = document.createElement('input-field')
     password.name = password.label = password.id = 'password'
@@ -27,13 +28,14 @@
     var checkbox = document.createElement('input-bool')
     checkbox.name = checkbox.label = checkbox.id = 'checkbox'
     checkbox.label = 'Check box'
+    checkbox.value = 'true'
 
     var select = document.createElement('input-select')
     select.name = select.label = select.id = 'select'
     select.label = 'A select'
     select.options = 'one, two, three'
     // select.emptyoption = false
-    select.emptyoption = `Select a number`
+    select.emptyoption = 'Select a number'
 
     var submit = document.createElement('button-element')
     submit.textContent = 'Submit'
@@ -61,9 +63,9 @@
         return false
     })
 
-    const bounceAmount = -4
-    const bounceSpeed = 300
-    const bounce = document.createElement('effect-bounce-z')
+    var bounceAmount = -4
+    var bounceSpeed = 300
+    var bounce = document.createElement('effect-bounce-z')
     document.body.appendChild(bounce)
 
     bounce.targets = [{

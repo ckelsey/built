@@ -1,5 +1,5 @@
 import { IsElement } from '../../utils/is-element.js'
-import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
 import { SetAttribute } from '../../utils/set-attribute.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToBool } from '../../utils/to-bool.js'
@@ -22,7 +22,7 @@ import { onInvalid } from './on-invalid.js'
 const trueOrNull = val => Pipe(ToBool, IfNot(true, null))(val).value
 const stringOrEmpty = val => Pipe(ToString, IfInvalid(``))(val).value
 const addRemoveContainerClass = (val, host, clss) => Get(host, `elements.container.classList`, { add: () => { }, remove: () => { } })[val ? `add` : `remove`](clss)
-const setInputAttribute = (host, name, value) => WCwhenPropertyReady(host, `input`).then(input => SetAttribute(input, name, value))
+const setInputAttribute = (host, name, value) => WCWhenPropertyReady(host, `input`).then(input => SetAttribute(input, name, value))
 const defaultType = host => {
     const tag = host.tagName.toLowerCase()
     return tag === `input-bool` ?
@@ -36,6 +36,12 @@ export const properties = {
     autofocus: {
         format: trueOrNull,
         onChange: (val, host) => setInputAttribute(host, `autofocus`, val)
+    },
+
+    cacheNeedsUpdate: { format: val => Pipe(ToBool, IfInvalid(true))(val).value },
+    cachedValue: {
+        format: val => val,
+        onChange: (_val, host) => host.cacheNeedsUpdate = false
     },
 
     disabled: {
@@ -63,7 +69,7 @@ export const properties = {
 
     helptext: {
         format: stringOrEmpty,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.help`).then(el => el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized || ``)
+        onChange: (val, host) => WCWhenPropertyReady(host, `elements.help`).then(el => el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized || ``)
     },
 
     inputID: {
@@ -76,7 +82,7 @@ export const properties = {
         onChange: (val, host) => {
             SetAttribute(host.elements.container, `valid`, val)
             addRemoveContainerClass(val, host, `invalid`)
-            WCwhenPropertyReady(host, `elements.error`).then(el => el.innerHTML = ValidateHtml(host.validationMessage, [], [`script`]).sanitized || ``)
+            WCWhenPropertyReady(host, `elements.error`).then(el => el.innerHTML = ValidateHtml(host.validationMessage, [], [`script`]).sanitized || ``)
             onInvalid(host)
         },
     },
@@ -84,8 +90,8 @@ export const properties = {
     labelposition: {
         format: (val, host) => Pipe(IndexOf(labelPositions), IfInvalid(getDefaultLabelPosition(host)))(val).value,
         onChange: (val, host) => {
-            WCwhenPropertyReady(host, `elements.container`).then(container => SetAttribute(container, `label-position`, val))
-            WCwhenPropertyReady(host, `labelelement`).then(label => label.slot = `label-${val}`)
+            WCWhenPropertyReady(host, `elements.container`).then(container => SetAttribute(container, `label-position`, val))
+            WCWhenPropertyReady(host, `labelelement`).then(label => label.slot = `label-${val}`)
         },
     },
 
@@ -135,24 +141,24 @@ export const properties = {
     },
 
     value: {
-        format: (val, host) => {
-            if (host.type === `checkbox` || host.type === `radio`) { return ToBool(val).value }
-            return val
-        },
+        format: (val, host) => host.type === `checkbox` || host.type === `radio` ? ToBool(val).value : val,
         onChange: (_val, host) => {
-            host.processValue()
-            dispatch(host, `inputchange`, host.value)
-            dispatch(host, `input`, host.value)
-        },
-    },
+            if (!host.eventSubscriptions) { host.eventSubscriptions = {} }
 
-    // clearbutton: {
-    //     format: val => Pipe(ToString, IfInvalid(null))(val).value,
-    //     onChange: (val, host) => {
-    //         SetAttribute(host.elements.clearButton, `type`, val)
-    //         addRemoveContainerClass(!!val, host, `clearbutton`)
-    //     }
-    // },
+            if (!host.eventSubscriptions.valuecaching) {
+                host.eventSubscriptions.valuecaching = host.state.value.subscribe(() => {
+                    host.cacheNeedsUpdate = true
+                    host.cachedPreProcessValueNeedsUpdate = true
+                })
+            }
+
+            host.processValue()
+
+            const val = host.value
+            dispatch(host, `inputchange`, val)
+            dispatch(host, `input`, val)
+        },
+    }
 }
 
 export const observedAttributes = Object.keys(properties)

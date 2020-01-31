@@ -119,7 +119,9 @@ const exported = {
                 loader: `babel-loader`,
                 options: {
                     presets: [
-                        [`@babel/env`, { modules: false }],
+                        [`@babel/env`, {
+                            modules: false,
+                        }],
                     ]
                 }
             }]

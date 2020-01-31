@@ -82,3 +82,80 @@ export const InputFile = WCConstructor({
 })
 
 WCDefine(componentName, InputFile)
+
+
+/*
+const elements = {
+    clearButton: {
+        selector: `.input-field-clear`,
+        // onChange: (el, host) => el.eventSubscriptions = {
+        //     click: ObserveEvent(el, `click`).subscribe(() => clearInput(host))
+        // }
+    },
+    container: { selector: `.input-field-container-inner` },
+    count: { selector: `.input-field-character-count` },
+    error: { selector: `.input-field-message-error` },
+    help: { selector: `.input-field-message-help` },
+    icon: {
+        selector: `.input-field-icon`,
+        onChange: (el, host) => el.eventSubscriptions = {
+            click: ObserveEvent(el, `click`).subscribe(() => {
+                host.dispatchEvent(new CustomEvent(`iconclick`, { detail: host }))
+            })
+        }
+    },
+    inputContainer: { selector: `.input-field-input-container-inner` },
+    max: { selector: `.input-field-character-count-max` },
+    root: { selector: `.input-field-container` },
+    // filePathInput: {
+    //     selector: `.input-field-file-path-overlay`,
+    //     onChange: (el, host) => {
+    //         if (host.type === `file` && host.pathvalue) {
+    //             el.value = host.pathvalue
+    //             return
+    //         }
+
+    //         el.value = ``
+
+    //         if (host.type !== `file`) {
+    //             el.style.display = `none`
+    //         }
+    //     }
+    // },
+}
+
+
+
+
+
+
+
+ // if ([`checkbox`, `radio`].indexOf(host.type) > -1) {
+        //     // input.eventSubscriptions.inputContainerClick = ObserveEvent(host.elements.inputContainer, `click`, { stopPropagation: true, preventDefault: true }).subscribe(() => {
+        //     //     const newVal = !host.value
+        //     //     host.value = newVal
+        //     //     dispatch(host, `input`, newVal)
+        //     //     dispatch(host, `inputchange`, newVal)
+        //     // })
+        //     input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => onInput(host))
+        // } else {
+        //     input.eventSubscriptions.onInput = ObserveEvent(input, `input`).subscribe(() => onInput(host))
+        // }
+
+
+        // setDroppable(host)
+
+
+
+
+
+
+
+   // clearbutton: {
+    //     format: val => Pipe(ToString, IfInvalid(null))(val).value,
+    //     onChange: (val, host) => {
+    //         SetAttribute(host.elements.clearButton, `type`, val)
+    //         addRemoveContainerClass(!!val, host, `clearbutton`)
+    //     }
+    // },
+*/

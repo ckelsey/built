@@ -1,4 +1,4 @@
-import { WCConstructor, WCDefine, OnNextFrame, ObserverUnsubscribe, ObserveEvent, ID, ObserveSlots, Get, WCwhenPropertyReady, CreateElement, Pipe, ToString, IfInvalid, Try, ToBool, ToNumber, CommasToArray, ToMap } from '../..'
+import { WCConstructor, WCDefine, OnNextFrame, ObserverUnsubscribe, ObserveEvent, ID, ObserveSlots, Get, WCWhenPropertyReady, CreateElement, Pipe, ToString, IfInvalid, Try, ToBool, ToNumber, CommasToArray, ToMap } from '../..'
 
 const defaultWidth = 240
 const defaultGap = [16, 16]
@@ -6,7 +6,7 @@ const template = require(`./index.html`)
 const componentName = `ajax-form`
 const componentRoot = `.${componentName}-container`
 const outerStyle = require(`./outer.scss`).toString()
-const setAttribute = (host, val, name, elKey) => WCwhenPropertyReady(host, `elements.${elKey}`).then(el => el[val ? `setAttribute` : `removeAttribute`](name, val))
+const setAttribute = (host, val, name, elKey) => WCWhenPropertyReady(host, `elements.${elKey}`).then(el => el[val ? `setAttribute` : `removeAttribute`](name, val))
 const submitForm = host => host.elements.form.dispatchEvent(new Event(`submit`))
 
 const getFormData = host => {
@@ -128,7 +128,7 @@ export const AjaxForm = WCConstructor({
     observedAttributes: Object.keys(properties),
     elements,
     onConnected(host) {
-        const wrap = el => WCwhenPropertyReady(host, `elements.grid`)
+        const wrap = el => WCWhenPropertyReady(host, `elements.grid`)
             .then(appendTo => {
                 const tagName = Get(el, `tagName.toLowerCase()`)
                 const isInput = tagName === `input-field`

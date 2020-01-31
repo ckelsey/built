@@ -1,6 +1,7 @@
 import { SetShadowRoot } from "./set-shadow-root"
 import { ComponentStore } from "../services/componentStore"
 import { ObserverUnsubscribe } from "./observer-unsubscribe"
+import { WCOuterStyle } from "./wc-outer-style"
 
 
 export function WCClass(
@@ -22,7 +23,7 @@ export function WCClass(
             self.state = {}
             self.elements = {}
             self.disconnectElements = () => { }
-            SetShadowRoot({ componentName, template, style, outerStyle, element: self })
+            SetShadowRoot({ componentName, template, style, element: self })
             try { self.internals_ = self.attachInternals() } catch (error) { }
             return self
         }
@@ -32,6 +33,7 @@ export function WCClass(
         attributeChangedCallback(attrName, oldValue, newValue) { if (newValue !== oldValue) { this[attrName] = newValue } }
 
         connectedCallback() {
+            WCOuterStyle(componentName, this, outerStyle)
             ComponentStore.addComponent(this)
             ConnectedFn(this)
         }

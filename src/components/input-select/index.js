@@ -1,5 +1,5 @@
 import { WCConstructor } from '../../utils/wc-constructor.js'
-import { ID } from '../../utils/id.js'
+import { ID } from '../../services/id.js'
 import { WCDefine } from '../../utils/wc-define.js'
 import { properties as Properties } from '../input-shared/properties.js'
 import { processedValue } from '../input-shared/processed-value.js'

@@ -1,9 +1,9 @@
-import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
 import { dispatch } from './dispatch.js'
 import { Get } from '../../utils/get.js'
 
 export function onDone(host) {
-    return WCwhenPropertyReady(host, `input`)
+    return WCWhenPropertyReady(host, `input`)
         .then(input => {
             input.blur()
 

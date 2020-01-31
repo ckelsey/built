@@ -1,4 +1,4 @@
-import { WCConstructor, WCDefine, CreateElement, Pipe, IfInvalid, ToString, WCwhenPropertyReady } from '../..'
+import { WCConstructor, WCDefine, CreateElement, Pipe, IfInvalid, ToString, WCWhenPropertyReady } from '../..'
 import { ToBool } from '../../utils/to-bool'
 
 const template = require(`./index.html`)
@@ -9,15 +9,15 @@ const style = require(`./style.scss`).toString()
 const properties = {
     name: {
         format: (val, host) => Pipe(ToString, IfInvalid(host.textContent))(val).value,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`name`, val))
+        onChange: (val, host) => WCWhenPropertyReady(host, `elements.button`).then(btn => btn.setAttribute(`name`, val))
     },
     disabled: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.root`).then(root => root.classList[val ? `add` : `remove`](`disabled`))
+        onChange: (val, host) => WCWhenPropertyReady(host, `elements.root`).then(root => root.classList[val ? `add` : `remove`](`disabled`))
     },
     type: {
         format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange: (val, host) => WCwhenPropertyReady(host, `elements.button`)
+        onChange: (val, host) => WCWhenPropertyReady(host, `elements.button`)
             .then(btn => {
                 if (val) {
                     btn.setAttribute(`type`, `submit`)

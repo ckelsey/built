@@ -1,5 +1,5 @@
 import { WCConstructor } from '../../utils/wc-constructor.js'
-import { ID } from '../../utils/id.js'
+import { ID } from '../../services/id.js'
 import { WCDefine } from '../../utils/wc-define.js'
 import { Get } from '../../utils/get.js'
 import { observedAttributes, properties } from '../input-shared/properties.js'
@@ -10,7 +10,7 @@ import { validationMessage } from '../input-shared/validation-message.js'
 import { ValidateBool } from '../../utils/validate-bool.js'
 import { validity } from '../input-shared/validity.js'
 import { checkValidity } from '../input-shared/check-validity.js'
-import { WCwhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
 
 const outerStyle = require(`../input-shared/outer.scss`).toString()
 const style = require(`./style.scss`).toString()
@@ -44,9 +44,17 @@ export const InputBool = WCConstructor({
     methods: {
         processValue,
         setCustomValidity,
-        preProcessValue: () => value => ValidateBool(value),
-        postProcessValue: host => results => WCwhenPropertyReady(host, `elements.container`)
-            .then(container => container.classList[results.sanitized ? `add` : `remove`](`checked`)),
+        preProcessValue: host => value => {
+            if (!host.cachedPreProcessValueNeedsUpdate) {
+                return host.cachedPreProcessValue
+            }
+
+            return ValidateBool(value)
+        },
+        postProcessValue: host => results => Promise.all([
+            WCWhenPropertyReady(host, `elements.container`).then(container => container.classList[results.sanitized ? `add` : `remove`](`checked`)),
+            WCWhenPropertyReady(host, `input`).then(input => input.checked = results.sanitized)
+        ]),
         checkValidity
     },
     computed: {
@@ -55,7 +63,10 @@ export const InputBool = WCConstructor({
         validity
     },
     getters: {
-        value: host => host.preProcessValue(Get(host, `state.value.value`, false)).sanitized
+        value: host => {
+            if (!host.cacheNeedsUpdate) { return host.cachedValue.sanitized }
+            return host.preProcessValue(Get(host, `state.value.value`, false)).sanitized
+        }
     },
     onConnected: host => host.inputID = ID(),
     formElement: true

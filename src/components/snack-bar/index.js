@@ -1,6 +1,6 @@
 import {
     WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToString,
-    ObserveEvent, IndexOf, IfEmpty, EventName, OnNextFrame, WCwhenPropertyReady, iconInfo, iconCheck,
+    ObserveEvent, IndexOf, IfEmpty, EventName, OnNextFrame, WCWhenPropertyReady, iconInfo, iconCheck,
     iconError, iconWarning, iconClose
 } from '../..'
 
@@ -47,7 +47,7 @@ const setType = host => {
 }
 
 const setIcon = (host, key) => {
-    WCwhenPropertyReady(host, key)
+    WCWhenPropertyReady(host, key)
         .then(() => {
             const icon = host.elements[key]
 
