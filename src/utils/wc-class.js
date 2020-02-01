@@ -14,18 +14,20 @@ export function WCClass(
     onDisconnected,
     formElement,
 ) {
+    console.log(componentName)
     class ComponentClass extends HTMLElement {
         static get observedAttributes() { return observedAttributes }
 
         constructor() {
-            const self = super()
-            self.wcID = ``
-            self.state = {}
-            self.elements = {}
-            self.disconnectElements = () => { }
-            SetShadowRoot({ componentName, template, style, element: self })
-            try { self.internals_ = self.attachInternals() } catch (error) { }
-            return self
+            console.log(`suosp`)
+            const s = super()
+            s.wcID = ``
+            s.state = {}
+            s.elements = {}
+            s.disconnectElements = () => { }
+            SetShadowRoot({ componentName, template, style, element: s })
+            try { s.internals_ = s.attachInternals() } catch (error) { }
+            return s
         }
 
         get form() { return this.internals_.form }
@@ -57,9 +59,11 @@ export function WCClass(
         }
     }
 
+    console.log(ComponentClass)
+
     if (formElement) {
         class FormElementComponent extends ComponentClass {
-            static formAssociated = true
+            static get formAssociated() { return true }
             constructor() {
                 const self = super()
                 try { self.internals_ = self.attachInternals() } catch (error) { }

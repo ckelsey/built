@@ -1,6 +1,8 @@
 const fs = require(`fs`)
 const https = require(`https`)
+const path = require(`path`)
 const port = 3000
+const index = process.env.INDEXFILE || `lambda`
 const options = {
     key: fs.readFileSync(`ssl.key`, `utf8`),
     cert: fs.readFileSync(`ssl.crt`, `utf8`),
@@ -10,11 +12,12 @@ const requestHandler = (request, response) => {
     let payload = ``
 
     if (request.url === `/`) {
-        payload = Buffer.from(fs.readFileSync(`lambda.html`, `utf8`)).toString()
+        payload = Buffer.from(fs.readFileSync(`${index}.html`, `utf8`)).toString()
     } else {
         try {
-            payload = Buffer.from(fs.readFileSync(request.url)).toString()
+            payload = Buffer.from(fs.readFileSync(path.resolve(`.${request.url}`))).toString()
         } catch (error) {
+            console.log(error)
         }
     }
 

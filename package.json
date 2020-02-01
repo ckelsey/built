@@ -6,9 +6,12 @@
         "start": "NODE_ENV=development webpack-dev-server --config ./webpack.config.js",
         "build": "NODE_ENV=production webpack --progress --config ./webpack.config.js",
         "watch": "NODE_ENV=production webpack --watch --progress --config ./webpack.config.js",
+        "watch-demo": "NODE_ENV=production webpack --watch --progress --config ./webpack.demo.config.js",
         "doc": "documentation build --document-exported ./src/index.js --format html --output ./docs",
         "server": "node server.js",
-        "serve": "(npm run server) & npm run watch"
+        "serve": "(npm run server) & npm run watch",
+        "setdemo": "INDEXFILE=serverless",
+        "demo": "(INDEXFILE=serverless npm run server) & npm run watch-demo"
     },
     "files": [
         "dist",
@@ -61,15 +64,8 @@
         "web components"
     ],
     "dependencies": {
-        "@webcomponents/webcomponentsjs": "^2.4.0",
-        "browser-sync": "^2.26.7",
-        "gulp": "^4.0.2",
-        "lodash.memoize": "^4.1.2",
-        "memoize-state": "^2.0.13"
+        "@webcomponents/webcomponentsjs": "^2.4.0"
     },
-    "sideEffects": [
-        "src/utils/id/index.js"
-    ],
     "description": "Useful things for UI",
     "bugs": {
         "url": "https://github.com/ckelsey/built/issues"
