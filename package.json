@@ -1,6 +1,6 @@
 {
     "name": "builtjs",
-    "version": "0.3.62",
+    "version": "0.3.63",
     "scripts": {
         "start": "webpack --watch --progress --config ./webpack.config.js",
         "build": "webpack --progress --config ./webpack.config.js"
