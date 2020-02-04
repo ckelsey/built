@@ -20,7 +20,7 @@ const exported = {
     entry: path.resolve(`./src/index`),
     resolve: { extensions: [`*`, `.js`, `.json`, `.scss`, `.html`] },
     optimization: {
-        minimize: true
+        minimize: false
     },
     output: {
         filename: `app.js`,

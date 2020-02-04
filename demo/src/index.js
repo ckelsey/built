@@ -1,13 +1,9 @@
-// import '@webcomponents/webcomponentsjs/webcomponents-bundle'
-import '../index.html'
+import '@webcomponents/webcomponentsjs/webcomponents-bundle'
 import 'builtjs'
+import '../index.html'
 import './components/test-element/index.js'
-// import 'core-js/features/url'
-// import 'core-js/features/url-search-params'
-// import '../../dist/built'
-// import { Router, CreateElement } from 'builtjs'
 
-const { Router, CreateElement } = window.builtjs
+import { Router, CreateElement } from 'builtjs'
 
 console.log(`Router`, Router, CreateElement)
 
