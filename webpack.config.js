@@ -1,36 +1,13 @@
-/* eslint-disable tree-shaking/no-side-effects-in-initialization */
-/* eslint-disable no-empty */
-// const index = process.env.INDEX || `lambda`
-// const WatchIgnorePlugin = require(`webpack`).WatchIgnorePlugin
-// const NamedModulesPlugin = require(`webpack`).NamedModulesPlugin
-// const HotModuleReplacementPlugin = require(`webpack`).HotModuleReplacementPlugin
+// const CleanWebpackPlugin = require(`clean-webpack-plugin`)
+const { CleanWebpackPlugin } = require(`clean-webpack-plugin`)
 const LoaderOptionsPlugin = require(`webpack`).LoaderOptionsPlugin
-// const join = require(`path`).join
-const _resolve = require(`path`).resolve
-
-// const accessSync = require(`fs`).accessSync
+// const HtmlWebpackPlugin = require(`html-webpack-plugin`)
+const path = require(`path`)
 const exec = require(`child_process`).exec
 const autoprefixer = require(`autoprefixer`)
-// const HtmlWebpackPlugin = require(`html-webpack-plugin`)
-// const HardSourceWebpackPlugin = require(`hard-source-webpack-plugin`)
-// const BundleAnalyzerPlugin = require(`webpack-bundle-analyzer`).BundleAnalyzerPlugin
 
-// const env = process.env.NODE_ENV || `production`
-const outDirPath = _resolve(`${__dirname}/dist`)
-
-// let devServer = {}
-// let plugins = []
-// let postPluginHasRan = false
-
-const optimization = {
-    // minimize: false,
-    // splitChunks: {
-    //     name: true,
-    //     chunks: `async`,
-    // },
-    // usedExports: true,
-    // providedExports: true,
-}
+const src = path.resolve(__dirname, `./src`)
+const dist = path.resolve(__dirname, `./dist`)
 
 const postPlugin = {
     apply: compiler => compiler.hooks.afterEmit.tap(
@@ -42,69 +19,33 @@ const postPlugin = {
     )
 }
 
-// if (env === `development`) {
-//     devServer = {
-//         contentBase: __dirname,
-//         compress: false,
-//         port: 9000,
-//         https: false,
-//         inline: false,
-//         open: false,
-//         host: `0.0.0.0`,
-//         hot: false,
-//         liveReload: false,
-//         writeToDisk: true,
-//         watchOptions: {
-//             aggregateTimeout: 300,
-//             poll: 1000,
-//         },
-//     }
-
-//     plugins = [
-//         new WatchIgnorePlugin([join(__dirname, `node_modules`)]),
-//         new HtmlWebpackPlugin({ filename: `index.html`, template: `index.html` }),
-//         new NamedModulesPlugin(),
-//         new HotModuleReplacementPlugin(),
-//         new LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
-//         new BundleAnalyzerPlugin(),
-//         postPlugin
-//     ]
-// }
-
-// if (env === `production`) {
-//     plugins = [
-//         new LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
-//         postPlugin
-//     ]
-// }
-
-// try {
-//     if (accessSync(_resolve(`${__dirname}/node_modules`))) {
-//         plugins.push(new HardSourceWebpackPlugin())
-//     }
-// } catch (error) { }
-
-const exported = {
+module.exports = {
     mode: `production`,
-    context: __dirname,
-    entry: _resolve(`./src/index`),
-    // resolve: { extensions: [`*`, `.js`, `.html`] },
-    resolve: { extensions: [`*`, `.js`, `.json`, `.scss`, `.html`] },
-    optimization,
-    // devServer,
+    entry: {
+        // legacy: `core-js/fn/promise`,
+        bundle: [`${src}/index.js`]
+    },
     output: {
-        filename: `built.js`,
-        path: outDirPath,
+        path: dist,
+        filename: `[name].js`,
         libraryTarget: `umd`,
         library: `builtjs`,
-        globalObject: `typeof self !== 'undefined' ? self : this`
+        // globalObject: `this`
+        // globalObject: `typeof self !== 'undefined' ? self : this`
     },
-    plugins: [
-        new LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
-        postPlugin
-    ],
+    optimization: {
+        // splitChunks: {
+        //     maxAsyncRequests: 1
+        // },
+        minimize: true
+    },
     module: {
         rules: [
+            {
+                test: /\.js$/,
+                loader: `babel-loader`,
+                exclude: /node_modules/
+            },
             // {
             //     test: /\.js$/,
             //     exclude: /node_modules/,
@@ -115,13 +56,9 @@ const exported = {
             //                 [`@babel/preset-env`, {
             //                     modules: false,
             //                     corejs: 3,
-            //                     // useBuiltIns: `entry`,
-            //                     // targets: {
-            //                     //     chrome: 78,
-            //                     //     ie: 11,
-            //                     //     safari: 12,
-            //                     //     edge: 17
-            //                     // }
+            //                     useBuiltIns: `usage`,
+            //                     targets: [`last 2 versions`, `ie >= 11`],
+            //                     exclude: [`transform-classes`]
             //                 }]
             //             ]
             //         }
@@ -137,7 +74,7 @@ const exported = {
                             minimize: true
                         }
                     }
-                ]
+                ],
             },
             {
                 test: /\.(scss|css)$/,
@@ -148,42 +85,29 @@ const exported = {
                     `postcss-loader`,
                 ],
             }
-            // {
-            //     test: /\.js$/,
-            //     exclude: /node_modules/,
-            //     use: [{
-            //         loader: `babel-loader`,
-            //         options: {
-            //             presets: [
-            //                 [`@babel/env`, {
-            //                     modules: false,
-            //                 }],
-            //             ]
-            //         }
-            //     }]
-            // }, {
-            //     test: /\.html$/,
-            //     exclude: /node_modules/,
-            //     use: [
-            //         {
-            //             loader: `html-loader`,
-            //             options: {
-            //                 minimize: true
-            //             }
-            //         }
-            //     ]
-            // },
-            // {
-            //     test: /\.(scss|css)$/,
-            //     exclude: /node_modules/,
-            //     use: [
-            //         `css-loader`,
-            //         `sass-loader`,
-            //         `postcss-loader`,
-            //     ],
-            // },
         ]
-    }
+    },
+    resolve: { extensions: [`*`, `.js`, `.json`, `.scss`, `.html`] },
+    // resolve: {
+    //     extensions: [`.js`],
+    //     // modules: [`node_modules`, `src`],
+    //     // alias: {
+    //     //     services: `${src}/app/services`,
+    //     //     helpers: `${src}/app/helpers`
+    //     // }
+    // },
+    plugins: [
+        new CleanWebpackPlugin({
+            root: process.cwd(),
+            verbose: true,
+            dry: false
+        }),
+        // new HtmlWebpackPlugin({
+        //     inject: false,
+        //     template: `${src}/demo/index.html`,
+        //     filename: 'index.html'
+        // }),
+        new LoaderOptionsPlugin({ options: { postcss: [autoprefixer()] } }),
+        postPlugin
+    ]
 }
-
-module.exports = exported

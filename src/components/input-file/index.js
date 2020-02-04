@@ -1,7 +1,5 @@
-import { WCConstructor, WCDefine, ID, ObserveEvent } from '../..'
-// import { observedAttributes, properties } from './properties'
-// import { processedValue, formattedValue, valid, validationMessage } from './computed'
-// import { setError, clearInput } from './methods-value'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 
 const outerStyle = require(`../input-shared/outer.scss`).toString()
 const style = require(`./style.scss`).toString()

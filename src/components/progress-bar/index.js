@@ -1,5 +1,16 @@
-import { WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToString, IndexOf, ToNumber, CommasToArray, ToMap, ValidateHtml, OnNextFrame } from '../..'
-import { ObserveEvent } from '../../utils/observe-event'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { CommasToArray } from '../../utils/commas-to-array.js'
+import { ToMap } from '../../utils/to-map.js'
+import { ValidateHtml } from '../../utils/validate-html.js'
+import { IndexOf } from '../../utils/index-of.js'
 
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 const style = require(`./style.scss`).toString()

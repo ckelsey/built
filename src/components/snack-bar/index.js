@@ -1,8 +1,16 @@
-import {
-    WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToString,
-    ObserveEvent, IndexOf, IfEmpty, EventName, OnNextFrame, WCWhenPropertyReady, iconInfo, iconCheck,
-    iconError, iconWarning, iconClose
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { EventName } from '../../utils/event-name.js'
+import { IndexOf } from '../../utils/index-of.js'
+import { iconInfo, iconCheck, iconError, iconWarning, iconClose } from '../../services/icons.js'
+import { IfEmpty } from '../../utils/if-empty.js'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./outer.scss`).toString()

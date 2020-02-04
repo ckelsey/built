@@ -1,4 +1,14 @@
-import { Pipe, ToBool, IfInvalid, ToNumber, WCConstructor, WCDefine, OnNextFrame, IndexOf, Timer, EaseInOut, Get } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { Get } from '../../utils/get.js'
+import { IndexOf } from '../../utils/index-of.js'
+import { Timer } from '../../services/timer.js'
+import { EaseInOut } from '../../utils/ease-in-out.js'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./outer.scss`).toString()

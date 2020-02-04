@@ -1,5 +1,4 @@
-import { WCConstructor, WCDefine } from 'builtjs'
-
+const { WCConstructor, WCDefine } = window.builtjs
 const outerStyle = require(`./outer.scss`).toString()
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)

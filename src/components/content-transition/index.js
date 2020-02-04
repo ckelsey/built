@@ -1,5 +1,10 @@
-import { WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToNumber } from '../..'
-import { transition, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren, setCurrent } from './methods'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { transition, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren, setCurrent } from './methods.js'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./outer.scss`).toString()

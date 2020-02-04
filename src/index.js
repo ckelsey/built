@@ -1,3 +1,5 @@
+import '@webcomponents/webcomponentsjs/webcomponents-bundle'
+
 /** COMPONENTS */
 export { AjaxForm } from './components/ajax-form'
 export { ButtonElement } from './components/button-element'

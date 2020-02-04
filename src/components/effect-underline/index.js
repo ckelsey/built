@@ -1,4 +1,5 @@
-import { WCConstructor, WCDefine } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 import {
     observedAttributes,
     properties,
@@ -11,8 +12,8 @@ import {
     canRunStart,
     canRunEnd,
     nonAutoOrigin
-} from './properties'
-import { toggle, unloadTargets, open, close } from './methods'
+} from './properties.js'
+import { toggle, unloadTargets, open, close } from './methods.js'
 
 const elements = {
     root: { selector: `.effect-underline-container` },

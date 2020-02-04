@@ -1,4 +1,12 @@
-import { Pipe, ToBool, ToString, IfInvalid, WCDefine, WCConstructor, ObserveEvent, SetStyleRules, ValidateHtml } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { ValidateHtml } from '../../utils/validate-html.js'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./outer.scss`).toString()

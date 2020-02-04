@@ -1,4 +1,7 @@
-import { WCConstructor, WCDefine, OnNextFrame, WCWhenPropertyReady } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
 
 const style = require(`./style.scss`).toString()
 const elements = { svgContainer: { selector: `.svg-container` }, }

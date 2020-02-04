@@ -1,4 +1,4 @@
-import { onDone } from "./on-done"
+import { onDone } from './on-done.js'
 
 export function onKeyDown(e, host) {
     if (!e) { return }

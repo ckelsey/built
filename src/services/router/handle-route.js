@@ -1,9 +1,9 @@
-import queryObjectToString from './query-object-to-string'
-import parseUrl from './parse-url'
-import getRoute from './get-route'
-import { Get } from '../..'
-import getQuery from './get-query'
-import UpdateState from './update-state'
+import queryObjectToString from './query-object-to-string.js'
+import parseUrl from './parse-url.js'
+import getRoute from './get-route.js'
+import { Get } from '../../utils/get.js'
+import getQuery from './get-query.js'
+import UpdateState from './update-state.js'
 
 const handleRoute = (methods, url, replace = false, force = false) => {
     const parsedUrl = parseUrl(url).toLowerCase()

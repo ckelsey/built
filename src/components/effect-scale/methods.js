@@ -1,4 +1,5 @@
-import { ObserveEvent, GetCurve } from '../..'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { GetCurve } from '../../utils/get-curve.js'
 
 const idealFPS = 60
 const frames = speed => Math.round(idealFPS * (speed / 1000))

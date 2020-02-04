@@ -47,12 +47,12 @@ export const CreateElement = obj => {
         if (key === `children`) {
             if (Array.isArray(obj[key])) {
                 return obj[key].forEach(
-                    child => IsElement(child) ?
+                    child => IsElement(child).valid ?
                         el.appendChild(child) :
                         el.appendChild(CreateElement(child))
                 )
             } else {
-                return IsElement(obj[key]) ?
+                return IsElement(obj[key]).valid ?
                     el.appendChild(obj[key]) :
                     el.appendChild(CreateElement(obj[key]))
             }

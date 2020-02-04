@@ -1,4 +1,10 @@
-import { WCConstructor, WCDefine, Pipe, ToBool, IfInvalid, ToString, ObserveEvent } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)

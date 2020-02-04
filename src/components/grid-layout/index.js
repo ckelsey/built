@@ -1,6 +1,20 @@
-import { WCConstructor, WCDefine, AppendStyleElement, ObserverUnsubscribe, SetStyleRules, ID, ToNumber, Pipe, IfInvalid, Get, ToBool, OnNextFrame, ObserveSlots, CommasToArray, ToMap } from '../..'
-import { Try } from '../../utils/try'
-import { ObserveVisibility } from '../../utils/observe-visibility'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { Try } from '../../utils/try.js'
+import { ObserveVisibility } from '../../utils/observe-visibility.js'
+import { Pipe } from '../../utils/pipe.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { CommasToArray } from '../../utils/commas-to-array.js'
+import { ToMap } from '../../utils/to-map.js'
+import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
+import { Get } from '../../utils/get.js'
+import { ObserveSlots } from '../../utils/observe-slots.js'
+import { ID } from '../../services/id.js'
+import { SetStyleRules } from '../../utils/set-style-rules.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { AppendStyleElement } from '../../utils/append-style-element.js'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./external.scss`).toString()

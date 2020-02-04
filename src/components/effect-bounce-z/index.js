@@ -1,7 +1,14 @@
-import {
-    WCConstructor, WCDefine, Pipe, IfInvalid, ToNumber, ToArray,
-    ComponentClassObject, GetCurve, ObserveEvent, Timer, Get, IsElement
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { Get } from '../../utils/get.js'
+import { Timer } from '../../services/timer.js'
+import { GetCurve } from '../../utils/get-curve.js'
+import { IsElement } from '../../utils/is-element.js'
+import { ToArray } from '../../utils/to-array.js'
 
 const template = require(`./index.html`)
 const componentName = `effect-bounce-z`
@@ -59,7 +66,6 @@ const loadTargets = (_val, host) => {
 }
 
 const properties = {
-    class: ComponentClassObject,
     targets: {
         format: val => Pipe(ToArray, IfInvalid([]))(val).value,
         onChange: loadTargets

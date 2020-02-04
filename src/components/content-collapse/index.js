@@ -2,10 +2,17 @@
  * add ripple and bounce to toggle container
  */
 
-import { WCConstructor, ComponentClassObject, WCDefine, ToNumber, ToString, IfInvalid, ToBool, Pipe, ObserveEvent } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
 import { GetParent } from '../../utils/get-parent.js'
 import { iconChevron } from '../../services/icons.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { ToString } from '../../utils/to-string.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { ToNumber } from '../../utils/to-number.js'
 
 const outerStyle = `:host(content-collapse) { display: block; }`
 const style = require(`./style.scss`).toString()
@@ -14,7 +21,6 @@ const componentName = `content-collapse`
 const componentRoot = `.${componentName}-container`
 
 const properties = {
-    class: ComponentClassObject,
     expanded: {
         format: val => Pipe(ToBool, IfInvalid(false))(val).value,
         onChange: (val, host) => {

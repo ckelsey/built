@@ -14,12 +14,11 @@ export function WCClass(
     onDisconnected,
     formElement,
 ) {
-    console.log(componentName)
+
     class ComponentClass extends HTMLElement {
         static get observedAttributes() { return observedAttributes }
 
         constructor() {
-            console.log(`suosp`)
             const s = super()
             s.wcID = ``
             s.state = {}
@@ -58,8 +57,6 @@ export function WCClass(
             }
         }
     }
-
-    console.log(ComponentClass)
 
     if (formElement) {
         class FormElementComponent extends ComponentClass {

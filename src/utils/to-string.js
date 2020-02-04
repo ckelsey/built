@@ -1,4 +1,6 @@
-import { Get, TMonad, Type } from '..'
+import { TMonad } from './t-monad.js'
+import { Type } from './type.js'
+import { Get } from './get.js'
 
 export function ToString(value) {
     let stop = Get(value, `stop`, false)

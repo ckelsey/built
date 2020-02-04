@@ -1,8 +1,9 @@
 const fs = require(`fs`)
 const https = require(`https`)
 const path = require(`path`)
-const port = 3000
-const index = process.env.INDEXFILE || `lambda`
+const mime = require(`mime-types`)
+const port = 5000
+const index = process.env.INDEXFILE || `index`
 const options = {
     key: fs.readFileSync(`ssl.key`, `utf8`),
     cert: fs.readFileSync(`ssl.crt`, `utf8`),
@@ -10,14 +11,22 @@ const options = {
 
 const requestHandler = (request, response) => {
     let payload = ``
+    let contentType = ``
+
+    const setIndex = () => {
+        contentType = mime.contentType(path.extname(`${index}.html`))
+        payload = fs.readFileSync(`${index}.html`, `utf8`)
+    }
 
     if (request.url === `/`) {
-        payload = Buffer.from(fs.readFileSync(`${index}.html`, `utf8`)).toString()
+        setIndex()
     } else {
+
         try {
-            payload = Buffer.from(fs.readFileSync(path.resolve(`.${request.url}`))).toString()
+            contentType = mime.contentType(path.extname(path.resolve(`.${request.url}`)))
+            payload = fs.readFileSync(path.resolve(`.${request.url}`))
         } catch (error) {
-            console.log(error)
+            setIndex()
         }
     }
 
@@ -25,8 +34,9 @@ const requestHandler = (request, response) => {
     response.setHeader(`Access-Control-Request-Method`, `*`)
     response.setHeader(`Access-Control-Allow-Methods`, `OPTIONS, GET`)
     response.setHeader(`Access-Control-Allow-Headers`, `*`)
+    response.setHeader(`Content-Type`, contentType)
     response.writeHead(200)
-    response.end(payload)
+    response.end(payload, `binary`)
 }
 
 const server = https.createServer(options, requestHandler)

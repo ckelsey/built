@@ -1,4 +1,4 @@
-import { TMonad } from '..'
+import { TMonad } from './t-monad.js'
 
 /**
  * Returns a function that then takes a TMonad. If that value is invalid, it returns the replacement instead

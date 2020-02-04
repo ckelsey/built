@@ -1,5 +1,5 @@
-import { Get } from "./get"
-import { OnNextFrame } from "../services/on-next-frame"
+import { OnNextFrame } from '../services/on-next-frame.js'
+import { Get } from './get.js'
 
 export function WCWhenPropertyReady(host, path, isMethod) {
     let max = 1000

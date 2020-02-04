@@ -1,4 +1,8 @@
-import { FromEntities, ToString, Pipe, svgTags, htmlTags } from '..'
+import { FromEntities } from './from-entities.js'
+import { ToString } from './to-string.js'
+import { Pipe } from './pipe.js'
+import { svgTags } from './svg-tags.js'
+import { htmlTags } from './html-tags.js'
 
 export function ValidateHtml(str, allowedHtmlTags, disallowedHtmlTags) {
     const original = str

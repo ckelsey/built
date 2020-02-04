@@ -1,4 +1,14 @@
-import { WCConstructor, WCDefine, ObserveEvent, ToNumber, IndexOf, ToString, IfInvalid, ToBool, Pipe, WasClickedOn, Throttle } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { Throttle } from '../../utils/throttle.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { IndexOf } from '../../utils/index-of.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { WasClickedOn } from '../../utils/was-clicked-on.js'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./outer.scss`).toString()
@@ -8,78 +18,6 @@ const componentRoot = `.${componentName}-container`
 const directions = [`horizontal`, `vertical`]
 const alignments = [`left`, `right`]
 const setAttr = (el, attr, value) => el ? el.setAttribute(attr, value) : undefined
-
-/** 
- * TODO
- * commented out collapse on wrap and minwidth settings as they are buggy at best
- */
-
-// const removeSizer = el => (el.parentElement || el.parentNode.host).removeChild(el)
-
-// const createSizer = () => {
-//     const iframe = document.createElement(`iframe`)
-//     iframe.style.opacity = `0`
-//     iframe.style.position = `absolute`
-//     iframe.style.width = `100%`
-//     iframe.style.height = `100%`
-//     iframe.style.top = `0%`
-//     iframe.style.left = `0%`
-//     iframe.style.zIndex = `-1`
-//     iframe.style.pointerEvents = `none`
-//     iframe.style.border = `none`
-//     return iframe
-// }
-
-// const handleCollapse = (container, host) => {
-//     Throttle(() => {
-//         if (!host.collapseonwrap || host.expanded) { return }
-
-//         const scrollWidth = container.scrollWidth
-//         const width = container.offsetWidth
-//         const itemsWidth = host.elements.items.scrollWidth
-//         const hostWidth = host.scrollWidth
-//         const siblingsWidth = Array.from(container.children).reduce((total, current) => total + current.scrollWidth, -(hostWidth + host.sizer.scrollWidth))
-
-//         if (scrollWidth > width && !host.expandable) {
-//             host.expandable = true
-//         } else if (width >= itemsWidth + siblingsWidth) {
-//             host.expandable = false
-//         }
-//     }, host.throttle || 0)()
-// }
-
-// const setContainer = (container, host) => {
-//     if (host.sizer) { removeSizer(host.sizer) }
-//     if (!container || !host.collapseonwrap) { return }
-
-//     host.sizer = createSizer()
-//     container.appendChild(host.sizer)
-
-//     host.sizer.contentWindow.addEventListener(`resize`, () => handleCollapse(container, host))
-//     requestAnimationFrame(() => handleCollapse(container, host))
-// }
-
-// const handleMinWidth = host => {
-//     if (!host.minwidth) { return }
-
-//     if (host.minWidthSizer.scrollWidth < host.minwidth) {
-//         host.expandable = true
-//     } else {
-//         host.expandable = false
-//     }
-// }
-
-// const setMinWidth = (minWidth, host) => {
-//     if (!minWidth && host.minWidthSizer) { return removeSizer(host.minWidthSizer) }
-//     if (!minWidth) { return }
-
-//     const root = host.elements.root
-//     host.minWidthSizer = createSizer()
-//     root.appendChild(host.minWidthSizer)
-//     host.minWidthSizer.contentWindow.addEventListener(`resize`, () => handleMinWidth(host))
-
-//     requestAnimationFrame(() => handleMinWidth(host))
-// }
 
 const setMinPageWidth = (minWidth, host) => {
     if (!minWidth) { return }
@@ -141,27 +79,7 @@ const properties = {
     background: {
         format: val => Pipe(ToString, IfInvalid(`none`))(val).value,
         onChange(val, host) { setBackground(val, host.elements.background) }
-    },
-
-    // throttle: {
-    //     format: val => Pipe(ToNumber, IfInvalid(0))(val).value
-    // },
-    // minwidth: {
-    //     format: val => Pipe(ToNumber, IfInvalid(null))(val).value,
-    //     onChange: setMinWidth,
-    // },
-    // collapseonwrap: {
-    //     format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-    //     onChange(val, host) {
-    //         const root = host.elements.root
-    //         if (!root) { return }
-    //         root.classList[val ? `add` : `remove`](`collapseonwrap`)
-    //     }
-    // },
-    // container: {
-    //     format: (val, host) => Get(host, val, host),
-    //     onChange: setContainer
-    // }
+    }
 }
 
 const observedAttributes = Object.keys(properties)

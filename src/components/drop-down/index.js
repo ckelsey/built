@@ -1,4 +1,13 @@
-import { WCDefine, WCConstructor, ObserveEvent, ToBool, IfInvalid, Pipe, WasClickedOn, ObserverUnsubscribe, ObserveSlots, OnNextFrame } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
+import { ObserveSlots } from '../../utils/observe-slots.js'
+import { WasClickedOn } from '../../utils/was-clicked-on.js'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./outer.scss`).toString()

@@ -1,4 +1,4 @@
-import { ValidateHtml } from '../..'
+import { ValidateHtml } from '../../utils/validate-html.js'
 
 const parseUrl = url => {
     const validated = typeof url === `string`

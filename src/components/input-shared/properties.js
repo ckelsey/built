@@ -100,7 +100,7 @@ export const properties = {
         onChange: (_val, host) => setLabel(host),
     },
 
-    matchinput: { format: val => IsElement(val) ? val : undefined },
+    matchinput: { format: val => IsElement(val).valid ? val : undefined },
 
     name: {
         format: stringOrEmpty,

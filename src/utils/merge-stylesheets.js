@@ -6,7 +6,7 @@ function exists(thing) { return !!thing }
 function getRules(sheet) { return Get(sheet, `sheet.rules`, Get(sheet, `sheet.cssRules`, [])) }
 function validRule(rule) { return !!rule.selector && rule.cssText }
 function getSelector(obj) { return obj.selector }
-function getStyleElement(obj) { return IsElement(obj) ? obj : Get(obj, `ownerNode`, Get(obj, `0.parentStyleSheet.ownerNode`)) }
+function getStyleElement(obj) { return IsElement(obj).valid ? obj : Get(obj, `ownerNode`, Get(obj, `0.parentStyleSheet.ownerNode`)) }
 
 function mapRuleObject(rule) {
     return {

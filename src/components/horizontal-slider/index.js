@@ -7,10 +7,12 @@
  * odd flicker when scrolling back
  * page scroll when center is messed up
  */
-import { WCConstructor, WCDefine, AppendStyleElement } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 import elements from './elements'
 import { observedAttributes, properties } from './properties'
 import { scrollToIndex } from './methods'
+import { AppendStyleElement } from '../../utils/append-style-element.js'
 
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)

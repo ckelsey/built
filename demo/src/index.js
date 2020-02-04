@@ -1,10 +1,15 @@
-import '@webcomponents/webcomponentsjs/webcomponents-bundle'
+// import '@webcomponents/webcomponentsjs/webcomponents-bundle'
+import '../index.html'
+import 'builtjs'
+import './components/test-element/index.js'
 // import 'core-js/features/url'
 // import 'core-js/features/url-search-params'
-import '../../dist/built'
-import { Router, CreateElement } from 'builtjs'
-import './index.html'
-import './components/test-element/index.js'
+// import '../../dist/built'
+// import { Router, CreateElement } from 'builtjs'
+
+const { Router, CreateElement } = window.builtjs
+
+console.log(`Router`, Router, CreateElement)
 
 const Routes = {
     home: {

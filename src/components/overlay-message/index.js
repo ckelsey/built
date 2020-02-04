@@ -1,8 +1,17 @@
-import {
-    WCConstructor, WCDefine, Pipe, ToBool,
-    IfInvalid, ToString, IndexOf, Get, Set, ObserveEvent, EaseInOut,
-    ObserverUnsubscribe, ObserveSlots, OnNextFrame, Timer
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
+import { Get } from '../../utils/get.js'
+import { ObserveSlots } from '../../utils/observe-slots.js'
+import { Timer } from '../../services/timer.js'
+import { EaseInOut } from '../../utils/ease-in-out.js'
+import { IndexOf } from '../../utils/index-of.js'
 
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)

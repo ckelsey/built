@@ -1,6 +1,11 @@
-import { Pipe, ToArray, IfInvalid, Get, ToBool, ToNumber } from '../..'
-import { unsetItemEvents, setItemEvents, setChicklets, setPrevious, setNext } from './elements'
-import { autoplay, setLoop } from './methods'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { Get } from '../../utils/get.js'
+import { unsetItemEvents, setItemEvents, setChicklets, setPrevious, setNext } from './elements.js'
+import { autoplay, setLoop } from './methods.js'
+import { ToArray } from '../../utils/to-array.js'
 
 export const attributes = {
     chicklets: {

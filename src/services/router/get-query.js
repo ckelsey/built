@@ -1,4 +1,4 @@
-import invalidQuery from './invalid-query'
+import invalidQuery from './invalid-query.js'
 
 const getQuery = url => {
     const result = {}

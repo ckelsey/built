@@ -1,4 +1,5 @@
-import { IsTMonad, Type } from '..'
+import { Type } from './type.js'
+import { IsTMonad } from './is-t-monad.js'
 
 export function TMonad(value) {
     if (IsTMonad(value)) {

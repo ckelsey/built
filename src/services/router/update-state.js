@@ -1,4 +1,4 @@
-import queryObjectToString from './query-object-to-string'
+import queryObjectToString from './query-object-to-string.js'
 
 const addLeadingSlash = pathname => !pathname ? `` : pathname[0] === `/` ? pathname : `/${pathname}`
 const joinUrl = (pathname, query) => `${location.protocol}//${location.host}${addLeadingSlash(pathname)}${queryObjectToString(query)}`

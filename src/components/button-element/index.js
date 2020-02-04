@@ -1,5 +1,11 @@
-import { WCConstructor, WCDefine, CreateElement, Pipe, IfInvalid, ToString, WCWhenPropertyReady } from '../..'
-import { ToBool } from '../../utils/to-bool'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToString } from '../../utils/to-string.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { CreateElement } from '../../utils/create-element.js'
 
 const template = require(`./index.html`)
 const componentName = `button-element`

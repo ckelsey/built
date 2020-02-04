@@ -1,12 +1,12 @@
-import { Observer } from '../..'
-import getQuery from './get-query'
-import queryObjectToString from './query-object-to-string'
-import GetRouteByPath from './get-route-by-path'
-import clickListener from './click-listener'
-import popStateListener from './pop-state-listener'
-import getRoute from './get-route'
-import handleRoute from './handle-route'
-import UpdateState from './update-state'
+import { Observer } from '../../utils/observer.js'
+import getQuery from './get-query.js'
+import queryObjectToString from './query-object-to-string.js'
+import GetRouteByPath from './get-route-by-path.js'
+import clickListener from './click-listener.js'
+import popStateListener from './pop-state-listener.js'
+import getRoute from './get-route.js'
+import handleRoute from './handle-route.js'
+import UpdateState from './update-state.js'
 
 export function Router(routes) {
     const _routes = Object.assign({}, routes)

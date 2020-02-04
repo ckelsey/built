@@ -1,6 +1,14 @@
-import { WCConstructor, WCDefine, ObserveEvent, iconArrow, Pipe, IndexOf, IfInvalid, ToBool, ToNumber } from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
 import { toggle } from './toggle.js'
 import { ToString } from '../../utils/to-string.js'
+import { iconArrow } from '../../services/icons.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { IndexOf } from '../../utils/index-of.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToBool } from '../../utils/to-bool.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
 const style = require(`./style.scss`).toString()
 const outerStyle = require(`./outer.scss`).toString()

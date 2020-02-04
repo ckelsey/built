@@ -1,8 +1,16 @@
-import {
-    WCConstructor, WCDefine, GetCurve, ObserveEvent, Timer, Get,
-    Pipe, IsElement, IfInvalid, ToNumber, CommasToArray, ToMap,
-    ComponentClassObject, ToArray
-} from '../..'
+import { WCConstructor } from '../../utils/wc-constructor.js'
+import { WCDefine } from '../../utils/wc-define.js'
+import { IfInvalid } from '../../utils/if-invalid.js'
+import { Pipe } from '../../utils/pipe.js'
+import { ToNumber } from '../../utils/to-number.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { CommasToArray } from '../../utils/commas-to-array.js'
+import { ToMap } from '../../utils/to-map.js'
+import { Get } from '../../utils/get.js'
+import { Timer } from '../../services/timer.js'
+import { GetCurve } from '../../utils/get-curve.js'
+import { IsElement } from '../../utils/is-element.js'
+import { ToArray } from '../../utils/to-array.js'
 
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)
@@ -79,7 +87,6 @@ const loadTargets = (_val, host) => {
 }
 
 const properties = {
-    class: ComponentClassObject,
     targets: {
         format: val => Pipe(ToArray, IfInvalid([]))(val).value,
         onChange: loadTargets

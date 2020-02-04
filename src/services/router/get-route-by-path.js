@@ -1,4 +1,4 @@
-import parseUrl from "./parse-url"
+import parseUrl from "./parse-url.js"
 
 const getRouteByPath = routes => path => {
     path = parseUrl(typeof path === `string` ? path.toLowerCase() : path)
