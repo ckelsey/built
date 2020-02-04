@@ -8,7 +8,7 @@ const postPlugin = {
     apply: compiler => compiler.hooks.afterEmit.tap(
         `AfterEmitPlugin`,
         () => new Promise(resolve => {
-            exec(`osascript -e 'display notification "Complete" with title "WEBPACK"'`, resolve)
+            exec(`cp -r ./node_modules/@webcomponents ./dist/@webcomponents`, () => exec(`osascript -e 'display notification "Complete" with title "WEBPACK"'`, resolve))
         })
     )
 }
@@ -34,7 +34,6 @@ const exported = {
         rules: [
             // {
             //     test: /\.js$/,
-            //     exclude: /node_modules/,
             //     use: [{
             //         loader: `babel-loader`,
             //         options: {
@@ -48,9 +47,11 @@ const exported = {
             //                         ie: 11,
             //                         safari: 12,
             //                         edge: 17
-            //                     }
+            //                     },
+            //                     exclude: [`transform-classes`]
             //                 }]
-            //             ]
+            //             ],
+            //             exclude: [`transform-classes`]
             //         }
             //     }]
             // },

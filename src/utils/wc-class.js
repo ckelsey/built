@@ -23,7 +23,7 @@ export function WCClass(
             s.wcID = ``
             s.state = {}
             s.elements = {}
-            s.disconnectElements = () => { }
+            s.disconnectElements = function () { }
             SetShadowRoot({ componentName, template, style, element: s })
             try { s.internals_ = s.attachInternals() } catch (error) { }
             return s
@@ -35,6 +35,7 @@ export function WCClass(
 
         connectedCallback() {
             WCOuterStyle(componentName, this, outerStyle)
+            console.log(`ComponentStore`, ComponentStore, ComponentStore.addComponent, typeof ComponentStore.addComponent)
             ComponentStore.addComponent(this)
             ConnectedFn(this)
         }

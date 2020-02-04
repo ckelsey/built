@@ -1,17 +1,17 @@
-/* eslint-disable tree-shaking/no-side-effects-in-initialization */
 import { Get } from '..'
 
 const ComponentStoreKey = Symbol.for(`builtjs.ComponentStore`)
 const globalSymbols = Object.getOwnPropertySymbols(global)
 const hasComponentStore = (globalSymbols.indexOf(ComponentStoreKey) > -1)
-const getTag = element => Get(element, `tagName`, ``).toLowerCase()
+
+function getTag(element) { return Get(element, `tagName`, ``).toLowerCase() }
 
 if (!hasComponentStore) {
     global[ComponentStoreKey] = {
         components: {},
         themes: {},
-        theme: (theme, element) => Object.keys(theme).forEach(property => element[property] = theme[property]),
-        addComponent: element => {
+        theme(theme, element) { return Object.keys(theme).forEach(function (property) { element[property] = theme[property] }) },
+        addComponent(element) {
             const tag = getTag(element)
 
             if (tag === ``) { return }
@@ -23,12 +23,12 @@ if (!hasComponentStore) {
 
             if (global[ComponentStoreKey].themes[tag]) {
                 Object.keys(global[ComponentStoreKey].themes[tag])
-                    .forEach(property =>
+                    .forEach(function (property) {
                         element[property] = global[ComponentStoreKey].themes[tag][property]
-                    )
+                    })
             }
         },
-        removeComponent: element => {
+        removeComponent(element) {
             const tag = getTag(element)
 
             if (tag === `` || !global[ComponentStoreKey].components[tag]) { return }
@@ -40,21 +40,21 @@ if (!hasComponentStore) {
             global[ComponentStoreKey].components[tag].splice(index, 1)
         },
 
-        addTheme: (tag, theme) => {
+        addTheme(tag, theme) {
             global[ComponentStoreKey].themes[tag] = theme
 
             if (!global[ComponentStoreKey].components[tag]) { return }
 
             global[ComponentStoreKey].components[tag]
-                .forEach(element => global[ComponentStoreKey].theme(global[ComponentStoreKey].themes[tag], element))
+                .forEach(function (element) { global[ComponentStoreKey].theme(global[ComponentStoreKey].themes[tag], element) })
         },
 
         tagSubscriptions: {},
-        triggerTagSubscriptions: (tag, data) => {
+        triggerTagSubscriptions(tag, data) {
             if (!global[ComponentStoreKey].tagSubscriptions[tag]) { return }
-            global[ComponentStoreKey].tagSubscriptions[tag].forEach(sub => sub(data))
+            global[ComponentStoreKey].tagSubscriptions[tag].forEach(function (sub) { sub(data) })
         },
-        watchForTag: (tag, cb) => {
+        watchForTag(tag, cb) {
             if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
                 global[ComponentStoreKey].tagSubscriptions[tag] = []
             }

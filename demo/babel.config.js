@@ -7,7 +7,8 @@ module.exports = {
                 modules: false,
                 useBuiltIns: `usage`,
                 targets: {
-                    browsers: [`last 2 versions`, `ie >= 11`]
+                    ie: 11,
+                    browsers: `last 2 versions`
                 },
                 exclude: [`transform-classes`]
             }
@@ -17,5 +18,6 @@ module.exports = {
         `@babel/plugin-syntax-dynamic-import`,
         `@babel/plugin-proposal-class-properties`,
         `@babel/plugin-transform-runtime`
-    ]
+    ],
+    exclude: [`transform-classes`]
 }

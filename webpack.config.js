@@ -41,11 +41,11 @@ module.exports = {
     },
     module: {
         rules: [
-            // {
-            //     test: /\.js$/,
-            //     loader: `babel-loader`,
-            //     exclude: /node_modules/
-            // },
+            {
+                test: /\.js$/,
+                loader: `babel-loader`,
+                exclude: /node_modules/
+            },
             // {
             //     test: /\.js$/,
             //     exclude: /node_modules/,
@@ -60,7 +60,8 @@ module.exports = {
             //                     targets: [`last 2 versions`, `ie >= 11`],
             //                     exclude: [`transform-classes`]
             //                 }]
-            //             ]
+            //             ],
+            //             exclude: [`transform-classes`]
             //         }
             //     }]
             // },

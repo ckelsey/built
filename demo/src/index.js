@@ -1,4 +1,4 @@
-import '@webcomponents/webcomponentsjs/webcomponents-bundle'
+// import '@webcomponents/webcomponentsjs/webcomponents-bundle'
 import 'builtjs'
 import '../index.html'
 import './components/test-element/index.js'
