@@ -5,6 +5,7 @@ import { dispose, run } from './methods.js'
 
 const elements = { root: { selector: `.effect-scale-container` } }
 const style = require(`./style.scss`).toString()
+const outerStyle = require(`./outer.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `effect-scale`
 const componentRoot = `.${componentName}-container`
@@ -14,6 +15,7 @@ export const EffectScale = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes,
     properties,
     elements,

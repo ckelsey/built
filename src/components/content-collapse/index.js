@@ -14,7 +14,7 @@ import { ToString } from '../../utils/to-string.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
 import { ToNumber } from '../../utils/to-number.js'
 
-const outerStyle = `:host(content-collapse) { display: block; }`
+const outerStyle = `content-collapse{display: block;}`
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `content-collapse`

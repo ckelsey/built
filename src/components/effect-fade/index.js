@@ -13,6 +13,7 @@ import { IsElement } from '../../utils/is-element.js'
 import { ToArray } from '../../utils/to-array.js'
 
 const style = require(`./style.scss`).toString()
+const outerStyle = `effect-ripple{pointer-events:none;}`
 const template = require(`./index.html`)
 const componentName = `effect-fade`
 const componentRoot = `.effect-fade-container`
@@ -104,6 +105,7 @@ export const EffectFade = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes: Object.keys(properties),
     properties,
     elements,

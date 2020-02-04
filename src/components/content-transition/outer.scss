@@ -1,21 +1,7 @@
-@mixin hostin {
+content-transition {
     display: block;
     width: 100%;
     position: relative;
-}
-
-:host(content-transition) {
-    @include hostin();
-}
-
-:host(content-transition).flex-stretch {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-content-transition {
-    @include hostin();
 
     &.flex-stretch {
         flex-grow: 1;

@@ -1,16 +1,7 @@
-@mixin hostin {
-    pointer-events: none;
-    box-sizing: border-box;
-}
-
-:host(effect-underline) {
-    @include hostin();
-}
-
-effect-underline,
 .effect-underline-container,
 .effect-underline-container * {
-    @include hostin();
+    pointer-events: none;
+    box-sizing: border-box;
 }
 
 .effect-underline-container {

@@ -11,6 +11,7 @@ import { Timer } from '../../services/timer.js'
 import { SelectorArrayToElements } from '../../utils/selector-array-to-elements.js'
 
 const style = require(`./style.scss`).toString()
+const outerStyle = `effect-ripple{pointer-events:none;}`
 const template = require(`./index.html`)
 const componentName = `effect-ripple`
 const componentRoot = `.effect-ripple-container`
@@ -150,6 +151,7 @@ export const EffectRipple = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes: Object.keys(properties),
     properties,
     elements,

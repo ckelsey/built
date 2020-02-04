@@ -4,6 +4,7 @@ import { OnNextFrame } from '../../services/on-next-frame.js'
 import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
 
 const style = require(`./style.scss`).toString()
+const outerStyle = `icon-element { display: inline-flex; align-items: center; justify-content: flex-start; }`
 const elements = { svgContainer: { selector: `.svg-container` }, }
 
 const attributes = {
@@ -40,6 +41,7 @@ export const IconElement = WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes: Object.keys(attributes),
     properties,
     elements,

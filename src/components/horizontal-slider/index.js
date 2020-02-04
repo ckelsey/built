@@ -15,6 +15,7 @@ import { scrollToIndex } from './methods'
 import { AppendStyleElement } from '../../utils/append-style-element.js'
 
 const style = require(`./style.scss`).toString()
+const outerStyle = `horizontal-slider { display: flex; width: 100%; height: 100%; pointer-events: none; overflow: hidden; position: relative; padding: 0 0 2.5em; box-sizing: border-box; }`
 const template = require(`./index.html`)
 const componentName = `horizontal-slider`
 const componentRoot = `.horizontal-slider-container`
@@ -24,6 +25,7 @@ export const HorizontalSlider = /*#__PURE__*/ WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes,
     properties,
     elements,

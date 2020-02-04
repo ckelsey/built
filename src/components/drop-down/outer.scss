@@ -1,13 +1,5 @@
-@mixin hostin {
+drop-down {
     outline: none !important;
     display: inline-block;
     position: relative;
-}
-
-:host(drop-down) {
-    @include hostin();
-}
-
-drop-down {
-    @include hostin();
 }

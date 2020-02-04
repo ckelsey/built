@@ -20,6 +20,7 @@ const elements = {
     underline: { selector: `.underline` }
 }
 
+const outerStyle = require(`./outer.scss`).toString()
 const style = require(`./style.scss`).toString()
 const template = require(`./index.html`)
 const componentName = `effect-underline`
@@ -29,6 +30,7 @@ export const EffectUnderline = /*#__PURE__*/ WCConstructor({
     componentRoot,
     template,
     style,
+    outerStyle,
     observedAttributes,
     properties,
     elements,

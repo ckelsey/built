@@ -1,4 +1,4 @@
-@mixin hostin {
+grid-layout {
     display: block;
     opacity: 0;
     transition: opacity 0.15s linear 0.15s;
@@ -6,12 +6,4 @@
     &[viewable="true"] {
         opacity: 1;
     }
-}
-
-:host(grid-layout) {
-    @include hostin();
-}
-
-grid-layout {
-    @include hostin();
 }

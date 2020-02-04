@@ -1,33 +1,13 @@
-@mixin hostin {
+input-field,
+input-bool,
+input-file,
+input-select {
     display: inline-block;
     width: 300px;
     max-width: 100%;
     vertical-align: top;
     position: relative;
     color: inherit;
-}
-
-:host(input-field) {
-    @include hostin();
-}
-
-:host(input-bool) {
-    @include hostin();
-}
-
-:host(input-file) {
-    @include hostin();
-}
-
-:host(input-select) {
-    @include hostin();
-}
-
-input-field,
-input-bool,
-input-file,
-input-select {
-    @include hostin();
 
     &[resize="auto"],
     &[resize="none"] {

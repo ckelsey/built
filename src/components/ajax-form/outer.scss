@@ -1,4 +1,4 @@
-@mixin hostin {
+ajax-form {
     font: inherit;
     line-height: inherit;
     display: block;
@@ -7,12 +7,4 @@
     input-field {
         width: 100%;
     }
-}
-
-:host(ajax-form) {
-    @include hostin();
-}
-
-ajax-form {
-    @include hostin();
 }

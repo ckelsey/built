@@ -1,4 +1,4 @@
-@mixin hostin {
+cookie-message {
     font: inherit;
     line-height: inherit;
     position: fixed;
@@ -11,15 +11,6 @@
     display: flex;
     align-items: flex-end;
     outline: none !important;
-}
-
-
-:host(cookie-message) {
-    @include hostin();
-}
-
-cookie-message {
-    @include hostin();
 }
 
 .cookie-message-container {

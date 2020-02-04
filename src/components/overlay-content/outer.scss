@@ -1,4 +1,4 @@
-@mixin hostStyles {
+overlay-content {
     display: block;
     position: fixed;
     height: 0px;
@@ -9,12 +9,4 @@
     overflow: visible;
     pointer-events: none;
     outline: none !important;
-}
-
-:host(overlay-content) {
-    @include hostStyles;
-}
-
-overlay-content {
-    @include hostStyles;
 }

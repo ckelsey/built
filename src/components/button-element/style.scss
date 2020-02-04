@@ -1,16 +1,8 @@
-@mixin hostin {
+button-element {
     font: inherit;
     line-height: inherit;
     display: inline-block;
     position: relative;
-}
-
-:host(button-element) {
-    @include hostin();
-}
-
-button-element {
-    @include hostin();
 }
 
 .button-element-container {

@@ -1,14 +1,6 @@
-@mixin hostin {
-    pointer-events: none;
-    box-sizing: border-box;
-}
-
-:host(effect-scale) {
-    @include hostin();
-}
-
 effect-scale,
 .effect-scale-container,
 .effect-scale-container * {
-    @include hostin();
+    pointer-events: none;
+    box-sizing: border-box;
 }
