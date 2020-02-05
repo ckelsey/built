@@ -1,4 +1,4 @@
-import { Get } from '..'
+import { Get } from '../utils/get.js'
 
 const ComponentStoreKey = Symbol.for(`builtjs.ComponentStore`)
 const globalSymbols = Object.getOwnPropertySymbols(global)

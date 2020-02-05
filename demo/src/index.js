@@ -1,11 +1,8 @@
-// import '@webcomponents/webcomponentsjs/webcomponents-bundle'
 import 'builtjs'
 import '../index.html'
 import './components/test-element/index.js'
 
 import { Router, CreateElement } from 'builtjs'
-
-console.log(`Router`, Router, CreateElement)
 
 const Routes = {
     home: {
@@ -16,7 +13,6 @@ const Routes = {
 }
 
 export const router = Router(Routes)
-console.log(router)
 
 router.route$.subscribe(route => {
     console.log(route)
