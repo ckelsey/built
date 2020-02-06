@@ -29,6 +29,6 @@
         "webpack-dev-server": "^3.5.0"
     },
     "dependencies": {
-        "builtjs": "^0.3.68"
+        "builtjs": "latest"
     }
 }
