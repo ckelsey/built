@@ -1,4 +1,4 @@
-import { OnNextFrame } from '..'
+import { OnNextFrame } from '../services/on-next-frame.js'
 
 export function PolyfillMutationObserver(w) {
     (function () {
@@ -15,7 +15,7 @@ export function PolyfillMutationObserver(w) {
             const cb = this.callBack
             let oldHtml
 
-            const func = () => {
+            function func() {
                 const html = element.innerHTML
 
                 if (html !== oldHtml) {

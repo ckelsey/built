@@ -1,5 +1,7 @@
 @import '../input-shared/style.scss';
 
-.input-field-arrow {
-    margin-right: -0.25em;
+.input-field-container.input-select {
+    .input-field-arrow {
+        margin-right: -0.25em;
+    }
 }

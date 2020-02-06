@@ -2,17 +2,20 @@ import { ObserveEvent } from '../../utils/observe-event.js'
 import { GetCurve } from '../../utils/get-curve.js'
 
 const idealFPS = 60
-const frames = speed => Math.round(idealFPS * (speed / 1000))
 
-const setTransform = (element, X, Y, doX, doY, lastFrame, toScaledState) => {
-    element.style.transform = `perspective(1px) translateZ(0) scaleX(${X}) scaleY(${Y})`
+function frames(speed) {
+    return Math.round(idealFPS * (speed / 1000))
+}
+
+function setTransform(element, X, Y, doX, doY, lastFrame, toScaledState) {
+    element.style.transform = 'perspective(1px) translateZ(0) scaleX('.concat(X, ') scaleY(', Y, ')')
 
     if (doX === true) {
-        element.style.width = `unset`
+        element.style.width = 'unset'
     }
 
     if (doY === true) {
-        element.style.height = `unset`
+        element.style.height = 'unset'
     }
 
     if (lastFrame && !toScaledState) { return }
@@ -20,51 +23,45 @@ const setTransform = (element, X, Y, doX, doY, lastFrame, toScaledState) => {
     const box = element.getBoundingClientRect()
 
     if (doX === true) {
-        element.style.width = lastFrame && !toScaledState ? `unset` : `${box.width}px`
+        element.style.width = lastFrame && !toScaledState ? 'unset' : ''.concat(box.width, 'px')
     }
 
     if (doY === true) {
-        element.style.height = lastFrame && !toScaledState ? `unset` : `${box.height}px`
+        element.style.height = lastFrame && !toScaledState ? 'unset' : ''.concat(box.height, 'px')
     }
-
-    /*
-    if (doX === true) {
-        const calculatedWidth = element.scrollWidth * X
-        element.style.width = lastFrame && !toScaledState ? `unset` : `${calculatedWidth}px`
-    }
-
-    if (doY === true) {
-        const calculatedHeight = element.scrollHeight * Y
-        element.style.height = lastFrame && !toScaledState ? `unset` : `${calculatedHeight}px`
-    }
-    */
 }
 
-const transformElements = (targets, X, Y, doX, doY, lastFrame, toScaledState) => {
-    targets.forEach(element => {
+function transformElements(targets, X, Y, doX, doY, lastFrame, toScaledState) {
+    targets.forEach(function (element) {
         if (Array.isArray(element)) {
-            return element.forEach(el => setTransform(el, X, Y, doX, doY, lastFrame, toScaledState))
+            return element.forEach(function (el) {
+                return setTransform(el, X, Y, doX, doY, lastFrame, toScaledState)
+            })
         }
 
         setTransform(element, X, Y, doX, doY, lastFrame, toScaledState)
     })
 }
 
-const setStaticTransform = targets => {
-    const set = el => {
-        el.style.transformStyle = `preserve-3d`
-        el.style.backfaceVisibility = `hidden`
-    }
+function setElStaticTransform(el) {
+    el.style.transformStyle = 'preserve-3d'
+    el.style.backfaceVisibility = 'hidden'
+}
 
-    targets.forEach(element => {
-        if (Array.isArray(element)) { return element.forEach(set) }
-        set(element)
+function setStaticTransform(targets) {
+
+
+    targets.forEach(function (element) {
+        if (Array.isArray(element)) { return element.forEach(setElStaticTransform) }
+        setElStaticTransform(element)
     })
 }
 
-const canNotRun = host => host.ready !== true || !host.hasTargets || typeof host.x !== `boolean` || typeof host.y !== `boolean` || typeof host.scaled !== `boolean`
+function canNotRun(host) {
+    return host.ready !== true || !host.hasTargets || typeof host.x !== 'boolean' || typeof host.y !== 'boolean' || typeof host.scaled !== 'boolean'
+}
 
-export const run = (scaled, host, quickSet = false) => {
+export function run(scaled, host, quickSet) {
     if (canNotRun(host)) { return }
 
     scaled = host.scaled
@@ -84,17 +81,20 @@ export const run = (scaled, host, quickSet = false) => {
 
     host.isInitialized = true
 
-    const loop = () => {
+    function loop() {
         if (scaled !== host.scaled) { return }
 
         const scale = scalePoints.shift()
         const lastFrame = !scalePoints.length
-        const getXY = key => !!host[key] && lastFrame ? endAmount : host[key] ? scale : 1
+
+        function getXY(key) {
+            return !!host[key] && lastFrame ? endAmount : host[key] ? scale : 1
+        }
 
         host.isScaling = lastFrame ? false : true
         host.isScaled = scaled && lastFrame ? true : false
 
-        transformElements(host.targets, getXY(`x`), getXY(`y`), host.x, host.y, lastFrame, scaled)
+        transformElements(host.targets, getXY('x'), getXY('y'), host.x, host.y, lastFrame, scaled)
 
         if (!lastFrame) { return requestAnimationFrame(loop) }
     }
@@ -102,19 +102,21 @@ export const run = (scaled, host, quickSet = false) => {
     loop()
 }
 
-export const setOrigin = (val, host) => {
+export function setOrigin(val, host) {
     if (!host.hasTargets) { return }
 
-    const parts = val.split(` `)
+    const parts = val.split(' ')
     const x = parts[0]
     const y = parts.length > 1 ? parts[1] : parts[0]
-    const origin = `${x} ${y}`
+    const origin = ''.concat(x, ' ', y)
 
     if (!Array.isArray(host.targets)) { return }
 
-    host.targets.forEach(target => {
+    host.targets.forEach(function (target) {
         if (Array.isArray(target)) {
-            return target.forEach(element => element.style.transformOrigin = origin)
+            return target.forEach(function (element) {
+                return element.style.transformOrigin = origin
+            })
         }
 
         if (target) {
@@ -123,21 +125,31 @@ export const setOrigin = (val, host) => {
     })
 }
 
-export const dispose = host => {
-    unloadElements(host, `targets`)
-    unloadElements(host, `triggers`)
+export function dispose(host) {
+    unloadElements(host, 'targets')
+    unloadElements(host, 'triggers')
 }
 
-const unloadElements = (host, key) => {
-    if (!host[`${key}$`]) {
+function unloadKey(key) {
+    return ''.concat(key, '$')
+}
+
+function unloadElements(host, key) {
+    const ukey = unloadKey(key)
+
+    if (!host[ukey]) {
         return
     }
-    host[`${key}$`].forEach(ob$ => ob$())
-    host[`${key}$`] = []
+
+    host[ukey].forEach(function (ob$) {
+        return ob$()
+    })
+
+    host[ukey] = []
 }
 
-const loadElements = (host, key) => {
-    if (key === `targets`) {
+function loadElements(host, key) {
+    if (key === 'targets') {
         return run(host.scaled, host)
     }
 
@@ -147,16 +159,23 @@ const loadElements = (host, key) => {
 
     const toggle = !host.end
 
-    const setEvents = trigger => {
+    function setEvents(trigger) {
         if (toggle) {
-            return host.triggers$.push(ObserveEvent(trigger, host.start).subscribe(() => host.scaled = !host.scaled))
+            return host.triggers$.push(ObserveEvent(trigger, host.start)
+                .subscribe(function () {
+                    return host.scaled = !host.scaled
+                }))
         }
 
-        host.triggers$.push(ObserveEvent(trigger, host.start).subscribe(() => host.scaled = true))
-        host.triggers$.push(ObserveEvent(trigger, host.end).subscribe(() => host.scaled = false))
+        host.triggers$.push(ObserveEvent(trigger, host.start).subscribe(function () {
+            return host.scaled = true
+        }))
+        host.triggers$.push(ObserveEvent(trigger, host.end).subscribe(function () {
+            return host.scaled = false
+        }))
     }
 
-    host.triggers.forEach(trigger => {
+    host.triggers.forEach(function (trigger) {
         if (Array.isArray(trigger)) {
             return trigger.forEach(setEvents)
         }
@@ -165,7 +184,7 @@ const loadElements = (host, key) => {
     })
 }
 
-export const unloadTargets = host => unloadElements(host, `targets`)
-export const unloadTriggers = host => unloadElements(host, `triggers`)
-export const loadTargets = host => loadElements(host, `targets`)
-export const loadTriggers = host => loadElements(host, `triggers`)
+export function unloadTargets(host) { return unloadElements(host, 'targets') }
+export function unloadTriggers(host) { return unloadElements(host, 'triggers') }
+export function loadTargets(host) { return loadElements(host, 'targets') }
+export function loadTriggers(host) { return loadElements(host, 'triggers') }

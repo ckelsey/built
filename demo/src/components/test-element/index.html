@@ -1,4 +1,39 @@
 <div class="test-element-container">
     <button-element>Hey</button-element>
 
+    <ajax-form method="post" action="/">
+        <input-field label="Input 1" slot="input"></input-field>
+        <input-field label="Input 2" slot="input"></input-field>
+        <input-select label="Select" slot="input" options="one,two,three" value="two"></input-select>
+        <input-bool label="Checkbox" slot="input"></input-bool>
+    </ajax-form>
+
+    <div>
+        <collapse-menu minpagewidth="700" background="#fff">
+            <div slot="item">Hi!</div>
+            <div slot="item">Hello!</div slot="item">
+            <div slot="item">Hola!</div slot="item">
+            <div slot="item">Hahah!</div slot="item">
+            <div slot="item">Hohoho!</div slot="item">
+        </collapse-menu>
+    </div>
+
+    <content-collapse>
+        <div slot="content-collapse-toggler">Toggle me!</div>
+        <div slot="content-collapse-content">Oh yeah you toggled me!</div>
+    </content-collapse>
+
+    <content-collapse group="toggle1">
+        <div slot="content-collapse-toggler">Toggle me too!</div>
+        <div slot="content-collapse-content">There can only be one!</div>
+    </content-collapse>
+
+    <content-collapse group="toggle1" expanded="true">
+        <div slot="content-collapse-toggler">Me first!</div>
+        <div slot="content-collapse-content">Cause I'm the one!</div>
+    </content-collapse>
+
+    <content-transition id="transition"></content-transition>
+    <button-element id="transition-content1">Content 1</button-element>
+    <button-element id="transition-content2">Content 2</button-element>
 </div>

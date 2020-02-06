@@ -1,4 +1,8 @@
-import { TMonad, TMonadUpdate, Pipe, ToArray, StopIfInvalid } from '..'
+import { TMonad } from './t-monad.js'
+import { StopIfInvalid } from './stop-if-invalid.js'
+import { ToArray } from './to-array.js'
+import { Pipe } from './pipe.js'
+import { TMonadUpdate } from './t-monad-update.js'
 
 export function ToFilter(predicate) {
     return function (value) {
@@ -6,7 +10,7 @@ export function ToFilter(predicate) {
 
         if (result.stop) { return result }
 
-        const filter = v => {
+        function filter(v) {
             v.value = v.value.filter(predicate)
             return v
         }
@@ -15,6 +19,6 @@ export function ToFilter(predicate) {
             ToArray,
             StopIfInvalid,
             filter
-        )(result), `array`, `Filter`)
+        )(result), 'array', 'Filter')
     }
 }

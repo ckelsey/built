@@ -1,7 +1,7 @@
-import { ToBool, Pipe, IndexOf, IfInvalid, ToNumber, ToString, ComponentClassObject, SelectorArrayToAllElements } from '../..'
+import { ToBool, Pipe, IndexOf, IfInvalid, ToNumber, ToString, SelectorArrayToAllElements } from '../..'
 import { unloadTargets, unloadTriggers, loadTriggers, setOrigin, run, loadTargets } from './methods'
 
-const reset = host => {
+function reset(host) {
     unloadTargets(host)
     unloadTriggers(host)
     loadTargets(host)
@@ -9,81 +9,94 @@ const reset = host => {
     setOrigin(host.startfrom, host)
 }
 
+function resetOnChange(_val, host) { reset(host) }
+
 const directions = [
-    `center`,
-    `center top`,
-    `center bottom`,
-    `left top`,
-    `left center`,
-    `left bottom`,
-    `right top`,
-    `right center`,
-    `right bottom`
+    'center',
+    'center top',
+    'center bottom',
+    'left top',
+    'left center',
+    'left bottom',
+    'right top',
+    'right center',
+    'right bottom'
 ]
 
-const onChange = () => { }
-const selectorsToDom = val => SelectorArrayToAllElements(null, val).value
+function selectorsToDom(val) {
+    return SelectorArrayToAllElements(null, val).value
+}
 
 const attributes = {
     amount: {
-        format: val => Pipe(ToNumber, IfInvalid(-1))(val).value,
-        onChange,
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(-1))(val).value
+        }
     },
 
-    class: ComponentClassObject,
-
     end: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange: (_val, host) => reset(host),
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(null))(val).value
+        },
+        onChange: resetOnChange,
     },
 
     scaled: {
-        format: val => Pipe(ToBool, IfInvalid(null))(val).value,
-        onChange: (val, host) => host.ready ? run(val, host) : undefined
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(null))(val).value
+        },
+        onChange: function (val, host) { return host.ready ? run(val, host) : undefined }
     },
 
     speed: {
-        format: val => Pipe(ToNumber, IfInvalid(333))(val).value,
-        onChange,
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(333))(val).value
+        }
     },
 
     spring: {
-        format: val => Pipe(ToNumber, IfInvalid(4))(val).value,
-        onChange,
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(4))(val).value
+        }
     },
 
     start: {
-        format: val => Pipe(ToString, IfInvalid(`mousedown`))(val).value,
-        onChange: (_val, host) => reset(host),
+        format: function (val) {
+            return Pipe(ToString, IfInvalid('mousedown'))(val).value
+        },
+        onChange: resetOnChange
     },
 
     startfrom: {
-        format: val => Pipe(IndexOf(directions), IfInvalid(`center`))(val).value,
+        format: function (val) {
+            return Pipe(IndexOf(directions), IfInvalid('center'))(val).value
+        },
         onChange: setOrigin,
     },
 
     targets: {
         format: selectorsToDom,
-        onChange: (_val, host) => reset(host),
+        onChange: resetOnChange
     },
 
     triggers: {
         format: selectorsToDom,
-        onChange: (_val, host) => reset(host),
+        onChange: resetOnChange
     },
 
     x: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange,
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        }
     },
 
     y: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange,
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        }
     },
 
 }
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 export const properties = attributes
 export const observedAttributes = Object.keys(attributes)

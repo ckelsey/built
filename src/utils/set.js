@@ -1,11 +1,11 @@
 export function Set(source, path, value) {
     if (path) {
-        path = [source].concat(path.split(`.`))
+        path = [source].concat(path.split('.'))
     } else {
         path = [source]
     }
 
-    path.reduce((accumulator, currentValue) => {
+    path.reduce(function (accumulator, currentValue) {
         if (!accumulator) {
             accumulator = {}
         }

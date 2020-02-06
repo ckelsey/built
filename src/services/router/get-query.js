@@ -1,10 +1,10 @@
 import invalidQuery from './invalid-query.js'
 
-const getQuery = url => {
+function getQuery(url) {
     const result = {}
-    let searchString = !!url && typeof url === `string` ? url.slice() : undefined
+    let searchString = !!url && typeof url === 'string' ? url.slice() : undefined
 
-    if (!!url && typeof url.search === `string`) {
+    if (!!url && typeof url.search === 'string') {
         searchString = url.search
     }
 
@@ -12,16 +12,16 @@ const getQuery = url => {
         return result
     }
 
-    const queryString = searchString.split(`?`)[1]
+    const queryString = searchString.split('?')[1]
 
     if (invalidQuery(queryString)) { return result }
 
-    queryString
-        .split(`&`)
-        .forEach(v => {
-            if (!v || typeof v.split !== `function`) { return }
-            result[v.split(`=`)[0]] = v.split(`=`)[1]
-        })
+    function queryEach(v) {
+        if (!v || typeof v.split !== 'function') { return }
+        result[v.split('=')[0]] = v.split('=')[1]
+    }
+
+    queryString.split('&').forEach(queryEach)
 
     return result
 }

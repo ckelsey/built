@@ -1,4 +1,6 @@
-import { TMonad, ToMatchMeta, ToString } from '..'
+import { TMonad } from './t-monad.js'
+import { ToMatchMeta } from './to-match-meta.js'
+import { ToString } from './to-string.js'
 
 export function ToMatchAll(search) {
     return function (value) {
@@ -6,7 +8,7 @@ export function ToMatchAll(search) {
 
         if (result.stop) { return result }
 
-        if (result.type !== `string`) { result = ToString(result) }
+        if (result.type !== 'string') { result = ToString(result) }
 
         const matches = ToMatchMeta(result.value, search)
 

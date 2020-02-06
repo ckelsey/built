@@ -14,42 +14,53 @@ import { onKeyDown } from './on-keydown.js'
 import { onInput } from './on-input.js'
 import { ValidateHtml } from '../../utils/validate-html.js'
 
-export const inputAttributeList = host =>
-    [`radio`, `checkbox`].indexOf(host.inputType) > -1
+export function inputAttributeList(host) {
+    return ['radio', 'checkbox'].indexOf(host.inputType) > -1
         ? InputFieldInputAttributes.bool :
-        host.type === `file` ?
+        host.type === 'file' ?
             InputFieldInputAttributes.file
             : InputFieldInputAttributes.field
-
+}
 const asIsTypes = [
-    `checkbox`,
-    `checkbox`,
-    `date`,
-    `email`,
-    `file`,
-    `number`,
-    `password`,
-    `radio`,
-    `tel`,
-    `url`
+    'checkbox',
+    'checkbox',
+    'date',
+    'email',
+    'file',
+    'number',
+    'password',
+    'radio',
+    'tel',
+    'url'
 ]
 
-const tagType = type => type === `textarea` ? `textarea` : type === `select` ? `select` : `input`
-const unsubscribeInput = input => ObserverUnsubscribe(input)
-const setInputValue = host => SetAttribute(host.input, `value`, host.processedValue.original)
+function tagType(type) {
+    return type === 'textarea' ? 'textarea' : type === 'select' ? 'select' : 'input'
+}
+
+function unsubscribeInput(input) {
+    return ObserverUnsubscribe(input)
+}
+
+function setInputValue(host) {
+    return SetAttribute(host.input, 'value', host.processedValue.original)
+}
 
 export function setInput(host) {
-    OnNextFrame(() => {
+    OnNextFrame(function () {
         if (host.input) { host.removeChild(host.input) }
 
-        WCWhenPropertyReady(host, `elements.container`).then(container => SetAttribute(container, `input-kind`, host.type))
+        WCWhenPropertyReady(host, 'elements.container')
+            .then(function (container) {
+                return SetAttribute(container, 'input-kind', host.type)
+            })
 
         const tagName = tagType(host.type)
-        const type = tagName === `input` ? asIsTypes.indexOf(host.type) > -1 ? host.type : `text` : undefined
+        const type = tagName === 'input' ? asIsTypes.indexOf(host.type) > -1 ? host.type : 'text' : undefined
         const elData = {
-            tagName,
-            class: `input-field-input`,
-            slot: `input`
+            tagName: tagName,
+            class: 'input-field-input',
+            slot: 'input'
         }
 
         if (type) { elData.type = type }
@@ -60,47 +71,64 @@ export function setInput(host) {
         host.input = input
 
         ObserveExists(input).subscribe(
-            () => { },
-            () => unsubscribeInput(input),
-            () => unsubscribeInput(input)
+            function () { },
+            function () { return unsubscribeInput(input) },
+            function () { return unsubscribeInput(input) }
         )
 
-        inputAttributeList(host).forEach(attr => attr === `value` ? setInputValue(host) : SetAttribute(input, attr, host[attr]))
+        inputAttributeList(host).forEach(function (attr) {
+            return attr === 'value' ? setInputValue(host) : SetAttribute(input, attr, host[attr])
+        })
 
-        input.name = Get(host, `name`, Get(host, `label`, Get(host, `placeholder`, ``)))
+        input.name = Get(host, 'name', Get(host, 'label', Get(host, 'placeholder', '')))
 
         setInputID(host)
 
-        if (host.type === `select` && Array.isArray(host.options)) {
-            if (host.emptyoption !== `false`) {
+        if (host.type === 'select' && Array.isArray(host.options)) {
+            if (host.emptyoption !== 'false') {
                 input.appendChild(
                     CreateElement({
-                        tagName: `option`,
-                        value: Get(host, `emptyoption.value`, ``),
-                        innerHTML: ValidateHtml(Get(host, `emptyoption.label`, Get(host, `emptyoption`, ``)), [], [`script`]).sanitized
+                        tagName: 'option',
+                        value: Get(host, 'emptyoption.value', ''),
+                        innerHTML: ValidateHtml(Get(host, 'emptyoption.label', Get(host, 'emptyoption', '')), [], ['script']).sanitized
                     })
                 )
             }
 
             if (Array.isArray(host.options)) {
-                host.options.forEach(o =>
-                    input.appendChild(
+                host.options.forEach(function (o) {
+                    return input.appendChild(
                         CreateElement({
-                            tagName: `option`,
+                            tagName: 'option',
                             value: o.value,
-                            innerHTML: ValidateHtml(o.label, [], [`script`]).sanitized
+                            innerHTML: ValidateHtml(o.label, [], ['script']).sanitized
                         })
                     )
-                )
+                })
 
             }
         }
 
         input.eventSubscriptions = {
-            onFocus: ObserveEvent(input, `focus`).subscribe(() => onFocus(host)),
-            onBlur: ObserveEvent(input, `blur`).subscribe(() => onBlur(host)),
-            onKeyDown: ObserveEvent(input, `keydown`).subscribe(e => onKeyDown(e, host)),
-            onInput: ObserveEvent(input, `input`, { preventDefault: true }).subscribe(() => onInput(host))
+            onFocus: ObserveEvent(input, 'focus').subscribe(function () {
+                onFocus(host)
+            }),
+            onBlur: ObserveEvent(input, 'blur').subscribe(function () {
+                onBlur(host)
+            }),
+            onKeyDown: ObserveEvent(input, 'keydown').subscribe(function (e) {
+                onKeyDown(e, host)
+            }),
+        }
+
+        if (['select', 'checkbox', 'radio'].indexOf(host.type) > -1) {
+            input.eventSubscriptions.onChange = ObserveEvent(input, 'change', { preventDefault: true }).subscribe(function () {
+                onInput(host)
+            })
+        } else {
+            input.eventSubscriptions.input = ObserveEvent(input, 'input', { preventDefault: true }).subscribe(function () {
+                onInput(host)
+            })
         }
     })
 }

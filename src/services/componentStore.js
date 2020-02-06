@@ -1,89 +1,95 @@
 import { Get } from '../utils/get.js'
 
-const ComponentStoreKey = Symbol.for(`builtjs.ComponentStore`)
-const globalSymbols = Object.getOwnPropertySymbols(global)
-const hasComponentStore = (globalSymbols.indexOf(ComponentStoreKey) > -1)
+function getTag(element) {
+    return Get(element, 'tagName', '').toLowerCase()
+}
 
-function getTag(element) { return Get(element, `tagName`, ``).toLowerCase() }
-
-if (!hasComponentStore) {
-    global[ComponentStoreKey] = {
+export const ComponentStore = (function ComponentStoreIFEE() {
+    const componentStore = {
         components: {},
         themes: {},
-        theme(theme, element) { return Object.keys(theme).forEach(function (property) { element[property] = theme[property] }) },
-        addComponent(element) {
+        theme: function (theme, element) {
+            return Object.keys(theme).forEach(
+                function (property) {
+                    element[property] = theme[property]
+                }
+            )
+        },
+        addComponent: function (element) {
             const tag = getTag(element)
 
-            if (tag === ``) { return }
+            if (tag === '') { return }
 
-            if (!global[ComponentStoreKey].components[tag]) { global[ComponentStoreKey].components[tag] = [] }
+            if (!componentStore.components[tag]) { componentStore.components[tag] = [] }
 
-            global[ComponentStoreKey].components[tag].push(element)
-            global[ComponentStoreKey].triggerTagSubscriptions(tag, element)
+            componentStore.components[tag].push(element)
+            componentStore.triggerTagSubscriptions(tag, element)
 
-            if (global[ComponentStoreKey].themes[tag]) {
-                Object.keys(global[ComponentStoreKey].themes[tag])
+            if (componentStore.themes[tag]) {
+                Object.keys(componentStore.themes[tag])
                     .forEach(function (property) {
-                        element[property] = global[ComponentStoreKey].themes[tag][property]
+                        element[property] = componentStore.themes[tag][property]
                     })
             }
         },
-        removeComponent(element) {
+        removeComponent: function (element) {
             const tag = getTag(element)
 
-            if (tag === `` || !global[ComponentStoreKey].components[tag]) { return }
+            if (tag === '' || !componentStore.components[tag]) { return }
 
-            const index = global[ComponentStoreKey].components[tag].indexOf(element)
+            const index = componentStore.components[tag].indexOf(element)
 
             if (index === -1) { return }
 
-            global[ComponentStoreKey].components[tag].splice(index, 1)
+            componentStore.components[tag].splice(index, 1)
         },
 
-        addTheme(tag, theme) {
-            global[ComponentStoreKey].themes[tag] = theme
+        addTheme: function (tag, theme) {
+            componentStore.themes[tag] = theme
 
-            if (!global[ComponentStoreKey].components[tag]) { return }
+            if (!componentStore.components[tag]) {
+                return
+            }
 
-            global[ComponentStoreKey].components[tag]
-                .forEach(function (element) { global[ComponentStoreKey].theme(global[ComponentStoreKey].themes[tag], element) })
+            componentStore.components[tag]
+                .forEach(function (element) {
+                    componentStore.theme(componentStore.themes[tag], element)
+                })
         },
 
         tagSubscriptions: {},
-        triggerTagSubscriptions(tag, data) {
-            if (!global[ComponentStoreKey].tagSubscriptions[tag]) { return }
-            global[ComponentStoreKey].tagSubscriptions[tag].forEach(function (sub) { sub(data) })
+        triggerTagSubscriptions: function (tag, data) {
+            if (!componentStore.tagSubscriptions[tag]) { return }
+
+            componentStore.tagSubscriptions[tag]
+                .forEach(function (sub) {
+                    sub(data)
+                })
         },
-        watchForTag(tag, cb) {
-            if (!global[ComponentStoreKey].tagSubscriptions[tag]) {
-                global[ComponentStoreKey].tagSubscriptions[tag] = []
+        watchForTag: function (tag, cb) {
+            if (!componentStore.tagSubscriptions[tag]) {
+                componentStore.tagSubscriptions[tag] = []
             }
 
-            global[ComponentStoreKey].tagSubscriptions[tag].push(cb)
+            componentStore.tagSubscriptions[tag].push(cb)
 
             return function () {
-                if (!global[ComponentStoreKey].tagSubscriptions[tag]) { return }
+                if (!componentStore.tagSubscriptions[tag]) { return }
 
                 let indexToRemove
-                let i = global[ComponentStoreKey].tagSubscriptions[tag].length
+                let i = componentStore.tagSubscriptions[tag].length
 
                 while (indexToRemove === undefined && i) {
                     i = i - 1
-                    if (global[ComponentStoreKey].tagSubscriptions[tag][i] === cb) {
+                    if (componentStore.tagSubscriptions[tag][i] === cb) {
                         indexToRemove = i
                     }
                 }
 
-                global[ComponentStoreKey].tagSubscriptions[tag].splice(indexToRemove, 1)
+                componentStore.tagSubscriptions[tag].splice(indexToRemove, 1)
             }
         }
     }
-}
 
-export const ComponentStore = Object.freeze(global[ComponentStoreKey])
-
-// Object.defineProperty(ComponentStore, "instance", {
-//     get: function () {
-//         return global[ComponentStoreKey];
-//     }
-// })
+    return componentStore
+})()

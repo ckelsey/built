@@ -8,27 +8,28 @@ import { OnNextFrame } from '../../services/on-next-frame.js'
 import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
 import { ObserveSlots } from '../../utils/observe-slots.js'
 import { WasClickedOn } from '../../utils/was-clicked-on.js'
+import { ArrayFrom } from '../../utils/array-from.js'
 
-const style = require(`./style.scss`).toString()
-const outerStyle = require(`./outer.scss`).toString()
+const style = require('./style.scss').toString()
+const outerStyle = require('./outer.scss').toString()
 
-const toggleOptions = (show, host) => {
+function toggleOptions(show, host) {
     const overlay = host.elements.overlay
     const root = host.elements.root
 
     if (!root || !overlay) { return }
     if (show && overlay.showing) { return }
 
-    try { overlay[show ? `show` : `hide`]() } catch (error) { }
+    try { overlay[show ? 'show' : 'hide']() } catch (error) { }
 
     OnNextFrame(() => {
         if (!show) {
-            root.classList.remove(`opened`)
+            root.classList.remove('opened')
         } else {
-            root.classList.add(`opened`)
+            root.classList.add('opened')
         }
 
-        host.dispatchEvent(new CustomEvent(show ? `selectopen` : `selectclose`, { detail: host }))
+        host.dispatchEvent(new CustomEvent(show ? 'selectopen' : 'selectclose', { detail: host }))
     })
 }
 
@@ -42,9 +43,9 @@ const properties = {
     }
 }
 
-const template = require(`./index.html`)
-const componentName = `drop-down`
-const componentRoot = `.${componentName}-container`
+const template = require('./index.html')
+const componentName = 'drop-down'
+const componentRoot = ''.concat('.', componentName, '-container')
 const openClose = (open, host) => {
     const change = () => {
         const needsFocusBlur = host.open !== open
@@ -58,7 +59,7 @@ const openClose = (open, host) => {
             }
         }
 
-        Array.from(host.children).forEach(c => c.blur())
+        ArrayFrom(host.children).forEach(c => c.blur())
     }
 
     if (open) {
@@ -70,10 +71,10 @@ const openClose = (open, host) => {
 
 const elements = {
     root: { selector: componentRoot },
-    heading: { selector: `.drop-down-heading` },
+    heading: { selector: '.drop-down-heading' },
     overlay: {
-        selector: `.drop-down-overlay`,
-        onChange(el, host) {
+        selector: '.drop-down-overlay',
+        onChange: function (el, host) {
             el.target = host
         }
     }
@@ -89,14 +90,14 @@ export const DropDown = WCConstructor({
     elements,
     observedAttributes: Object.keys(properties),
     onConnected(host) {
-        host.tabIndex = `0`
+        host.tabIndex = '0'
 
         const addClasses = () => {
-            Array.from(host.children)
+            ArrayFrom(host.children)
                 .forEach(child => {
-                    if (child.getAttribute(`slot`) === `option`) {
-                        child.tabIndex = `0`
-                        child.classList.add(`drop-down-option`)
+                    if (child.getAttribute('slot') === 'option') {
+                        child.tabIndex = '0'
+                        child.classList.add('drop-down-option')
                     }
                 })
         }
@@ -105,17 +106,17 @@ export const DropDown = WCConstructor({
 
         host.eventSubscriptions = {
             slotObserver: ObserveSlots(host, true).subscribe(addClasses),
-            docClick: ObserveEvent(document.body, `click`).subscribe(e => {
+            docClick: ObserveEvent(document.body, 'click').subscribe(e => {
                 if (!WasClickedOn(host, e)) {
                     return host.open ? openClose(false, host) : undefined
                 }
 
-                if (WasClickedOn(Array.from(host.querySelectorAll(`[slot="option"]`)), e)) {
-                    host.dispatchEvent(new CustomEvent(`optionclick`, { detail: { host, event: e } }))
+                if (WasClickedOn(ArrayFrom(host.querySelectorAll('[slot="option"]')), e)) {
+                    host.dispatchEvent(new CustomEvent('optionclick', { detail: { host: host, event: e } }))
                 }
 
-                if (WasClickedOn([host.elements.heading, host.querySelector(`[slot="label"]`)], e)) {
-                    host.dispatchEvent(new CustomEvent(`labelclick`, { detail: { host, event: e } }))
+                if (WasClickedOn([host.elements.heading, host.querySelector('[slot="label"]')], e)) {
+                    host.dispatchEvent(new CustomEvent('labelclick', { detail: { host: host, event: e } }))
 
                     if (host.open) {
                         return OnNextFrame(() => openClose(false, host))

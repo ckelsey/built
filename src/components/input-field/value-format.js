@@ -4,12 +4,13 @@
  * */
 
 import { ToRegex } from '../../utils/to-regex.js'
+import { MatchAll } from '../../utils/match-all.js'
 
 export function valueFormat(pattern, value) {
-    if (typeof value !== `string` || !pattern) {
+    if (typeof value !== 'string' || !pattern) {
         return {
             valid: true,
-            value
+            value: value
         }
     }
 
@@ -19,16 +20,11 @@ export function valueFormat(pattern, value) {
     if (!regex.valid) {
         return {
             valid: true,
-            value
+            value: value
         }
     }
 
-    const matches = value.matchAll(regexp)
-    const results = []
-
-    for (const match of matches) { results.push(match[0]) }
-
-    const result = results.join(``)
+    const result = MatchAll(regexp, value).map(function (v) { return v[0] }).join('')
 
     return {
         valid: result === value,

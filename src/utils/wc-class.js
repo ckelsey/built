@@ -1,30 +1,23 @@
-import { SetShadowRoot } from "./set-shadow-root"
-import { ComponentStore } from "../services/componentStore"
-import { ObserverUnsubscribe } from "./observer-unsubscribe"
-import { WCOuterStyle } from "./wc-outer-style"
+import { SetShadowRoot } from './set-shadow-root.js'
+import { ComponentStore } from '../services/componentStore.js'
+import { ObserverUnsubscribe } from './observer-unsubscribe.js'
+import { WCOuterStyle } from './wc-outer-style.js'
 
+export function WCClass(componentName, template, style, outerStyle, observedAttributes, ConnectedFn, onDisconnected, formElement) {
+    // class ComponentClass {
+    //     constructor() { }
+    // }
 
-export function WCClass(
-    componentName,
-    template,
-    style,
-    outerStyle,
-    observedAttributes,
-    ConnectedFn,
-    onDisconnected,
-    formElement,
-) {
-
+    // return ComponentClass
     class ComponentClass extends HTMLElement {
         static get observedAttributes() { return observedAttributes }
-
         constructor() {
             const s = super()
-            s.wcID = ``
+            s.wcID = ''
             s.state = {}
             s.elements = {}
             s.disconnectElements = function () { }
-            SetShadowRoot({ componentName, template, style, element: s })
+            SetShadowRoot({ componentName: componentName, template: template, style: style, element: s })
             try { s.internals_ = s.attachInternals() } catch (error) { }
             return s
         }
@@ -35,17 +28,17 @@ export function WCClass(
 
         connectedCallback() {
             WCOuterStyle(componentName, this, outerStyle)
-            console.log(`ComponentStore`, ComponentStore, ComponentStore.addComponent, typeof ComponentStore.addComponent)
             ComponentStore.addComponent(this)
             ConnectedFn(this)
         }
 
         disconnectedCallback() {
             ComponentStore.removeComponent(this)
+            const t = this
 
             if (this.state) {
-                Object.keys(this.state).forEach(key => {
-                    this.state[key].complete()
+                Object.keys(this.state).forEach(function (key) {
+                    t.state[key].complete()
                 })
             }
 

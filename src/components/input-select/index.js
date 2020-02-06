@@ -16,37 +16,46 @@ import { IfInvalid } from '../../utils/if-invalid.js'
 import { setInput } from '../input-shared/set-input.js'
 import { Get } from '../../utils/get.js'
 import { iconTriangle } from '../../services/icons.js'
+import { AssignObject } from '../../utils/assign.js'
+import { ArrayFrom } from '../../utils/array-from.js'
 
-const outerStyle = require(`../input-shared/outer.scss`).toString()
-const style = require(`./style.scss`).toString()
-const template = require(`./index.html`)
-const componentName = `input-select`
-const componentRoot = `.${componentName}-container`
-const postProcessValue = () => results => results.input.value = results.sanitized
+const outerStyle = require('../input-shared/outer.scss').toString()
+const style = require('./style.scss').toString()
+const template = require('./index.html')
+const componentName = 'input-select'
+const componentRoot = ''.concat('.', componentName, '-container')
+function postProcessValue() {
+    return function (results) {
+        return results.input.value = results.sanitized
+    }
+}
 
-const properties = Object.assign({}, Properties, {
+const properties = AssignObject({}, Properties, {
     options: {
-        format: val => Pipe(
-            CommasToArray,
-            IfInvalid([]),
-            ToMap(option => {
-                if (typeof option !== `object`) {
-                    option = { value: option, label: option }
-                }
+        format: function (val) {
+            return Pipe(
+                CommasToArray,
+                IfInvalid([]),
+                ToMap(function (option) {
+                    if (typeof option !== 'object') {
+                        option = { value: option, label: option }
+                    }
 
-                if (!Object.prototype.hasOwnProperty.call(option, `value`)) { return }
+                    if (!Object.prototype.hasOwnProperty.call(option, 'value')) { return }
 
-                return option
-            }),
-            ToFilter(o => !!o)
-        )(val).value,
+                    return option
+                }),
+                ToFilter(function (o) { return !!o })
+            )(val).value
+        },
 
-        onChange(_val, host) { setInput(host) }
+        onChange: function (_val, host) { setInput(host) }
+
     },
 
     emptyoption: {
-        format: val => val,
-        onChange(_val, host) { setInput(host) }
+        format: function (val) { return val },
+        onChange: function (_val, host) { setInput(host) }
     }
 })
 
@@ -54,53 +63,59 @@ const observedAttributes = Object.keys(properties)
 
 const elements = {
     arrow: {
-        selector: `.input-field-arrow`,
-        onChange: el => el.svg = iconTriangle
+        selector: '.input-field-arrow',
+        onChange: function (el) { el.svg = iconTriangle }
     },
-    container: { selector: `.input-field-container-inner` },
-    error: { selector: `.input-field-message-error` },
-    help: { selector: `.input-field-message-help` },
-    inputContainer: { selector: `.input-field-input-container-inner` },
-    root: { selector: `.input-field-container` },
+    container: { selector: '.input-field-container-inner' },
+    error: { selector: '.input-field-message-error' },
+    help: { selector: '.input-field-message-help' },
+    inputContainer: { selector: '.input-field-input-container-inner' },
+    root: { selector: '.input-field-container' },
 }
 
 export const InputSelect = WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
-    outerStyle,
-    observedAttributes,
-    properties,
-    elements,
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    outerStyle: outerStyle,
+    observedAttributes: observedAttributes,
+    properties: properties,
+    elements: elements,
     methods: {
-        processValue,
-        setCustomValidity,
-        postProcessValue,
-        checkValidity
+        processValue: processValue,
+        setCustomValidity: setCustomValidity,
+        postProcessValue: postProcessValue,
+        checkValidity: checkValidity
     },
     computed: {
-        processedValue,
-        validationMessage,
-        validity,
-        selectedIndex: host => ({
-            get() {
-                return Get(host, `input.selectedIndex`, 0)
+        processedValue: processedValue,
+        validationMessage: validationMessage,
+        validity: validity,
+        selectedIndex: function (host) {
+            return {
+                get: function () {
+                    return Get(host, 'input.selectedIndex', 0)
+                }
             }
-        }),
-        selectedOptions: host => ({
-            get() {
-                return Array.from(Get(host, `input.selectedOptions`, []))
+        },
+        selectedOptions: function (host) {
+            return {
+                get: function () {
+                    return ArrayFrom(Get(host, 'input.selectedOptions', []))
+                }
             }
-        }),
-        optionElements: host => ({
-            get() {
-                return Array.from(Get(host, `input.options`, []))
+        },
+        optionElements: function (host) {
+            return {
+                get: function () {
+                    return ArrayFrom(Get(host, 'input.options', []))
+                }
             }
-        })
+        },
     },
-    getters: { value: host => Get(host, `state.value.value`, ``) },
-    onConnected: host => {
+    getters: { value: function (host) { return Get(host, 'state.value.value', '') } },
+    onConnected: function (host) {
         host.inputID = ID()
         host.processValue()
     },

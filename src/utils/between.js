@@ -1,7 +1,7 @@
 export function Between(start, end, value) {
-    const regex = new RegExp(`${start}([^${end}]+)${end}`, `gm`)
+    const regex = new RegExp(''.concat(start, '([^', end, ']+)', end), 'gm')
 
-    const getAll = () => {
+    function getAll() {
         let match
         const matches = []
 
@@ -13,21 +13,21 @@ export function Between(start, end, value) {
     }
 
     return {
-        all() {
+        all: function () {
             return getAll()
         },
-        first() {
+        first: function () {
             return regex.exec(value)[1]
         },
-        last() {
+        last: function () {
             const results = getAll()
             return results[results.length - 1]
         },
-        at(index) {
+        at: function (index) {
             const results = getAll()
             return results[index]
         },
-        get() {
+        get: function () {
             return regex.exec(value)
         }
     }

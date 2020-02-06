@@ -5,33 +5,32 @@ import { ID } from '../services/id.js'
 import { ToBool } from './to-bool.js'
 import { Observer } from './observer.js'
 import { WCElements } from './wc-elements.js'
-import { SetShadowRoot } from './set-shadow-root.js'
 import { WCWhenPropertyReady } from './wc-when-property-ready.js'
 import { ObserverUnsubscribe } from './observer-unsubscribe.js'
 import { OnNextFrame } from '../services/on-next-frame.js'
-import { WCClass } from './wc-class.js'
 import { ComponentClassObject } from './component-class-object.js'
 import { SetStyleRules } from './set-style-rules.js'
 import { WCOuterStyle } from './wc-outer-style.js'
+import { WCClass } from './wc-class.js'
 
-/** Does not actually mutate anything, tho itself gets mutated across setting styles, properties, etc */
+function emptyFn() { }
 
-const setProperty = (host, key, formatter, getter, setter) => {
+function setProperty(host, key, formatter, getter, setter) {
     try {
         Object.defineProperty(host, key, {
-            get() {
-                if (typeof getter === `function`) { return getter(host) }
+            get: function () {
+                if (typeof getter === 'function') { return getter(host) }
                 return host.state[key].value
             },
-            set(value) {
+            set: function (value) {
                 if (!host.state[key]) { return }
 
-                if (typeof setter === `function`) { return setter(host)(value) }
+                if (typeof setter === 'function') { return setter(host)(value) }
 
                 const formattedValue = formatter(value, host)
                 const previous = host.state[key].value
 
-                if (typeof previous === `function` && typeof formattedValue === `function` && formattedValue.toString() !== previous.toString()) {
+                if (typeof previous === 'function' && typeof formattedValue === 'function' && formattedValue.toString() !== previous.toString()) {
                     return host.state[key].next(formattedValue)
                 }
 
@@ -40,90 +39,121 @@ const setProperty = (host, key, formatter, getter, setter) => {
                 }
             }
         })
-        // eslint-disable-next-line no-empty
     } catch (error) { }
 }
 
-const setStateProperty = (host, key, formatter, onChange, getter, setter) => {
-    OnNextFrame(() => {
-        if (typeof formatter !== `function`) { return }
+function setStateProperty(host, key, formatter, onChange, getter, setter) {
+    OnNextFrame(function setStatePropertyNext() {
+        if (typeof formatter !== 'function') { return }
 
         host.state[key] = Observer(formatter(host[key], host))
 
         setProperty(host, key, formatter, getter, setter)
 
-        if (typeof onChange !== `function`) { return }
+        if (typeof onChange !== 'function') { return }
 
-        host.state[key].subscribe(val => onChange(val, host))
+        host.state[key].subscribe(function stateNext(val) { return onChange(val, host) })
     })
 }
 
 export function WCConstructor(options) {
-    const {
-        componentName,
-        computed = {},
-        elements = {},
-        getters = {},
-        methods = {},
-        onConnected = () => { },
-        onDisconnected = () => { },
-        onReady = () => { },
-        properties = {},
-        setters = {},
-        style = ``,
-        outerStyle,
-        template = `<slot></slot>`,
-        formElement = false
-    } = options
+    const componentName = options.componentName
+    const computed = options.computed || {}
+    const elements = options.elements || {}
+    const getters = options.getters || {}
+    const methods = options.methods || {}
+    const onConnected = options.onConnected || emptyFn
+    const onDisconnected = options.onDisconnected || emptyFn
+    const onReady = options.onReady || emptyFn
+    const properties = options.properties || {}
+    const setters = options.setters || {}
+    const style = options.style || ''
+    const outerStyle = options.outerStyle
+    const template = options.template || '<slot></slot>'
+    const formElement = options.formElement || false
 
     if (!componentName) { return }
 
     const propertyKeys = Object.keys(properties)
     options.observedAttributes = options.observedAttributes || propertyKeys
 
-    properties[`class`] = ComponentClassObject
+    properties['class'] = ComponentClassObject
 
-    properties[`outertheme`] = {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => WCOuterStyle(componentName, host, val, `outertheme`)
+    properties['outertheme'] = {
+        format: function (val) { return typeof val === 'string' ? val : '' },
+        onChange: function (val, host) { return WCOuterStyle(componentName, host, val, 'outertheme') }
     }
 
-    properties[`styles`] = {
-        format: val => typeof val === `string` ? val : ``,
-        onChange: (val, host) => WCWhenPropertyReady(host, `elements.injectedStyles`)
-            .then(stylesElement => SetStyleRules(stylesElement, val))
-            .catch(() => { })
+    properties['styles'] = {
+        format: function (val) { return typeof val === 'string' ? val : '' },
+        onChange: function (val, host) {
+            return WCWhenPropertyReady(host, 'elements.injectedStyles')
+                .then(function (stylesElement) { return SetStyleRules(stylesElement, val) })
+                .catch(emptyFn())
+        }
     }
 
-    properties[`theme`] = {
-        format: (val, host) => typeof val === `string` ? val : host.theme,
-        onChange: (val, host) => WCWhenPropertyReady(host, `elements.theme`)
-            .then(themeElement => SetStyleRules(themeElement, val))
-            .catch(() => { })
+    properties['theme'] = {
+        format: function (val, host) { return typeof val === 'string' ? val : host.theme },
+        onChange: function (val, host) {
+            return WCWhenPropertyReady(host, 'elements.theme')
+                .then(function (themeElement) { return SetStyleRules(themeElement, val) })
+                .catch(emptyFn)
+        }
     }
 
-    options.observedAttributes.push(`class`)
-    options.observedAttributes.push(`styles`)
-    options.observedAttributes.push(`theme`)
-    options.observedAttributes.push(`outertheme`)
+    options.observedAttributes.push('class')
+    options.observedAttributes.push('styles')
+    options.observedAttributes.push('theme')
+    options.observedAttributes.push('outertheme')
 
-    elements[`injectedStyles`] = { selector: `style.injectedStyles` }
-    elements[`theme`] = { selector: `style.themeStyles` }
-    elements[`componentStyle`] = { selector: `style.componentStyle` }
+    elements['injectedStyles'] = { selector: 'style.injectedStyles' }
+    elements['theme'] = { selector: 'style.themeStyles' }
+    elements['componentStyle'] = { selector: 'style.componentStyle' }
 
     const observedAttributes = options.observedAttributes
 
-    const ConnectedFn = element => {
-        OnNextFrame(() => {
+    function ConnectedFn(element) {
+        OnNextFrame(function ConnectedFnNext() {
             element.wcID = ID()
 
-            element.unsubscribeEvents = () => ObserverUnsubscribe(element)
+            function unsubscribeEvents() {
+                return ObserverUnsubscribe(element)
+            }
 
-            Object.keys(computed).forEach(key => {
+            function computedEach(key) {
                 try { Object.defineProperty(element, key, computed[key](element)) } catch (error) { }
-            })
+            }
 
-            Object.keys(methods).forEach(key => element[key] = methods[key](element))
+            function methodsEach(key) {
+                element[key] = methods[key](element)
+            }
+
+            function validationFn(val) {
+                return Pipe(ToBool, IfInvalid(false))(val).value
+            }
+
+            function setPropFn(key) {
+                return setStateProperty(
+                    element,
+                    key,
+                    properties[key].format,
+                    properties[key].onChange,
+                    getters[key],
+                    setters[key]
+                )
+            }
+
+            function finishNext() {
+                element['ready'] = true
+                onReady(element)
+                onConnected(element)
+                element.dispatchEvent(new CustomEvent('ready', { detail: element }))
+            }
+
+            element.unsubscribeEvents = unsubscribeEvents
+            Object.keys(computed).forEach(computedEach)
+            Object.keys(methods).forEach(methodsEach)
 
             if (elements) {
                 const ElementData = WCElements(element, elements)
@@ -134,35 +164,22 @@ export function WCConstructor(options) {
             if (!properties.ready) {
                 setStateProperty(
                     element,
-                    `ready`,
-                    val => Pipe(ToBool, IfInvalid(false))(val).value,
-                    () => { },
+                    'ready',
+                    validationFn,
+                    emptyFn,
                     getters.ready,
                     setters.ready
                 )
             }
 
-            Object.keys(properties).forEach(key => setStateProperty(
-                element,
-                key,
-                properties[key].format,
-                properties[key].onChange,
-                getters[key],
-                setters[key]
-            ))
+            Object.keys(properties).forEach(setPropFn)
 
-            OnNextFrame(() => {
-                element[`ready`] = true
-                onReady(element)
-                onConnected(element)
-
-                // check - when should events go off?
-                element.dispatchEvent(new CustomEvent(`ready`, { detail: element }))
-            })
+            OnNextFrame(finishNext)
         })
+
     }
 
-    const componentClass = WCClass(
+    return WCClass(
         componentName,
         template,
         style,
@@ -170,28 +187,6 @@ export function WCConstructor(options) {
         observedAttributes,
         ConnectedFn,
         onDisconnected,
-        formElement,
+        formElement
     )
-
-    function newComponentObject() {
-        return function (element) {
-            element.observedAttributes = observedAttributes.slice()
-            element.state = {}
-            element.elements = {}
-            element.disconnectElements = () => { }
-            element.attributeChangedCallback = () => { }
-            element.disconnectedCallback = () => { }
-            SetShadowRoot({ componentName, template, style, element })
-            ConnectedFn(element)
-            return element
-        }
-    }
-
-    /** TODO - to provide support for old ass browsers eventually */
-    const object = newComponentObject()
-
-    return {
-        object,
-        component: componentClass
-    }
 }

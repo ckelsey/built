@@ -1,4 +1,4 @@
-import { ToRegex } from '..'
+import { ToRegex } from './to-regex.js'
 
 export function RemoveMeta(string, search) {
     let match
@@ -13,14 +13,14 @@ export function RemoveMeta(string, search) {
             end: match.index + match[0].length,
             input: match.input,
             length: match[0].length,
-            result: ``,
+            result: '',
             removed: match[0]
         }
 
-        const first = matched.start !== 0 ? result.value.slice(0, matched.start) : ``
+        const first = matched.start !== 0 ? result.value.slice(0, matched.start) : ''
         const second = result.value.slice(matched.end)
 
-        matched.result = `${first}${second}`
+        matched.result = ''.concat(first, second)
         result.stringChanges.push(matched)
         result.value = matched.result
     }

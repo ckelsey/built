@@ -1,4 +1,4 @@
-import { ReduceMap } from '..'
+import { ReduceMap } from './reduce-map.js'
 
 /**
  * Performs a provided mapping operation to a provided collection. Intended to be used inconjunction with a transducer.
@@ -7,7 +7,7 @@ import { ReduceMap } from '..'
  * @param {any[]} collection - The collection to iterate over
  * @return {any[]} Mapped collection
  * @example
- * Map(v=>v.toLowerCase(), [`A`, `B`]) // [`a`, `b`]
+ * Map(v=>v.toLowerCase(), ['A', 'B']) // ['a', 'b']
  * TODO - be able to take an object, Set, Weak map, etc
  */
 function Map(mapFunction, collection) {

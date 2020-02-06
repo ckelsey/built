@@ -1,4 +1,3 @@
-/* eslint-disable no-fallthrough */
 import {
     TMonad, Pipe, ToSplit, ValidateNumber, ValidateBool, ValidateEmail,
     ValidateHtml, ValidateText, ValidateUsZip, ValidateUsPhone, ValidateUrl,
@@ -7,8 +6,9 @@ import {
     AfterEveryNth, BeforeEveryNth, ToUpperCase, ToLowerCase, ToCapitalize
 } from '../..'
 import { processedFileValue } from '../input-shared/definitions.js'
+import { ArrayFrom } from '../../utils/array-from.js'
 
-const supportsInternals = `ElementInternals` in window && `setFormData` in window.ElementInternals
+const supportsInternals = 'ElementInternals' in window && 'setFormData' in window.ElementInternals
 
 export const setMaskPositions = (input, positions) => {
     if (!input) { return }
@@ -18,14 +18,14 @@ export const setMaskPositions = (input, positions) => {
     } else if (input.createTextRange) {
         var range = input.createTextRange()
         range.collapse(true)
-        range.moveEnd(`character`, positions[1])
-        range.moveStart(`character`, positions[0])
+        range.moveEnd('character', positions[1])
+        range.moveStart('character', positions[0])
         range.select()
     }
 }
 
 export const valueToMask = (value, masks, positions) => {
-    const initial = `+_ (___) ___-____`
+    const initial = '+_ (___) ___-____'
     const newPositions = positions.slice(0)
 
     if (!value) { return { value: initial, positions: [1, 1] } }
@@ -45,11 +45,11 @@ export const valueToMask = (value, masks, positions) => {
         let i = 0
 
         while (i < parts.length) {
-            if (parts[i] !== ``) { return parts[i] }
+            if (parts[i] !== '') { return parts[i] }
             i = i + 1
         }
 
-        return ``
+        return ''
     }
 
     const valueAreaCode = getAreaCode(value)
@@ -75,21 +75,21 @@ export const valueToMask = (value, masks, positions) => {
         mask = possibles[0]
     }
 
-    if (!mask) { return { value: ``, positions } }
+    if (!mask) { return { value: '', positions } }
 
-    const valueParts = value.split(``)
+    const valueParts = value.split('')
     const newValue = mask
-        .split(``)
+        .split('')
         .map((char, index) => {
             if (char === valueParts[0]) {
                 valueParts.shift()
                 return char
             }
 
-            if (char === `#`) {
+            if (char === '#') {
                 if (!valueParts.length) {
                     // incrementPositions(index)
-                    return `_`
+                    return '_'
                 }
 
                 let v = valueParts.shift()
@@ -111,7 +111,7 @@ export const valueToMask = (value, masks, positions) => {
         })
 
     return {
-        value: newValue.join(``),
+        value: newValue.join(''),
         positions: newPositions
     }
 }
@@ -153,7 +153,7 @@ export const masker = (input, value, positions, masks, unmask = false) => {
         newValue = valueToMask(value, masks, positions)
     }
 
-    input.value = newValue.value || ``
+    input.value = newValue.value || ''
 
     setMaskPositions(input, newValue.positions)
 
@@ -170,14 +170,14 @@ export const inputCaretPositions = input => {
     return !input ? [0, 0] : [input.selectionStart || 0, input.selectionEnd || 0]
 }
 
-export const clearInput = host => host.value = ``
+export const clearInput = host => host.value = ''
 
 export const setError = host => error => {
     host.processedError = error
     host.invalid = !error ? false : true
 }
 
-export const isEmpty = val => (val === `` || val === null || val === undefined)
+export const isEmpty = val => (val === '' || val === null || val === undefined)
 
 export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
     if (Array.isArray(type)) {
@@ -187,31 +187,31 @@ export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
     let validation
 
     switch (type) {
-        case `number`:
-        case `month`:
+        case 'number':
+        case 'month':
             validation = ValidateNumber(val)
             break
-        case `radio`:
-        case `checkbox`:
+        case 'radio':
+        case 'checkbox':
             validation = ValidateBool(val)
             break
-        case `email`:
+        case 'email':
             validation = ValidateEmail(val)
             break
-        case `tel`:
-        case `usphone`:
+        case 'tel':
+        case 'usphone':
             validation = ValidateUsPhone(val)
             break
-        case `intlphone`:
+        case 'intlphone':
             validation = ValidateIntlPhone(val)
             break
-        case `uszip`:
+        case 'uszip':
             validation = ValidateUsZip(val)
             break
-        case `url`:
+        case 'url':
             validation = ValidateUrl(val)
             break
-        case `file`:
+        case 'file':
             validation = processedFileValue(val)
             break
         default:
@@ -222,7 +222,7 @@ export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
             }
     }
 
-    if (validation && !validation.valid && validation.reason[0] === `no value`) {
+    if (validation && !validation.valid && validation.reason[0] === 'no value') {
         validation.reason.shift()
         validation.valid = true
     }
@@ -232,44 +232,44 @@ export const sanitizeValue = (val, type, allowhtml, disallowhtml) => {
 
 const getFunction = (functionString, args = []) => {
     switch (functionString) {
-        case `Slice`:
-        case `slice`:
+        case 'Slice':
+        case 'slice':
             return ToSlice.apply(null, args || [])
 
-        case `Split`:
-        case `split`:
+        case 'Split':
+        case 'split':
             return ToSplit(args[0])
 
-        case `Join`:
-        case `join`:
+        case 'Join':
+        case 'join':
             return ToJoin(args[0])
 
-        case `Match`:
-        case `match`:
+        case 'Match':
+        case 'match':
             return ToMatch.call(null, args[0])
 
-        case `MatchAll`:
+        case 'MatchAll':
             return ToMatchAll.call(null, args[0])
 
-        case `Replace`:
-        case `replace`:
+        case 'Replace':
+        case 'replace':
             return ToReplace.apply(null, args || [])
 
-        case `UpperCase`:
-        case `toUpperCase`:
+        case 'UpperCase':
+        case 'toUpperCase':
             return ToUpperCase
 
-        case `LowerCase`:
-        case `toLowerCase`:
+        case 'LowerCase':
+        case 'toLowerCase':
             return ToLowerCase
 
-        case `Capitalize`:
+        case 'Capitalize':
             return ToCapitalize
 
-        case `AfterEveryNth`:
+        case 'AfterEveryNth':
             return AfterEveryNth.apply(null, args || [])
 
-        case `BeforeEveryNth`:
+        case 'BeforeEveryNth':
             return BeforeEveryNth.apply(null, args || [])
     }
 
@@ -281,19 +281,19 @@ export const InputFieldFormatValue = (value, format) => {
 
     let Format
 
-    if (typeof format === `string`) {
+    if (typeof format === 'string') {
         try {
             Format = JSON.parse(format).slice()
         } catch (error) {
             switch (format) {
-                case `tel`:
-                case `telephone`:
-                case `phone`:
-                case `usphone`:
+                case 'tel':
+                case 'telephone':
+                case 'phone':
+                case 'usphone':
                     return ToPhone(value)
-                case `intlphone`:
+                case 'intlphone':
                     return ToIntlPhone(value)
-                case `uszip`:
+                case 'uszip':
                     return ToUsZip(value)
             }
 
@@ -318,5 +318,5 @@ export const InputFieldFormatValue = (value, format) => {
 
 
 
-export const getFileValue = input => !input || !input.files || input.files.length === 0 ? null : Array.from(input.files)
+export const getFileValue = input => !input || !input.files || input.files.length === 0 ? null : ArrayFrom(input.files)
 const getDroppedFiles = value => Array.isArray(value) && value.filter(f => f instanceof File).length ? value : null

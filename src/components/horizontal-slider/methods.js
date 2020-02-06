@@ -2,12 +2,12 @@ import { setActiveChicklet, setActiveItem } from './elements'
 
 function whichTransitionEvent() {
     var t
-    var el = document.createElement(`fakeelement`)
+    var el = document.createElement('fakeelement')
     var transitions = {
-        'transition': `transitionend`,
-        'OTransition': `oTransitionEnd`,
-        'MozTransition': `transitionend`,
-        'WebkitTransition': `webkitTransitionEnd`
+        'transition': 'transitionend',
+        'OTransition': 'oTransitionEnd',
+        'MozTransition': 'transitionend',
+        'WebkitTransition': 'webkitTransitionEnd'
     }
 
     for (t in transitions) {
@@ -17,7 +17,7 @@ function whichTransitionEvent() {
     }
 }
 
-export const setLoop = host => {
+export function setLoop(host) {
     const itemContainer = host.elements.itemContainer
     const inner = host.elements.inner
 
@@ -26,7 +26,7 @@ export const setLoop = host => {
     const transitionEvent = whichTransitionEvent()
 
     if (!transitionEvent) {
-        setTimeout(() => { finish() }, 300)
+        setTimeout(function () { finish() }, 300)
     } else {
         itemContainer.addEventListener(transitionEvent, function endHandler() {
             finish()
@@ -37,11 +37,16 @@ export const setLoop = host => {
     const items = host.items
     const currentItem = items[host.currentindex]
 
-    const getLeft = () => (currentItem.offsetLeft + (currentItem.offsetWidth / 2)) - (inner.offsetWidth / 2)
-    itemContainer.style.transform = `translateZ(0) translateX(${-getLeft()}px)`
+    function getLeft() {
+        return (currentItem.offsetLeft + (currentItem.offsetWidth / 2)) - (inner.offsetWidth / 2)
+    }
 
-    const finish = () => {
-        itemContainer.style.transition = `none`
+    function trans() {
+        return ''.concat('translateZ(0) translateX(', -getLeft(), 'px)')
+    }
+
+    function finish() {
+        itemContainer.style.transition = 'none'
 
         const indexShift = Math.ceil(host.items.length / 2) - host.currentindex
         let beforeCurrent = host.currentindex - 1
@@ -49,7 +54,7 @@ export const setLoop = host => {
 
         currentItem.style.order = Math.ceil(host.items.length / 2)
 
-        const getShift = index => {
+        function getShift(index) {
             if (index + indexShift > items.length) {
                 return -(items.length) + index + indexShift
             }
@@ -61,32 +66,36 @@ export const setLoop = host => {
             return index + indexShift
         }
 
+
+
         while (items[beforeCurrent]) {
             items[beforeCurrent].style.order = getShift(beforeCurrent)
-            itemContainer.style.transform = `translateZ(0) translateX(${-getLeft()}px)`
+            itemContainer.style.transform = trans()
             beforeCurrent = beforeCurrent - 1
         }
 
         while (items[afterCurrent]) {
             items[afterCurrent].style.order = getShift(afterCurrent)
-            itemContainer.style.transform = `translateZ(0) translateX(${-getLeft()}px)`
+            itemContainer.style.transform = trans()
             afterCurrent = afterCurrent + 1
         }
 
-        itemContainer.style.removeProperty(`transition`)
+        itemContainer.style.removeProperty('transition')
     }
+
+    itemContainer.style.transform = trans()
 }
 
-export const autoplay = host => {
+export function autoplay(host) {
     if (!Array.isArray(host.items)) { return }
 
-    let canPlay = () => !!host.intervalplay && host.intervalplay > 0 && host.paused !== true
+    let canPlay = function () { return !!host.intervalplay && host.intervalplay > 0 && host.paused !== true }
 
     if (host.playing && canPlay()) { return }
 
     let time = new Date().getTime()
 
-    const run = () => {
+    function run() {
         if (!canPlay()) {
             host.playing = false
             return
@@ -106,33 +115,35 @@ export const autoplay = host => {
     if (canPlay()) { run() }
 }
 
-export const scrollToIndex = host => index => {
-    const itemContainer = host.elements.itemContainer
+export function scrollToIndex(host) {
+    return function (index) {
+        const itemContainer = host.elements.itemContainer
 
-    if (!host.items || !itemContainer) { return }
+        if (!host.items || !itemContainer) { return }
 
-    const finish = () => {
-        setActiveItem(host)
-        setActiveChicklet(host, index)
+        function finish() {
+            setActiveItem(host)
+            setActiveChicklet(host, index)
+        }
+
+        if (host.loop) {
+            setLoop(host)
+            return finish()
+        }
+
+        const item = host.items[index]
+        host.currentindex = index
+
+        if (!item) { return }
+
+        const left = -(item.offsetLeft - (host.center ? (host.elements.inner.offsetWidth / 2) - (item.offsetWidth / 2) : 0))
+        itemContainer.style.transform = ''.concat('translateZ(0) translateX(', left, 'px)')
+
+        finish()
     }
-
-    if (host.loop) {
-        setLoop(host)
-        return finish()
-    }
-
-    const item = host.items[index]
-    host.currentindex = index
-
-    if (!item) { return }
-
-    const left = -(item.offsetLeft - (host.center ? (host.elements.inner.offsetWidth / 2) - (item.offsetWidth / 2) : 0))
-    itemContainer.style.transform = `translateZ(0) translateX(${left}px)`
-
-    finish()
 }
 
-export const goToNextPage = (host, currentIndex) => {
+export function goToNextPage(host, currentIndex) {
     const inner = host.elements.inner
     const itemContainer = host.elements.itemContainer
 
@@ -155,7 +166,7 @@ export const goToNextPage = (host, currentIndex) => {
     host.currentindex = i
 }
 
-export const goToPreviousPage = (host, currentIndex) => {
+export function goToPreviousPage(host, currentIndex) {
     const inner = host.elements.inner
     const itemContainer = host.elements.itemContainer
 

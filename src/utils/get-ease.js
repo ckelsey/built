@@ -1,4 +1,6 @@
-const distance = v => v[1] - v[0]
+function distance(v) {
+    return v[1] - v[0]
+}
 
 export function GetEase(values, duration, pow, powerFn) {
     const results = []

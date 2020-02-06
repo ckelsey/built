@@ -1,4 +1,4 @@
-import { TMonad } from '..'
+import { TMonad } from './t-monad.js'
 
 export function ToSlice(start, end) {
     return function (value) {
@@ -10,7 +10,7 @@ export function ToSlice(start, end) {
             const v = result.value.slice()
             result.value = v.slice(start, end)
 
-            if (typeof v === `string`) {
+            if (typeof v === 'string') {
                 if (start !== 0) {
                     result.stringChanges.push({
                         start: 0,

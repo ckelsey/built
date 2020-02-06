@@ -1,4 +1,4 @@
-import { ToNumber } from '..'
+import { ToNumber } from './to-number.js'
 
 export function ValidateNumber(num) {
     const original = num
@@ -6,11 +6,11 @@ export function ValidateNumber(num) {
     const formatted = ToNumber(num)
 
     if (!formatted.valid) {
-        reasons.push(`not a number`)
+        reasons.push('not a number')
     }
 
     return {
-        original,
+        original: original,
         valid: reasons.length === 0,
         sanitized: formatted.value,
         reason: reasons

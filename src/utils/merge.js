@@ -1,48 +1,59 @@
-import { Type } from '..'
+import { Type } from './type.js'
+import { AssignObject } from './assign.js'
 
-const mergeArray = (arr1, arr2) => {
+function arrEach(result) {
+    return function arrEachInner(value, index) {
+        return result[index] = value
+    }
+}
+
+function mergeArray(arr1, arr2) {
     const result = arr1.slice(0)
-    arr2.forEach((value, index) => result[index] = value)
+    const _arrEach = arrEach(result)
+
+    arr2.forEach(_arrEach)
+
     return result
 }
 
-const merge = (obj1, obj2) => {
+function merge(obj1, obj2) {
     if (!obj1) {
-        return Object.assign({}, obj2)
+        return AssignObject({}, obj2)
     }
 
     if (!obj2) {
-        return Object.assign({}, obj1)
+        return AssignObject({}, obj1)
     }
 
     const type1 = Type(obj1)
     const type2 = Type(obj2)
 
-    if (type1 !== type2 || [`array`, `object`].indexOf(type1) === -1) {
+    if (type1 !== type2 || ['array', 'object'].indexOf(type1) === -1) {
         return obj2
     }
 
-    if (type1 === `array`) {
+    if (type1 === 'array') {
         return mergeArray(obj1, obj2)
     }
 
-    const result = Object.assign({}, obj1)
+    const result = AssignObject({}, obj1)
 
-    for (const key in obj2) {
-        if (!obj2[key]) { continue }
+    Object.keys(obj2).forEach(function (key) {
+        if (!obj2[key]) { return }
 
         result[key] = merge(obj1[key], obj2[key])
-    }
+    })
 
     return result
 }
 
-const mutateMergeArray = (arr1, arr2) => {
-    arr2.forEach((value, index) => arr1[index] = value)
+function mutateMergeArray(arr1, arr2) {
+    const _arrEach = arrEach(arr1)
+    arr2.forEach(_arrEach)
     return arr1
 }
 
-const mutateMerge = (obj1, obj2) => {
+function mutateMerge(obj1, obj2) {
     if (!obj1) {
         return obj2
     }
@@ -54,21 +65,24 @@ const mutateMerge = (obj1, obj2) => {
     const type1 = Type(obj1)
     const type2 = Type(obj2)
 
-    if (type1 !== type2 || [`array`, `object`].indexOf(type1) === -1) {
+    if (type1 !== type2 || ['array', 'object'].indexOf(type1) === -1) {
         return obj2
     }
 
-    if (type1 === `array`) {
+    if (type1 === 'array') {
         return mutateMergeArray(obj1, obj2)
     }
 
-    for (const key in obj2) {
-        if (!obj2[key]) { continue }
+    Object.keys(obj2).forEach(function (key) {
+        if (!obj2[key]) { return }
 
         obj1[key] = mutateMerge(obj1[key], obj2[key])
-    }
+    })
 
     return obj1
 }
 
-export const Merge = (obj1, obj2, mutate = false) => !mutate ? merge(obj1, obj2) : mutateMerge(obj1, obj2)
+export function Merge(obj1, obj2, mutate) {
+    mutate = mutate ? true : false
+    return !mutate ? merge(obj1, obj2) : mutateMerge(obj1, obj2)
+}

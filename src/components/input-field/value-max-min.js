@@ -1,12 +1,12 @@
 export function valueMaxMin(host, value) {
     let valid = true
-    let errorText = ``
+    let errorText = ''
 
     if (value === undefined || value === null) {
-        return { value, valid, errorText }
+        return { value: value, valid: valid, errorText: errorText }
     }
 
-    if (host.type === `number`) {
+    if (host.type === 'number') {
         if (!!host.max && host.max < value) {
             value = host.max
         }
@@ -20,10 +20,10 @@ export function valueMaxMin(host, value) {
         }
 
         if (!!host.min && !!value && host.min > value.length && !host.focused) {
-            errorText = `Must be at least ${host.min} characters`
+            errorText = ''.concat('Must be at least ', host.min, ' characters')
             valid = false
         }
     }
 
-    return { value, valid, errorText }
+    return { value: value, valid: valid, errorText: errorText }
 }

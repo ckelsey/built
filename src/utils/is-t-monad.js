@@ -11,11 +11,11 @@ import { ReduceFilter } from './reduce-filter.js'
  * @example
  * IsTMonad({}) // false
  * IsTMonad([]) // false
- * IsTMonad(``) // false
+ * IsTMonad('') // false
  * IsTMonad({
- *      value:``,
+ *      value:'',
  *      valid: true,
- *      type: `string`
+ *      type: 'string'
  * }) // true
  */
 
@@ -25,13 +25,13 @@ export function IsTMonad(value) {
     }
 
     const keysItShouldHave = [{
-        key: `valid`,
-        type: `boolean`
+        key: 'valid',
+        type: 'boolean'
     }, {
-        key: `type`,
-        type: `string`
+        key: 'type',
+        type: 'string'
     }, {
-        key: `value`,
+        key: 'value',
     }]
 
     return keysItShouldHave.reduce(

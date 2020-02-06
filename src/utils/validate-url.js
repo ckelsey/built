@@ -1,33 +1,35 @@
-import { FromEntities, Pipe, ToString } from '..'
+import { FromEntities } from './from-entities.js'
+import { Pipe } from './pipe.js'
+import { ToString } from './to-string.js'
 
 export function ValidateUrl(str) {
     const original = str
     const converted = Pipe(ToString, FromEntities)(str)
     const val = converted.value
 
-    if (!str || str.length === 0 || converted.type !== `string`) {
+    if (!str || str.length === 0 || converted.type !== 'string') {
         return {
             original: str,
             valid: false,
             sanitized: null,
-            reason: [`no value`]
+            reason: ['no value']
         }
     }
 
     const reasons = []
-    const link = document.createElement(`a`)
+    const link = document.createElement('a')
     link.href = val
 
     if (!link.protocol) {
-        reasons.push(`Missing url protocol`)
+        reasons.push('Missing url protocol')
     }
 
     if (!link.host) {
-        reasons.push(`Missing url host`)
+        reasons.push('Missing url host')
     }
 
     return {
-        original,
+        original: original,
         valid: reasons.length === 0,
         sanitized: val,
         reason: reasons

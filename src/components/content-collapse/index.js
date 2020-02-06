@@ -14,43 +14,56 @@ import { ToString } from '../../utils/to-string.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
 import { ToNumber } from '../../utils/to-number.js'
 
-const outerStyle = `content-collapse{display: block;}`
-const style = require(`./style.scss`).toString()
-const template = require(`./index.html`)
-const componentName = `content-collapse`
-const componentRoot = `.${componentName}-container`
+const outerStyle = 'content-collapse{display: block;}'
+const style = require('./style.scss').toString()
+const template = require('./index.html')
+const componentName = 'content-collapse'
+const componentRoot = ''.concat('.', componentName, '-container')
 
 const properties = {
     expanded: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (val, host) => {
-            host.setAttribute(`expanded`, val)
+        format: function (val) { return Pipe(ToBool, IfInvalid(false))(val).value },
+        onChange: function (val, host) {
+            host.setAttribute('expanded', val)
 
             if (host.group && val) {
                 const parent = GetParent(host)
 
                 Array
                     .from(parent ? parent.children : [])
-                    .forEach(s => s !== host && s.group === host.group && s.expanded === true ? s.expanded = false : undefined)
+                    .forEach(function (s) { return s !== host && s.group === host.group && s.expanded === true ? s.expanded = false : undefined })
             }
 
-            WCWhenPropertyReady(host, `elements.transition.transition`)
-                .then(transition => {
+            WCWhenPropertyReady(host, 'elements.transition.transition')
+                .then(function (transition) {
                     transition(val ? 1 : 0)
-                    host.elements.icon.setAttribute(`rotation`, val ? `down` : `right`)
+                    host.elements.icon.setAttribute('rotation', val ? 'down' : 'right')
                 })
         }
     },
     arrow: {
-        format: val => Pipe(ToString, IfInvalid(iconChevron))(val).value,
-        onChange(val, host) { WCWhenPropertyReady(host, `elements.icon`).then(el => el.svg = val) }
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(iconChevron))(val).value
+        },
+        onChange: function (val, host) {
+            WCWhenPropertyReady(host, 'elements.icon').then(function (el) { el.svg = val })
+        }
     },
     group: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(null))(val).value
+        }
     },
     speed: {
-        format: val => Pipe(ToNumber, IfInvalid(333))(val).value,
-        onChange: (val, host) => WCWhenPropertyReady(host, `elements.transition`).then(transition => transition.speed = val)
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(333))(val).value
+        },
+        onChange: function (val, host) {
+            return WCWhenPropertyReady(host, 'elements.transition')
+                .then(function (transition) {
+                    transition.speed = val
+                })
+        }
 
     }
 }
@@ -59,29 +72,29 @@ const observedAttributes = Object.keys(properties)
 
 const elements = {
     root: { selector: componentRoot, },
-    transition: { selector: `.${componentName}-transition` },
-    icon: { selector: `.${componentName}-toggler-icon` },
+    transition: { selector: '.'.concat(componentName, '-transition') },
+    icon: { selector: '.'.concat(componentName, '-toggler-icon') },
     toggler: {
-        selector: `.${componentName}-toggler`,
-        onChange(el, host) {
+        selector: '.'.concat(componentName, '-toggler'),
+        onChange: function (el, host) {
             el.eventSubscriptions = {
-                click: ObserveEvent(el, `click`).subscribe(() => host.expanded = !host.expanded),
-                mouseenter: ObserveEvent(el, `mouseenter`).subscribe(() => el.classList.add(`hovering`)),
-                mouseleave: ObserveEvent(el, `mouseleave`).subscribe(() => el.classList.remove(`hovering`))
+                click: ObserveEvent(el, 'click').subscribe(function () { host.expanded = !host.expanded }),
+                mouseenter: ObserveEvent(el, 'mouseenter').subscribe(function () { el.classList.add('hovering') }),
+                mouseleave: ObserveEvent(el, 'mouseleave').subscribe(function () { el.classList.remove('hovering') })
             }
         }
     },
 }
 
 export const ContentCollapse = WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
-    outerStyle,
-    observedAttributes,
-    properties,
-    elements
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    outerStyle: outerStyle,
+    observedAttributes: observedAttributes,
+    properties: properties,
+    elements: elements
 })
 
 WCDefine(componentName, ContentCollapse)

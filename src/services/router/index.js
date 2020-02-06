@@ -7,78 +7,68 @@ import popStateListener from './pop-state-listener.js'
 import getRoute from './get-route.js'
 import handleRoute from './handle-route.js'
 import UpdateState from './update-state.js'
+import { AssignObject } from '../../utils/assign.js'
+
+function getBaseUrl() {
+    return ''.concat(location.protocol, '//', location.host, location.port ? ':' + location.port : '')
+}
 
 export function Router(routes) {
-    const _routes = Object.assign({}, routes)
+    const _routes = AssignObject({}, routes)
     const getRouteByPath = GetRouteByPath(_routes)
 
     // internal state
     let lastState = {}
-    let current = Object.assign({}, {
+    let current = AssignObject({}, {
         path: location.pathname,
         query: getQuery(location.search),
-        base: `${location.protocol}//${location.host}${location.port ? `:${location.port}` : ``}`
+        base: getBaseUrl()
     }, getRouteByPath(location.pathname))
 
-    const initialPath = `${location.pathname}${location.search}`
-    const initialRoute = Object.assign({}, getRoute(_routes, initialPath), current)
+    const initialPath = ''.concat(location.pathname, location.search)
+    const initialRoute = AssignObject({}, getRoute(_routes, initialPath), current)
 
     const methods = {
-        get current() {
-            return Object.assign(
-                {},
-                current || {},
-                {
-                    path: location.pathname,
-                    base: `${location.protocol}//${location.host}${location.port ? `:${location.port}` : ``}`
-                })
-        },
-
-        // TODO should not be accesible but handle-route needs it, refactor later
-        set current(cur) { current = cur },
-        get lastState() { return lastState },
-        set lastState(l) { lastState = l },
-
-        getRouteByPath,
-        getQuery,
-        queryObjectToString,
+        getRouteByPath: getRouteByPath,
+        getQuery: getQuery,
+        queryObjectToString: queryObjectToString,
         routes: _routes,
-        has: url => !!getRoute(_routes, url),
-        route: (url, force = false) => handleRoute(methods, url, false, force),
-        replaceRoute: (url, force = false) => handleRoute(methods, url, true, force),
+        has: function (url) { return !!getRoute(_routes, url) },
+        route: function (url, force) { return handleRoute(methods, url, false, force) },
+        replaceRoute: function (url, force) { return handleRoute(methods, url, true, force) },
         route$: Observer(initialRoute),
         query$: Observer(initialRoute.query),
 
-        updateQuery(query) {
+        updateQuery: function (query) {
             if (!methods.current) { return }
-            methods.current = Object.assign({}, methods.current, { query })
+            methods.current = AssignObject({}, methods.current, { query: query })
             UpdateState(methods)
         },
 
-        addQuery(query) {
+        addQuery: function (query) {
             if (!methods.current) { return }
-            methods.current = Object.assign({}, methods.current, { query: Object.assign({}, methods.current.query, query) })
+            methods.current = AssignObject({}, methods.current, { query: AssignObject({}, methods.current.query, query) })
             UpdateState(methods)
         },
 
-        replaceQuery(query) {
+        replaceQuery: function (query) {
             if (!methods.current) { return }
-            methods.current = Object.assign({}, methods.current)
+            methods.current = AssignObject({}, methods.current)
             methods.current.query = query
             UpdateState(methods, true)
         },
 
-        removeQuery(query) {
+        removeQuery: function (query) {
             if (!methods.current) { return }
 
             if (!query || (Array.isArray(query) && !query.length)) {
                 methods.current.query = {}
             } else {
-                if (typeof query === `string`) {
+                if (typeof query === 'string') {
                     methods.current.query[query] = undefined
                     delete methods.current.query[query]
                 } else if (Array.isArray(query)) {
-                    query.forEach(key => {
+                    query.forEach(function queryEach(key) {
                         methods.current.query[key] = undefined
                         delete methods.current.query[key]
                     })
@@ -86,8 +76,33 @@ export function Router(routes) {
             }
 
             UpdateState(methods, true, true)
-        },
+        }
     }
+
+    Object.defineProperties(methods, {
+        current: {
+            get: function () {
+                return AssignObject(
+                    {},
+                    current || {},
+                    {
+                        path: location.pathname,
+                        base: getBaseUrl()
+                    })
+            },
+            set: function (cur) {
+                current = cur
+            }
+        },
+        lastState: {
+            get: function () {
+                return lastState
+            },
+            set: function (l) {
+                lastState = l
+            }
+        }
+    })
 
     clickListener(methods)
     popStateListener(methods)

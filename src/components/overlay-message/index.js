@@ -12,81 +12,116 @@ import { ObserveSlots } from '../../utils/observe-slots.js'
 import { Timer } from '../../services/timer.js'
 import { EaseInOut } from '../../utils/ease-in-out.js'
 import { IndexOf } from '../../utils/index-of.js'
+import { ArrayFrom } from '../../utils/array-from.js'
 
-const style = require(`./style.scss`).toString()
-const template = require(`./index.html`)
-const componentName = `overlay-message`
-const componentRoot = `.${componentName}-container`
+const style = require('./style.scss').toString()
+const template = require('./index.html')
+const componentName = 'overlay-message'
+const componentRoot = ''.concat('.', componentName, '-container')
 const speed = 333
 
-const setShown = host => {
+function setShown(host) {
     const root = host.elements.root
 
     if (!root) { return }
 
     const opacityNow = root.style.opacity
 
-    if (!host.shown && (opacityNow === `` || opacityNow === `0`)) { return }
+    if (!host.shown && (opacityNow === '' || opacityNow === '0')) { return }
 
     Timer(
-        opacityStep => root.style.opacity = opacityStep,
+        function (opacityStep) {
+            return root.style.opacity = opacityStep
+        },
         EaseInOut(host.shown ? [0, 1] : [1, 0], speed)
-    ).then(() => {
-        root.classList[host.shown ? `add` : `remove`](`shown`)
-        host.dispatchEvent(
-            new CustomEvent(host.shown ? `opened` : `closed`, { detail: host })
-        )
-    })
+    )
+        .then(function () {
+            root.classList[host.shown ? 'add' : 'remove']('shown')
+            host.dispatchEvent(
+                new CustomEvent(host.shown ? 'opened' : 'closed', { detail: host })
+            )
+        })
 }
 
-const setColorTheme = (color, root) => root.setAttribute(`colortheme`, color)
+function setColorTheme(color, root) {
+    return root.setAttribute('colortheme', color)
+}
 
-const setCloseButton = host => {
-    Array.from(host.querySelectorAll(`*`))
-        .forEach(el => {
-            try { Get(el, `eventSubscriptions.closeOverlay`, () => { })() } catch (error) { }
+function setCloseButton(host) {
+    ArrayFrom(host.querySelectorAll('*'))
+        .forEach(function (el) {
+            try { Get(el, 'eventSubscriptions.closeOverlay', function () { })() } catch (error) { }
         })
 
     if (!host.closeselector) { return }
 
-    Array.from(host.querySelectorAll(host.closeselector))
-        .forEach(el => Set(el, `eventSubscriptions.closeOverlay`,
-            ObserveEvent(el, `click`).subscribe(() => host.shown = false)
-        ))
+    ArrayFrom(host.querySelectorAll(host.closeselector))
+        .forEach(function (el) {
+            return Set(
+                el,
+                'eventSubscriptions.closeOverlay',
+                ObserveEvent(el, 'click').subscribe(function () {
+                    host.shown = false
+                })
+            )
+        })
 }
 
 const properties = {
     shown: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (_val, host) => OnNextFrame(() => setShown(host))
+        format: function (val) { return Pipe(ToBool, IfInvalid(false))(val).value },
+        onChange: function (_val, host) {
+            OnNextFrame(function () {
+                setShown(host)
+            })
+        }
     },
     colortheme: {
-        format: val => Pipe(IndexOf([`dark`, `light`, `transparent`]), IfInvalid(`light`))(val).value,
-        onChange: (val, host) => OnNextFrame(() => setColorTheme(val, host.elements.root))
+        format: function (val) {
+            return Pipe(IndexOf(['dark', 'light', 'transparent']), IfInvalid('light'))(val).value
+        },
+        onChange: function (val, host) {
+            return OnNextFrame(function () {
+                return setColorTheme(val, host.elements.root)
+            })
+        }
     },
     closeselector: {
-        format: val => Pipe(ToString, IfInvalid(`[overlay-message-close]`))(val).value,
-        onChange: (_val, host) => OnNextFrame(() => setCloseButton(host))
+        format: function (val) {
+            return Pipe(ToString, IfInvalid('[overlay-message-close]'))(val).value
+        },
+        onChange: function (_val, host) { OnNextFrame(function () { setCloseButton(host) }) }
     }
 }
 
 const elements = { root: { selector: componentRoot } }
 
 export const OverlayMessage = WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
     observedAttributes: Object.keys(properties),
-    properties,
-    elements,
+    properties: properties,
+    elements: elements,
     methods: {
-        clear: host => () => Array.from(host.children).forEach(c => c.slot ? host.removeChild(c) : undefined)
+        clear: function (host) {
+            return function () {
+                return ArrayFrom(host.children)
+                    .forEach(function (c) {
+                        return c.slot ? host.removeChild(c) : undefined
+                    })
+            }
+        }
     },
-    onDisconnected(host) { ObserverUnsubscribe(host) },
-    onConnected(host) {
+    onDisconnected: function (host) { ObserverUnsubscribe(host) },
+    onConnected: function (host) {
         host.subscriptions = {
-            slots: ObserveSlots(host, true).subscribe(() => OnNextFrame(() => setCloseButton(host)))
+            slots: ObserveSlots(host, true).subscribe(function () {
+                return OnNextFrame(function () {
+                    return setCloseButton(host)
+                })
+            })
         }
     }
 })

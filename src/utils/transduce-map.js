@@ -1,3 +1,7 @@
 export function TransduceMap(conversionFunction) {
-    return nextReducer => (result, current) => nextReducer(result, conversionFunction(current))
+    return function TransduceMapInner(nextReducer) {
+        return function TransduceMapInnerInner(result, current) {
+            return nextReducer(result, conversionFunction(current))
+        }
+    }
 }

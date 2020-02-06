@@ -6,7 +6,7 @@
  * @example
  * IsObject() // false
  * IsObject(()=>{}) // false
- * IsObject(``) // false
+ * IsObject('') // false
  * IsObject(true) // false
  * IsObject(null) // false
  * IsObject(new Date()) // false
@@ -15,5 +15,5 @@
  */
 
 export function IsObject(value) {
-    return (typeof value).indexOf(`object`) > -1 && value !== null && !Array.isArray(value) && !(value instanceof Date)
+    return (typeof value).indexOf('object') > -1 && value !== null && !Array.isArray(value) && !(value instanceof Date)
 }

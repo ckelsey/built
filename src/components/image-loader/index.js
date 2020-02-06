@@ -8,241 +8,310 @@ import { ToBool } from '../../utils/to-bool.js'
 import { SetStyleRules } from '../../utils/set-style-rules.js'
 import { ValidateHtml } from '../../utils/validate-html.js'
 
-const style = require(`./style.scss`).toString()
-const outerStyle = require(`./outer.scss`).toString()
-const template = require(`./index.html`)
-const componentName = `image-loader`
-const componentRoot = `.image-loader-container`
+const style = require('./style.scss').toString()
+const outerStyle = require('./outer.scss').toString()
+const template = require('./index.html')
+const componentName = 'image-loader'
+const componentRoot = ''.concat('.', componentName, '-container')
 
-const setStyles = (el, styles) => {
+function setStyles(el, styles) {
     if (!el) { return }
     SetStyleRules(el, styles)
 }
 
-const setInternalStyle = host => {
+function setInternalStyle(host) {
+    const pos = host.position ? host.position : '50% 50%'
+    const fit = host.fit ? host.fit : 'contain'
     const internalStyle = !host.fit ?
-        `` :
-        `.image-loader-container>img.image-loader-image{
-            object-position:${host.position ? host.position : `50% 50%`};
-            object-fit:${host.fit ? host.fit : `contain`};
-        }`
+        '' :
+        ''.concat('.image-loader-container>img.image-loader-image{ object-position:, ', pos, '; object-fit:', fit, '; }')
 
     setStyles(host.elements.internalStyles, internalStyle)
-    waitForEl(host, `root`)
-        .then(root => {
-
+    waitForEl(host, 'root')
+        .then(function (root) {
             if (host.fit) {
-                root.classList.add(`fill`)
-                root.setAttribute(`fit`, host.fit)
+                root.classList.add('fill')
+                root.setAttribute('fit', host.fit)
             } else {
-                root.classList.remove(`fill`)
-                root.removeAttribute(`fit`)
+                root.classList.remove('fill')
+                root.removeAttribute('fit')
             }
         })
 }
 
-const waitForEl = (host, key) => new Promise(resolve => {
-    let el = host.elements[key]
+function timerForString(key) {
+    return ''.concat('timerFor', key)
+}
 
-    const checkIfReady = () => {
-        cancelAnimationFrame(host[`timerFor${key}`])
+function waitForEl(host, key) {
+    return new Promise(
+        function (resolve) {
+            let el = host.elements[key]
 
-        el = host.elements[key]
+            function checkIfReady() {
+                cancelAnimationFrame(host[timerForString(key)])
 
-        return !el ?
-            host[`timerFor${key}`] = requestAnimationFrame(checkIfReady) :
-            resolve(el)
-    }
+                el = host.elements[key]
 
-    checkIfReady()
-})
+                return !el ?
+                    host[timerForString(key)] = requestAnimationFrame(checkIfReady) :
+                    resolve(el)
+            }
 
-const waitForEls = (host, keys) => Promise.all(keys.map(key => waitForEl(host, key)))
-
-const toggleLoad = host => waitForEls(host, [`root`, `spinner`])
-    .then(elements => {
-        clearTimeout(host.spinnerTimer)
-        const root = elements[0]
-        const spinner = elements[1]
-        const loaded = !host.loading && !!host.src
-
-        host.setAttribute(`loaded`, loaded)
-        host.setAttribute(`errored`, host.error)
-
-        root.setAttribute(`loaded`, loaded)
-        root.classList[host.loading ? `add` : `remove`](`loading`)
-        root.classList[host.error ? `add` : `remove`](`errored`)
-
-        host.dispatchEvent(new CustomEvent(
-            host.error ?
-                `imageerror` :
-                host.loading ?
-                    `imageloading` :
-                    `imageloaded`,
-            { detail: host }
-        ))
-
-        if (!host.loading) {
-            host.complete = true
-            host.dispatchEvent(new CustomEvent(`imagecomplete`, { detail: host }))
+            checkIfReady()
         }
+    )
+}
 
-        toggleText(host)
+function waitForEls(host, keys) {
+    return Promise.all(keys.map(function (key) { return waitForEl(host, key) }))
+}
 
-        if (!host.loading) {
-            spinner.setAttribute(`visible`, false)
-            return
-        }
+function toggleLoad(host) {
+    return waitForEls(host, ['root', 'spinner'])
+        .then(function (elements) {
+            clearTimeout(host.spinnerTimer)
+            const root = elements[0]
+            const spinner = elements[1]
+            const loaded = !host.loading && !!host.src
 
-        host.spinnerTimer = setTimeout(() =>
-            spinner.setAttribute(`visible`,
-                host.loading && host.spinner ? true : false
-            ), 333
-        )
-    })
+            host.setAttribute('loaded', loaded)
+            host.setAttribute('errored', host.error)
 
-const toggleText = host => waitForEl(host, `root`)
-    .then(root => {
-        const showingtext = (host.error && !host.loading) || !host.src
-        root.classList[showingtext ? `add` : `remove`](`show-text`)
-        host.setAttribute(`showingtext`, showingtext)
-    })
+            root.setAttribute('loaded', loaded)
+            root.classList[host.loading ? 'add' : 'remove']('loading')
+            root.classList[host.error ? 'add' : 'remove']('errored')
+
+            host.dispatchEvent(new CustomEvent(
+                host.error ?
+                    'imageerror' :
+                    host.loading ?
+                        'imageloading' :
+                        'imageloaded',
+                { detail: host }
+            ))
+
+            if (!host.loading) {
+                host.complete = true
+                host.dispatchEvent(new CustomEvent('imagecomplete', { detail: host }))
+            }
+
+            toggleText(host)
+
+            if (!host.loading) {
+                spinner.setAttribute('visible', false)
+                return
+            }
+
+            host.spinnerTimer = setTimeout(function () {
+                spinner.setAttribute('visible',
+                    host.loading && host.spinner ? true : false
+                )
+            }, 333)
+        })
+}
+
+function toggleText(host) {
+    return waitForEl(host, 'root')
+        .then(function (root) {
+            const showingtext = (host.error && !host.loading) || !host.src
+            root.classList[showingtext ? 'add' : 'remove']('show-text')
+            host.setAttribute('showingtext', showingtext)
+        })
+}
 
 const properties = {
     src: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange: (val, host) => loadSrc(host, val)
+        format: function (val) { return Pipe(ToString, IfInvalid(null))(val).value },
+        onChange: function (val, host) { return loadSrc(host, val) }
     },
 
-    altsrc: { format: val => Pipe(ToString, IfInvalid(null))(val).value, },
+    altsrc: {
+        format: function (val) { return Pipe(ToString, IfInvalid(null))(val).value }
+    },
 
     alttext: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange(val, host) {
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(null))(val).value
+        },
+        onChange: function (val, host) {
             if (!val) { return }
 
-            waitForEl(host, `text`).then(textEl => {
-                textEl.innerHTML = ValidateHtml(val, [], [`script`]).sanitized
+            waitForEl(host, 'text').then(function (textEl) {
+                textEl.innerHTML = ValidateHtml(val, [], ['script']).sanitized
                 toggleText(host)
             })
         }
     },
 
     loading: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange(_val, host) { toggleLoad(host) }
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        },
+        onChange: function (_val, host) { toggleLoad(host) }
     },
     error: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        },
     },
     complete: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        },
     },
     fit: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange(_val, host) { setInternalStyle(host) }
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(null))(val).value
+        },
+        onChange: function (_val, host) { setInternalStyle(host) }
     },
     position: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange(_val, host) { setInternalStyle(host) }
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(null))(val).value
+        },
+        onChange: function (_val, host) { setInternalStyle(host) }
     },
 
-    spinner: { format: val => Pipe(ToBool, IfInvalid(false))(val).value },
+    spinner: { format: function (val) { return Pipe(ToBool, IfInvalid(false))(val).value } },
 }
 
 const observedAttributes = Object.keys(properties)
 const elements = {
     root: {
         selector: componentRoot,
-        onChange(el) {
-            requestAnimationFrame(() => {
-                el.classList.remove(`notready`)
-                el.style.removeProperty(`opacity`)
+        onChange: function (el) {
+            requestAnimationFrame(function () {
+                el.classList.remove('notready')
+                el.style.removeProperty('opacity')
             })
         }
     },
     spinner: {
-        selector: `${componentRoot} spinner-element`,
-        onChange(el) {
-            const remove = () => el.style.removeProperty(`opacity`)
-            setTimeout(() => requestAnimationFrame(remove), 66)
+        selector: ''.concat(componentRoot, ' spinner-element'),
+        onChange: function (el) {
+            function remove() { return el.style.removeProperty('opacity') }
+            setTimeout(function () { requestAnimationFrame(remove) }, 66)
         }
     },
     img: {
-        selector: `img`,
-        onChange(el, host) {
+        selector: 'img',
+        onChange: function (el, host) {
             el.eventSubscriptions = {
-                load: ObserveEvent(el, `load`)
-                    .subscribe(() => {
+                load: ObserveEvent(el, 'load')
+                    .subscribe(function () {
                         host.error = false
                         host.loading = false
                     }),
 
-                error: ObserveEvent(el, `error`)
-                    .subscribe(() => {
+                error: ObserveEvent(el, 'error')
+                    .subscribe(function () {
                         host.error = true
                         host.loading = false
                     }),
             }
         }
     },
-    text: { selector: `.image-loader-text` },
+    text: { selector: '.image-loader-text' },
     internalStyles: {
-        selector: `style.internalStyles`,
-        onChange: (_el, host) => setInternalStyle(host)
+        selector: 'style.internalStyles',
+        onChange: function (_el, host) { return setInternalStyle(host) }
     }
 }
 
-const loadSrc = (host, src) => new Promise(resolve => {
-    if (!src) { return resolve() }
+function loadSrc(host, src) {
+    return new Promise(function (resolve) {
+        if (!src) { return resolve() }
 
-    waitForEl(host, `img`).then(img => {
-        if (img.src === src) { return resolve(img) }
-        host.error = false
-        host.loading = true
-        img.src = src
+        waitForEl(host, 'img').then(function (img) {
+            if (img.src === src) { return resolve(img) }
+            host.error = false
+            host.loading = true
+            img.src = src
+        })
     })
-})
+}
 
 const methods = {
-    toCanvas: host => () => {
-        try {
-            const dpr = window.devicePixelRatio || 1
-            const ctx = document.createElement(`canvas`).getContext(`2d`)
-            ctx.canvas.width = host.image.width * dpr
-            ctx.canvas.height = host.image.height * dpr
-            ctx.scale(dpr, dpr)
-            ctx.drawImage(host.image, 0, 0)
-            return ctx.canvas
-        } catch (error) {
-            throw Error(error)
+    toCanvas: function (host) {
+        return function () {
+            try {
+                const dpr = window.devicePixelRatio || 1
+                const ctx = document.createElement('canvas').getContext('2d')
+                ctx.canvas.width = host.image.width * dpr
+                ctx.canvas.height = host.image.height * dpr
+                ctx.scale(dpr, dpr)
+                ctx.drawImage(host.image, 0, 0)
+                return ctx.canvas
+            } catch (error) {
+                throw Error(error)
+            }
         }
     },
 
-    toDataUrl: host => (mime = `image/jpeg`, quality = 1) => host.toCanvas()
-        .then(canvas => canvas.toDataURL(mime, quality)),
+    toDataUrl: function (host) {
+        return function (mime, quality) {
+            mime = mime ? mime : 'image/jpeg'
+            quality = quality === undefined ? 1 : quality
+            return host.toCanvas()
+                .then(function (canvas) {
+                    return canvas.toDataURL(mime, quality)
+                })
+        }
+    },
 
-    toObjectUrl: host => (mime = `image/jpeg`, quality = 1) => host.toBlob(mime, quality)
-        .then(blob => URL.createObjectURL(blob)),
+    toObjectUrl: function (host) {
+        return function (mime, quality) {
+            mime = mime ? mime : 'image/jpeg'
+            quality = quality === undefined ? 1 : quality
+            return host.toBlob(mime, quality)
+                .then(function (blob) {
+                    return URL.createObjectURL(blob)
+                })
+        }
+    },
 
-    toBlob: host => (mime = `image/jpeg`, quality = 1) => host.toCanvas()
-        .then(canvas => new Promise(resolve => canvas.toBlob(resolve, mime, quality))),
+    toBlob: function (host) {
+        return function (mime, quality) {
+            mime = mime ? mime : 'image/jpeg'
+            quality = quality === undefined ? 1 : quality
+            return host.toCanvas()
+                .then(function (canvas) {
+                    return new Promise(function (resolve) {
+                        return canvas.toBlob(resolve, mime, quality)
+                    })
+                })
+        }
+    },
 
-    toData: host => (x = 0, y = 0, w, h) => host.toCanvas()
-        .then(canvas => canvas.getContext(`2d`).getImageData(x, y, w ? w : canvas.width, h ? h : canvas.height)),
+    toData: function (host) {
+        return function (x, y, w, h) {
+            x = x ? x : 0
+            y = y ? y : 0
+
+            return host.toCanvas()
+                .then(function (canvas) {
+                    return canvas.getContext('2d').getImageData(
+                        x, y,
+                        w ? w : canvas.width,
+                        h ? h : canvas.height
+                    )
+                })
+        }
+    },
 }
 
 export const ImageLoader = WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
-    outerStyle,
-    observedAttributes,
-    properties,
-    elements,
-    methods,
-    onConnected(host) {
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    outerStyle: outerStyle,
+    observedAttributes: observedAttributes,
+    properties: properties,
+    elements: elements,
+    methods: methods,
+    onConnected: function (host) {
         setInternalStyle(host)
     }
 })

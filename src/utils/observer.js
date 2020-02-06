@@ -1,7 +1,13 @@
 import { ID } from '../services/id.js'
+import { AssignObject } from './assign.js'
 
-function Observer(initialValue, noInit = false, onSubscribe = () => { }) {
-    let values = Object.assign({}, {
+const emptyFn = function () { }
+
+function Observer(initialValue, noInit, onSubscribe) {
+    noInit = noInit ? true : false
+    onSubscribe = onSubscribe && typeof onSubscribe === 'function' ? onSubscribe : emptyFn
+
+    let values = AssignObject({}, {
         value: initialValue,
         errors: [],
         previousValue: undefined,
@@ -10,38 +16,56 @@ function Observer(initialValue, noInit = false, onSubscribe = () => { }) {
         isComplete: false
     })
 
-    const destroy = () => {
-        Object.keys(values.subscriptions).forEach(subscriptionId => values.subscriptions[subscriptionId].unsubscribe())
+    function valuesSubsEach(subscriptionId) {
+        return values.subscriptions[subscriptionId].unsubscribe()
+    }
+
+    function destroy() {
+        Object.keys(values.subscriptions).forEach(valuesSubsEach)
 
         Object.defineProperties(result, {
-            value: { get() { return undefined } },
-            previous: { get() { return undefined } },
-            subscriptions: { get() { return undefined } },
-            next: { value: () => { } },
-            error: { value: () => { } },
-            complete: { value: () => { } },
-            subscribe: { value: () => { } },
-            unsubscribe: { value: () => { } },
+            value: { get: function () { return undefined } },
+            previous: { get: function () { return undefined } },
+            subscriptions: { get: function () { return undefined } },
+            next: { value: emptyFn },
+            error: { value: emptyFn },
+            complete: { value: emptyFn },
+            subscribe: { value: emptyFn },
+            unsubscribe: { value: emptyFn },
         })
 
         values.isComplete = true
     }
 
-    const loop = (key, val, valuesObj = {}) => {
-        Object.keys(values.subscriptions).forEach(subscriptionId => {
+    function loopSubsEach(key, val, valuesObj) {
+        return function loopSubsEachInner(subscriptionId) {
             const subscriptionFn = values.subscriptions[subscriptionId][key]
-            if (typeof subscriptionFn !== `function`) { return }
+            if (typeof subscriptionFn !== 'function') { return }
             subscriptionFn(val, valuesObj, subscriptionId)
-        })
+        }
+    }
 
-        if (key === `complete`) {
+    function loop(key, val, valuesObj) {
+        valuesObj = valuesObj ? valuesObj : {}
+
+        const _loopSubsEach = loopSubsEach(key, val, valuesObj)
+
+        Object.keys(values.subscriptions).forEach(_loopSubsEach)
+
+        if (key === 'complete') {
             destroy()
         }
     }
 
-    const unsubscribe = subscription => () => {
-        values.subscriptions[subscription.id] = null
-        delete values.subscriptions[subscription.id]
+    function unsubscribe(subscription) {
+        return function unsubscribeInner() {
+            values.subscriptions[subscription.id] = null
+            delete values.subscriptions[subscription.id]
+        }
+    }
+
+    function trace() {
+        return new Error().stack
     }
 
     const result = {
@@ -50,33 +74,43 @@ function Observer(initialValue, noInit = false, onSubscribe = () => { }) {
         get previous() { return values.previousValue },
         get subscriptions() { return values.subscriptions },
 
-        next(v) {
-            values = Object.assign({}, values, {
+        next: function (v) {
+            values = AssignObject({}, values, {
                 value: v,
                 previousValue: values.value,
                 updated: new Date().getTime(),
             })
 
-            loop(`next`, values.value, values)
+            loop('next', values.value, values)
         },
 
-        error(err) {
-            values = Object.assign({}, values, {
+        error: function (err) {
+            values = AssignObject({}, values, {
                 errors: values.errors.concat([err]),
                 updated: new Date().getTime(),
             })
 
-            loop(`error`, err, values)
+            loop('error', err, values)
         },
-        complete() { loop(`complete`, values) },
 
-        subscribe(next, error = () => { }, complete = () => { }) {
-            const trace = () => new Error().stack
-            const subscription = Object.assign({}, { next, error, complete, id: ID(), trace: trace() })
+        complete: function () { loop('complete', values) },
+
+        subscribe: function (next, error, complete) {
+            error = error ? error : emptyFn
+            complete = complete ? complete : emptyFn
+
+            const subscription = AssignObject({}, {
+                next: next,
+                error: error,
+                complete: complete,
+                id: ID(),
+                trace: trace()
+            })
+
             subscription.unsubscribe = unsubscribe(subscription)
             values.subscriptions[subscription.id] = subscription
 
-            if (!noInit && values.value !== undefined && typeof subscription.next === `function`) {
+            if (!noInit && values.value !== undefined && typeof subscription.next === 'function') {
                 subscription.next(values.value, values, subscription.id)
             }
 
@@ -85,7 +119,7 @@ function Observer(initialValue, noInit = false, onSubscribe = () => { }) {
             return unsubscribe(subscription)
         },
 
-        unsubscribe(subscription) {
+        unsubscribe: function (subscription) {
             if (!subscription || !subscription.id || !values.subscriptions[subscription.id]) { return }
 
             return unsubscribe(subscription)

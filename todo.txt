@@ -1,4 +1,7 @@
-ie11 - intersectionObserver
+- tel format (pretty with parans and -)
+
+content-drawer
+input-file
 
 input format cursor position
 input clearbutton functionality

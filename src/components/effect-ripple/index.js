@@ -10,25 +10,38 @@ import { EaseInOut } from '../../utils/ease-in-out.js'
 import { Timer } from '../../services/timer.js'
 import { SelectorArrayToElements } from '../../utils/selector-array-to-elements.js'
 
-const style = require(`./style.scss`).toString()
-const outerStyle = `effect-ripple{pointer-events:none;}`
-const template = require(`./index.html`)
-const componentName = `effect-ripple`
-const componentRoot = `.effect-ripple-container`
+const style = require('./style.scss').toString()
+const outerStyle = 'effect-ripple{pointer-events:none;}'
+const template = require('./index.html')
+const componentName = 'effect-ripple'
+const componentRoot = ''.concat('.', componentName, '-container')
 const maxScale = 1.3
-const animator = (points, speed, stepFn) => new Promise(resolve => Timer(stepFn, EaseInOut(points, speed)).then(resolve))
-const trigger = host => () => runStart(host)
-const selectorsToDom = val => SelectorArrayToElements(null, val).value
 
-const runStart = host => {
+function animator(points, speed, stepFn) {
+    return new Promise(function (resolve) {
+        return Timer(stepFn, EaseInOut(points, speed)).then(resolve)
+    })
+}
+
+function trigger(host) {
+    return function () {
+        return runStart(host)
+    }
+}
+
+function selectorsToDom(val) {
+    return SelectorArrayToElements(null, val).value
+}
+
+function runStart(host) {
     if (!host.ready || host.isRunning) { return }
 
     host.isRunning = true
 
     const ripple = host.elements.ripple
-    const rippleInner = document.createElement(`span`)
+    const rippleInner = document.createElement('span')
 
-    rippleInner.className = `ripple-inner`
+    rippleInner.className = 'ripple-inner'
     rippleInner.style.backgroundColor = host.color
     ripple.appendChild(rippleInner)
 
@@ -37,32 +50,38 @@ const runStart = host => {
     animator(
         [0, maxScale],
         host.speed / 2,
-        scale => {
+        function (scale) {
             const scaleAmount = Math.max(Math.min(maxScale, scale), 0)
-            rippleInner.style.transform = `perspective(1px) translateZ(0) scaleX(${scaleAmount}) scaley(${scaleAmount})`
+            rippleInner.style.transform = 'perspective(1px) translateZ(0) scaleX('.concat(scaleAmount, ') scaley(', scaleAmount, ')')
         }
     )
 
     animator(
         [host.opacity * 0.5, host.opacity, host.opacity * 0.5, host.opacity * 0.125, host.opacity * 0.03, 0],
         host.speed,
-        opacity => rippleInner.style.opacity = `${Math.max(Math.min(1, opacity), 0)}`,
+        function (opacity) {
+            return rippleInner.style.opacity = ''.concat(Math.max(Math.min(1, opacity), 0))
+        }
     )
-        .then(() => OnNextFrame(() => ripple ? ripple.removeChild(rippleInner) : undefined))
+        .then(function () {
+            return OnNextFrame(function () {
+                return ripple ? ripple.removeChild(rippleInner) : undefined
+            })
+        })
 
 }
 
-const setOrigin = (host, rippleInner) => {
+function setOrigin(host, rippleInner) {
     if (!host.ready) { return }
 
-    OnNextFrame(() => {
+    OnNextFrame(function () {
         const nonAutoOrigin = host.nonAutoOrigin
         const rippleInnerStyle = rippleInner.style
 
         if (nonAutoOrigin) { return rippleInnerStyle.transformOrigin = nonAutoOrigin }
 
         if (!host.downEvent || !host.downEvent.target) {
-            return rippleInnerStyle.transformOrigin = `50% 50%`
+            return rippleInnerStyle.transformOrigin = '50% 50%'
         }
 
         const eventX = host.downEvent.x
@@ -71,100 +90,157 @@ const setOrigin = (host, rippleInner) => {
         const left = Math.round(((eventX - targetBox.left) / targetBox.width) * 100)
         const top = Math.round(((eventY - targetBox.top) / targetBox.height) * 100)
 
-        rippleInnerStyle.transformOrigin = `${left}% ${top}%`
+        rippleInnerStyle.transformOrigin = ''.concat(left, '% ', top, '%')
     })
 }
 
-const unloadTargets = host => {
+function unloadTargets(host) {
     if (!host.hasTargets$) { return }
-    host.targets$.forEach(ob$ => ob$())
+    host.targets$.forEach(function (ob$) { return ob$() })
     host.targets$ = []
 }
 
-const loadTargets = host => {
+function loadTargets(host) {
     if (!Array.isArray(host.targets$)) {
         host.targets$ = []
     }
     if (!host.targets || !host.start) { return }
     if (!Array.isArray(host.targets)) { return }
 
-    host.targets.forEach(target => {
-        host.targets$.push(ObserveEvent(target, `mousedown`).subscribe(e => host.downEvent = e))
-        host.targets$.push(ObserveEvent(target, host.start).subscribe(() => runStart(host)))
+    host.targets.forEach(function (target) {
+        host.targets$.push(
+            ObserveEvent(target, 'mousedown')
+                .subscribe(function (e) {
+                    return host.downEvent = e
+                })
+        )
+        host.targets$.push(
+            ObserveEvent(target, host.start)
+                .subscribe(function () {
+                    return runStart(host)
+                })
+        )
     })
 }
 
-const resetTargets = host => {
+function resetTargets(host) {
     unloadTargets(host)
     loadTargets(host)
 }
 
 const properties = {
-    color: { format: val => Pipe(ToString, IfInvalid(`#59a2d8`))(val).value, },
-    opacity: { format: val => Math.min(1, Math.max(0, Pipe(ToNumber, IfInvalid(0.2))(val).value)), },
-    speed: { format: val => Pipe(ToNumber, IfInvalid(600))(val).value, },
-    start: {
-        format: val => Pipe(ToString, IfInvalid(`mousedown`))(val).value,
-        onChange: (_val, host) => resetTargets(host)
+    color: {
+        format: function (val) {
+            return Pipe(ToString, IfInvalid('#59a2d8'))(val).value
+        }
     },
-    direction: { format: val => typeof val === `string` ? val : `auto`, },
+    opacity: {
+        format: function (val) {
+            return Math.min(1, Math.max(0, Pipe(ToNumber, IfInvalid(0.2))(val).value))
+        }
+    },
+    speed: {
+        format: function (val) { return Pipe(ToNumber, IfInvalid(600))(val).value }
+    },
+    start: {
+        format: function (val) {
+            return Pipe(ToString, IfInvalid('mousedown'))(val).value
+        },
+        onChange: function (_val, host) {
+            resetTargets(host)
+        }
+    },
+    direction: {
+        format: function (val) { return typeof val === 'string' ? val : 'auto' }
+    },
     targets: {
         format: selectorsToDom,
-        onChange: (_val, host) => resetTargets(host)
+        onChange: function (_val, host) {
+            resetTargets(host)
+        }
     },
 }
 
-const hasTargets = host => ({ get() { return host.ready && !!host.targets && Array.isArray(host.targets) && !!host.targets.length } })
-const hasTargets$ = host => ({ get() { return host.hasTargets && host.targets$ && Array.isArray(host.targets$) } })
-const hasStart = host => ({ get() { return host.hasTargets && host.hasTargets$ && !!host.start } })
-const canStart = host => ({ get() { return host.hasTargets && host.hasTargets$ && host.start && host.start !== `none` } })
-
-const nonAutoOrigin = host => ({
-    get() {
-        return (
-            host.downEvent === undefined
-            || (host.downEvent && !host.downEvent.target)
-            || (host.direction !== undefined && host.direction !== `auto`)
-        )
-            ? host.direction === `to left`
-                ? `100% center`
-                : [`center`, `auto`].indexOf(host.direction) > -1
-                    ? `center center`
-                    : `0% center`
-            : false
+function hasTargets(host) {
+    return {
+        get: function () { return host.ready && !!host.targets && Array.isArray(host.targets) && !!host.targets.length }
     }
-})
+}
 
-const canLoadTargets = host => ({
-    get() {
-        return host.hasTargets && host.hasTargets$ && host.hasStart
+function hasTargets$(host) {
+    return {
+        get: function () {
+            return host.hasTargets && host.targets$ && Array.isArray(host.targets$)
+        }
     }
-})
+}
+
+function hasStart(host) {
+    return {
+        get: function () {
+            return host.hasTargets && host.hasTargets$ && !!host.start
+        }
+    }
+}
+
+function canStart(host) {
+    return {
+        get: function () {
+            return host.hasTargets && host.hasTargets$ && host.start && host.start !== 'none'
+        }
+    }
+}
+
+function nonAutoOrigin(host) {
+    return {
+        get: function () {
+            return (
+                host.downEvent === undefined
+                || (host.downEvent && !host.downEvent.target)
+                || (host.direction !== undefined && host.direction !== 'auto')
+            )
+                ? host.direction === 'to left'
+                    ? '100% center'
+                    : ['center', 'auto'].indexOf(host.direction) > -1
+                        ? 'center center'
+                        : '0% center'
+                : false
+        }
+    }
+}
+
+function canLoadTargets(host) {
+    return {
+        get: function () {
+            return host.hasTargets && host.hasTargets$ && host.hasStart
+        }
+    }
+}
 
 const elements = {
-    root: { selector: `.effect-ripple-container` },
-    ripple: { selector: `.ripple` },
+    root: { selector: '.effect-ripple-container' },
+    ripple: { selector: '.ripple' },
 }
 
 export const EffectRipple = WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
-    outerStyle,
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    outerStyle: outerStyle,
     observedAttributes: Object.keys(properties),
-    properties,
-    elements,
-    methods: { trigger },
+    properties: properties,
+    elements: elements,
+    methods: { trigger: trigger },
     computed: {
-        hasTargets,
-        hasTargets$,
-        hasStart,
-        canLoadTargets,
-        canStart,
-        nonAutoOrigin,
+        hasTargets: hasTargets,
+        hasTargets$: hasTargets$,
+        hasStart: hasStart,
+        canLoadTargets: canLoadTargets,
+        canStart: canStart,
+        nonAutoOrigin: nonAutoOrigin,
     },
-    onDisconnected: host => unloadTargets(host)
+    onDisconnected: function (host) { unloadTargets(host) }
 })
 
 WCDefine(componentName, EffectRipple)

@@ -12,6 +12,7 @@
         "@babel/preset-env": "^7.4.5",
         "autoprefixer": "^9.7.4",
         "babel-loader": "^8.0.6",
+        "core-js": "^3.6.4",
         "css-loader": "^2.1.1",
         "file-loader": "^3.0.1",
         "html-loader": "^0.5.5",
@@ -28,8 +29,6 @@
         "webpack-dev-server": "^3.5.0"
     },
     "dependencies": {
-        "@webcomponents/webcomponentsjs": "^2.4.1",
-        "builtjs": "^0.3.67",
-        "core-js": "^3.6.4"
+        "builtjs": "^0.3.68"
     }
 }

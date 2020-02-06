@@ -6,7 +6,11 @@ export function WCDefine(componentName, componentClass) {
     const wc = window.WebComponents
     const ce = window.customElements
 
-    const defineComponent = () => {
+    function defineComponent() {
+        if (!componentClass) {
+            return
+        }
+
         if (!ce) {
             PolyfillObjectAssign()
             PolyfillMutationObserver(window)
@@ -14,15 +18,17 @@ export function WCDefine(componentName, componentClass) {
         }
 
         if (!ce.get(componentName)) {
-            ce.define(componentName, componentClass.component)
+            ce.define(componentName, componentClass)
         }
     }
 
     if (wc && wc.ready) {
         defineComponent()
     } else {
-        window.addEventListener(`WebComponentsReady`, function () {
+        window.addEventListener('WebComponentsReady', function () {
             defineComponent()
         })
     }
 }
+
+WCDefine.native = !!window.customElements

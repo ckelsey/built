@@ -6,7 +6,7 @@
  * @example
  * IsNonCollection({}) // false
  * IsNonCollection([]) // false
- * IsNonCollection(``) // true
+ * IsNonCollection('') // true
  * IsNonCollection(1) // true
  * IsNonCollection(null) // true
  * IsNonCollection(undefined) // true
@@ -14,6 +14,6 @@
  * IsNonCollection(true) // true
  */
 
-const nonCollections = [`string`, `number`, `null`, `undefined`, `function`, `boolean`, `date`]
+const nonCollections = ['string', 'number', 'null', 'undefined', 'function', 'boolean', 'date']
 
 export function IsNonCollection(value) { return nonCollections.indexOf(typeof value) > -1 || value === null || value instanceof Date }

@@ -1,10 +1,12 @@
-export const toggle = (host, open) => {
+import { ArrayFrom } from '../../utils/array-from.js'
+
+export function toggle(host, open) {
     if (!host.ready) { return }
 
     const root = host.elements.root
 
     if (root) {
-        root.classList[open ? `add` : `remove`](`open`)
+        root.classList[open ? 'add' : 'remove']('open')
     }
 
     const header = host.elements.header
@@ -43,14 +45,18 @@ export const toggle = (host, open) => {
     let others = []
 
     if (host.drawergroup) {
-        others = Array.from(document.querySelectorAll(`content-drawer[drawergroup="${host.drawergroup}"]`))
+        others = ArrayFrom(
+            document.querySelectorAll(
+                'content-drawer[drawergroup="'.concat(host.drawergroup, '"]')
+            )
+        )
     }
 
     if (open) {
 
         underline.open()
 
-        others.forEach(other => {
+        others.forEach(function (other) {
             if (other !== host) {
                 other.open = false
             }

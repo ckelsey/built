@@ -1,4 +1,5 @@
-import { IsEmpty, TMonad } from '..'
+import { IsEmpty } from './is-empty.js'
+import { TMonad } from './t-monad.js'
 
 export function IfEmpty(newValue) {
     return function (value) {

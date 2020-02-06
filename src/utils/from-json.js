@@ -1,4 +1,6 @@
-import { TMonad, Type, FromURIComponent } from '..'
+import { TMonad } from './t-monad.js'
+import { FromURIComponent } from './from-uri-component.js'
+import { Type } from './type.js'
 
 export function FromJSON(value) {
     const result = TMonad(value)
@@ -14,7 +16,7 @@ export function FromJSON(value) {
 
     result.type = Type(result.value)
 
-    if ([`object`, `array`].indexOf(result.type) > -1) {
+    if (['object', 'array'].indexOf(result.type) > -1) {
         result.valid = true
     }
 

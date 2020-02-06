@@ -1,9 +1,10 @@
 import { Type } from './type.js'
 import { IsTMonad } from './is-t-monad.js'
+import { AssignObject } from './assign.js'
 
 export function TMonad(value) {
     if (IsTMonad(value)) {
-        return Object.assign({}, value, { type: Type(value.value) })
+        return AssignObject({}, value, { type: Type(value.value) })
     }
 
     return {

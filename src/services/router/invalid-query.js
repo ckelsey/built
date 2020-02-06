@@ -1,2 +1,2 @@
-const invalidQuery = searchString => !searchString || typeof searchString.split !== `function` || searchString === ``
+function invalidQuery(searchString) { return !searchString || typeof searchString.split !== 'function' || searchString === '' }
 export default invalidQuery

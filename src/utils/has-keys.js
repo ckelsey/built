@@ -1,4 +1,4 @@
-import { ToObject } from '..'
+import { ToObject } from './to-object.js'
 
 export function HasKeys(compare) {
     return function (value) {
@@ -10,11 +10,15 @@ export function HasKeys(compare) {
 
         const keys = Object.keys(result.value)
 
+        function compareFilter(v) {
+            return keys.indexOf(v) > -1
+        }
+
         result.valid = !keys.length && !compare.length
             ? true
             : keys.length && !compare.length
                 ? false
-                : compare.filter(v => keys.indexOf(v) > -1).length === compare.length
+                : compare.filter(compareFilter).length === compare.length
 
         return result
     }

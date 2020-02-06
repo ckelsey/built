@@ -1,4 +1,5 @@
-import { TMonad, IsElement } from '..'
+import { TMonad } from './t-monad.js'
+import { IsElement } from './is-element.js'
 
 export function SelectorToElement(parent, value) {
     const Value = TMonad(value)
@@ -7,11 +8,11 @@ export function SelectorToElement(parent, value) {
         return Value
     }
 
-    if (!parent || typeof parent.querySelector !== `function`) {
+    if (!parent || typeof parent.querySelector !== 'function') {
         parent = document.firstElementChild || document.documentElement.body || document.documentElement.firstElementChild
     }
 
-    if (Value.type === `string`) {
+    if (Value.type === 'string') {
         Value.value = parent.querySelector(Value.value)
     }
 

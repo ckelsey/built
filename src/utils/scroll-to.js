@@ -1,11 +1,18 @@
-import { Timer, EaseInOut, Get } from '..'
+import { Timer } from '../services/timer.js'
+import { EaseInOut } from './ease-in-out.js'
+import { Get } from './get.js'
+import { AssignObject } from './assign.js'
 
-const animator = (from, to, speed, stepFn) => new Promise(resolve =>
-    Timer(
-        stepFn,
-        EaseInOut([from, to], speed)
-    ).then(resolve)
-)
+function animator(from, to, speed, stepFn) {
+    return new Promise(
+        function animatorPromise(resolve) {
+            return Timer(
+                stepFn,
+                EaseInOut([from, to], speed)
+            ).then(resolve)
+        }
+    )
+}
 
 export function ScrollTo(options) {
     if (!options) { return }
@@ -16,7 +23,7 @@ export function ScrollTo(options) {
         options.y = box.top
     }
 
-    options = Object.assign(
+    options = AssignObject(
         {},
         {
             speed: 300,
@@ -27,16 +34,20 @@ export function ScrollTo(options) {
         options
     )
 
-    const target = Get(options, `target`)
+    const target = Get(options, 'target')
 
     if (!target) { return }
 
     /** TODO - handle x */
 
     const fromY = target.scrollY || target.scrollTop
-    const toY = Get(options, `y`)
-    const toX = Get(options, `x`)
-    const speed = Get(options, `speed`)
+    const toY = Get(options, 'y')
+    const toX = Get(options, 'x')
+    const speed = Get(options, 'speed')
 
-    animator(fromY || 0, toY || 0, speed, y => target.scrollTo(toX, y))
+    function scrollTargetY(y) {
+        return target.scrollTo(toX, y)
+    }
+
+    animator(fromY || 0, toY || 0, speed, scrollTargetY)
 }

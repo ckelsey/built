@@ -1,11 +1,15 @@
-import { ToString, ToRegex } from '..'
+import { ToString } from './to-string.js'
+import { ToRegex } from './to-regex.js'
 
-export function ToMatchMeta(string, search, justOne = false) {
+export function ToMatchMeta(string, search, justOne) {
     const matches = []
     const changes = []
-    const value = typeof string === `string` ? string : ToString(string).value
-    const lastMatch = () => changes[changes.length - 1]
+    const value = typeof string === 'string' ? string : ToString(string).value
     let hasMatched = false
+
+    function lastMatch() {
+        return changes[changes.length - 1]
+    }
 
     value.replace(ToRegex(search).value, function () {
         if (justOne && hasMatched) {
@@ -16,7 +20,7 @@ export function ToMatchMeta(string, search, justOne = false) {
 
         const arr = ([]).slice.call(arguments, 0)
 
-        if (arr[0] === ``) { return }
+        if (arr[0] === '') { return }
 
         const extras = arr.splice(-2)
         arr.index = extras[0]
@@ -28,7 +32,7 @@ export function ToMatchMeta(string, search, justOne = false) {
             start: arr.index,
             end: arr.index + length,
             input: arr.input,
-            length,
+            length: length,
             result: arr[0],
             removed: undefined
         }

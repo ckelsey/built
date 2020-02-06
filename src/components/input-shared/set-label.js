@@ -4,37 +4,43 @@ import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
 import { ValidateHtml } from '../../utils/validate-html.js'
 import { CreateElement } from '../../utils/create-element.js'
 import { inputIdString } from './set-input-id.js'
-// import { ObserveEvent } from '../../utils/observe-event.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
+import { onLabelClick } from './on-label-click.js'
 
-const unsubscribeLabel = input => ObserverUnsubscribe(input)
+function unsubscribeLabel(input) {
+    return ObserverUnsubscribe(input)
+}
 
 export function setLabel(host) {
-    const { labelelement, inputID, labelposition, label } = host
+    const labelelement = host.labelelement
+    const inputID = host.inputID
+    const labelposition = host.labelposition
+    const label = host.label
 
-    Try(() => host.removeChild(labelelement))
+    Try(function () { host.removeChild(labelelement) })
 
     const element = CreateElement({
-        tagName: `label`,
+        tagName: 'label',
         id: inputID,
         tabIndex: -1,
         for: inputIdString(host),
-        class: `input-field-${labelposition}-label`,
-        slot: `label-${labelposition}`,
-        innerHTML: ValidateHtml(label, [], [`script`]).sanitized || ``
+        class: ''.concat('input-field-', labelposition, '-label'),
+        slot: ''.concat('label-', labelposition, ''),
+        innerHTML: ValidateHtml(label, [], ['script']).sanitized || ''
     })
 
     host.appendChild(element)
     host.labelelement = element
 
+    element.eventSubscriptions = {
+        onLabelClick: ObserveEvent(element, 'click').subscribe(function (e) {
+            onLabelClick(e, host)
+        })
+    }
+
     ObserveExists(element).subscribe(
-        () => { },
-        () => unsubscribeLabel(element),
-        () => unsubscribeLabel(element)
+        function () { },
+        function () { return unsubscribeLabel(element) },
+        function () { return unsubscribeLabel(element) }
     )
-
-
-
-    // host.labelelement.eventSubscriptions = {
-    //     click: ObserveEvent(host.labelelement, `click`).subscribe(e => onLabelClick(e, host))
-    // }
 }

@@ -3,7 +3,7 @@ import { Type } from './type.js'
 import { Get } from './get.js'
 
 export function ToString(value) {
-    let stop = Get(value, `stop`, false)
+    let stop = Get(value, 'stop', false)
 
     if (stop) {
         return TMonad(value)
@@ -12,11 +12,11 @@ export function ToString(value) {
     let result = TMonad(value)
 
     try {
-        if (!!result.value || result.value === ``) {
+        if (!!result.value || result.value === '') {
             result.value = result.value.toString()
-            result.valid = typeof result.value === `string`
+            result.valid = typeof result.value === 'string'
         } else {
-            result.value = ``
+            result.value = ''
             result.valid = false
         }
     } catch (error) {

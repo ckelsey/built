@@ -1,3 +1,5 @@
+import { ArrayFrom } from './array-from.js'
+
 /**
  * Converts a function to a curried partial function. Arguments are added by calling the 
  * partial(no set arity) until all possible arguments are met, which then
@@ -10,13 +12,13 @@
  * 
  * @example
  * const curried = FunctionToPartial( (a, b, c) => { console.log(a, b, c) })
- * curried(`one`) // proxy with argument `a` populated with `one`
- * curried(`two`) // proxy with argument `b` populated with `two`
- * curried(`three`) // `one two three`
+ * curried('one') // proxy with argument 'a' populated with 'one'
+ * curried('two') // proxy with argument 'b' populated with 'two'
+ * curried('three') // 'one two three'
  */
 
-export function FunctionToPartial(...args) {
-    const argArray = [...args]
+export function FunctionToPartial() {
+    const argArray = ArrayFrom(arguments)
     const fn = argArray.shift()
 
     /** If no function passed in, return */
@@ -28,5 +30,7 @@ export function FunctionToPartial(...args) {
     }
 
     /** return function that takes new arguments which then returns a new FunctionToPartial */
-    return (...newArgs) => FunctionToPartial(fn, ...(argArray.concat([...newArgs])))
+    return function () {
+        return FunctionToPartial.apply(null, [fn].concat(argArray.concat(ArrayFrom(arguments))))
+    }
 }

@@ -1,19 +1,19 @@
-import { OnNextFrame } from '..'
+import { OnNextFrame } from '../services/on-next-frame'
 
-export function Animator(
-    {
-        duration = 0,
-        stepFn = () => { },
-        frameValues = [],
-        completeFn = () => { }
-    }
-) {
+function emptyFn() { }
+
+export function Animator(options) {
+
+    const duration = options.duration ? options.duration : 0
+    const stepFn = options.stepFn ? options.stepFn : emptyFn
+    const frameValues = options.frameValues ? options.frameValues : []
+    const completeFn = options.completeFn ? options.completeFn : emptyFn
 
     if (!duration || isNaN(duration) || !Array.isArray(frameValues) || !frameValues.length) { return }
 
     const startTime = Date.now()
 
-    const run = () => {
+    function run() {
         const currentTime = Date.now()
         const currentFrame = frameValues[currentTime - startTime]
 
@@ -21,7 +21,7 @@ export function Animator(
             return completeFn()
         }
 
-        OnNextFrame(() => stepFn(currentFrame))
+        OnNextFrame(function runNext() { return stepFn(currentFrame) })
         OnNextFrame(run)
     }
 

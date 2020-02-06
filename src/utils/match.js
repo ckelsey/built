@@ -1,10 +1,14 @@
-import { ToRegex } from '..'
+import { ToRegex } from './to-regex.js'
 
-export const Match = (toSearchFor, toSearchIn) => {
-    const doSearch = search => search.match(ToRegex(toSearchFor).value)
+export function Match(toSearchFor, toSearchIn) {
+    function doSearch(search) {
+        return search.match(ToRegex(toSearchFor).value)
+    }
 
     if (toSearchIn === undefined) {
-        return toSearchIn => doSearch(toSearchIn)
+        return function MatchInner(toSearchIn) {
+            return doSearch(toSearchIn)
+        }
     }
 
     return doSearch(toSearchIn)

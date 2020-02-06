@@ -1,4 +1,5 @@
-import { Type, IsNonCollection } from '..'
+import { Type } from './type.js'
+import { IsNonCollection } from './is-non-collection.js'
 
 export function Equals(value1, value2) {
     const type = Type(value1)
@@ -9,23 +10,23 @@ export function Equals(value1, value2) {
         return value2 === value1
     }
 
-    if (type === `boolean` && value1 !== value2) {
+    if (type === 'boolean' && value1 !== value2) {
         return false
     }
 
-    if (type === `array` && value1.length !== value2.length) {
+    if (type === 'array' && value1.length !== value2.length) {
         return false
     }
 
-    if (type === `object` && Object.keys(value1).length !== Object.keys(value2).length) {
+    if (type === 'object' && Object.keys(value1).length !== Object.keys(value2).length) {
         return false
     }
 
-    if (type === `object` && value1.constructor !== value2.constructor) {
+    if (type === 'object' && value1.constructor !== value2.constructor) {
         return false
     }
 
-    if (type === `date`) {
+    if (type === 'date') {
         let d = value1 === value2
 
         try {
@@ -34,13 +35,13 @@ export function Equals(value1, value2) {
         return d
     }
 
-    if (type === `dom`) {
+    if (type === 'dom') {
         return value1.isEqualNode(value2)
     }
 
     // Start walking
 
-    if (type === `array`) {
+    if (type === 'array') {
         let len = value1.length
 
         while (len--) {
@@ -50,7 +51,7 @@ export function Equals(value1, value2) {
         }
     }
 
-    if (type === `object`) {
+    if (type === 'object') {
         const keys = Object.keys(value1)
         let len = keys.length
 

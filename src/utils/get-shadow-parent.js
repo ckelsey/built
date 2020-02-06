@@ -1,18 +1,19 @@
-import { Get } from '..'
+import { Get } from './get.js'
 
 export function GetShadowParent(element) {
     let parent = element
     let found = false
 
-    const getParent = el =>
-        Get(el, `parentNode`,
-            Get(el, `host`,
-                Get(el, `__shady_parent.host`)
+    function getParent(el) {
+        return Get(el, 'parentNode',
+            Get(el, 'host',
+                Get(el, '__shady_parent.host')
             )
         )
+    }
 
     while (parent && parent !== document.body && !found) {
-        if (parent.nodeName === `#document-fragment` && !!parent.host) {
+        if (parent.nodeName === '#document-fragment' && !!parent.host) {
             found = true
             break
         }

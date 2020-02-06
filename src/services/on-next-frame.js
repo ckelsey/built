@@ -1,33 +1,50 @@
 import { ID } from '../services/id.js'
 
-const OnNextFrameKey = Symbol.for(`builtjs.OnNextFrame`)
-const hasOnNextFrame = (Object.getOwnPropertySymbols(global).indexOf(OnNextFrameKey) > -1)
-
-const OnNextFrameSet = new Set()
+const OnNextFrameQueueObject = {}
+const OnNextFrameQueue = []
 let isRunning = false
 let frameTimer
 let timeout
+
+// function getEntry() {
+//     return OnNextFrameData[OnNextFrameIds.shift()]
+// }
+
+function deleteEntry(id) {
+    if (!OnNextFrameQueueObject[id]) { return }
+    OnNextFrameQueueObject[id].hasRun = true
+    OnNextFrameQueueObject[id].canceled = true
+    OnNextFrameQueueObject[id] = null
+    delete OnNextFrameQueueObject[id]
+}
+
+function hasTime(startTime) {
+    return performance.now() - startTime < runTasks.max
+}
 
 function runTasks(startTime) {
     cancelAnimationFrame(frameTimer)
     clearTimeout(timeout)
 
-    const hasTime = () => performance.now() - startTime < runTasks.max
+    do {
+        const id = OnNextFrameQueue.shift()
 
-    while (hasTime() && OnNextFrameSet.size) {
-        const entries = OnNextFrameSet.values()
-        let entry = entries.next()
-
-        while (entry.done === false && hasTime()) {
-            const val = entry.value
-            OnNextFrameSet.delete(entry.value)
-            if (val) { val.resolve(val.task()) }
-            entry = entries.next()
+        if (OnNextFrameQueueObject[id] && !OnNextFrameQueueObject[id].canceled && !OnNextFrameQueueObject[id].hasRun) {
+            OnNextFrameQueueObject[id].hasRun = true
+            OnNextFrameQueueObject[id].resolve(OnNextFrameQueueObject[id].task())
+            requestAnimationFrame(function () {
+                deleteEntry(id)
+            })
         }
-    }
 
-    if (OnNextFrameSet.size) {
-        return frameTimer = requestAnimationFrame(() => timeout = setTimeout(() => runTasks(performance.now())))
+    } while (hasTime(startTime) && OnNextFrameQueue.length)
+
+    if (OnNextFrameQueue.length) {
+        return frameTimer = requestAnimationFrame(function () {
+            timeout = setTimeout(
+                function () { runTasks(performance.now()) }
+            )
+        })
     } else {
         isRunning = false
     }
@@ -36,37 +53,37 @@ function runTasks(startTime) {
 runTasks.max = 5
 
 function RunOnNextFrame() {
-    if (isRunning) { return }
+    if (isRunning || !OnNextFrameQueue.length) { return }
     isRunning = true
     runTasks(performance.now())
 }
 
-if (!hasOnNextFrame) {
-    global[OnNextFrameKey] = task => {
+export function OnNextFrame(task) {
+    var resolve
+    var reject
 
-        let resolve, reject
-        const promise = new Promise((res, rej) => {
-            resolve = res
-            reject = rej
-        })
+    const promise = new Promise(function OnNextFramePromise(res, rej) {
+        resolve = res
+        reject = rej
+    })
 
-        const id = ID()
-        const data = {
-            task,
-            promise,
-            resolve,
-            reject,
-            id,
-            cancel: () => OnNextFrameSet.delete(data)
+    const id = ID()
+    OnNextFrameQueueObject[id] = {
+        hasRun: false,
+        canceled: false,
+        task: task,
+        promise: promise,
+        resolve: resolve,
+        reject: reject,
+        id: id,
+        cancel: function OnNextFrameCancel() {
+            deleteEntry(id)
         }
-
-        OnNextFrameSet.add(data)
-        RunOnNextFrame()
-
-        return data
     }
 
-    global[OnNextFrameKey].max = max => { runTasks.max = max }
+    OnNextFrameQueue.push(id)
+    RunOnNextFrame()
+    return OnNextFrameQueueObject[id]
 }
 
-export const OnNextFrame = Object.freeze(global[OnNextFrameKey])
+OnNextFrame.max = function OnNextFrameMax(max) { runTasks.max = max }

@@ -203,4 +203,8 @@ input-select {
     select.input-field-input {
         padding: 1em 2em 1em 1em;
     }
+
+    select::-ms-expand {
+        display: none;
+    }
 }

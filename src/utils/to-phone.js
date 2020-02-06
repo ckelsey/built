@@ -1,4 +1,9 @@
-import { TMonad, Pipe, ToDigits, ToSplit, ToMap, ToJoin } from '..'
+import { TMonad } from './t-monad.js'
+import { Pipe } from './pipe.js'
+import { ToDigits } from './to-digits.js'
+import { ToSplit } from './to-split.js'
+import { ToMap } from './to-map.js'
+import { ToJoin } from './to-join.js'
 
 export function ToPhone(value) {
     let result = TMonad(value)
@@ -7,45 +12,45 @@ export function ToPhone(value) {
 
     if (result.stop) { return result }
 
-    const mapper = ToMap((val, index) => {
-        const length = `${result.value || ``}`.length
-        let mapped = ``
+    function mapper(val, index) {
+        const length = ''.concat(result.value || '').length
+        let mapped = ''
 
         if (index === 0) {
-            mapped = length ? `(${val}` : val
+            mapped = length ? ''.concat('(', val) : val
             changes.push({
                 start: pointer,
                 end: pointer + 1,
                 input: val,
                 length: 1,
                 result: mapped,
-                added: `(`
+                added: '('
             })
             pointer = pointer + 2
         }
 
         if (index === 3) {
-            mapped = length > 4 ? `) ${val}` : val
+            mapped = length > 4 ? ''.concat(') ', val) : val
             changes.push({
                 start: pointer,
                 end: pointer + 2,
                 input: val,
                 length: 2,
                 result: mapped,
-                added: `) `
+                added: ') '
             })
             pointer = pointer + 3
         }
 
         if (index === 6) {
-            mapped = length > 9 ? `-${val}` : val
+            mapped = length > 9 ? ''.concat('-', val) : val
             changes.push({
                 start: pointer,
                 end: pointer + 1,
                 input: val,
                 length: 1,
                 result: mapped,
-                added: `-`
+                added: '-'
             })
             pointer = pointer + 2
         }
@@ -56,7 +61,7 @@ export function ToPhone(value) {
         }
 
         if (index > 9) {
-            mapped = ``
+            mapped = ''
             changes.push({
                 start: pointer,
                 end: pointer + 1,
@@ -69,16 +74,16 @@ export function ToPhone(value) {
         }
 
         return mapped
-    })
+    }
 
     const r = Pipe(
         ToDigits,
-        ToSplit(``),
-        mapper,
-        ToJoin(``),
+        ToSplit(''),
+        ToMap(mapper),
+        ToJoin('')
     )(result)
 
     r.stringChanges = r.stringChanges.concat(changes)
-    r.valid = typeof r.value === `string` && r.value.length === 14
+    r.valid = typeof r.value === 'string' && r.value.length === 14
     return r
 }

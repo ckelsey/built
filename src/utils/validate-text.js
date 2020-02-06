@@ -1,4 +1,7 @@
-import { Pipe, ValidateHtml, ToString, FromEntities } from '..'
+import { Pipe } from './pipe.js'
+import { ToString } from './to-string.js'
+import { FromEntities } from './from-entities.js'
+import { ValidateHtml } from './validate-html.js'
 
 export function ValidateText(str) {
     const original = str
@@ -6,12 +9,12 @@ export function ValidateText(str) {
     const converted = Pipe(ToString, FromEntities)(str)
     let val = converted.value
 
-    if (!val || !val.length || converted.type !== `string`) {
+    if (!val || !val.length || converted.type !== 'string') {
         return {
-            original,
+            original: original,
             valid: false,
             sanitized: val,
-            reason: reasons.concat([`no value`])
+            reason: reasons.concat(['no value'])
         }
     }
 

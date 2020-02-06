@@ -1,17 +1,19 @@
 import { IsEmpty } from '../../utils/is-empty.js'
 
-const queryObjectToString = (query = {}) => {
-    if (!Object.keys(query).length) { return `` }
+function queryObjectToString(query) {
+    query = query ? query : {}
+
+    if (!Object.keys(query).length) { return '' }
 
     const queries = Object
         .keys(query)
-        .map(q => IsEmpty(query[q]) ? false : `${q}=${query[q]}`)
-        .filter(v => !!v)
-        .join(`&`)
+        .map(function (q) { return IsEmpty(query[q]) ? false : ''.concat(q, '=', query[q]) })
+        .filter(function (v) { return !!v })
+        .join('&')
 
-    if (queries) { return `?${queries}` }
+    if (queries) { return ''.concat('?', queries) }
 
-    return ``
+    return ''
 }
 
 export default queryObjectToString

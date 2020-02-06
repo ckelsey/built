@@ -1,9 +1,18 @@
 import queryObjectToString from './query-object-to-string.js'
 
-const addLeadingSlash = pathname => !pathname ? `` : pathname[0] === `/` ? pathname : `/${pathname}`
-const joinUrl = (pathname, query) => `${location.protocol}//${location.host}${addLeadingSlash(pathname)}${queryObjectToString(query)}`
+function addLeadingSlash(pathname) {
+    return !pathname ?
+        '' :
+        pathname[0] === '/' ?
+            pathname :
+            ''.concat('/', pathname)
+}
 
-const UpdateState = (methods, replace = false, force = false) => {
+function joinUrl(pathname, query) {
+    return ''.concat(location.protocol, '//', location.host, addLeadingSlash(pathname), queryObjectToString(query))
+}
+
+function UpdateState(methods, replace, force) {
     if (!methods.current) { return }
 
     const lastQuery = queryObjectToString(methods.lastState.query)
@@ -12,7 +21,7 @@ const UpdateState = (methods, replace = false, force = false) => {
     const state = {
         title: methods.current.title || document.title,
         pathname: methods.current.pathname,
-        full,
+        full: full,
         query: methods.current.query || {}
     }
 

@@ -6,71 +6,77 @@ import { ToBool } from '../../utils/to-bool.js'
 import { ToNumber } from '../../utils/to-number.js'
 import { transition, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren, setCurrent } from './methods.js'
 
-const style = require(`./style.scss`).toString()
-const outerStyle = require(`./outer.scss`).toString()
-const template = require(`./index.html`)
-const componentName = `content-transition`
-const componentRoot = `.content-transition-container`
+const style = require('./style.scss').toString()
+const outerStyle = require('./outer.scss').toString()
+const template = require('./index.html')
+const componentName = 'content-transition'
+const componentRoot = ''.concat('.', componentName, '-container')
 
 const elements = {
     root: {
-        selector: `.content-transition-container`,
-        onChange: (el, host) => {
-            el.setAttribute(`type`, host.type)
+        selector: '.content-transition-container',
+        onChange: function (el, host) {
+            el.setAttribute('type', host.type)
         }
     },
-    current: { selector: `slot[name="current"]`, },
-    next: { selector: `slot[name="next"]`, },
-    nextContainer: { selector: `.next-slot` },
-    hidden: { selector: `slot[name="hidden"]`, },
-    hiddentContainer: { selector: `.hidden-slot` },
-    currentContainer: { selector: `.current-slot` }
+    current: { selector: 'slot[name="current"]', },
+    next: { selector: 'slot[name="next"]', },
+    nextContainer: { selector: '.next-slot' },
+    hidden: { selector: 'slot[name="hidden"]', },
+    hiddentContainer: { selector: '.hidden-slot' },
+    currentContainer: { selector: '.current-slot' }
 }
 
 const properties = {
-    speed: { format: val => Pipe(ToNumber, IfInvalid(300))(val).value },
+    speed: {
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(300))(val).value
+        }
+    },
 
     type: {
-        format: val => [`fade`, `slide`, `height`].indexOf(val) > -1 ? val : `fade`,
-        onChange: (val, host) => {
+        format: function (val) {
+            return ['fade', 'slide', 'height'].indexOf(val) > -1 ? val : 'fade'
+        },
+        onChange: function (val, host) {
             const root = host.elements.root
             if (!root) { return }
-            root.setAttribute(`type`, val)
+            root.setAttribute('type', val)
         }
     },
 
     keepchildren: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (_val, host) => {
+        format: function (val) { return Pipe(ToBool, IfInvalid(false))(val).value },
+        onChange: function (_val, host) {
             const root = host.elements.root
             if (!root) { return }
-            root.classList[host.keepchildren ? `add` : `remove`](`keepchildren`)
+            root.classList[host.keepchildren ? 'add' : 'remove']('keepchildren')
         }
     },
 
-    current: { format: val => val },
-    start: { format: val => val },
-    end: { format: val => val }
+    current: { format: function (val) { return val } },
+    start: { format: function (val) { return val } },
+    end: { format: function (val) { return val } },
 }
 
 export const ContentTransition = WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
-    outerStyle,
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    outerStyle: outerStyle,
     observedAttributes: Object.keys(properties),
-    properties,
-    elements,
+    properties: properties,
+    elements: elements,
     methods: {
-        transition,
-        getComponentStyles,
-        getIndex,
-        getCurrent,
-        getChildren,
-        start$,
-        end$,
-        setCurrent
+        transition: transition,
+        getComponentStyles: getComponentStyles,
+        getIndex: getIndex,
+        getCurrent: getCurrent,
+        getChildren: getChildren,
+        start$: start$,
+        end$: end$,
+        setCurrent: setCurrent
     }
 })
 

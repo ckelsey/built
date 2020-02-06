@@ -1,6 +1,10 @@
 /** BORROWED HEAVILY FROM: https://stackoverflow.com/a/15528789 */
 
-export function GetCurve(points, tension = 0.5, closedPath = false, frames = 16) {
+export function GetCurve(points, tension, closedPath, frames) {
+    tension = tension === undefined ? 0.5 : tension
+    closedPath = closedPath ? true : false
+    frames = frames === undefined ? 16 : frames
+
     const numOfSegments = Math.round(frames * .3295)
     const isPairs = Array.isArray(points[0])
     const res = []
@@ -20,10 +24,14 @@ export function GetCurve(points, tension = 0.5, closedPath = false, frames = 16)
     let t
     let i
 
+    function ptsMapper(p) {
+        return [p, p]
+    }
+
     if (isPairs) {
         pts = pts.concat.apply([], pts)
     } else {
-        pts = pts.concat.apply([], pts.map(p => [p, p]))
+        pts = pts.concat.apply([], pts.map(ptsMapper))
     }
 
     pts2 = pts.slice(0)
@@ -69,5 +77,9 @@ export function GetCurve(points, tension = 0.5, closedPath = false, frames = 16)
         }
     }
 
-    return isPairs ? res : res.map(p => p[0])
+    function resMapper(p) {
+        return p[0]
+    }
+
+    return isPairs ? res : res.map(resMapper)
 }

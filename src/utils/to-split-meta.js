@@ -1,6 +1,10 @@
-import { ToRegex } from '..'
+import { ToRegex } from './to-regex.js'
 
-export function ToSplitMeta(string, delimeter = ``) {
+function is(v) { return !!v }
+
+export function ToSplitMeta(string, delimeter) {
+    delimeter = delimeter ? delimeter : ''
+
     let match
     const arr = []
     const result = {
@@ -9,15 +13,15 @@ export function ToSplitMeta(string, delimeter = ``) {
     }
 
     try {
-        if (!string || (!delimeter && delimeter !== ``)) { return result }
+        if (!string || (!delimeter && delimeter !== '')) { return result }
 
         delimeter = ToRegex(delimeter).value
 
-        let str = result.value ? result.value.toString() : ``
+        let str = result.value ? result.value.toString() : ''
 
-        if (delimeter.toString() === `/(?:)/`) {
+        if (delimeter.toString() === '/(?:)/') {
             return {
-                value: str.split(``),
+                value: str.split(''),
                 stringChanges: []
             }
         }
@@ -28,12 +32,12 @@ export function ToSplitMeta(string, delimeter = ``) {
                 start: match.index,
                 end: match.index + length,
                 input: match.input,
-                length,
+                length: length,
                 result: [],
                 removed: match[0]
             }
 
-            const first = matched.start !== 0 ? str.slice(0, matched.start) : ``
+            const first = matched.start !== 0 ? str.slice(0, matched.start) : ''
             const second = str.slice(matched.end)
 
             matched.result = [first, second]
@@ -43,7 +47,7 @@ export function ToSplitMeta(string, delimeter = ``) {
         }
 
         arr.push(str)
-        result.value = arr.filter(v => !!v)
+        result.value = arr.filter(is)
 
     } catch (error) { }
 

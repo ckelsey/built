@@ -1,13 +1,14 @@
-export function SetAttribute(element, name, value, asProperty = false) {
+export function SetAttribute(element, name, value, asProperty) {
+    asProperty = asProperty ? true : false
     if (!element || !name) { return element }
 
-    const set = (n, v) => {
-        if (n === `accept`) { return element.setAttribute(`accept`, v ? Array.isArray(v) ? v.join(`, `) : v : undefined) }
+    function set(n, v) {
+        if (n === 'accept') { return element.setAttribute('accept', v ? Array.isArray(v) ? v.join(', ') : v : undefined) }
 
-        const arias = [`disabled`, `required`]
+        const arias = ['disabled', 'required']
 
         if (arias.indexOf(n) > -1) {
-            set(`aria-${n}`, v)
+            set('aria-' + n, v)
         }
 
         if (!asProperty) {
@@ -17,8 +18,12 @@ export function SetAttribute(element, name, value, asProperty = false) {
         return v ? element[n] = v : element[n] = undefined
     }
 
+    function nameEach(n, i) {
+        set(n, value[i])
+    }
+
     if (Array.isArray(name)) {
-        name.forEach((n, i) => set(n, value[i]))
+        name.forEach(nameEach)
     } else {
         set(name, value)
     }

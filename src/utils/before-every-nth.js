@@ -1,4 +1,9 @@
-import { ToString, Pipe, ToSplit, ToJoin, ToMap, TMonad } from '..'
+import { ToString } from './to-string.js'
+import { TMonad } from './t-monad.js'
+import { ToMap } from './to-map.js'
+import { Pipe } from './pipe.js'
+import { ToSplit } from './to-split.js'
+import { ToJoin } from './to-join.js'
 
 export function BeforeEveryNth(nth, insert) {
     return function (value) {
@@ -8,13 +13,13 @@ export function BeforeEveryNth(nth, insert) {
 
         if (result.stop) { return result }
 
-        if (result.type !== `string`) { result = ToString(result) }
+        if (result.type !== 'string') { result = ToString(result) }
 
-        const mapper = ToMap((val, index) => {
-            let mapped = ``
+        function mapper(val, index) {
+            let mapped = ''
 
             if ((index + 1) % nth === 0 && index !== 0) {
-                mapped = `${insert}${val}`
+                mapped = ''.concat(insert, val)
                 changes.push({
                     start: pointer,
                     end: pointer + (1 + insert.length),
@@ -30,16 +35,16 @@ export function BeforeEveryNth(nth, insert) {
             }
 
             return mapped
-        })
+        }
 
         const r = Pipe(
-            ToSplit(``),
-            mapper,
-            ToJoin(``),
+            ToSplit(''),
+            ToMap(mapper),
+            ToJoin('')
         )(result)
 
         r.stringChanges = r.stringChanges.concat(changes)
-        r.valid = typeof r.value === `string` && r.value.length === 14
+        r.valid = typeof r.value === 'string' && r.value.length === 14
         return r
     }
 }

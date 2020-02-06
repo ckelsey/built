@@ -1,5 +1,7 @@
-import { ToDate, DateToObject } from '..'
-export const LastOfMonth = value => {
+import { ToDate } from './to-date.js'
+import { DateToObject } from './date-to-object.js'
+
+export function LastOfMonth(value) {
     let result = ToDate(value)
 
     if (result.stop || !result.valid) { return result }

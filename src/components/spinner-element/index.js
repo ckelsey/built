@@ -6,61 +6,61 @@ import { OnNextFrame } from '../../services/on-next-frame.js'
 import { ToNumber } from '../../utils/to-number.js'
 import { ToBool } from '../../utils/to-bool.js'
 
-const style = require(`./style.scss`).toString()
-const outerStyle = require(`./outer.scss`).toString()
-const template = require(`./index.html`)
-const componentName = `spinner-element`
-const componentRoot = `.${componentName}-container`
+const style = require('./style.scss').toString()
+const outerStyle = require('./outer.scss').toString()
+const template = require('./index.html')
+const componentName = 'spinner-element'
+const componentRoot = ''.concat('.', componentName, '-container')
 
-const doAllTheThings = host => {
+function doAllTheThings(host) {
     const root = host.elements.root
     if (!root) { return }
 
-    root.setAttribute(`type`, host.type)
-    setRootClass(host, host.page, `fullpage`)
-    setRootClass(host, host.scrim, `showscrim`)
+    root.setAttribute('type', host.type)
+    setRootClass(host, host.page, 'fullpage')
+    setRootClass(host, host.scrim, 'showscrim')
     setType(host)
     setScrimColor(host)
     setScrimOpacity(host)
     setBlur(host)
 }
 
-const setRootClass = (host, condition, clss) => {
-    OnNextFrame(() => {
+function setRootClass(host, condition, clss) {
+    OnNextFrame(function () {
         const root = host.elements.root
 
         if (!root) { return }
 
-        root.classList[condition ? `add` : `remove`](clss)
+        root.classList[condition ? 'add' : 'remove'](clss)
     })
 }
 
-const setType = host => {
-    OnNextFrame(() => {
+function setType(host) {
+    OnNextFrame(function () {
         const root = host.elements.root
         if (!root) { return }
-        root.setAttribute(`type`, host.type)
+        root.setAttribute('type', host.type)
     })
 }
 
-const setBlur = host => {
-    OnNextFrame(() => {
+function setBlur(host) {
+    OnNextFrame(function () {
         const scrim = host.elements.scrim
         if (!scrim) { return }
-        scrim.style.backdropFilter = `blur(${host.blur}px)`
+        scrim.style.backdropFilter = ''.concat('blur(', host.blur, 'px)')
     })
 }
 
-const setScrimColor = host => {
-    OnNextFrame(() => {
+function setScrimColor(host) {
+    OnNextFrame(function () {
         const scrim = host.elements.scrim
         if (!scrim) { return }
         scrim.style.background = host.scrimcolor
     })
 }
 
-const setScrimOpacity = host => {
-    OnNextFrame(() => {
+function setScrimOpacity(host) {
+    OnNextFrame(function () {
         const scrim = host.elements.scrim
 
         if (!scrim) { return }
@@ -73,57 +73,77 @@ const setScrimOpacity = host => {
     })
 }
 
-const toggleVisibility = host => OnNextFrame(() => host.elements.root.classList[host.visible ? `add` : `remove`](`shown`))
+function toggleVisibility(host) {
+    return OnNextFrame(function () {
+        return host.elements.root.classList[host.visible ? 'add' : 'remove']('shown')
+    })
+}
+
+function onChangeDoThings(_el, host) {
+    return doAllTheThings(host)
+}
 
 const elements = {
     root: {
         selector: componentRoot,
-        onChange: (_el, host) => doAllTheThings(host)
+        onChange: onChangeDoThings
     },
     scrim: {
-        selector: `.spinner-element-scrim`,
-        onChange: (_el, host) => doAllTheThings(host)
+        selector: '.spinner-element-scrim',
+        onChange: onChangeDoThings
     },
-    inner: { selector: `.spinner-element-inner` },
-    slot: { selector: `slot` }
+    inner: { selector: '.spinner-element-inner' },
+    slot: { selector: 'slot' }
 }
 
 const properties = {
     visible: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (_val, host) => toggleVisibility(host)
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        },
+        onChange: function (_val, host) { toggleVisibility(host) }
     },
     page: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (_val, host) => doAllTheThings(host)
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        },
+        onChange: onChangeDoThings
     },
     scrim: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange: (_val, host) => doAllTheThings(host)
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        },
+        onChange: onChangeDoThings
     },
     blur: {
-        format: val => Pipe(ToNumber, IfInvalid(0))(val).value,
-        onChange: (_val, host) => doAllTheThings(host)
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(0))(val).value
+        },
+        onChange: onChangeDoThings
     },
     scrimopacity: {
-        format: val => Pipe(ToNumber, IfInvalid(1))(val).value,
-        onChange: (_val, host) => doAllTheThings(host)
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(1))(val).value
+        },
+        onChange: onChangeDoThings
     },
     type: {
-        format: val => typeof val === `string` ? val : `column`,
-        onChange: (_val, host) => doAllTheThings(host)
+        format: function (val) {
+            return typeof val === 'string' ? val : 'column'
+        },
+        onChange: onChangeDoThings
     }
 }
 
 export const SpinnerElement = WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
-    outerStyle,
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    outerStyle: outerStyle,
     observedAttributes: Object.keys(properties),
-    properties,
-    elements,
+    properties: properties,
+    elements: elements,
 })
 
 WCDefine(componentName, SpinnerElement)

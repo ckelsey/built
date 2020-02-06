@@ -1,4 +1,9 @@
-import { ID, Get, ToJSON, ToString } from '..'
+import { ID } from '../services/id.js'
+import { Get } from './get.js'
+import { ToString } from './to-string.js'
+import { ToJSON } from './to-json.js'
+
+function emptyFn() { }
 
 export function ObserveWorker(func) {
     let value
@@ -6,105 +11,118 @@ export function ObserveWorker(func) {
     let worker
     let functionString = ToString(func).value
     const subscriptions = {}
-    const firstBracket = functionString.indexOf(`{`)
+    const firstBracket = functionString.indexOf('{')
     const beginingSlice = functionString.slice(firstBracket)
     const pendingSubscriptions = []
 
-    functionString = `function webworker()${beginingSlice}webworker()`
+    functionString = ''.concat('function webworker()', beginingSlice, 'webworker()')
 
-    const loop = (method, data, subs) =>
-        Object.keys(subs)
-            .forEach(key =>
-                Get(subs, `${key}.${method}`, () => { })(data)
-            )
+    function loop(method, data, subs) {
+        function loopInner(key) {
+            return Get(subs, ''.concat(key, '.', method), emptyFn())(data)
+        }
 
-    const shutDown = () => {
+        return Object.keys(subs).forEach(loopInner)
+    }
+
+    function shutDown() {
         if (worker) { worker.terminate() }
         worker = undefined
         return false
     }
 
-    const startUp = () => {
+    function startUp() {
         if (worker) { return }
 
         let blob
 
         try {
-            blob = window.URL.createObjectURL(new Blob([functionString], { type: `application/javascript` }))
+            blob = window.URL.createObjectURL(new Blob([functionString], { type: 'application/javascript' }))
         } catch (error) { }
 
         if (!blob) { return }
 
         worker = new Worker(blob)
 
-        worker.onmessage = e => {
+        worker.onmessage = function onmessageFn(e) {
             previous = value
             value = e.data
-            return loop(`next`, value, subscriptions)
+            return loop('next', value, subscriptions)
         }
-        worker.onerror = e => loop(`error`, e.message, subscriptions)
+
+        worker.onerror = function onerrorFn(e) {
+            return loop('error', e.message, subscriptions)
+        }
         return worker
     }
 
-    const noShutdown = subs => Object.keys(subs).length === 0 ? shutDown() : true
-
-    const unSubscribe = subscriberId => () => {
-        subscriptions[subscriberId] = null
-        delete subscriptions[subscriberId]
-        noShutdown(subscriptions)
+    function noShutdown(subs) {
+        return Object.keys(subs).length === 0 ? shutDown() : true
     }
 
-    const completeAll = subs => Object.keys(subs)
-        .forEach(key => {
+    function unSubscribe(subscriberId) {
+        return function unSubscribeInner() {
+            subscriptions[subscriberId] = null
+            delete subscriptions[subscriberId]
+            noShutdown(subscriptions)
+        }
+    }
+
+    function completeAll(subs) {
+        function completeAllEach(key) {
             subs[key].complete()
             unSubscribe(key)
-        })
+        }
+
+        return Object.keys(subs).forEach(completeAllEach)
+    }
 
     const methods = {
-        get value() { return value },
-        get previous() { return previous },
-        get functionString() { return functionString },
-        get subscriptions() { return subscriptions },
-        get pending() { return pendingSubscriptions },
+        dispose: function () { completeAll(subscriptions) },
 
-        dispose() { completeAll(subscriptions) },
-
-        post(msg) {
+        post: function (msg) {
             const index = pendingSubscriptions.length
 
-            return new Promise((resolve, reject) => {
-                const res = e => {
-                    pendingSubscriptions[index]()
-                    return resolve(e)
-                }
+            return new Promise(
+                function postPromise(resolve, reject) {
+                    function res(e) {
+                        pendingSubscriptions[index]()
+                        return resolve(e)
+                    }
 
-                const rej = e => {
-                    pendingSubscriptions[index]()
-                    return reject(e)
-                }
+                    function rej(e) {
+                        pendingSubscriptions[index]()
+                        return reject(e)
+                    }
 
-                pendingSubscriptions.push(methods.subscribe(res, rej, rej))
-                worker.postMessage(ToJSON(msg).value)
-            })
+                    pendingSubscriptions.push(methods.subscribe(res, rej, rej))
+                    worker.postMessage(ToJSON(msg).value)
+                }
+            )
         },
 
-        subscribe(next, error = () => { }, complete = () => { }) {
-            if (typeof next !== `function`) { return }
+        subscribe: function (next, error, complete) {
+            error = error ? error : emptyFn
+            complete = complete ? complete : emptyFn
+
+            if (typeof next !== 'function') {
+                return
+            }
 
             const subscriber = {
-                next,
-                error,
-                complete,
+                next: next,
+                error: error,
+                complete: complete,
                 id: ID()
             }
 
             subscriptions[subscriber.id] = subscriber
 
-            if (typeof subscriptions[subscriber.id].error !== `function`) {
+            if (typeof subscriptions[subscriber.id].error !== 'function') {
                 subscriptions[subscriber.id].error = unSubscribe(subscriber.id)
             }
 
-            if (typeof subscriptions[subscriber.id].complete !== `function`) {
+            if (typeof subscriptions[subscriber.id].complete !== 'function') {
                 subscriptions[subscriber.id].complete = unSubscribe(subscriber.id)
             }
 
@@ -113,6 +131,34 @@ export function ObserveWorker(func) {
             return unSubscribe(subscriber.id)
         }
     }
+
+    Object.defineProperties(methods, {
+        value: {
+            get: function () {
+                return value
+            }
+        },
+        previous: {
+            get: function () {
+                return previous
+            }
+        },
+        functionString: {
+            get: function () {
+                return functionString
+            }
+        },
+        subscriptions: {
+            get: function () {
+                return subscriptions
+            }
+        },
+        pending: {
+            get: function () {
+                return pendingSubscriptions
+            }
+        }
+    })
 
     return methods
 }

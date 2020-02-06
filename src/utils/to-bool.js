@@ -1,6 +1,9 @@
 import { TMonad } from './t-monad.js'
 import { Type } from './type.js'
 
+const invalids = ['0', 0, 'off', 'false', false]
+const valids = ['1', 1, 'on', 'true', true]
+
 export function ToBool(value) {
     const result = TMonad(value)
 
@@ -8,29 +11,15 @@ export function ToBool(value) {
         return result
     }
 
-    switch (result.value) {
-        case `0`:
-        case 0:
-        case `off`:
-        case `false`:
-        case false:
-            result.value = false
-            result.valid = true
-            break
-
-        case `1`:
-        case 1:
-        case `on`:
-        case `true`:
-        case true:
-            result.value = true
-            result.valid = true
-            break
-
-        default:
-            result.value = false
-            result.valid = false
-            break
+    if (invalids.indexOf(result.value) > -1) {
+        result.value = false
+        result.valid = true
+    } else if (valids.indexOf(result.value) > -1) {
+        result.value = true
+        result.valid = true
+    } else {
+        result.value = false
+        result.valid = false
     }
 
     result.type = Type(result.value)

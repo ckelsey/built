@@ -2,7 +2,7 @@ import { Get } from '../..'
 import { processedNullValue } from '../input-shared/definitions.js'
 import { sanitizeValue, isEmpty, InputFieldFormatValue, maxMin, pattern } from './methods-value'
 
-const processedErrorText = sanitized => sanitized && sanitized.reason ? sanitized.reason.join(`, `) : ``
+const processedErrorText = sanitized => sanitized && sanitized.reason ? sanitized.reason.join(', ') : ''
 
 const getVal = (host, value) => {
     const sanitized = sanitizeValue(value, host.type, host.allowhtml, host.disallowhtml)
@@ -11,11 +11,11 @@ const getVal = (host, value) => {
     let matchInputValid = true
 
     if (host.musthave) {
-        mustHaveValid = new RegExp(host.musthave, `g`).test(maxMined.value)
+        mustHaveValid = new RegExp(host.musthave, 'g').test(maxMined.value)
     }
 
     if (host.matchinput) {
-        matchInputValid = maxMined.value === Get(host, `matchinput.value`)
+        matchInputValid = maxMined.value === Get(host, 'matchinput.value')
     }
 
     sanitized.valid = sanitized.valid && maxMined.valid && mustHaveValid && matchInputValid
@@ -23,17 +23,17 @@ const getVal = (host, value) => {
     if (maxMined.errorText) { sanitized.reason.push(maxMined.errorText) }
 
     if (!mustHaveValid) {
-        sanitized.reason.push(`Invalid value.`)
+        sanitized.reason.push('Invalid value.')
     }
 
     if (!matchInputValid) {
         const toMatch = host.matchinput
-        const label = toMatch.label || toMatch.getAttribute(`label`)
-        const placeholder = toMatch.placeholder || toMatch.getAttribute(`placeholder`)
-        const name = toMatch.name || toMatch.getAttribute(`name`)
+        const label = toMatch.label || toMatch.getAttribute('label')
+        const placeholder = toMatch.placeholder || toMatch.getAttribute('placeholder')
+        const name = toMatch.name || toMatch.getAttribute('name')
         const toMatchName = label || placeholder || name
-
-        sanitized.reason.push(`Value does not match${toMatchName ? ` '${toMatchName}'` : ``}.`)
+        const _toMatchName = toMatchName ? ''.concat(' \'', toMatchName, '\'') : ''
+        sanitized.reason.push(''.concat('Value does not match', _toMatchName, '.'))
     }
 
     host.processedError = processedErrorText(sanitized)
@@ -44,8 +44,8 @@ const getVal = (host, value) => {
 }
 
 export const processedValue = host => ({
-    get() {
-        const value = Get(host.state, `value.value`)
+    get: function () {
+        const value = Get(host.state, 'value.value')
 
         if (isEmpty(value)) { return processedNullValue() }
 
@@ -54,8 +54,8 @@ export const processedValue = host => ({
 })
 
 export const formattedValue = host => ({
-    get() {
-        const value = Get(host.state, `value.value`)
+    get: function () {
+        const value = Get(host.state, 'value.value')
 
         if (isEmpty(value)) { return processedNullValue().sanitized }
 
@@ -66,16 +66,16 @@ export const formattedValue = host => ({
 })
 
 export const valid = host => ({
-    get() {
-        return (!host.processedError || host.processedError === ``) && Get(host, `input.validity.valid`)
+    get: function () {
+        return (!host.processedError || host.processedError === '') && Get(host, 'input.validity.valid')
     }
 })
 
 export const validationMessage = host => ({
-    get() {
+    get: function () {
         return [
             host.processedError,
-            Get(host, `input.validationMessage`)
+            Get(host, 'input.validationMessage')
         ].filter(m => !!m)
     }
 })

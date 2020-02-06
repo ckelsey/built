@@ -12,56 +12,102 @@ import { ToMap } from '../../utils/to-map.js'
 import { ValidateHtml } from '../../utils/validate-html.js'
 import { IndexOf } from '../../utils/index-of.js'
 
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-const style = require(`./style.scss`).toString()
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
-const template = require(`./index.html`)
-const componentName = `progress-bar`
-const componentRoot = `.${componentName}-container`
-const types = [`bar`, `circle`]
-const animations = [`indeterminate`, `linear`, `volley`]
-const setVisible = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`visible`) : undefined)
-const setOverlay = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`overlay`) : undefined)
-const setPercentage = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`percentage`) : undefined)
-const setScrimColor = (val, root) => OnNextFrame(() => root ? val ? root.style.backgroundColor = val : root.style.removeProperty(`background-color`) : undefined)
-const setTrack = (val, root) => OnNextFrame(() => root ? root.classList[val ? `add` : `remove`](`track`) : undefined)
-const setScrimBlur = (val, root) => OnNextFrame(() => root ? root.style.backdropFilter = `blur(${val}px)` : undefined)
-const setThickness = (val, el) => OnNextFrame(() => el ? el.style.height = val : undefined)
-const setHeading = (val, el) => el ? el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized : undefined
-const setText = (val, el) => el ? el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized : undefined
-const setColor = (val, el) => OnNextFrame(() => el && val ? el.style.color = val : el ? el.style.removeProperty(`color`) : undefined)
-const setAnimation = (val, root) => root ? root.setAttribute(`animation`, val) : undefined
+const style = require('./style.scss').toString()
+const template = require('./index.html')
+const componentName = 'progress-bar'
+const componentRoot = ''.concat('.', componentName, '-container')
+const types = ['bar', 'circle']
+const animations = ['indeterminate', 'linear', 'volley']
 
-const setScrim = (val, root) => {
-    if (!root) { return }
-
-    OnNextFrame(() => {
-        if (!val) { root.style.removeProperty(`background-color`) }
-        root.classList[val ? `add` : `remove`](`scrim`)
+function setVisible(val, root) {
+    return OnNextFrame(function () {
+        return root ? root.classList[val ? 'add' : 'remove']('visible') : undefined
     })
 }
 
-const setButton = (val, el) => {
-    OnNextFrame(() => {
+function setOverlay(val, root) {
+    return OnNextFrame(function () {
+        return root ? root.classList[val ? 'add' : 'remove']('overlay') : undefined
+    })
+}
+function setPercentage(val, root) {
+    return OnNextFrame(function () {
+        return root ? root.classList[val ? 'add' : 'remove']('percentage') : undefined
+    })
+}
+
+function setScrimColor(val, root) {
+    return OnNextFrame(function () {
+        return root ? val ? root.style.backgroundColor = val : root.style.removeProperty('background-color') : undefined
+    })
+}
+
+function setTrack(val, root) {
+    return OnNextFrame(function () {
+        return root ? root.classList[val ? 'add' : 'remove']('track') : undefined
+    })
+}
+
+function setScrimBlur(val, root) {
+    return OnNextFrame(function () {
+        return root ? root.style.backdropFilter = ''.concat('blur(', val, 'px)') : undefined
+    })
+}
+
+function setThickness(val, el) {
+    return OnNextFrame(function () {
+        return el ? el.style.height = val : undefined
+    })
+}
+
+function setHeading(val, el) {
+    return el ? el.innerHTML = ValidateHtml(val, [], ['script']).sanitized : undefined
+}
+
+function setText(val, el) {
+    return el ? el.innerHTML = ValidateHtml(val, [], ['script']).sanitized : undefined
+}
+
+function setColor(val, el) {
+    return OnNextFrame(function () {
+        return el && val ? el.style.color = val : el ? el.style.removeProperty('color') : undefined
+    })
+}
+
+function setAnimation(val, root) {
+    return root ? root.setAttribute('animation', val) : undefined
+}
+
+function setScrim(val, root) {
+    if (!root) { return }
+
+    OnNextFrame(function () {
+        if (!val) { root.style.removeProperty('background-color') }
+        root.classList[val ? 'add' : 'remove']('scrim')
+    })
+}
+
+function setButton(val, el) {
+    OnNextFrame(function () {
         if (val && el) {
-            el.classList.add(`show`)
-            el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized
+            el.classList.add('show')
+            el.innerHTML = ValidateHtml(val, [], ['script']).sanitized
         } else if (el) {
-            el.classList.remove(`show`)
+            el.classList.remove('show')
         }
     })
 }
 
-const setValues = (vals, host) => {
+function setValues(vals, host) {
     const top = host.elements.top
     const bottom = host.elements.bottom
     const percentage = host.elements.percentage
-    const mainVal = `${Math.min(100, (vals[0] || 0))}%`
-    const secondaryVal = `${Math.min(100, (vals[1] || 0))}%`
+    const mainVal = ''.concat(Math.min(100, (vals[0] || 0)), '%')
+    const secondaryVal = ''.concat(Math.min(100, (vals[1] || 0)), '%')
 
     if (!top || !bottom) { return }
 
-    OnNextFrame(() => {
+    OnNextFrame(function () {
         top.style.width = mainVal
         bottom.style.width = secondaryVal
         percentage.textContent = mainVal
@@ -70,71 +116,101 @@ const setValues = (vals, host) => {
 
 const properties = {
     value: {
-        format: val => Pipe(
-            CommasToArray,
-            IfInvalid([val]),
-            ToMap(v => isNaN(parseInt(v)) ? 0 : parseInt(v)),
-        )(val).value,
-        onChange(val, host) { setValues(val, host) }
+        format: function (val) {
+            return Pipe(
+                CommasToArray,
+                IfInvalid([val]),
+                ToMap(function (v) {
+                    return isNaN(parseInt(v)) ? 0 : parseInt(v)
+                })
+            )(val).value
+        },
+        onChange: function (val, host) { setValues(val, host) }
     },
     color: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange(val, host) { setColor(val, host.elements.trackInner) }
+        format: function (val) { return Pipe(ToString, IfInvalid(null))(val).value },
+        onChange: function (val, host) { setColor(val, host.elements.trackInner) }
     },
     button: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange(val, host) { setButton(val, host.elements.button) }
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(null))(val).value
+        },
+        onChange: function (val, host) { setButton(val, host.elements.button) }
     },
     text: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange(val, host) { setText(val, host.elements.text) }
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(''))(val).value
+        },
+        onChange: function (val, host) { setText(val, host.elements.text) }
     },
     header: {
-        format: val => Pipe(ToString, IfInvalid(``))(val).value,
-        onChange(val, host) { setHeading(val, host.elements.header) }
+        format: function (val) {
+            return Pipe(ToString, IfInvalid(''))(val).value
+        },
+        onChange: function (val, host) { setHeading(val, host.elements.header) }
     },
     percentage: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange(val, host) { setPercentage(val, host.elements.root) }
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(true))(val).value
+        },
+        onChange: function (val, host) { setPercentage(val, host.elements.root) }
     },
     thickness: {
-        format: val => Pipe(ToString, IfInvalid(`3px`))(val).value,
-        onChange(val, host) { setThickness(val, host.elements.container) }
+        format: function (val) {
+            return Pipe(ToString, IfInvalid('3px'))(val).value
+        },
+        onChange: function (val, host) { setThickness(val, host.elements.container) }
     },
     visible: {
-        format: val => Pipe(ToBool, IfInvalid(false))(val).value,
-        onChange(val, host) { setVisible(val, host.elements.root) }
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(false))(val).value
+        },
+        onChange: function (val, host) { setVisible(val, host.elements.root) }
     },
     overlay: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange(val, host) { setOverlay(val, host.elements.root) }
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(true))(val).value
+        },
+        onChange: function (val, host) { setOverlay(val, host.elements.root) }
     },
     scrim: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange(val, host) { setScrim(val, host.elements.root) }
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(true))(val).value
+        },
+        onChange: function (val, host) { setScrim(val, host.elements.root) }
     },
     track: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange(val, host) { setTrack(val, host.elements.root) }
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(true))(val).value
+        },
+        onChange: function (val, host) { setTrack(val, host.elements.root) }
     },
     scrimcolor: {
-        format: val => Pipe(ToString, IfInvalid(`rgba(0,0,0,0.84)`))(val).value,
-        onChange(val, host) { setScrimColor(val, host.elements.root) }
+        format: function (val) {
+            return Pipe(ToString, IfInvalid('rgba(0,0,0,0.84)'))(val).value
+        },
+        onChange: function (val, host) { setScrimColor(val, host.elements.root) }
     },
     scrimblur: {
-        format: val => Pipe(ToNumber, IfInvalid(0))(val).value,
-        onChange(val, host) { setScrimBlur(val, host.elements.root) }
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(0))(val).value
+        },
+        onChange: function (val, host) { setScrimBlur(val, host.elements.root) }
     },
 
     animation: {
-        format: val => Pipe(IndexOf(animations), IfInvalid(animations[0]))(val).value,
-        onChange(val, host) {
+        format: function (val) {
+            return Pipe(IndexOf(animations), IfInvalid(animations[0]))(val).value
+        },
+        onChange: function (val, host) {
             setAnimation(val, host.elements.root)
         }
     },
 
     /** TODO */
-    type: { format: val => Pipe(IndexOf(types), IfInvalid(types[0]))(val).value },
+    type: {
+        format: function (val) { return Pipe(IndexOf(types), IfInvalid(types[0]))(val).value }
+    },
 }
 
 const observedAttributes = Object.keys(properties)
@@ -142,7 +218,7 @@ const observedAttributes = Object.keys(properties)
 const elements = {
     root: {
         selector: componentRoot,
-        onChange(el, host) {
+        onChange: function (el, host) {
             setOverlay(host.overlay, el)
             setScrim(host.scrim, el)
             setScrimColor(host.scrimcolor, el)
@@ -154,34 +230,46 @@ const elements = {
         }
     },
     container: {
-        selector: `.progress-bar-inner`,
-        onChange(el, host) {
+        selector: '.progress-bar-inner',
+        onChange: function (el, host) {
             setThickness(host.thickness, el)
         }
     },
     trackInner: {
-        selector: `.progress-bar-track-inner`,
-        onChange(el, host) { setColor(host.color, el) }
+        selector: '.progress-bar-track-inner',
+        onChange: function (el, host) { setColor(host.color, el) }
     },
     header: {
-        selector: `.progress-bar-header`,
-        onChange(el, host) { setHeading(host.header, el) }
+        selector: '.progress-bar-header',
+        onChange: function (el, host) { setHeading(host.header, el) }
     },
     text: {
-        selector: `.progress-bar-text`,
-        onChange(el, host) { setText(host.text, el) }
+        selector: '.progress-bar-text',
+        onChange: function (el, host) { setText(host.text, el) }
     },
     button: {
-        selector: `.progress-bar-button`,
-        onChange(el, host) {
-            el.eventSubscriptions = { click: ObserveEvent(el, `click`).subscribe(() => host.dispatchEvent(new CustomEvent(`buttonclick`, { detail: host }))) }
+        selector: '.progress-bar-button',
+        onChange: function (el, host) {
+            el.eventSubscriptions = {
+                click: ObserveEvent(el, 'click').subscribe(function () {
+                    host.dispatchEvent(new CustomEvent('buttonclick', { detail: host }))
+                })
+            }
             setButton(host.button, el)
         }
     },
-    percentage: { selector: `.progress-bar-percentage` },
-    bottom: { selector: `.progress-bar-bottom` },
-    top: { selector: `.progress-bar-top` }
+    percentage: { selector: '.progress-bar-percentage' },
+    bottom: { selector: '.progress-bar-bottom' },
+    top: { selector: '.progress-bar-top' }
 }
 
-export const ProgressBar = WCConstructor({ componentName, componentRoot, template, style, observedAttributes, properties, elements })
+export const ProgressBar = WCConstructor({
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    observedAttributes: observedAttributes,
+    properties: properties,
+    elements: elements
+})
 WCDefine(componentName, ProgressBar)

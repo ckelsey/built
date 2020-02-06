@@ -3,7 +3,7 @@ export function WasClickedOn(element, event) {
 
     const isArray = Array.isArray(element)
 
-    const isIt = (el, par) => {
+    function isIt(el, par) {
         const isEqual = el === par
         const isContained = par instanceof Node && el.contains(par)
         if (isEqual || isContained) { return true }
@@ -12,7 +12,7 @@ export function WasClickedOn(element, event) {
 
     const target = Array.isArray(event.path) ?
         event.path[0] :
-        event.composedPath && typeof event.composedPath === `function` && event.composedPath()[0] ?
+        event.composedPath && typeof event.composedPath === 'function' && event.composedPath()[0] ?
             event.composedPath()[0] :
             event.originalTarget ?
                 event.originalTarget :
@@ -20,7 +20,7 @@ export function WasClickedOn(element, event) {
                     event.explicitOriginalTarget :
                     event.target
 
-    const cycleUp = parent => {
+    function cycleUp(parent) {
         while (parent && parent !== document.body) {
             if (isArray) {
                 if (element.length == 1) {

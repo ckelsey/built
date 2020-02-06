@@ -1,4 +1,9 @@
-import { TMonad, TMonadUpdate, Pipe, StopIfInvalid, Type, ToArray } from '..'
+import { TMonad } from './t-monad.js'
+import { Type } from './type.js'
+import { TMonadUpdate } from './t-monad-update.js'
+import { ToArray } from './to-array.js'
+import { StopIfInvalid } from './stop-if-invalid.js'
+import { Pipe } from './pipe.js'
 
 export function ToMap(fn) {
     return function (value) {
@@ -6,8 +11,8 @@ export function ToMap(fn) {
 
         if (result.stop) { return result }
 
-        const map = v => {
-            if (Type(v.value) !== `array`) {
+        function map(v) {
+            if (Type(v.value) !== 'array') {
                 v.valid = false
                 return v
             }
@@ -20,6 +25,6 @@ export function ToMap(fn) {
             ToArray,
             StopIfInvalid,
             map
-        )(result), `array`, `Map`)
+        )(result), 'array', 'Map')
     }
 }

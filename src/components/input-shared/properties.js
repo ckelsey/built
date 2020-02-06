@@ -19,134 +19,182 @@ import { dispatch } from './dispatch.js'
 import { ValidateHtml } from '../../utils/validate-html.js'
 import { onInvalid } from './on-invalid.js'
 
-const trueOrNull = val => Pipe(ToBool, IfNot(true, null))(val).value
-const stringOrEmpty = val => Pipe(ToString, IfInvalid(``))(val).value
-const addRemoveContainerClass = (val, host, clss) => Get(host, `elements.container.classList`, { add: () => { }, remove: () => { } })[val ? `add` : `remove`](clss)
-const setInputAttribute = (host, name, value) => WCWhenPropertyReady(host, `input`).then(input => SetAttribute(input, name, value))
-const defaultType = host => {
+function trueOrNull(val) {
+    return Pipe(ToBool, IfNot(true, null))(val).value
+}
+
+function stringOrEmpty(val) {
+    return Pipe(ToString, IfInvalid(''))(val).value
+}
+
+function addRemoveContainerClass(val, host, clss) {
+    return Get(host, 'elements.container.classList', { add: function () { }, remove: function () { } })[val ? 'add' : 'remove'](clss)
+}
+
+function setInputAttribute(host, name, value) {
+    return WCWhenPropertyReady(host, 'input').then(function (input) {
+        return SetAttribute(input, name, value)
+    })
+}
+
+function defaultType(host) {
     const tag = host.tagName.toLowerCase()
-    return tag === `input-bool` ?
-        `checkbox` :
-        tag === `input-select` ?
-            `select` :
-            `text`
+    return tag === 'input-bool' ?
+        'checkbox' :
+        tag === 'input-select' ?
+            'select' :
+            'text'
 }
 
 export const properties = {
     autofocus: {
         format: trueOrNull,
-        onChange: (val, host) => setInputAttribute(host, `autofocus`, val)
+        onChange: function (val, host) { setInputAttribute(host, 'autofocus', val) }
     },
 
-    cacheNeedsUpdate: { format: val => Pipe(ToBool, IfInvalid(true))(val).value },
+    cacheNeedsUpdate: {
+        format: function (val) { return Pipe(ToBool, IfInvalid(true))(val).value }
+    },
     cachedValue: {
-        format: val => val,
-        onChange: (_val, host) => host.cacheNeedsUpdate = false
+        format: function (val) { return val },
+        onChange: function (_val, host) { host.cacheNeedsUpdate = false }
     },
 
     disabled: {
         format: trueOrNull,
-        onChange: (val, host) => {
-            setInputAttribute(host, `disabled`, val)
-            addRemoveContainerClass(val, host, `disabled`)
+        onChange: function (val, host) {
+            setInputAttribute(host, 'disabled', val)
+            addRemoveContainerClass(val, host, 'disabled')
         }
     },
 
     focused: {
         format: trueOrNull,
-        onChange: (val, host) => {
-            addRemoveContainerClass(val, host, `focused`)
-            host.setAttribute(`focused`, val ? val : `false`)
+        onChange: function (val, host) {
+            addRemoveContainerClass(val, host, 'focused')
+            host.setAttribute('focused', val ? val : 'false')
             host.processValue()
-            dispatch(host, `focus`, host)
+            dispatch(host, 'focus', host)
         },
     },
 
     format: {
-        format: val => Pipe(ToObject, IfInvalid(Pipe(ToString, IfInvalid(null))(val).value))(val).value,
-        onChange: (_val, host) => host.processValue(),
+        format: function (val) {
+            return Pipe(ToObject, IfInvalid(Pipe(ToString, IfInvalid(null))(val).value))(val).value
+        },
+        onChange: function (_val, host) { host.processValue() },
     },
 
     helptext: {
         format: stringOrEmpty,
-        onChange: (val, host) => WCWhenPropertyReady(host, `elements.help`).then(el => el.innerHTML = ValidateHtml(val, [], [`script`]).sanitized || ``)
+        onChange: function (val, host) {
+            WCWhenPropertyReady(host, 'elements.help').then(function (el) {
+                return el.innerHTML = ValidateHtml(val, [], ['script']).sanitized || ''
+            })
+        }
     },
 
     inputID: {
         format: stringOrEmpty,
-        onChange: (_val, host) => setInputID(host),
+        onChange: function (_val, host) {
+            setInputID(host)
+        },
     },
 
     invalid: {
-        format: val => ToBool(val).value,
-        onChange: (val, host) => {
-            SetAttribute(host.elements.container, `valid`, val)
-            addRemoveContainerClass(val, host, `invalid`)
-            WCWhenPropertyReady(host, `elements.error`).then(el => el.innerHTML = ValidateHtml(host.validationMessage, [], [`script`]).sanitized || ``)
+        format: function (val) {
+            return ToBool(val).value
+        },
+        onChange: function (val, host) {
+            SetAttribute(host.elements.container, 'valid', val)
+            addRemoveContainerClass(val, host, 'invalid')
+            WCWhenPropertyReady(host, 'elements.error').then(function (el) {
+                return el.innerHTML = ValidateHtml(host.validationMessage, [], ['script']).sanitized || ''
+            })
             onInvalid(host)
         },
     },
 
     labelposition: {
-        format: (val, host) => Pipe(IndexOf(labelPositions), IfInvalid(getDefaultLabelPosition(host)))(val).value,
-        onChange: (val, host) => {
-            WCWhenPropertyReady(host, `elements.container`).then(container => SetAttribute(container, `label-position`, val))
-            WCWhenPropertyReady(host, `labelelement`).then(label => label.slot = `label-${val}`)
+        format: function (val, host) {
+            return Pipe(IndexOf(labelPositions), IfInvalid(getDefaultLabelPosition(host)))(val).value
+        },
+        onChange: function (val, host) {
+            WCWhenPropertyReady(host, 'elements.container').then(function (container) {
+                return SetAttribute(container, 'label-position', val)
+            })
+            WCWhenPropertyReady(host, 'labelelement').then(function (label) {
+                return label.slot = ''.concat('label-', val, '')
+            })
         },
     },
 
     label: {
         format: stringOrEmpty,
-        onChange: (_val, host) => setLabel(host),
+        onChange: function (_val, host) { setLabel(host) },
     },
 
-    matchinput: { format: val => IsElement(val).valid ? val : undefined },
+    matchinput: {
+        format: function (val) {
+            return IsElement(val).valid ? val : undefined
+        }
+    },
 
     name: {
         format: stringOrEmpty,
-        onChange: (val, host) => setInputAttribute(host, `name`, val),
+        onChange: function (val, host) {
+            return setInputAttribute(host, 'name', val)
+        },
     },
 
     notempty: {
-        format: val => ToBool(val).value,
-        onChange: (val, host) => addRemoveContainerClass(val, SetAttribute(host, `has-value`, `${val}`), `notempty`),
+        format: function (val) {
+            return ToBool(val).value
+        },
+        onChange: function (val, host) {
+            addRemoveContainerClass(val, SetAttribute(host, 'has-value', ''.concat(val)), 'notempty')
+        },
     },
 
     readonly: {
         format: trueOrNull,
-        onChange: (val, host) => setInputAttribute(host, `readonly`, val)
+        onChange: function (val, host) {
+            setInputAttribute(host, 'readonly', val)
+        }
     },
 
     ready: {
         format: trueOrNull,
-        onChange: (val, host) => addRemoveContainerClass(val, host, `ready`),
+        onChange: function (val, host) { addRemoveContainerClass(val, host, 'ready') },
     },
 
     required: {
         format: trueOrNull,
-        onChange: (val, host) => {
-            setInputAttribute(host, `required`, val)
-            setInputAttribute(host, `aria-required`, val)
+        onChange: function (val, host) {
+            setInputAttribute(host, 'required', val)
+            setInputAttribute(host, 'aria-required', val)
         },
     },
 
     tabindex: {
-        format: val => Pipe(ToNumber, IfInvalid(0))(val).value,
-        onChange: (val, host) => setInputAttribute(host, `tabIndex`, val)
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(0))(val).value
+        },
+        onChange: function (val, host) { setInputAttribute(host, 'tabIndex', val) }
     },
 
     type: {
-        format: (val, host) => Pipe(IndexOf(supportedInputTypes), IfInvalid(defaultType(host)))(val).value,
-        onChange: (_val, host) => setInput(host),
+        format: function (val, host) { return Pipe(IndexOf(supportedInputTypes), IfInvalid(defaultType(host)))(val).value },
+        onChange: function (_val, host) { setInput(host) },
     },
 
     value: {
-        format: (val, host) => host.type === `checkbox` || host.type === `radio` ? ToBool(val).value : val,
-        onChange: (_val, host) => {
+        format: function (val, host) { return host.type === 'checkbox' || host.type === 'radio' ? ToBool(val).value : val },
+        onChange: function (_val, host) {
             if (!host.eventSubscriptions) { host.eventSubscriptions = {} }
 
             if (!host.eventSubscriptions.valuecaching) {
-                host.eventSubscriptions.valuecaching = host.state.value.subscribe(() => {
+                host.eventSubscriptions.valuecaching = host.state.value.subscribe(function () {
                     host.cacheNeedsUpdate = true
                     host.cachedPreProcessValueNeedsUpdate = true
                 })
@@ -155,8 +203,8 @@ export const properties = {
             host.processValue()
 
             const val = host.value
-            dispatch(host, `inputchange`, val)
-            dispatch(host, `input`, val)
+            dispatch(host, 'inputchange', val)
+            dispatch(host, 'input', val)
         },
     }
 }

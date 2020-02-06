@@ -3,63 +3,56 @@ import { ToString } from './to-string.js'
 import { Pipe } from './pipe.js'
 import { svgTags } from './svg-tags.js'
 import { htmlTags } from './html-tags.js'
+import { ArrayFrom } from './array-from.js'
+
+function getElements(Doc, selector) {
+    return ArrayFrom(Doc.body.querySelectorAll(selector))
+}
 
 export function ValidateHtml(str, allowedHtmlTags, disallowedHtmlTags) {
     const original = str
     const converted = Pipe(ToString, FromEntities)(str)
     let val = converted.value
 
-    const getElements = (Doc, selector) => {
-        return Array.from(Doc.body.querySelectorAll(selector))
-    }
-
-    if (!str || !str.length || converted.type !== `string`) {
+    if (!str || !str.length || converted.type !== 'string') {
         return {
-            original,
+            original: original,
             valid: false,
             sanitized: val,
-            reason: [`no value`]
+            reason: ['no value']
         }
     }
 
     let doc
 
     try {
-        doc = new DOMParser().parseFromString(val, `text/html`)
+        doc = new DOMParser().parseFromString(val, 'text/html')
     } catch (error) {
         return {
-            original,
+            original: original,
             valid: true,
             sanitized: val,
-            reason: [`no html present`],
+            reason: ['no html present'],
         }
     }
 
-    const totalElements = getElements(doc, `*`)
+    const totalElements = getElements(doc, '*')
     let tagsToDestroy = []
     let elementsToDestroy = []
 
-    if (disallowedHtmlTags && disallowedHtmlTags.length) {
-        tagsToDestroy = disallowedHtmlTags.slice(0)
-    } else {
-        tagsToDestroy = [].concat(svgTags, htmlTags)
+    function allowedHtmlTagsEach(tag) {
+        const index = tagsToDestroy.indexOf(tag)
+
+        if (index > -1) {
+            tagsToDestroy.splice(index, 1)
+        }
     }
 
-    if (allowedHtmlTags && allowedHtmlTags.length) {
-        allowedHtmlTags.forEach(tag => {
-            const index = tagsToDestroy.indexOf(tag)
-
-            if (index > -1) {
-                tagsToDestroy.splice(index, 1)
-            }
-        })
-    }
-
-    tagsToDestroy.forEach(tag => {
+    function tagsToDestroyEach(tag) {
         elementsToDestroy = [].concat(getElements(doc, tag), elementsToDestroy)
-    })
+    }
 
-    elementsToDestroy.forEach(el => {
+    function elementsToDestroyEach(el) {
         if (el && el.parentNode) {
 
             const childrenLength = el.children.length
@@ -74,16 +67,30 @@ export function ValidateHtml(str, allowedHtmlTags, disallowedHtmlTags) {
 
             el.parentNode.removeChild(el)
         }
-    })
+    }
 
-    const leftOverElements = getElements(doc, `*`)
+    if (disallowedHtmlTags && disallowedHtmlTags.length) {
+        tagsToDestroy = disallowedHtmlTags.slice(0)
+    } else {
+        tagsToDestroy = [].concat(svgTags, htmlTags)
+    }
+
+    if (allowedHtmlTags && allowedHtmlTags.length) {
+        allowedHtmlTags.forEach(allowedHtmlTagsEach)
+    }
+
+    tagsToDestroy.forEach(tagsToDestroyEach)
+
+    elementsToDestroy.forEach(elementsToDestroyEach)
+
+    const leftOverElements = getElements(doc, '*')
     const diff = totalElements.length - leftOverElements.length
     const valid = diff === 0
 
     return {
-        original,
-        valid,
-        sanitized: valid ? val : !doc.body.innerHTML || !doc.body.innerHTML.length ? `` : doc.body.innerHTML,
-        reason: valid ? [] : [`${diff} element${diff > 1 ? `s were` : ` was`} removed`]
+        original: original,
+        valid: valid,
+        sanitized: valid ? val : !doc.body.innerHTML || !doc.body.innerHTML.length ? '' : doc.body.innerHTML,
+        reason: valid ? [] : [''.concat(diff, ' element', diff > 1 ? 's were' : ' was', ' removed')]
     }
 }

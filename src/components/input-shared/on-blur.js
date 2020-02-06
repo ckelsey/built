@@ -7,10 +7,10 @@ export function onBlur(host) {
 
     host.focused = false
 
-    WCWhenPropertyReady(host, `input`).then(input => {
+    WCWhenPropertyReady(host, 'input').then(function (input) {
         host.value = GetInputValue(input)
         input.blur()
-        dispatch(host, `blur`, host)
+        dispatch(host, 'blur', host)
     })
 
 }

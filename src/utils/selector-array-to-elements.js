@@ -1,4 +1,6 @@
-import { ToArray, UseIf, SelectorToElement } from '..'
+import { ToArray } from './to-array.js'
+import { UseIf } from './use-if.js'
+import { SelectorToElement } from './selector-to-element.js'
 
 export function SelectorArrayToElements(parent, value) {
     const Value = ToArray(value)
@@ -7,7 +9,7 @@ export function SelectorArrayToElements(parent, value) {
         return Value
     }
 
-    if (!Value.valid || Value.type !== `array`) {
+    if (!Value.valid || Value.type !== 'array') {
         return Value
     }
 
@@ -15,13 +17,23 @@ export function SelectorArrayToElements(parent, value) {
         parent = document.firstElementChild
     }
 
-    Value.value = Value.value.map(el =>
-        UseIf(
-            v => v.valid,
-            () => ({ value: null }),
-            SelectorToElement(null, el)
-        ).value
-    ).filter(v => !!v)
+    function valid(v) {
+        return v.valid
+    }
+
+    function valueObj() {
+        return { value: null }
+    }
+
+    function valueMapper(el) {
+        return UseIf(valid, valueObj, SelectorToElement(null, el)).value
+    }
+
+    function valueFilter(v) {
+        return !!v
+    }
+
+    Value.value = Value.value.map(valueMapper).filter(valueFilter)
 
     Value.valid = Value.value.length
     return Value

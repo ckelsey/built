@@ -3,19 +3,27 @@ import { Get } from './get.js'
 
 export function WCWhenPropertyReady(host, path, isMethod) {
     let max = 1000
-    return new Promise((resolve, reject) => {
+    return new Promise(function WCWhenPropertyReadyPromise(resolve, reject) {
         if (!host || (!host.parentNode && !host.parentElement)) {
-            return reject({ host, path })
+            return reject({
+                host: host,
+                path: path
+            })
         }
 
-        const test = () => {
+        function test() {
             max = max - 1
 
             const val = Get(host, path)
 
-            if (!max) { return reject({ host, path }) }
+            if (!max) {
+                return reject({
+                    host: host,
+                    path: path
+                })
+            }
 
-            if (val === undefined || (isMethod && typeof val !== `function`)) { return OnNextFrame(test) }
+            if (val === undefined || (isMethod && typeof val !== 'function')) { return OnNextFrame(test) }
 
             return resolve(val)
         }

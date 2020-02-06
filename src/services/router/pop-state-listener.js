@@ -1,5 +1,7 @@
-const popStateListener = methods => {
-    window.addEventListener(`popstate`, () => methods.route(`${location.pathname}${location.search}`, true), false)
+function popStateListener(methods) {
+    window.addEventListener('popstate', function popstateHandler() {
+        methods.route(''.concat(location.pathname, location.search), true)
+    }, false)
 }
 
 export default popStateListener

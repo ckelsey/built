@@ -1,15 +1,23 @@
 import { ObserveEvent, EaseInOut, Timer, Get, OnNextFrame } from '../..'
 
-const signalEnd = host => runEnd(host)
+function signalEnd(host) {
+    return runEnd(host)
+}
 
-const animator = (points, speed, stepFn) => new Promise(resolve =>
-    Timer(
-        stepFn,
-        EaseInOut(points, speed),
-    ).then(resolve)
-)
+function animator(points, speed, stepFn) {
+    return new Promise(function (resolve) {
+        return Timer(
+            stepFn,
+            EaseInOut(points, speed)
+        ).then(resolve)
+    })
+}
 
-const runAnimation = (host, isOn) => {
+function transform(v) {
+    return 'perspective(1px) translateZ(0) scaleX('.concat(v, ')')
+}
+
+function runAnimation(host, isOn) {
     const underlineStyle = host.elements.underline.style
 
     if (isOn) {
@@ -20,50 +28,61 @@ const runAnimation = (host, isOn) => {
     animator(
         isOn ? [0, 1] : [1, 0],
         host.speed / 2,
-        scale => underlineStyle.transform = `perspective(1px) translateZ(0) scaleX(${scale})`
-    ).then(() => underlineStyle.transform = `perspective(1px) translateZ(0) scaleX(${isOn ? 1 : 0})`)
+        function (scale) {
+            return underlineStyle.transform = transform(scale)
+        }
+    ).then(function () {
+        return underlineStyle.transform = transform(isOn ? 1 : 0)
+    })
 }
 
-const runEnd = host => () => {
-    if (!host.canRunEnd) { return }
-    host.on = false
-    runAnimation(host, false)
+function runEnd(host) {
+    return function () {
+        if (!host.canRunEnd) { return }
+        host.on = false
+        runAnimation(host, false)
+    }
 }
 
-const runStart = host => () => {
-    if (!host.canRunStart) { return }
-    host.on = true
-    runAnimation(host, true)
-    host.downEvent = undefined
+function runStart(host) {
+    return function () {
+        if (!host.canRunStart) { return }
+        host.on = true
+        runAnimation(host, true)
+        host.downEvent = undefined
+    }
 }
 
-const setOrigin = host => {
+function setOrigin(host) {
     if (!host.ready) { return }
 
-    OnNextFrame(() => {
+    OnNextFrame(function () {
         const nonAutoOrigin = host.nonAutoOrigin
         const underlineStyle = host.elements.underline.style
 
         if (nonAutoOrigin) { return underlineStyle.transformOrigin = nonAutoOrigin }
 
-        const eventX = Get(host, `downEvent.x`, 0)
-        const targetBox = Get(host, `downEvent.target.getBoundingClientRect()`, { left: 0, width: 0 })
+        const eventX = Get(host, 'downEvent.x', 0)
+        const targetBox = Get(host, 'downEvent.target.getBoundingClientRect()', { left: 0, width: 0 })
         const left = Math.round(((eventX - targetBox.left) / targetBox.width) * 100)
-        underlineStyle.transformOrigin = `${left}% center`
+        underlineStyle.transformOrigin = ''.concat(left, '% center')
     })
 }
 
-export const toggle = host => host.on ? runEnd(host) : runStart(host)
-export const open = host => runStart(host)
-export const close = host => runEnd(host)
+export function toggle(host) {
+    return host.on ? runEnd(host) : runStart(host)
+}
 
-export const unloadTargets = host => {
+export function open(host) { return runStart(host) }
+export function close(host) { return runEnd(host) }
+
+export function unloadTargets(host) {
     if (!host.hasTargets$) { return }
-    host.targets$.forEach(ob$ => ob$())
+    host.targets$.forEach(function (ob$) { return ob$() })
     host.targets$ = []
 }
 
-export const loadTargets = host => {
+export function loadTargets(host) {
     if (!Array.isArray(host.targets$)) { host.targets$ = [] }
 
     if (!host.canLoadTargets) { return }
@@ -72,9 +91,9 @@ export const loadTargets = host => {
 
     if (!Array.isArray(host.targets)) { return }
 
-    host.targets.forEach(target => {
+    host.targets.forEach(function (target) {
         if (host.canStart) {
-            host.targets$.push(ObserveEvent(target, `mousedown`).subscribe(e => host.downEvent = e))
+            host.targets$.push(ObserveEvent(target, 'mousedown').subscribe(function (e) { host.downEvent = e }))
             host.targets$.push(ObserveEvent(target, host.start).subscribe(runStart(host)))
         }
 

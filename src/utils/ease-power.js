@@ -1,3 +1,4 @@
-export function EasePower(stepDecimal, pow = 4) {
+export function EasePower(stepDecimal, pow) {
+    pow = pow === undefined ? 4 : pow
     return 1 - Math.pow(1 - stepDecimal, pow)
 }

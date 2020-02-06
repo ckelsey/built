@@ -1,6 +1,7 @@
-import { ToDate, DateToObject } from '..'
+import { ToDate } from './to-date.js'
+import { DateToObject } from './date-to-object.js'
 
-export const FirstOfMonth = value => {
+export function FirstOfMonth(value) {
     let result = ToDate(value)
 
     if (result.stop || !result.valid) { return result }

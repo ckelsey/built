@@ -1,4 +1,5 @@
-import { ToObject, Type } from '..'
+import { ToObject } from './to-object.js'
+import { Type } from './type.js'
 
 export function PropertiesAre(compare) {
     return function (value) {
@@ -10,7 +11,11 @@ export function PropertiesAre(compare) {
 
         const keys = Object.keys(result.value)
 
-        result.valid = keys.length === 0 ? true : keys.filter(v => Type(v) === compare).length > 0
+        function filter(v) {
+            return Type(v) === compare
+        }
+
+        result.valid = keys.length === 0 ? true : keys.filter(filter).length > 0
 
         return result
     }

@@ -1,4 +1,6 @@
-import { Observer, FunctionToPartial } from '..'
+import { ArrayFrom } from './array-from.js'
+import { FunctionToPartial } from './function-to-partial.js'
+import { Observer } from './observer.js'
 
 /**
  * Gives functions super powers. Allows functions to be curried, passing in 
@@ -21,7 +23,7 @@ import { Observer, FunctionToPartial } from '..'
  * @property {string[]} args - Returns or sets the stored arguments
  * @property {boolean} complete - Returns true if the stored arguments length is that of the original functions argument length
  * @property {function} curried - Returns a new super copy of the function
- * @property {function(...args)} curry - Returns a copy of the current curried function, adding in any passed arguments
+ * @property {function(args)} curry - Returns a copy of the current curried function, adding in any passed arguments
  * @property {function(arg)} pushArgument - Adds a new argument
  * @property {function()} popArgument - Removes the last argument
  * @property {function(property:string, next:function, error:function, complete:function)} subscribe - Subscribes to a state property observer, if it exists
@@ -29,55 +31,58 @@ import { Observer, FunctionToPartial } from '..'
  * @return {function()} A proxy version of the original function with the above properties/methods
  * 
  * @example
- * const wonderFunction = SuperFunction( (a, b, c) => `${a} | ${b} | ${c}` )
+ * function wonderFunction = SuperFunction( (a, b, c) => '${a} | ${b} | ${c}' )
  * 
- * wonderFunction(`one`) // `one undefined undefined`
+ * wonderFunction('one') // 'one undefined undefined'
  * 
  * const curried = wonderFunction.curried
- * curried(`one`) // proxy with argument `a` populated with `one`
- * curried(`two`) // proxy with argument `b` populated with `two`
- * curried(`three`) // `one | two | three`
+ * curried('one') // proxy with argument 'a' populated with 'one'
+ * curried('two') // proxy with argument 'b' populated with 'two'
+ * curried('three') // 'one | two | three'
  * 
  * const curried2 = wonderFunction.curried
- * curried2.pushArgument(`Aquaman`) // (`Aquaman`, b, c) => `${a} | ${b} | ${c}`
+ * curried2.pushArgument('Aquaman') // ('Aquaman', b, c) => '${a} | ${b} | ${c}'
  * 
  * const curried3 = curried2.curried
- * curried3.pushArgument(`Skateman`) // (`Aquaman`, `Skateman`, c) => `${a} | ${b} | ${c}`
+ * curried3.pushArgument('Skateman') // ('Aquaman', 'Skateman', c) => '${a} | ${b} | ${c}'
  * curried3.length // 3
- * curried3.args // [`Aquaman`, `Skateman`]
+ * curried3.args // ['Aquaman', 'Skateman']
  * curried3.complete // false
  * curried3.versions // [curried, curried2]
  * 
  * curried3.popArgument()
- * curried3.args // [`Aquaman`]
+ * curried3.args // ['Aquaman']
  * 
- * curried3.curry(`Krypto the Superdog`, `Arm Rip Off Boy`) // `Aquaman | Krypto the Superdog | Arm Rip Off Boy`
+ * curried3.curry('Krypto the Superdog', 'Arm Rip Off Boy') // 'Aquaman | Krypto the Superdog | Arm Rip Off Boy'
  * 
- * curried3.subscribe(`args`, console.log)
- * curried3.pushArgument(`Squirrel Girl`) 
- * // subscription triggered -> [`Aquaman`, `Squirrel Girl`]
+ * curried3.subscribe('args', console.log)
+ * curried3.pushArgument('Squirrel Girl') 
+ * // subscription triggered -> ['Aquaman', 'Squirrel Girl']
  * 
- * curried3.subscribe(`call`, console.log)
- * curried3(`Razorback`)
+ * curried3.subscribe('call', console.log)
+ * curried3('Razorback')
  * // subscription triggered -> {
  * //   arguments:[
- * //       `Aquaman`, 
- * //       `Squirrel Girl`, 
- * //       `Razorback`
+ * //       'Aquaman', 
+ * //       'Squirrel Girl', 
+ * //       'Razorback'
  * //   ], 
- * //   returned: `Aquaman | Squirrel Girl | Razorback`, 
+ * //   returned: 'Aquaman | Squirrel Girl | Razorback,
  * //   self:curried3 
  * // }
  */
 
-function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn.length : 0) {
+function SuperFunction(fn, args, name, length) {
+    args = args ? args : []
+    name = name ? name : fn ? fn.name : ''
+    length = length ? length : fn ? fn.length : 0
 
     if (!fn) { return }
 
     /** State object, holds observers to subscribe to */
     const state = {
         curried: Observer([FunctionToPartial(fn)]),
-        args: Observer([...args]),
+        args: Observer(ArrayFrom(arguments)),
         call: Observer({})
     }
 
@@ -89,16 +94,16 @@ function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn
     const result = {}
 
     /** Proxy, a function that wraps the original function, passing in the stored arguments and any arguments passed in */
-    result[name] = function (...proxyArgs) {
+    result[name] = function () {
 
         // concat the arguments, call the original function and store it's result
-        const newArgs = state.args.value.concat(proxyArgs).slice(0, length)
+        const newArgs = state.args.value.concat(ArrayFrom(arguments)).slice(0, length)
 
         /** TODO - this is duplicate code, needs to be DRY but not sure how yet */
         const newResult = {}
         newResult[name] = fn.apply(result[name], newArgs)
 
-        if (typeof newResult[name] === `function` && newResult[name].name === ``) {
+        if (typeof newResult[name] === 'function' && newResult[name].name === '') {
             newResult[name] = SuperFunction(newResult[name], [], name, length)
         }
 
@@ -120,14 +125,14 @@ function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn
         name: { value: name, },
 
         /** @prototype Inherit original function arity */
-        length: { get() { return length } },
+        length: { get: function () { return length } },
 
         /** @prototype Stored arguments */
         args: {
-            get() { return state.args.value },
+            get: function () { return state.args.value },
 
             /** Replaces all stored arguments and resets the curried versions */
-            set(arg) {
+            set: function (arg) {
                 state.args.next(!Array.isArray(arg) ? [arg] : arg)
                 state.curried.next([FunctionToPartial(fn)])
             }
@@ -135,14 +140,14 @@ function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn
 
         /** Returns a new super copy of the function */
         curried: {
-            get() {
+            get: function () {
                 return SuperFunction(currentCurry(), state.args.value, name, length)
             }
         },
 
         /** Returns true if the stored arguments length is that of the original functions argument length */
         complete: {
-            get() { return state.args.value.length === length }
+            get: function () { return state.args.value.length === length }
         },
 
         isSuperFunction: { value: true }
@@ -153,7 +158,8 @@ function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn
      * @prototype Adds a new argument to the end of the stored arguments
      * @param {any} arg - the argument to add
      */
-    result[name].pushArgument = arg => {
+
+    result[name].pushArgument = function pushArgumentFn(arg) {
         /** Do not add more arguments than the function can take */
         if (length === state.args.value.length) { return }
 
@@ -168,7 +174,7 @@ function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn
 
 
     /** @prototype Removes the last argument from the stored arguments as well as the last curry */
-    result[name].popArgument = () => {
+    result[name].popArgument = function popArgumentFn() {
         if (state.args.value.length === 0) { return }
 
         state.args.next(state.args.value.slice(0, state.args.value.length - 1))
@@ -177,9 +183,9 @@ function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn
 
 
     /** @prototype Returns a copy of the current curried function, adding in any passed arguments */
-    result[name].curry = (...argsToAdd) => {
+    result[name].curry = function curryFn() {
         const proxy = result[name].curried
-        argsToAdd.forEach(proxy.pushArgument)
+        ArrayFrom(arguments).forEach(proxy.pushArgument)
         return proxy
     }
 
@@ -189,8 +195,10 @@ function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn
      * @param {string} property - the property in which to subscribe
      * @param {any} callbacks - Observer callbacks, next, error, complete
      */
-    result[name].subscribe = (...subscribeArguments) =>
-        !state[subscribeArguments[0]] ?
+    result[name].subscribe = function subFn() {
+        const subscribeArguments = ArrayFrom(arguments)
+
+        return !state[subscribeArguments[0]] ?
             undefined :
             state[subscribeArguments[0]]
                 .subscribe(
@@ -198,6 +206,8 @@ function SuperFunction(fn, args = [], name = fn ? fn.name : ``, length = fn ? fn
                     subscribeArguments[2],
                     subscribeArguments[3]
                 )
+    }
+
 
     return result[name]
 }

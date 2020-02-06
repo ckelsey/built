@@ -1,4 +1,5 @@
-import { Type, FromJSON } from '..'
+import { Type } from './type'
+import FromJSON from './from-json'
 
 export function ToJSON(value) {
     const result = FromJSON(value)

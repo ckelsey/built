@@ -1,16 +1,29 @@
-const setBUIltComponents = w => w.bUIltComponents ? undefined : w.bUIltComponents = {}
-const setBUIltComponentsListener = w => {
+import { ArrayFrom } from './array-from.js'
+
+function setBUIltComponents(w) {
+    return w.bUIltComponents ? undefined : w.bUIltComponents = {}
+}
+
+function setBUIltComponentsListener(w) {
+    function querySelectorAllEach(key) {
+        return function querySelectorAllEachInner(el) {
+            if (!el.ready) {
+                w.bUIltComponents[key](el)
+            }
+        }
+    }
+
+    function bUIltComponentsEach(key) {
+        const _querySelectorAllEach = querySelectorAllEach(key)
+
+        ArrayFrom(document.body.querySelectorAll(key))
+            .forEach(_querySelectorAllEach)
+    }
+
     if (!w.bUIltComponents.listener) {
         w.bUIltComponents.listener = new w.MutationObserver(function () {
             Object.keys(w.bUIltComponents)
-                .forEach(key => {
-                    Array.from(document.body.querySelectorAll(key))
-                        .forEach(el => {
-                            if (!el.ready) {
-                                w.bUIltComponents[key](el)
-                            }
-                        })
-                })
+                .forEach(bUIltComponentsEach)
         })
 
         w.bUIltComponents.listener.observe(document.body)

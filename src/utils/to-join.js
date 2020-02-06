@@ -1,4 +1,6 @@
-import { TMonad, TMonadUpdate, ToJoinMeta } from '..'
+import { TMonad } from './t-monad.js'
+import { ToJoinMeta } from './to-join-meta.js'
+import { TMonadUpdate } from './t-monad-update.js'
 
 export function ToJoin(delimeter) {
     return function (value) {
@@ -9,7 +11,7 @@ export function ToJoin(delimeter) {
         const resultingMeta = ToJoinMeta(result.value, delimeter)
         result.value = resultingMeta.value
         result.stringChanges = result.stringChanges.concat(resultingMeta.stringChanges)
-        result.valid = typeof result.value === `string`
-        return TMonadUpdate(result, `string`, `Join`)
+        result.valid = typeof result.value === 'string'
+        return TMonadUpdate(result, 'string', 'Join')
     }
 }

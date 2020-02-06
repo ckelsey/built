@@ -8,7 +8,7 @@ import { ValidateHtml } from '../../utils/validate-html.js'
 import { ValidateText } from '../../utils/validate-text.js'
 
 function parseNoValue(validated) {
-    if (validated && !validated.valid && validated.reason[0] === `no value`) {
+    if (validated && !validated.valid && validated.reason[0] === 'no value') {
         validated.reason.shift()
         validated.valid = true
     }
@@ -17,29 +17,29 @@ function parseNoValue(validated) {
 }
 
 export function valueValidation(val, type, allowhtml, disallowhtml) {
-    if (type === `number` || type === `month`) {
+    if (type === 'number' || type === 'month') {
         const validated = ValidateNumber(val)
-        validated.sanitized = validated.sanitized === undefined || validated.sanitized === null || validated.sanitized === `` ? validated.sanitized : `${validated.sanitized}`
+        validated.sanitized = validated.sanitized === undefined || validated.sanitized === null || validated.sanitized === '' ? validated.sanitized : ''.concat(validated.sanitized)
         return parseNoValue(ValidateNumber(val))
     }
 
-    if (type === `email`) {
+    if (type === 'email') {
         return parseNoValue(ValidateEmail(val))
     }
 
-    if (type === `tel` || type === `usphone`) {
+    if (type === 'tel' || type === 'usphone') {
         return parseNoValue(ValidateUsPhone(val))
     }
 
-    if (type === `intlphone`) {
+    if (type === 'intlphone') {
         return parseNoValue(ValidateIntlPhone(val))
     }
 
-    if (type === `uszip`) {
+    if (type === 'uszip') {
         return parseNoValue(ValidateUsZip(val))
     }
 
-    if (type === `url`) {
+    if (type === 'url') {
         return parseNoValue(ValidateUrl(val))
     }
 

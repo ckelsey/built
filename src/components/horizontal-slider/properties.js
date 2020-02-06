@@ -6,28 +6,35 @@ import { Get } from '../../utils/get.js'
 import { unsetItemEvents, setItemEvents, setChicklets, setPrevious, setNext } from './elements.js'
 import { autoplay, setLoop } from './methods.js'
 import { ToArray } from '../../utils/to-array.js'
+import { AssignObject } from '../../utils/assign.js'
 
 export const attributes = {
     chicklets: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange: (_val, host) => setChicklets(host)
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(true))(val).value
+        },
+        onChange: function (val, host) { setChicklets(host) }
     },
 
     arrows: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange: (_val, host) => {
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(true))(val).value
+        },
+        onChange: function (val, host) {
             setPrevious(host.elements.previous, host)
             setNext(host.elements.next, host)
         }
     },
 
     intervalplay: {
-        format: val => Pipe(ToNumber, IfInvalid(0))(val).value,
-        onChange: (_val, host) => autoplay(host)
+        format: function (val) {
+            return Pipe(ToNumber, IfInvalid(0))(val).value
+        },
+        onChange: function (val, host) { autoplay(host) }
     },
 
     currentindex: {
-        format: (val, host) => {
+        format: function (val, host) {
             let num = Pipe(ToNumber, IfInvalid(0))(val).value
 
             if (Array.isArray(host.items) && num >= host.items.length) {
@@ -38,35 +45,41 @@ export const attributes = {
 
             return num
         },
-        onChange: (val, host) => host.scrollToIndex(val)
+        onChange: function (val, host) { host.scrollToIndex(val) }
     },
 
     loop: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange: (_val, host) => {
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(true))(val).value
+        },
+        onChange: function (val, host) {
             setLoop(host)
         }
     },
 
     center: {
-        format: val => Pipe(ToBool, IfInvalid(true))(val).value,
-        onChange: (_val, host) => {
+        format: function (val) {
+            return Pipe(ToBool, IfInvalid(true))(val).value
+        },
+        onChange: function (val, host) {
             host.scrollToIndex(host.currentindex)
         }
     }
 }
 
-export const properties = Object.assign({}, attributes, {
+export const properties = AssignObject({}, attributes, {
     items: {
-        format: (val, host) => Pipe(ToArray, IfInvalid(Get(host, `state.items.value`, [])))(val).value,
-        onChange: (val, host) => {
+        format: function (val, host) {
+            return Pipe(ToArray, IfInvalid(Get(host, 'state.items.value', [])))(val).value
+        },
+        onChange: function (val, host) {
             unsetItemEvents(host.state.items.previous)
             setItemEvents(val, host)
             host.scrollToIndex(host.currentindex)
             setChicklets(host)
             setLoop(host)
             autoplay(host)
-            host.classList.add(`isready`)
+            host.classList.add('isready')
         }
     }
 })

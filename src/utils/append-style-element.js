@@ -1,4 +1,5 @@
-import { SetStyleRules, CreateElement } from '..'
+import { SetStyleRules } from './set-style-rules.js'
+import { CreateElement } from './create-element.js'
 
 /**
  * Appends a style element with the provided rules to a provided element
@@ -7,7 +8,7 @@ import { SetStyleRules, CreateElement } from '..'
  * @param {HTMLElement} parent - The element to append to
  * @param {string} name - Optional. A name to give the style element
  * @example
- * AppendStyleElement(`.selector { color: black;}`, document.head, `dark-text-n-stuff`)
+ * AppendStyleElement('.selector { color: black;}', document.head, 'dark-text-n-stuff')
  */
 
 
@@ -16,11 +17,11 @@ export function AppendStyleElement(rulesString, parent, name, classes) {
 
     /** First create and add the style element */
     const style = CreateElement({
-        tagName: `style`,
-        type: `text/css`,
-        style: `display:none;`,
+        tagName: 'style',
+        type: 'text/css',
+        style: 'display:none;',
         class: classes,
-        name,
+        name: name,
     }, true)
 
     parent.appendChild(style)

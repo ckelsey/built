@@ -21,107 +21,114 @@ import { valueValidation } from './value-validation.js'
 import { valueMaxMin } from './value-max-min.js'
 import { valueFormat } from './value-format.js'
 import { ToBool } from '../../utils/to-bool.js'
+import { AssignObject } from '../../utils/assign.js'
 
-const outerStyle = require(`../input-shared/outer.scss`).toString()
-const style = require(`./style.scss`).toString()
-const template = require(`./index.html`)
-const componentName = `input-field`
-const componentRoot = `.${componentName}-container`
+const outerStyle = require('../input-shared/outer.scss').toString()
+const style = require('./style.scss').toString()
+const template = require('./index.html')
+const componentName = 'input-field'
+const componentRoot = ''.concat('.', componentName, '-container')
 
-const preProcessValue = host => value => {
-    if (!host.cachedPreProcessValueNeedsUpdate) {
-        return host.cachedPreProcessValue
+function preProcessValue(host) {
+    return function (value) {
+        if (!host.cachedPreProcessValueNeedsUpdate) {
+            return host.cachedPreProcessValue
+        }
+
+        const validated = valueValidation(value, host.type, host.allowhtml, host.disallowhtml)
+        const formatParsed = valueFormat(host.format, validated.sanitized)
+        const parsedValue = valueMaxMin(host, formatParsed.value)
+
+        const data = {
+            valid: validated.valid && parsedValue.valid && formatParsed.valid,
+            reason: [
+                !formatParsed.valid ? 'Value does not match pattern' : undefined,
+                parsedValue.errorText,
+            ]
+                .concat(validated.reason)
+                .filter(function (m) { return !!m }),
+            value: parsedValue.value,
+            sanitized: parsedValue.value
+        }
+
+        host.cachedPreProcessValue = data
+
+        return data
     }
-
-    const validated = valueValidation(value, host.type, host.allowhtml, host.disallowhtml)
-    const formatParsed = valueFormat(host.format, validated.sanitized)
-    const parsedValue = valueMaxMin(host, formatParsed.value)
-
-    const data = {
-        valid: validated.valid && parsedValue.valid && formatParsed.valid,
-        reason: [
-            !formatParsed.valid ? `Value does not match pattern` : undefined,
-            parsedValue.errorText,
-        ]
-            .concat(validated.reason)
-            .filter(m => !!m),
-        value: parsedValue.value,
-        sanitized: parsedValue.value
-    }
-
-    host.cachedPreProcessValue = data
-
-    return data
 }
 
-const postProcessValue = host => results => {
-    results.input.value = results.sanitized
-    host.count = host.type === `number` ? results.sanitized : results.sanitized ? results.sanitized.length : 0
+function postProcessValue(host) {
+    return function (results) {
+        results.input.value = results.sanitized
+        host.count = host.type === 'number' ? results.sanitized : results.sanitized ? results.sanitized.length : 0
+    }
 }
 
-const properties = Object.assign({}, Properties, {
+const properties = AssignObject({}, Properties, {
     pattern: {
-        format: val => Pipe(ToString, IfInvalid(null))(val).value,
-        onChange: (val, host) => WCWhenPropertyReady(host, `input`).then(input => SetAttribute(input, `pattern`, val))
+        format: function (val) { return Pipe(ToString, IfInvalid(null))(val).value },
+        onChange: function (val, host) { WCWhenPropertyReady(host, 'input').then(function (input) { return SetAttribute(input, 'pattern', val) }) }
     },
-    cachedPreProcessValueNeedsUpdate: { format: val => Pipe(ToBool, IfInvalid(true))(val).value },
+    cachedPreProcessValueNeedsUpdate: { format: function (val) { return Pipe(ToBool, IfInvalid(true))(val).value } },
     cachedPreProcessValue: {
-        format: val => val,
-        onChange: (_val, host) => host.cachedPreProcessValueNeedsUpdate = false
+        format: function (val) { return val },
+        onChange: function (_val, host) { host.cachedPreProcessValueNeedsUpdate = false }
     }
 })
 
 const elements = {
     clearButton: {
-        selector: `.input-field-clear`,
+        selector: '.input-field-clear',
         /** TODO needs to add back functionality */
     },
-    container: { selector: `.input-field-container-inner` },
-    count: { selector: `.input-field-character-count` },
-    error: { selector: `.input-field-message-error` },
-    help: { selector: `.input-field-message-help` },
+    container: { selector: '.input-field-container-inner' },
+    count: { selector: '.input-field-character-count' },
+    error: { selector: '.input-field-message-error' },
+    help: { selector: '.input-field-message-help' },
     icon: {
-        selector: `.input-field-icon`,
-        onChange: (el, host) => el.eventSubscriptions = {
-            click: ObserveEvent(el, `click`).subscribe(() => {
-                host.dispatchEvent(new CustomEvent(`iconclick`, { detail: host }))
-            })
+        selector: '.input-field-icon',
+        onChange: function (el, host) {
+            el.eventSubscriptions = {
+                click: ObserveEvent(el, 'click').subscribe(function () {
+                    host.dispatchEvent(new CustomEvent('iconclick', { detail: host }))
+                })
+            }
         }
     },
-    inputContainer: { selector: `.input-field-input-container-inner` },
-    max: { selector: `.input-field-character-count-max` },
-    root: { selector: `.input-field-container` }
+    inputContainer: { selector: '.input-field-input-container-inner' },
+    max: { selector: '.input-field-character-count-max' },
+    root: { selector: '.input-field-container' }
 }
 
 export const InputField = WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
-    outerStyle,
-    properties,
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    outerStyle: outerStyle,
+    properties: properties,
     observedAttributes: Object.keys(properties),
-    elements,
+    elements: elements,
     methods: {
-        processValue,
-        setCustomValidity,
-        checkValidity,
-        preProcessValue,
-        postProcessValue,
+        processValue: processValue,
+        setCustomValidity: setCustomValidity,
+        checkValidity: checkValidity,
+        preProcessValue: preProcessValue,
+        postProcessValue: postProcessValue,
     },
     computed: {
-        processedValue,
-        validationMessage,
-        validity
+        processedValue: processedValue,
+        validationMessage: validationMessage,
+        validity: validity
     },
     getters: {
-        value: host => {
+        value: function (host) {
             if (!host.cacheNeedsUpdate) { return host.cachedValue.sanitized }
-            return host.preProcessValue(Get(host, `state.value.value`, ``)).sanitized
+            return host.preProcessValue(Get(host, 'state.value.value', '')).sanitized
         }
     },
-    onConnected: host => host.inputID = ID(),
+    onConnected: function (host) { host.inputID = ID() },
     formElement: true
 })
 
-WCDefine(componentName, InputField, `input`)
+WCDefine(componentName, InputField, 'input')

@@ -1,11 +1,14 @@
-import { TMonad, Type, RemoveMeta, ToString } from '..'
+import { TMonad } from './t-monad.js'
+import { ToString } from './to-string.js'
+import { RemoveMeta } from './remove-meta.js'
+import { Type } from './type.js'
 
 export function ToDigits(value) {
     let result = TMonad(value)
 
     if (result.stop) { return result }
 
-    if (result.type !== `string`) { result = ToString(result) }
+    if (result.type !== 'string') { result = ToString(result) }
 
     try {
         const cleaned = RemoveMeta(result.value, /[^\d]+/g)

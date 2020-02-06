@@ -1,36 +1,36 @@
 import { Get } from './../../utils/get.js'
 
-const findParentLink = parent => {
+function findParentLink(parent) {
     let link
 
     try {
         while (!link && parent && parent !== document.body) {
-            if (Get(parent, `tagName`).toLowerCase() === `a`) {
+            if (Get(parent, 'tagName').toLowerCase() === 'a') {
                 link = parent
             }
 
             parent = parent.parentNode
         }
-        // eslint-disable-next-line no-empty
     } catch (error) { }
 
     return link
 }
 
-const clickListener = methods => {
-    document.documentElement.addEventListener(`click`, e => {
+function clickListener(methods) {
+    document.documentElement.addEventListener('click', function clickHandler(e) {
         const target = e.target
         const tag = target.tagName.toLowerCase()
         let link
 
-        if (tag === `a`) { link = target }
+        if (tag === 'a') { link = target }
 
         if (!link && Array.isArray(e.path)) {
             let pathIndex = 0
 
             while (!link && pathIndex < e.path.length) {
-                if (Get(e, `path.${pathIndex}.tagName`, ``).toLowerCase() === `a` && !!Get(e, `path.${pathIndex}.href`)) {
-                    link = Get(e, `path.${pathIndex}`)
+
+                if (Get(e, ''.concat('path.', pathIndex, '.tagName'), '').toLowerCase() === 'a' && !!Get(e, ''.concat('path.', pathIndex, '.href'))) {
+                    link = Get(e, ''.concat('path.', pathIndex))
                 }
 
                 pathIndex = pathIndex + 1
@@ -38,12 +38,12 @@ const clickListener = methods => {
         }
 
         // Safari
-        if (!link && e.composedPath && typeof e.composedPath === `function`) {
+        if (!link && e.composedPath && typeof e.composedPath === 'function') {
             const ePath = e.composedPath()
             let pathIndex = 0
 
             while (!link && pathIndex < ePath.length) {
-                if (Get(ePath, `${pathIndex}.tagName`, ``).toLowerCase() === `a` && !!Get(ePath, `${pathIndex}.href`)) {
+                if (Get(ePath, ''.concat(pathIndex, '.tagName'), '').toLowerCase() === 'a' && !!Get(ePath, ''.concat(pathIndex, '.href'))) {
                     link = ePath[pathIndex]
                 }
 
@@ -64,13 +64,12 @@ const clickListener = methods => {
             link = findParentLink(e.parentNode)
         }
 
-        if (!link || link.getAttribute(`target`) === `_blank`) { return }
+        if (!link || link.getAttribute('target') === '_blank') { return }
 
         try {
             const url = new URL(link.href)
             if (url.host !== location.host) { return }
             if (methods.route(url)) { e.preventDefault() }
-            // eslint-disable-next-line no-empty
         } catch (error) { }
     }, true)
 }

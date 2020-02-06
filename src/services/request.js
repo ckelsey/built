@@ -1,21 +1,27 @@
-import { ObserveWorker } from '..'
+import { ObserveWorker } from '../utils/observe-worker.js'
+import { AssignObject } from '../utils/assign.js'
 
 export function Request(apiBase) {
     return function (reqData) {
+        reqData = reqData ? reqData : {}
+
         const base = apiBase
-        const path = `${base}${`/${reqData.path || ``}`.split(`//`).join(`/`)}`
-        const REQ = Object.assign({}, {
-            data: undefined,
-            headers: {},
-            method: `POST`
-        },
+        const path = ''.concat(base, ''.concat('/', reqData.path || '').split('//').join('/'))
+
+        const REQ = AssignObject(
+            {},
+            {
+                data: undefined,
+                headers: {},
+                method: 'POST'
+            },
             reqData,
-            { path }
+            { path: path }
         )
 
         const isFormData = REQ.data instanceof FormData
 
-        if (!isFormData && REQ.data && typeof REQ.data !== `string`) {
+        if (!isFormData && REQ.data && typeof REQ.data !== 'string') {
             REQ.data = JSON.stringify(REQ.data)
         }
 
@@ -30,34 +36,51 @@ export function Request(apiBase) {
             REQ.data = JSON.stringify(REQ.data)
         }
 
-        return new Promise((resolve, reject) => {
-            const worker$ = ObserveWorker(
-                function () {
-                    self.onmessage = function (e) {
-                        var xhr = new XMLHttpRequest()
-                        var data = JSON.parse(e.data)
-                        var formData = data.data
+        return new Promise(
+            function RequestPromise(resolve, reject) {
+                let workerSubscription
 
-                        if (data.toForm) {
-                            const form = new FormData()
-                            Object.keys(formData).forEach(key => form.append(key, formData[key]))
-                            formData = form
+                const worker$ = ObserveWorker(
+                    function () {
+                        self.onmessage = function (e) {
+                            var xhr = new XMLHttpRequest()
+                            var data = JSON.parse(e.data)
+                            var formData = data.data
+                            var form = new FormData()
+
+                            function formDataKeysEach(key) {
+                                return form.append(key, formData[key])
+                            }
+
+                            function onloadFn() {
+                                postMessage({ status: xhr.status, response: xhr.responseText || xhr.statusText })
+                            }
+
+                            function onerrorFn() {
+                                postMessage({ status: xhr.status, response: xhr.statusText })
+                            }
+
+                            function headersEach(key) {
+                                xhr.setRequestHeader(key, data.headers[key])
+                            }
+
+                            if (data.toForm) {
+                                Object.keys(formData).forEach(formDataKeysEach)
+                                formData = form
+                            }
+
+                            xhr.open(data.method, data.path, false)
+                            Object.keys(data.headers).forEach(headersEach)
+                            xhr.onload = onloadFn
+                            xhr.onerror = onerrorFn
+                            xhr.send(data.data)
                         }
-
-                        xhr.open(data.method, data.path, false)
-                        Object.keys(data.headers).forEach(key => xhr.setRequestHeader(key, data.headers[key]))
-                        xhr.onload = () => postMessage({ status: xhr.status, response: xhr.responseText || xhr.statusText })
-                        xhr.onerror = () => postMessage({ status: xhr.status, response: xhr.statusText })
-                        xhr.send(data.data)
                     }
-                }
-            )
+                )
 
-            const workerSubscription = worker$.subscribe(
-                e => {
+                function workerSub(e) {
                     workerSubscription()
                     let res = e.response
-                    // eslint-disable-next-line no-empty
                     try { res = JSON.parse(res) } catch (error) { }
 
                     if (e.status === 200) {
@@ -65,14 +88,17 @@ export function Request(apiBase) {
                     } else {
                         return reject(e)
                     }
-                },
-                e => {
+                }
+
+                function workerError(e) {
                     workerSubscription()
                     reject(e)
                 }
-            )
 
-            worker$.post(REQ)
-        })
+                workerSubscription = worker$.subscribe(workerSub, workerError)
+
+                worker$.post(REQ)
+            }
+        )
     }
 }

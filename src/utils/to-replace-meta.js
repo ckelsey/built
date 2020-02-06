@@ -1,4 +1,5 @@
-import { ToRegex, ToReplacementPattern } from '..'
+import { ToRegex } from './to-regex.js'
+import { ToReplacementPattern } from './to-replacement-pattern.js'
 
 export function ToReplaceMeta(string, search, insert) {
     const replacements = ToReplacementPattern(insert)
@@ -7,33 +8,44 @@ export function ToReplaceMeta(string, search, insert) {
     let match
     let index = 0
 
+    function replacementsReducer(previous, current) {
+        if (typeof current === 'string') { return ''.concat(previous, current) }
+        return ''.concat(previous, match[current.index] || '')
+    }
+
+    function stringChangesReducer(previous, current, i) {
+        const added = current.added || ''
+        const post = i !== result.stringChanges.length - 1
+            ? ''
+            : current.post
+
+        return ''.concat(previous, current.pre, added, post)
+    }
+
     while ((match = ToRegex(search).value.exec(testString)) !== null) {
         const end = match.index + match[0].length
         const matched = {
             start: match.index,
-            end,
+            end: end,
             input: match.input,
             length: match[0].length,
-            result: ``,
+            result: '',
             removed: match[0],
-            pre: ``,
-            post: ``,
-            index
+            pre: '',
+            post: '',
+            index: index
         }
 
-        matched.pre = matched.start !== 0 ? testString.slice(0, matched.start) : ``
+        matched.pre = matched.start !== 0 ? testString.slice(0, matched.start) : ''
         matched.post = testString.slice(end)
-        matched.result = `${matched.pre}${matched.post}`
+        matched.result = ''.concat(matched.pre, matched.post)
 
         if (match.length > 1 && replacements.length) {
-            matched.added = replacements.reduce((previous, current) => {
-                if (typeof current === `string`) { return `${previous}${current}` }
-                return `${previous}${match[current.index] || ``}`
-            }, ``)
+            matched.added = replacements.reduce(replacementsReducer, '')
 
             matched.length = matched.added.length
             matched.end = match.index + matched.length
-            matched.result = `${matched.pre}${matched.added || ``}${matched.post}`
+            matched.result = ''.concat(matched.pre, matched.added || '', matched.post)
         }
 
         result.stringChanges.push(matched)
@@ -42,16 +54,7 @@ export function ToReplaceMeta(string, search, insert) {
     }
 
     if (result.stringChanges.length) {
-        result.value = result.stringChanges.reduce(
-            (previous, current, i) => {
-                const added = current.added || ``
-                const post = i !== result.stringChanges.length - 1
-                    ? ``
-                    : current.post
-
-                return `${previous}${current.pre}${added}${post}`
-            }, ``
-        )
+        result.value = result.stringChanges.reduce(stringChangesReducer, '')
     }
 
     return result

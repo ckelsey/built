@@ -5,17 +5,17 @@ import { IsObject } from './is-object.js'
 
 export function Type(value) {
     return value === null ?
-        `null` :
+        'null' :
         IsNonCollection(value) ?
             typeof value :
             IsDom(value) ?
-                `dom` :
+                'dom' :
                 Array.isArray(value) ?
-                    `array` :
+                    'array' :
                     IsDate(value) ?
-                        `date` :
+                        'date' :
                         IsObject(value) ?
-                            `object` :
+                            'object' :
                             typeof thing
 
 }

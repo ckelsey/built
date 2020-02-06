@@ -1,18 +1,22 @@
 export function ReplaceElementContents(element, contents) {
-    const respond = () => ({ element, contents })
+    function respond() { return { element: element, contents: contents } }
 
     if (!element) { return respond() }
 
-    element.innerHTML = ``
+    element.innerHTML = ''
 
-    if (typeof contents === `string`) {
+    if (typeof contents === 'string') {
         element.innerHTML = contents
         return respond()
     }
 
     if (!Array.isArray(contents)) { return respond() }
 
-    contents.forEach(content => element.appendChild(content))
+    function contentsEach(content) {
+        element.appendChild(content)
+    }
+
+    contents.forEach(contentsEach)
 
     return respond()
 }

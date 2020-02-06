@@ -1,4 +1,7 @@
-import { TMonad, TMonadUpdate, ToReplaceMeta, ToString } from '..'
+import { TMonad } from './t-monad.js'
+import { ToString } from './to-string.js'
+import { ToReplaceMeta } from './to-replace-meta.js'
+import { TMonadUpdate } from './t-monad-update.js'
 
 export function ToReplace(search, replace) {
     return function (value) {
@@ -6,7 +9,7 @@ export function ToReplace(search, replace) {
 
         if (result.stop) { return result }
 
-        if (result.type !== `string`) { result = ToString(result) }
+        if (result.type !== 'string') { result = ToString(result) }
 
         try {
             const replaced = ToReplaceMeta(result.value, search, replace)
@@ -18,6 +21,6 @@ export function ToReplace(search, replace) {
             result.valid = false
         }
 
-        return TMonadUpdate(result, `string`, `Replace`)
+        return TMonadUpdate(result, 'string', 'Replace')
     }
 }

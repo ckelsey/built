@@ -15,38 +15,38 @@ import {
 } from './properties.js'
 import { toggle, unloadTargets, open, close } from './methods.js'
 
-const elements = {
-    root: { selector: `.effect-underline-container` },
-    underline: { selector: `.underline` }
-}
 
-const outerStyle = require(`./outer.scss`).toString()
-const style = require(`./style.scss`).toString()
-const template = require(`./index.html`)
-const componentName = `effect-underline`
-const componentRoot = `.effect-underline-container`
+const outerStyle = require('./outer.scss').toString()
+const style = require('./style.scss').toString()
+const template = require('./index.html')
+const componentName = 'effect-underline'
+const componentRoot = ''.concat('.', componentName, '-container')
+const elements = {
+    root: { selector: componentRoot },
+    underline: { selector: '.underline' }
+}
 export const EffectUnderline = /*#__PURE__*/ WCConstructor({
-    componentName,
-    componentRoot,
-    template,
-    style,
-    outerStyle,
-    observedAttributes,
-    properties,
-    elements,
-    methods: { toggle, open, close },
+    componentName: componentName,
+    componentRoot: componentRoot,
+    template: template,
+    style: style,
+    outerStyle: outerStyle,
+    observedAttributes: observedAttributes,
+    properties: properties,
+    elements: elements,
+    methods: { toggle: toggle, open: open, close: close },
     computed: {
-        hasTargets,
-        hasTargets$,
-        hasStart,
-        canLoadTargets,
-        canStart,
-        canEnd,
-        canRunStart,
-        canRunEnd,
-        nonAutoOrigin,
+        hasTargets: hasTargets,
+        hasTargets$: hasTargets$,
+        hasStart: hasStart,
+        canLoadTargets: canLoadTargets,
+        canStart: canStart,
+        canEnd: canEnd,
+        canRunStart: canRunStart,
+        canRunEnd: canRunEnd,
+        nonAutoOrigin: nonAutoOrigin,
     },
-    onDisconnected: host => unloadTargets(host)
+    onDisconnected: function (host) { unloadTargets(host) }
 })
 
 WCDefine(componentName, EffectUnderline)

@@ -4,9 +4,9 @@
  * @param {any} value - The value to test
  * @return {boolean} If the value is a DOM element
  * @example
- * const element = document.createElement(`div`)
+ * const element = document.createElement('div')
  * IsDom(element) // true
- * IsDom(`nope`) // false
+ * IsDom('nope') // false
  */
 export function IsDom(value) {
     return (value instanceof Element) || (value instanceof Node)

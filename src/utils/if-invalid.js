@@ -7,9 +7,9 @@ import { TMonad } from './t-monad.js'
  * @return {any} Either the original value or the replacement
  * @example
  * 
- * const ifInvalid = IfInvalid(`hey`)
- * const value = ToNumber(`hola`)
- * const result = ifInvalid(value).value // `hey`
+ * const ifInvalid = IfInvalid('hey')
+ * const value = ToNumber('hola')
+ * const result = ifInvalid(value).value // 'hey'
  */
 
 export function IfInvalid(replacement) {

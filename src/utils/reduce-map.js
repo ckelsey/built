@@ -4,7 +4,7 @@
  * @param {function( item:any ) :any } mapFunction - The function to be called on every element, performs the mapping operation
  * @return {function( accumulator:[], current:any ):[] } ReduceMapResult - The reducer function
  * @example 
- * [`A`, `B`].reduce(ReduceMap(mapFunction), []) // [`a`, `b`,]
+ * ['A', 'B'].reduce(ReduceMap(mapFunction), []) // ['a', 'b',]
  */
 
 export function ReduceMap(mapFunction) {

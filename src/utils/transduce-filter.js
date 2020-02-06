@@ -1,5 +1,9 @@
 export function TransduceFilter(predicateFunction) {
-    return nextReducer => (result, current) => predicateFunction(current) ?
-        nextReducer(result, current) :
-        result
+    return function TransduceFilterInner(nextReducer) {
+        return function TransduceFilterInnerInner(result, current) {
+            return predicateFunction(current) ?
+                nextReducer(result, current) :
+                result
+        }
+    }
 }

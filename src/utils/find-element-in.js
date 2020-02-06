@@ -1,5 +1,5 @@
-export function FindElementIn(parent, selector, all = false) {
+export function FindElementIn(parent, selector, all) {
     return !parent
         ? undefined
-        : parent[all ? `querySelectorAll` : `querySelector`](selector)
+        : parent[all ? 'querySelectorAll' : 'querySelector'](selector)
 }

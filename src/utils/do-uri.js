@@ -1,6 +1,7 @@
-import { TMonad, Type } from '..'
+import { TMonad } from './t-monad.js'
+import { Type } from './type.js'
 
-export function DoURI(value, encode = false, component = false) {
+export function DoURI(value, encode, component) {
     const result = TMonad(value)
 
     if (result.stop) { return result }

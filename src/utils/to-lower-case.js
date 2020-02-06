@@ -1,4 +1,4 @@
-import { TMonad } from '..'
+import { TMonad } from './t-monad.js'
 export function ToLowerCase(string) {
     const result = TMonad(string)
 

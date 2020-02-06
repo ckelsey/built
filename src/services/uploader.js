@@ -1,11 +1,14 @@
-/* eslint-disable tree-shaking/no-side-effects-in-initialization */
-import { ToObject, ObserveWorker, UseIf } from '..'
+import { ToObject } from '../utils/to-object.js'
+import { ObserveWorker } from '../utils/observe-worker.js'
+import { UseIf } from '../utils/use-if.js'
+import { AssignObject } from '../utils/assign.js'
+
 // TODO pako is not so great, minimal size savings. Is there anything else?
 // const pako = require('../lib/pako/dist/pako.min.js')
 // var reader = new FileReader();
 // reader.onload = function () {
 //     var compressed_file = pako.deflate(this.result, { level: 5 });
-//     var myBlob = new Blob([compressed_file], { type: `application/x-gzip` })
+//     var myBlob = new Blob([compressed_file], { type: 'application/x-gzip' })
 //     // Pass it back to the main thread
 // }
 // reader.readAsArrayBuffer(fileObject)
@@ -18,32 +21,45 @@ import { ToObject, ObserveWorker, UseIf } from '..'
 // TODO pre upload chunk function?
 // TODO pre upload function?
 
+function emptyFn() { }
+
 export function UploadService(options, file) {
 
-    if (!file) { return { upload() { }, cancel() { } } }
+    if (!file) {
+        return {
+            upload: function () { },
+            cancel: function () { }
+        }
+    }
 
-    const Options = Object.assign({}, {
-        progressCB: () => { },
-        completeCB: () => { },
-        errorCB: () => { },
+    const Options = AssignObject({}, {
+        progressCB: emptyFn,
+        completeCB: emptyFn,
+        errorCB: emptyFn,
         url: location.href,
         bytesPerChunk: 647212,
         withCredentials: false,
-        uploadMethod: `POST`,
+        uploadMethod: 'POST',
         headers: {},
         parallel: false
     }, options)
 
-    const getFile = () => file[0] ? file[0] : file
-    const getTotal = (file, bytesPerChunk) => !!bytesPerChunk && bytesPerChunk > 0 ? Math.ceil(file.size / bytesPerChunk) : 1
+    function getFile() {
+        return file[0] ? file[0] : file
+    }
+
+    function getTotal(file, bytesPerChunk) {
+        return !!bytesPerChunk && bytesPerChunk > 0 ? Math.ceil(file.size / bytesPerChunk) : 1
+    }
+
     const uploadMessages = []
     const completedChunks = []
     const fileObject = getFile()
     const size = fileObject.size
     const total = getTotal(fileObject, Options.bytesPerChunk)
-    const uploadData = Object.assign({},
+    const uploadData = AssignObject({},
         Options,
-        { size, total, fileObject }
+        { size: size, total: total, fileObject: fileObject }
     )
 
     let stop = false
@@ -57,7 +73,11 @@ export function UploadService(options, file) {
             x.open(data.method, data.url, true)
             x.withCredentials = data.withCredentials
 
-            Object.keys(data.headers).forEach(key => x.setRequestHeader(key, data.headers[key]))
+            function headersEach(key) {
+                return x.setRequestHeader(key, data.headers[key])
+            }
+
+            Object.keys(data.headers).forEach(headersEach)
 
             x.onloadend = function () {
                 self.postMessage(JSON.stringify({
@@ -71,35 +91,44 @@ export function UploadService(options, file) {
         }
     })
 
-    const setProgress = () => Options.progressCB(
-        UseIf(
-            p => p <= 1,
-            () => 1,
-            uploadData.total === 1
-                ? 1
-                : !completedChunks.length
-                    ? 0
-                    : Math.ceil((completedChunks.length / uploadData.total) * 100) / 100
-        ).value
-    )
+    function setProgress() {
 
-    const getHeaders = (index, chunkSize, fileSize) => {
-        return Object.assign({}, {
-            'Content-Type': `application/octet-stream`,
+        return Options.progressCB(
+            UseIf(
+                function progValid(p) { return p <= 1 },
+                function elseNot() { return 1 },
+                uploadData.total === 1
+                    ? 1
+                    : !completedChunks.length
+                        ? 0
+                        : Math.ceil((completedChunks.length / uploadData.total) * 100) / 100
+            ).value
+        )
+    }
+
+    function getHeaders(index, chunkSize, fileSize) {
+        return AssignObject({}, {
+            'Content-Type': 'application/octet-stream',
             'X-Chunk-Id': index,
             'X-Chunk-Length': chunkSize,
             'X-File-Length': fileSize
         }, uploadData.headers)
     }
 
-    const uploadUrl = (index, url) => !Array.isArray(url) ? url : url[index]
+    function uploadUrl(index, url) {
+        return !Array.isArray(url) ? url : url[index]
+    }
 
-    const getChunk = index => uploadData.total === 1 ? uploadData.fileObject : uploadData.fileObject.slice(index * uploadData.bytesPerChunk, (index + 1) * uploadData.bytesPerChunk)
+    function getChunk(index) {
+        return uploadData.total === 1 ?
+            uploadData.fileObject :
+            uploadData.fileObject.slice(index * uploadData.bytesPerChunk, (index + 1) * uploadData.bytesPerChunk)
+    }
 
-    const populateData = index => {
+    function populateData(index) {
         const data = getChunk(index)
         return {
-            data,
+            data: data,
             url: uploadUrl(index, uploadData.url),
             method: uploadData.uploadMethod,
             withCredentials: uploadData.withCredentials,
@@ -107,7 +136,7 @@ export function UploadService(options, file) {
         }
     }
 
-    const onChunkUploaded = e => {
+    function onChunkUploaded(e) {
         // If no event, reject
         if (!e) { return Promise.reject() }
 
@@ -116,7 +145,7 @@ export function UploadService(options, file) {
         if (data.status !== 200) { return Promise.reject(data.statusText) }
 
         completedChunks.push(chunkIndex)
-        uploadMessages.push({ chunk: chunkIndex, data })
+        uploadMessages.push({ chunk: chunkIndex, data: data })
 
         // increment current chunk index
         chunkIndex = chunkIndex + 1
@@ -133,7 +162,7 @@ export function UploadService(options, file) {
         }
     }
 
-    const onChunkUploadedAsync = (index, e) => {
+    function onChunkUploadedAsync(index, e) {
         if (!e) { return Promise.reject() }
 
         const data = ToObject(e).value
@@ -141,7 +170,7 @@ export function UploadService(options, file) {
         if (data.status !== 200) { return Promise.reject(data.statusText) }
 
         completedChunks.push(index)
-        uploadMessages.push({ chunk: index, data })
+        uploadMessages.push({ chunk: index, data: data })
 
         // update progress
         setProgress()
@@ -149,43 +178,51 @@ export function UploadService(options, file) {
         return Promise.resolve()
     }
 
-    const uploadChunk = index => new Promise((resolve, reject) => {
-        if (stop) { return reject(`upload was canceled`) }
+    function uploadChunk(index) {
+        return new Promise(
+            function uploadChunkPromise(resolve, reject) {
+                if (stop) { return reject('upload was canceled') }
 
-        return worker$.post(populateData(index))
-            .then(onChunkUploaded)
-            .then(resolve)
-            .catch(reject)
-    })
+                return worker$.post(populateData(index))
+                    .then(onChunkUploaded)
+                    .then(resolve)
+                    .catch(reject)
+            }
+        )
+    }
 
-    const uploadChunkAsync = index => new Promise((resolve, reject) => {
-        if (stop) { return reject(`upload was canceled`) }
+    function uploadChunkAsync(index) {
+        return new Promise(
+            function uploadChunkAsyncPromise(resolve, reject) {
+                if (stop) { return reject('upload was canceled') }
 
-        return worker$.post(populateData(index))
-            .then(res => onChunkUploadedAsync(index, res))
-            .then(resolve)
-            .catch(reject)
-    })
+                return worker$.post(populateData(index))
+                    .then(function populateDataResult(res) {
+                        return onChunkUploadedAsync(index, res)
+                    })
+                    .then(resolve)
+                    .catch(reject)
+            }
+        )
+    }
 
     const methods = {
-        get currentChunk() { return chunkIndex },
+        cancel: function () { stop = true },
 
-        cancel() { stop = true },
-
-        upload() {
+        upload: function () {
             if (!uploadData.size || !uploadData.total) {
                 worker$.dispose()
-                return Options.errorCB(`invalid file`)
+                return Options.errorCB('invalid file')
             }
 
             if (!uploadData.url) {
                 worker$.dispose()
-                return Options.errorCB(`invalid upload url`)
+                return Options.errorCB('invalid upload url')
             }
 
             if (stop) {
                 worker$.dispose()
-                return Options.errorCB(`upload stopped`)
+                return Options.errorCB('upload stopped')
             }
 
             if (!uploadData.parallel) {
@@ -202,12 +239,26 @@ export function UploadService(options, file) {
                 index = index + 1
             }
 
-            return Promise.all(chunkArray.map(c => uploadChunkAsync(c)))
-                .then(() => Options.completeCB(uploadMessages))
+            function chunkMapper(c) {
+                return uploadChunkAsync(c)
+            }
+
+            function chunkMapAfter() {
+                return Options.completeCB(uploadMessages)
+            }
+
+            return Promise.all(chunkArray.map(chunkMapper))
+                .then(chunkMapAfter)
                 .catch(Options.errorCB)
 
         }
     }
+
+    Object.defineProperty(methods, 'currentChunk', {
+        get: function () {
+            return chunkIndex
+        }
+    })
 
     return methods
 }

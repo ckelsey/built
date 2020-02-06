@@ -1,23 +1,15 @@
-import { Observer, GetParent, OnNextFrame } from '..'
+import { Observer } from './observer.js'
+import { ObserverReturnEmpty } from './observer-empty.js'
+import { GetParent } from './get-parent.js'
 
 export function ObserveExists(element) {
-    const returnEmpty = () => {
-        const _observer = Observer(false)
-        OnNextFrame(() => {
-            _observer.next(false)
-            _observer.complete()
-        })
-
-        return _observer
-    }
-
     const initialParent = GetParent(element)
 
-    if (!initialParent) { return returnEmpty() }
+    if (!initialParent) { return ObserverReturnEmpty() }
 
     let isRunning = false
 
-    const mObserver = new MutationObserver(e => {
+    const mObserver = new MutationObserver(function mObserverInner(e) {
         let elementIsRemoved = false
         let ii = e.length
 
@@ -34,16 +26,19 @@ export function ObserveExists(element) {
         if (elementIsRemoved) { dispose() }
     })
 
-    const startup = () => {
+    function startup() {
         if (!GetParent(element) || isRunning) { return }
         isRunning = true
         mObserver.observe(initialParent, { childList: true })
     }
 
     const observer = Observer(!!initialParent, undefined, startup)
-    const shutDown = () => isRunning = false
 
-    const dispose = () => {
+    function shutDown() {
+        isRunning = false
+    }
+
+    function dispose() {
         shutDown()
         observer.next(false)
         observer.complete()

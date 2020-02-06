@@ -11,7 +11,7 @@ export function ToJoinMeta(array, delimeter) {
 
     try {
         let index = 1
-        let joinedValue = result.value[index] || ``
+        let joinedValue = result.value[index] || ''
 
         while (index < result.value.length) {
             result.stringChanges.push({
@@ -19,10 +19,10 @@ export function ToJoinMeta(array, delimeter) {
                 end: joinedValue.length + delimeter.length,
                 input: result.value[index],
                 length: delimeter.length,
-                result: ``,
+                result: '',
                 added: delimeter
             })
-            joinedValue = `${joinedValue}${delimeter}${result.value[index]}`
+            joinedValue = ''.concat(joinedValue, delimeter, result.value[index])
             index = index + 1
         }
 
