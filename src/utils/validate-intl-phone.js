@@ -7,7 +7,7 @@ export function ValidateIntlPhone(val) {
     const original = val
     const reason = []
     const converted = Pipe(ToString, FromEntities, IfInvalid(''))(val)
-    const value = converted.value.replace(/[^\d]+/g, '')
+    const value = converted.value.replace(/[^\d]+/g, '').slice(0, 15)
 
     if (value.length < 11) {
         reason.push('needs at least 11 digits')
@@ -16,7 +16,7 @@ export function ValidateIntlPhone(val) {
     return {
         original: original,
         valid: reason.length === 0,
-        sanitized: original,
+        sanitized: value,
         reason: reason
     }
 }
