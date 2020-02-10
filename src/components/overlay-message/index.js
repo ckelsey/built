@@ -12,7 +12,7 @@ import { ObserveSlots } from '../../utils/observe-slots.js'
 import { Timer } from '../../services/timer.js'
 import { EaseInOut } from '../../utils/ease-in-out.js'
 import { IndexOf } from '../../utils/index-of.js'
-import { ArrayFrom } from '../../utils/array-from.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')
@@ -37,9 +37,7 @@ function setShown(host) {
     )
         .then(function () {
             root.classList[host.shown ? 'add' : 'remove']('shown')
-            host.dispatchEvent(
-                new CustomEvent(host.shown ? 'opened' : 'closed', { detail: host })
-            )
+            DispatchEvent(host, host.shown ? 'opened' : 'closed', host)
         })
 }
 
@@ -48,14 +46,14 @@ function setColorTheme(color, root) {
 }
 
 function setCloseButton(host) {
-    ArrayFrom(host.querySelectorAll('*'))
+    Array.from(host.querySelectorAll('*'))
         .forEach(function (el) {
             try { Get(el, 'eventSubscriptions.closeOverlay', function () { })() } catch (error) { }
         })
 
     if (!host.closeselector) { return }
 
-    ArrayFrom(host.querySelectorAll(host.closeselector))
+    Array.from(host.querySelectorAll(host.closeselector))
         .forEach(function (el) {
             return Set(
                 el,
@@ -107,7 +105,7 @@ export const OverlayMessage = WCConstructor({
     methods: {
         clear: function (host) {
             return function () {
-                return ArrayFrom(host.children)
+                return Array.from(host.children)
                     .forEach(function (c) {
                         return c.slot ? host.removeChild(c) : undefined
                     })

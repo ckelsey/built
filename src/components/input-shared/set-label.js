@@ -15,6 +15,7 @@ export function setLabel(host) {
     const labelelement = host.labelelement
     const inputID = host.inputID
     const labelposition = host.labelposition
+    const slotSelector = '[label-' + labelposition + ']'
     const label = host.label
 
     Try(function () { host.removeChild(labelelement) })
@@ -25,11 +26,10 @@ export function setLabel(host) {
         tabIndex: -1,
         for: inputIdString(host),
         class: ''.concat('input-field-', labelposition, '-label'),
-        slot: ''.concat('label-', labelposition, ''),
         innerHTML: ValidateHtml(label, [], ['script']).sanitized || ''
     })
 
-    host.appendChild(element)
+    host.querySelector(slotSelector).appendChild(element)
     host.labelelement = element
 
     element.eventSubscriptions = {

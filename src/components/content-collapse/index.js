@@ -2,9 +2,9 @@
  * add ripple and bounce to toggle container
  */
 
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { Components } from '../../services/components.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { GetParent } from '../../utils/get-parent.js'
 import { iconChevron } from '../../services/icons.js'
 import { Pipe } from '../../utils/pipe.js'
@@ -34,7 +34,7 @@ const properties = {
                     .forEach(function (s) { return s !== host && s.group === host.group && s.expanded === true ? s.expanded = false : undefined })
             }
 
-            WCWhenPropertyReady(host, 'elements.transition.transition')
+            WhenAvailable(host, 'elements.transition.transition')
                 .then(function (transition) {
                     transition(val ? 1 : 0)
                     host.elements.icon.setAttribute('rotation', val ? 'down' : 'right')
@@ -46,7 +46,7 @@ const properties = {
             return Pipe(ToString, IfInvalid(iconChevron))(val).value
         },
         onChange: function (val, host) {
-            WCWhenPropertyReady(host, 'elements.icon').then(function (el) { el.svg = val })
+            WhenAvailable(host, 'elements.icon').then(function (el) { el.svg = val })
         }
     },
     group: {
@@ -59,7 +59,7 @@ const properties = {
             return Pipe(ToNumber, IfInvalid(333))(val).value
         },
         onChange: function (val, host) {
-            return WCWhenPropertyReady(host, 'elements.transition')
+            return WhenAvailable(host, 'elements.transition')
                 .then(function (transition) {
                     transition.speed = val
                 })
@@ -86,7 +86,7 @@ const elements = {
     },
 }
 
-export const ContentCollapse = WCConstructor({
+const ContentCollapse = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -97,4 +97,6 @@ export const ContentCollapse = WCConstructor({
     elements: elements
 })
 
-WCDefine(componentName, ContentCollapse)
+Components.addComponent(componentName, ContentCollapse)
+
+export { ContentCollapse }

@@ -1,5 +1,3 @@
-import { ArrayFrom } from './array-from.js'
-
 export function GetInputValue(input) {
     if (!input) { return }
 
@@ -14,7 +12,7 @@ export function GetInputValue(input) {
     }
 
     if (type === 'file') {
-        return ArrayFrom(input.files)
+        return Array.from(input.files)
     }
 
     return input.value

@@ -1,5 +1,5 @@
 import { dispatch } from './dispatch.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { GetInputValue } from '../../utils/get-input-value.js'
 
 export function onBlur(host) {
@@ -7,7 +7,7 @@ export function onBlur(host) {
 
     host.focused = false
 
-    WCWhenPropertyReady(host, 'input').then(function (input) {
+    WhenAvailable(host, 'input').then(function (input) {
         host.value = GetInputValue(input)
         input.blur()
         dispatch(host, 'blur', host)

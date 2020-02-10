@@ -1,8 +1,8 @@
 import { dispatch } from './dispatch.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 
 export function onLabelClick(e, host) {
-    return WCWhenPropertyReady(host, 'input')
+    return WhenAvailable(host, 'input')
         .then(function (input) {
             input.focus()
 

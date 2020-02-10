@@ -1,3 +1,5 @@
+import { OnNextFrame } from './on-next-frame.js'
+
 export function WCSupportClass() {
     function setUnsupportedClass() {
         return document.body.className = 'wc-unsupported'
@@ -14,7 +16,7 @@ export function WCSupportClass() {
                 setUnsupportedClass()
             }
         }
-        requestAnimationFrame(tryCustomElementsInner)
+        OnNextFrame(tryCustomElementsInner)
     }
 
     function safariReducer(prev, cur) {

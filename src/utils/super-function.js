@@ -1,4 +1,3 @@
-import { ArrayFrom } from './array-from.js'
 import { FunctionToPartial } from './function-to-partial.js'
 import { Observer } from './observer.js'
 
@@ -82,7 +81,7 @@ function SuperFunction(fn, args, name, length) {
     /** State object, holds observers to subscribe to */
     const state = {
         curried: Observer([FunctionToPartial(fn)]),
-        args: Observer(ArrayFrom(arguments)),
+        args: Observer(Array.from(arguments)),
         call: Observer({})
     }
 
@@ -97,7 +96,7 @@ function SuperFunction(fn, args, name, length) {
     result[name] = function () {
 
         // concat the arguments, call the original function and store it's result
-        const newArgs = state.args.value.concat(ArrayFrom(arguments)).slice(0, length)
+        const newArgs = state.args.value.concat(Array.from(arguments)).slice(0, length)
 
         /** TODO - this is duplicate code, needs to be DRY but not sure how yet */
         const newResult = {}
@@ -185,7 +184,7 @@ function SuperFunction(fn, args, name, length) {
     /** @prototype Returns a copy of the current curried function, adding in any passed arguments */
     result[name].curry = function curryFn() {
         const proxy = result[name].curried
-        ArrayFrom(arguments).forEach(proxy.pushArgument)
+        Array.from(arguments).forEach(proxy.pushArgument)
         return proxy
     }
 
@@ -196,7 +195,7 @@ function SuperFunction(fn, args, name, length) {
      * @param {any} callbacks - Observer callbacks, next, error, complete
      */
     result[name].subscribe = function subFn() {
-        const subscribeArguments = ArrayFrom(arguments)
+        const subscribeArguments = Array.from(arguments)
 
         return !state[subscribeArguments[0]] ?
             undefined :

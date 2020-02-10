@@ -1,15 +1,16 @@
-import { ArrayFrom } from './array-from.js'
-
-function PipeInnerFunctionReducer(result, currentFunction) {
-    return typeof currentFunction !== 'function' ?
-        result :
-        currentFunction(result)
-}
-
 export function Pipe() {
-    const functions = ArrayFrom(arguments)
+    const functions = arguments
+    const count = functions.length
 
     return function PipeInnerFunction(value) {
-        return functions.reduce(PipeInnerFunctionReducer, value)
+        let loopIndex = count + 1
+
+        while (loopIndex--) {
+            value = typeof functions[count - loopIndex] !== 'function' ?
+                value :
+                functions[count - loopIndex](value)
+        }
+
+        return value
     }
 }

@@ -1,8 +1,8 @@
 import { GetInputValue } from '../../utils/get-input-value.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 
 export function onInput(host) {
-    return WCWhenPropertyReady(host, 'input')
+    return WhenAvailable(host, 'input')
         .then(function (input) {
             host.value = GetInputValue(input)
 

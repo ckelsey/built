@@ -1,9 +1,10 @@
 import { OnNextFrame } from '../services/on-next-frame.js'
 import { Get } from './get.js'
 
-export function WCWhenPropertyReady(host, path, isMethod) {
-    let max = 1000
-    return new Promise(function WCWhenPropertyReadyPromise(resolve, reject) {
+export function WhenAvailable(host, path, isMethod, max) {
+    max = max === undefined ? 1000 : max
+
+    return new Promise(function WhenAvailablePromise(resolve, reject) {
         if (!host || (!host.parentNode && !host.parentElement)) {
             return reject({
                 host: host,

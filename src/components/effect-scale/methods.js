@@ -1,5 +1,6 @@
 import { ObserveEvent } from '../../utils/observe-event.js'
 import { GetCurve } from '../../utils/get-curve.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
 
 const idealFPS = 60
 
@@ -96,7 +97,7 @@ export function run(scaled, host, quickSet) {
 
         transformElements(host.targets, getXY('x'), getXY('y'), host.x, host.y, lastFrame, scaled)
 
-        if (!lastFrame) { return requestAnimationFrame(loop) }
+        if (!lastFrame) { return OnNextFrame(loop) }
     }
 
     loop()

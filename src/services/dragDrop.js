@@ -1,4 +1,4 @@
-import { ArrayFrom } from '../utils/array-from.js'
+import { DispatchEvent } from '../utils/dispatch-event'
 
 export function DragDropService(element) {
     let draggables = []
@@ -9,7 +9,7 @@ export function DragDropService(element) {
     }
 
     function handleDataTransfer(dataTransfer) {
-        return element.dispatchEvent(new CustomEvent('dropped', { detail: dataTransfer }))
+        return DispatchEvent(element, 'dropped', dataTransfer)
     }
 
     function setUserSelect(remove) {
@@ -27,7 +27,7 @@ export function DragDropService(element) {
 
         e.preventDefault()
         setUserSelect()
-        element.dispatchEvent(new CustomEvent('dragstarted'))
+        DispatchEvent(element, 'dragstarted')
     }
 
     function drop(e) {
@@ -53,7 +53,7 @@ export function DragDropService(element) {
         element.classList.remove('dragging')
         element.classList.remove('dragover')
         setUserSelect(true)
-        element.dispatchEvent(new CustomEvent('dragended'))
+        DispatchEvent(element, 'dragended')
     }
 
     element.addEventListener('dragstart', startDrag)
@@ -87,7 +87,7 @@ export function DragDropService(element) {
             set: function (elements) {
                 draggables = []
 
-                filterElements(ArrayFrom(elements)).forEach(function (d) {
+                filterElements(Array.from(elements)).forEach(function (d) {
                     draggables.push(d)
                 })
             }

@@ -11,6 +11,7 @@ import { CommasToArray } from '../../utils/commas-to-array.js'
 import { ToMap } from '../../utils/to-map.js'
 import { ValidateHtml } from '../../utils/validate-html.js'
 import { IndexOf } from '../../utils/index-of.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')
@@ -252,7 +253,7 @@ const elements = {
         onChange: function (el, host) {
             el.eventSubscriptions = {
                 click: ObserveEvent(el, 'click').subscribe(function () {
-                    host.dispatchEvent(new CustomEvent('buttonclick', { detail: host }))
+                    DispatchEvent(host, 'buttonclick', host)
                 })
             }
             setButton(host.button, el)

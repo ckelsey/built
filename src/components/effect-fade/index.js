@@ -11,6 +11,7 @@ import { Timer } from '../../services/timer.js'
 import { GetCurve } from '../../utils/get-curve.js'
 import { IsElement } from '../../utils/is-element.js'
 import { ToArray } from '../../utils/to-array.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = 'effect-ripple{pointer-events:none;}'
@@ -64,7 +65,7 @@ function loadTargets(_val, host) {
             if (validTarget(target)) {
                 object.onHandler = function (e) {
                     object.atStart = atStartPosition(object)
-                    host.dispatchEvent(new Event('startedon', { detail: object }))
+                    DispatchEvent(host, 'startedon', object)
 
                     if (typeof target.onHandler === 'function') { target.onHandler(e) }
 
@@ -74,14 +75,14 @@ function loadTargets(_val, host) {
                         setOpacity
                     ).then(function () {
                         setOpacity(object.opacity[object.opacity.length])
-                        host.dispatchEvent(new Event('endedon', { detail: object }))
+                        DispatchEvent(host, 'endedon', object)
                         return object
                     })
                 }
 
                 object.offHandler = function (e) {
                     object.atStart = atStartPosition(object)
-                    host.dispatchEvent(new Event('startedoff', { detail: object }))
+                    DispatchEvent(host, 'startedoff', object)
 
                     if (typeof target.offHandler === 'function') { target.offHandler(e) }
 
@@ -91,7 +92,7 @@ function loadTargets(_val, host) {
                         setOpacity
                     ).then(function () {
                         setOpacity(object.opacity[0])
-                        host.dispatchEvent(new Event('endedoff', { detail: object }))
+                        DispatchEvent(host, 'endedoff', object)
                         return object
                     })
                 }

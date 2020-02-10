@@ -1,5 +1,7 @@
 import { WCConstructor } from '../../utils/wc-constructor.js'
 import { WCDefine } from '../../utils/wc-define.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { ObserveEvent } from '../../utils/observe-event.js'
 
 const outerStyle = require('../input-shared/outer.scss').toString()
 const style = require('./style.scss').toString()
@@ -28,7 +30,7 @@ export const elements = {
         selector: '.input-field-icon',
         onChange: (el, host) => el.eventSubscriptions = {
             click: ObserveEvent(el, 'click').subscribe(() => {
-                host.dispatchEvent(new CustomEvent('iconclick', { detail: host }))
+                DispatchEvent(host, 'iconclick', host)
             })
         }
     },
@@ -98,7 +100,7 @@ const elements = {
         selector: `.input-field-icon`,
         onChange: (el, host) => el.eventSubscriptions = {
             click: ObserveEvent(el, `click`).subscribe(() => {
-                host.dispatchEvent(new CustomEvent(`iconclick`, { detail: host }))
+                DispatchEvent(host, `iconclick`, { detail: host }))
             })
         }
     },

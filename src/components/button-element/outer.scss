@@ -1,0 +1,8 @@
+button-element {
+    opacity: 0;
+    display: inline-block;
+
+    &[ready="true"] {
+        opacity: 1
+    }
+}

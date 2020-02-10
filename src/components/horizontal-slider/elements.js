@@ -1,7 +1,7 @@
 import { goToNextPage, goToPreviousPage, autoplay } from './methods.js'
-import { ArrayFrom } from '../../utils/array-from.js'
 import { Get } from '../../utils/get.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const sliderItemSelectedClass = 'active-horizontal-slider-item'
 const sliderItemClass = 'horizontal-slider-item'
@@ -12,7 +12,7 @@ function handleItemUp(item) { return item.touching = false }
 function handleItemDown(item, host) {
     item.touching = true
     host.currentindex = item.itemIndex
-    host.dispatchEvent(new CustomEvent('itemclick', { detail: { index: host.currentindex, item: item, host: host } }))
+    DispatchEvent(host, 'itemclick', { index: host.currentindex, item: item, host: host })
 }
 
 
@@ -57,7 +57,7 @@ export function setSlot(el, host) {
                 .map(function (item, index) {
                     item.itemIndex = index
                     item.style.order = index + 1
-                    images = images.concat(ArrayFrom(item.querySelectorAll('img')))
+                    images = images.concat(Array.from(item.querySelectorAll('img')))
                     return item
                 })
 
@@ -110,7 +110,7 @@ export function setChicklets(host) {
     if (!chicklets || !Array.isArray(host.items)) { return }
 
     if (!host.chicklets) {
-        const currentChicklets = ArrayFrom(chicklets.querySelectorAll('.'.concat(chickletSelector)))
+        const currentChicklets = Array.from(chicklets.querySelectorAll('.'.concat(chickletSelector)))
         currentChicklets.forEach(function (chicklet) { host.unsubscribeEvents(chicklet) })
         chicklets.innerHTML = ''
     }

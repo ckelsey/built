@@ -148,7 +148,8 @@ input-select {
             transform: scale(1.1) translateY(2.5em) translateX(1em);
             transform-origin: left center;
             min-height: 1.6em;
-            max-width: calc(100% - 4em);
+            max-width: calc(100% - 6em);
+            transition: max-width 0.2s, transform 0.2s, opacity 0.2s;
         }
     }
 

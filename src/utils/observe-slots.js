@@ -1,7 +1,6 @@
 import { Observer } from './observer.js'
 import { ObserveExists } from './observe-exists.js'
 import { ObserverReturnEmpty } from './observer-empty.js'
-import { ArrayFrom } from './array-from.js'
 
 export function ObserveSlots(element, mustHaveSlotAttribute) {
     if (!mustHaveSlotAttribute) { mustHaveSlotAttribute = false }
@@ -25,7 +24,7 @@ export function ObserveSlots(element, mustHaveSlotAttribute) {
         function slotObserverMutationObs(mutationsList) {
             const added = []
             const removed = []
-            const list = ArrayFrom(mutationsList)
+            const list = Array.from(mutationsList)
             let len = list.length
 
             function addToArray(el, arrToAddTo) {

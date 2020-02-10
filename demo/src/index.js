@@ -1,25 +1,31 @@
 import 'builtjs'
 import '../index.html'
-import './components/test-element/index.js'
 
-import { Router, CreateElement } from 'builtjs'
+import { Benches, ID, Transduce } from 'builtjs'
+window.IDs = ID
+window.Benches = Benches
+window.Transduce = Transduce
 
-const Routes = {
-    home: {
-        pathname: '/',
-        content: 'test-element',
-        title: 'Paramount Pictures Support'
-    }
-}
+// import './components/test-element/index.js'
 
-export const router = Router(Routes)
+// import { Router, CreateElement } from 'builtjs'
 
-router.route$.subscribe(route => {
+// const Routes = {
+//     home: {
+//         pathname: '/',
+//         content: 'test-element',
+//         title: 'Paramount Pictures Support'
+//     }
+// }
 
-    document.body.setAttribute('page', route.content)
-    document.title = route.title
+// export const router = Router(Routes)
 
-    const content = document.getElementById('app')
-    content.innerHTML = ''
-    content.appendChild(CreateElement({ tagName: route.content }))
-})
+// router.route$.subscribe(route => {
+
+//     document.body.setAttribute('page', route.content)
+//     document.title = route.title
+
+//     const content = document.getElementById('app')
+//     content.innerHTML = ''
+//     content.appendChild(CreateElement({ tagName: route.content }))
+// })

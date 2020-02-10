@@ -1,4 +1,4 @@
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { IsAutoFilled } from '../../utils/is-autofilled.js'
 import { Get } from '../../utils/get.js'
 
@@ -6,7 +6,7 @@ const supportsInternals = 'ElementInternals' in window && 'setFormData' in windo
 
 export function processValue(host) {
     return function processingValue() {
-        return WCWhenPropertyReady(host, 'input')
+        return WhenAvailable(host, 'input')
             .then(function (input) {
                 const processed = host.processedValue
                 const sanitized = processed.sanitized

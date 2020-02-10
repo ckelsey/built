@@ -4,7 +4,6 @@ import getRoute from './get-route.js'
 import { Get } from '../../utils/get.js'
 import getQuery from './get-query.js'
 import UpdateState from './update-state.js'
-import { AssignObject } from '../../utils/assign.js'
 
 function handleRoute(methods, url, replace, force) {
     replace = replace ? true : false
@@ -42,7 +41,7 @@ function handleRoute(methods, url, replace, force) {
 
     if (routePath === currentPath && currentQuery === routeQuery && !force) { return true }
 
-    methods.current = AssignObject({}, route, { query: query, pathname: parsedUrl })
+    methods.current = Object.assign({}, route, { query: query, pathname: parsedUrl })
 
     if (replace) {
         UpdateState(methods, true, force)

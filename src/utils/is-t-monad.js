@@ -1,7 +1,6 @@
 import { Type } from './type.js'
 import { IsEmpty } from './is-empty.js'
 import { IsObject } from './is-object.js'
-import { ReduceFilter } from './reduce-filter.js'
 
 /**
  * Determines if a value is a TMonad
@@ -34,10 +33,14 @@ export function IsTMonad(value) {
         key: 'value',
     }]
 
-    return keysItShouldHave.reduce(
-        ReduceFilter(function hasValue(keyObj) {
-            return Object.prototype.hasOwnProperty.call(value, keyObj.key) && (!keyObj.type || Type(value[keyObj.key]) === keyObj.type)
-        }),
-        []
-    ).length === keysItShouldHave.length
+    let loopIndex = keysItShouldHave.length
+    let count = 0
+
+    while (loopIndex--) {
+        if (Object.prototype.hasOwnProperty.call(value, keysItShouldHave[loopIndex].key) && (!keysItShouldHave[loopIndex].type || Type(value[keysItShouldHave[loopIndex].key]) === keysItShouldHave[loopIndex].type)) {
+            count = count + 1
+        }
+    }
+
+    return keysItShouldHave.length === count
 }

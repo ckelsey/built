@@ -6,7 +6,6 @@ import {
     AfterEveryNth, BeforeEveryNth, ToUpperCase, ToLowerCase, ToCapitalize
 } from '../..'
 import { processedFileValue } from '../input-shared/definitions.js'
-import { ArrayFrom } from '../../utils/array-from.js'
 
 const supportsInternals = 'ElementInternals' in window && 'setFormData' in window.ElementInternals
 
@@ -318,5 +317,5 @@ export const InputFieldFormatValue = (value, format) => {
 
 
 
-export const getFileValue = input => !input || !input.files || input.files.length === 0 ? null : ArrayFrom(input.files)
+export const getFileValue = input => !input || !input.files || input.files.length === 0 ? null : Array.from(input.files)
 const getDroppedFiles = value => Array.isArray(value) && value.filter(f => f instanceof File).length ? value : null

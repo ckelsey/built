@@ -1,4 +1,3 @@
-import { ArrayFrom } from '../../utils/array-from.js'
 
 export function toggle(host, open) {
     if (!host.ready) { return }
@@ -45,7 +44,7 @@ export function toggle(host, open) {
     let others = []
 
     if (host.drawergroup) {
-        others = ArrayFrom(
+        others = Array.from(
             document.querySelectorAll(
                 'content-drawer[drawergroup="'.concat(host.drawergroup, '"]')
             )

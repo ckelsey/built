@@ -1,9 +1,10 @@
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { dispatch } from './dispatch.js'
 import { Get } from '../../utils/get.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 export function onDone(host) {
-    return WCWhenPropertyReady(host, 'input')
+    return WhenAvailable(host, 'input')
         .then(function (input) {
             input.blur()
 
@@ -15,9 +16,9 @@ export function onDone(host) {
                 try {
                     const domEvent = document.createEvent('Event')
                     domEvent.initEvent('submit', false, true)
-                    form.dispatchEvent(domEvent)
+                    DispatchEvent(form, domEvent)
                 } catch (error) {
-                    form.dispatchEvent(new Event('submit'))
+                    DispatchEvent(form, 'submit')
                 }
             }
         })

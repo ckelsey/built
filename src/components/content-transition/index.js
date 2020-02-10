@@ -1,10 +1,10 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { ToNumber } from '../../utils/to-number.js'
-import { transition, getComponentStyles, getIndex, start$, end$, getCurrent, getChildren, setCurrent } from './methods.js'
+import { transition, getIndex, start$, end$, getCurrent, getChildren, setCurrent } from './methods.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { Components } from '../../services/components.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = require('./outer.scss').toString()
@@ -19,10 +19,10 @@ const elements = {
             el.setAttribute('type', host.type)
         }
     },
-    current: { selector: 'slot[name="current"]', },
-    next: { selector: 'slot[name="next"]', },
+    current: { selector: '[slotname="current"]', },
+    next: { selector: '[slotname="next"]', },
     nextContainer: { selector: '.next-slot' },
-    hidden: { selector: 'slot[name="hidden"]', },
+    hidden: { selector: '[slotname="hidden"]', },
     hiddentContainer: { selector: '.hidden-slot' },
     currentContainer: { selector: '.current-slot' }
 }
@@ -59,7 +59,7 @@ const properties = {
     end: { format: function (val) { return val } },
 }
 
-export const ContentTransition = WCConstructor({
+const ContentTransition = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -70,7 +70,6 @@ export const ContentTransition = WCConstructor({
     elements: elements,
     methods: {
         transition: transition,
-        getComponentStyles: getComponentStyles,
         getIndex: getIndex,
         getCurrent: getCurrent,
         getChildren: getChildren,
@@ -80,4 +79,6 @@ export const ContentTransition = WCConstructor({
     }
 })
 
-WCDefine(componentName, ContentTransition)
+Components.addComponent(componentName, ContentTransition)
+
+export { ContentTransition }

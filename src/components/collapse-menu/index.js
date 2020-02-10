@@ -9,7 +9,7 @@ import { ToBool } from '../../utils/to-bool.js'
 import { ToNumber } from '../../utils/to-number.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
 import { WasClickedOn } from '../../utils/was-clicked-on.js'
-import { ArrayFrom } from '../../utils/array-from.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = require('./outer.scss').toString()
@@ -109,14 +109,14 @@ const elements = {
             el.classList[host.collapseonwrap ? 'add' : 'remove']('collapseonwrap')
 
             function subFn(e) {
-                const items = ArrayFrom(host.querySelectorAll('[slot="item"]'))
+                const items = Array.from(host.querySelectorAll('[slot="item"]'))
                 let len = items.length
 
                 while (len) {
                     len = len - 1
 
                     if (WasClickedOn(items[len], e)) {
-                        return host.dispatchEvent(new CustomEvent('itemclick', { detail: { event: e, item: items[len] } }))
+                        DispatchEvent(host, 'itemclick', { event: e, item: items[len] })
                     }
                 }
             }

@@ -21,13 +21,84 @@
             }
 
         </style>
+        <style type="text/css" style="display:none;" name="button-element-init">
+            button-element {
+                opacity: 0;
+            }
+
+        </style>
     </head>
 
     <body>
         <div id="app"></div>
-        <button-element>Jk</button-element>
-        <input-field label="Phone" type="tel"></input-field>
+        <button-element>Hi</button-element>
+        <input-field label="ho" type="tel"></input-field>
+        <input-bool type="checkbox" label="Checkbox"></input-bool>
+        <input-select options="one, two, three" label="Select..."></input-select>
+
+        <ajax-form>
+            <input-select options="one, two, three" label="Options"></input-select>
+            <input-field label="Email please" type="email"></input-field>
+            <input-bool type="checkbox" label="Check this"></input-bool>
+        </ajax-form>
+
+        <content-collapse group="content-collapse">
+            <div slot="content-collapse-toggler">Toggle 1</div>
+            <div slot="content-collapse-content">Toggle 1 body</div>
+        </content-collapse>
+
+        <content-collapse group="content-collapse">
+            <div slot="content-collapse-toggler">Toggle 2</div>
+            <div slot="content-collapse-content">Toggle 2 body</div>
+        </content-collapse>
+
+        <content-collapse>
+            <div slot="content-collapse-toggler">Toggle 3</div>
+            <div slot="content-collapse-content">Toggle 3 body</div>
+        </content-collapse>
+
+        <snack-bar shown="true" type="info">
+            <div slot="body">A snackie poo</div>
+        </snack-bar>
+
         <script type="text/javascript" src="/dist/app.js"></script>
+
+        <script>
+            // var len = 0
+            // while (len--) {
+            //     var btn = document.createElement('button-element')
+            //     btn.innerHTML = 'Hello'
+            //     document.body.appendChild(btn)
+
+            //     var input = document.createElement('input-field')
+            //     input.label = 'An input'
+            //     input.type = 'email'
+            //     document.body.appendChild(input)
+            // }
+
+            // var form = document.body.querySelector('ajax-form')
+            // var newInput = document.createElement('input-field')
+            // newInput.label = 'New Field'
+            // newInput.addEventListener('click', console.log)
+            // form.appendChild(newInput)
+
+            // setTimeout(function () {
+            //     var ajaxCheckbox = document.querySelector('input-bool[label="Check this"]')
+            //     ajaxCheckbox.parentElement.removeChild(ajaxCheckbox)
+            // }, 5000)
+
+            // var initialNode = document.createElement('div')
+            // initialNode.textContent = 'node 1'
+            // initialNode.addEventListener('click', console.log)
+            // document.body.appendChild(initialNode)
+
+
+            // var copiedNode = document.adoptNode(initialNode)
+            // copiedNode.textContent = 'copied'
+            // document.body.appendChild(copiedNode)
+
+            // initialNode.textContent = 'oh hey'
+        </script>
     </body>
 
 </html>

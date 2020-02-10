@@ -2,14 +2,14 @@
     <div class="content-collapse-toggler">
         <icon-element class="content-collapse-toggler-icon" size="1.5em"></icon-element>
         <div class="content-collapse-toggler-content">
-            <slot name="content-collapse-toggler"></slot>
+            <span slotname="content-collapse-toggler"></slot>
         </div>
     </div>
     <div class="content-collapse-content">
         <content-transition class="content-collapse-transition" keepchildren="true" type="fade">
             <div class="content-collapse-empty" slot="hidden"></div>
             <div class="content-collapse-content-holder" slot="hidden">
-                <slot name="content-collapse-content"></slot>
+                <span slotname="content-collapse-content"></span>
             </div>
         </content-transition>
     </div>

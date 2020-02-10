@@ -1,5 +1,4 @@
 import { ID } from '../services/id.js'
-import { AssignObject } from './assign.js'
 
 const emptyFn = function () { }
 
@@ -7,7 +6,7 @@ function Observer(initialValue, noInit, onSubscribe) {
     noInit = noInit ? true : false
     onSubscribe = onSubscribe && typeof onSubscribe === 'function' ? onSubscribe : emptyFn
 
-    let values = AssignObject({}, {
+    let values = Object.assign({}, {
         value: initialValue,
         errors: [],
         previousValue: undefined,
@@ -64,8 +63,24 @@ function Observer(initialValue, noInit, onSubscribe) {
         }
     }
 
-    function trace() {
-        return new Error().stack
+    function getArrayIndexOf(element, isArray) {
+        if (!isArray) { return }
+
+        const index = values.value.indexOf(element)
+
+        return index === -1 ? undefined : index
+    }
+
+    function getObjectKey(value) {
+        try {
+            for (const prop in values.value) {
+                if (values.value[prop]) {
+                    if (values.value[prop] === value) {
+                        return prop
+                    }
+                }
+            }
+        } catch (error) { }
     }
 
     const result = {
@@ -75,17 +90,18 @@ function Observer(initialValue, noInit, onSubscribe) {
         get subscriptions() { return values.subscriptions },
 
         next: function (v) {
-            values = AssignObject({}, values, {
+            values = Object.assign({}, values, {
                 value: v,
                 previousValue: values.value,
                 updated: new Date().getTime(),
             })
 
             loop('next', values.value, values)
+            return values
         },
 
         error: function (err) {
-            values = AssignObject({}, values, {
+            values = Object.assign({}, values, {
                 errors: values.errors.concat([err]),
                 updated: new Date().getTime(),
             })
@@ -99,12 +115,11 @@ function Observer(initialValue, noInit, onSubscribe) {
             error = error ? error : emptyFn
             complete = complete ? complete : emptyFn
 
-            const subscription = AssignObject({}, {
+            const subscription = Object.assign({}, {
                 next: next,
                 error: error,
                 complete: complete,
-                id: ID(),
-                trace: trace()
+                id: ID()
             })
 
             subscription.unsubscribe = unsubscribe(subscription)
@@ -123,6 +138,128 @@ function Observer(initialValue, noInit, onSubscribe) {
             if (!subscription || !subscription.id || !values.subscriptions[subscription.id]) { return }
 
             return unsubscribe(subscription)
+        },
+
+        insert: function (element, index) {
+            try {
+                if (index === undefined) {
+                    index = values.value.length
+                }
+
+                if (Array.isArray(values.value)) {
+                    values.value.splice(index, 0, element)
+                    return result.next(values.value)
+                }
+
+                if (typeof values.value === 'string') {
+                    values.value.splice(index, 0, element)
+                    return result.next(values.value.slice(0, index) + element + values.value.slice(index))
+                }
+
+                values.value[index] = element
+
+            } catch (error) { }
+
+            return result.next(values.value)
+        },
+
+        remove: function (element, index, all) {
+            try {
+                const isArray = Array.isArray(values.value)
+                const isString = typeof values.value === 'string'
+
+                if (index === undefined) {
+                    index = getArrayIndexOf(element, isArray)
+                }
+
+                if (index === undefined && isArray) {
+                    return values.value
+                }
+
+                if (index === undefined && isString) {
+                    return result.next(values.value.replace(new RegExp(element, all ? 'gm' : ''), ''))
+                }
+
+                if (index !== undefined) {
+                    if (isArray) {
+                        values.value.splice(index, 1)
+                    } else if (isString) {
+                        values.value = values.value.slice(0, index)
+                    } else {
+                        values.value[index] = undefined
+                        delete values.value[index]
+                    }
+
+                    return result.next(values.value)
+                }
+
+                const objectKey = getObjectKey(element)
+
+                if (objectKey !== undefined) {
+                    values.value[objectKey] = undefined
+                    delete values.value[objectKey]
+                    return result.next(values.value)
+                }
+
+            } catch (error) { }
+
+            return result.next(values.value)
+        },
+
+        reverse: function () {
+            const isArray = Array.isArray(values.value)
+            const isString = typeof values.value === 'string'
+
+            if (isArray) {
+                return result.next(values.value.reverse())
+            }
+
+            if (isString) {
+                return result.next(values.value.split('').reverse())
+            }
+
+            result.next(values.value)
+        },
+
+        has: function (value) {
+            try {
+                const isArray = Array.isArray(values.value)
+                const isString = typeof values.value === 'string'
+
+                if (isArray) {
+                    return getArrayIndexOf(value, isArray) || false
+                }
+
+                if (isString) {
+                    return values.value.indexOf(value) > -1
+                }
+
+                const objectKey = getObjectKey(value)
+
+                if (objectKey !== undefined) {
+                    return true
+                }
+            } catch (error) { }
+
+            return false
+        },
+
+        indexOf: function (value) {
+            try {
+                const isArray = Array.isArray(values.value)
+                const isString = typeof values.value === 'string'
+
+                if (isArray) {
+                    return getArrayIndexOf(value, isArray) || -1
+                }
+
+                if (isString) {
+                    return values.value.indexOf(value)
+                }
+
+            } catch (error) { }
+
+            return getObjectKey(value) || -1
         }
     }
 

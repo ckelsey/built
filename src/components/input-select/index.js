@@ -1,6 +1,6 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { Components } from '../../services/components.js'
 import { ID } from '../../services/id.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { properties as Properties } from '../input-shared/properties.js'
 import { processedValue } from '../input-shared/processed-value.js'
 import { processValue } from '../input-shared/process-value.js'
@@ -16,8 +16,6 @@ import { IfInvalid } from '../../utils/if-invalid.js'
 import { setInput } from '../input-shared/set-input.js'
 import { Get } from '../../utils/get.js'
 import { iconTriangle } from '../../services/icons.js'
-import { AssignObject } from '../../utils/assign.js'
-import { ArrayFrom } from '../../utils/array-from.js'
 
 const outerStyle = require('../input-shared/outer.scss').toString()
 const style = require('./style.scss').toString()
@@ -30,7 +28,7 @@ function postProcessValue() {
     }
 }
 
-const properties = AssignObject({}, Properties, {
+const properties = Object.assign({}, Properties, {
     options: {
         format: function (val) {
             return Pipe(
@@ -73,7 +71,7 @@ const elements = {
     root: { selector: '.input-field-container' },
 }
 
-export const InputSelect = WCConstructor({
+const InputSelect = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -102,14 +100,14 @@ export const InputSelect = WCConstructor({
         selectedOptions: function (host) {
             return {
                 get: function () {
-                    return ArrayFrom(Get(host, 'input.selectedOptions', []))
+                    return Array.from(Get(host, 'input.selectedOptions', []))
                 }
             }
         },
         optionElements: function (host) {
             return {
                 get: function () {
-                    return ArrayFrom(Get(host, 'input.options', []))
+                    return Array.from(Get(host, 'input.options', []))
                 }
             }
         },
@@ -122,4 +120,6 @@ export const InputSelect = WCConstructor({
     formElement: true
 })
 
-WCDefine(componentName, InputSelect)
+Components.addComponent(componentName, InputSelect)
+
+export { InputSelect }

@@ -22,11 +22,8 @@ function wcClass(el, newClasses, previousClasses) {
     }
 
     let oldBrowser = !window.DOMTokenList.prototype.replace
-
     let newClassArray = Pipe(CommasToArray, IfInvalid([]))(newClasses).value
     let previousClassArray = Pipe(CommasToArray, IfInvalid([]))(previousClasses).value
-
-
 
     function previousClassArrayEach(c) {
         el.className = el

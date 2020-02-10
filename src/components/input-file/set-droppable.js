@@ -1,4 +1,3 @@
-import { ArrayFrom } from '../../utils/array-from.js'
 import { UseIf } from '../../utils/use-if.js'
 import { dispatch } from '../input-shared/dispatch.js'
 import { DragDropService } from '../../services/dragDrop.js'
@@ -13,8 +12,8 @@ export const setDroppable = host => {
             v => v.length > 0,
             () => '',
             !host.accept
-                ? ArrayFrom(e.detail.files)
-                : ArrayFrom(e.detail.files)
+                ? Array.from(e.detail.files)
+                : Array.from(e.detail.files)
                     .filter(file =>
                         host.accept.indexOf(file.type) > -1
                     )

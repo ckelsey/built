@@ -1,21 +1,21 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
-import { Try } from '../../utils/try.js'
-import { ObserveVisibility } from '../../utils/observe-visibility.js'
 import { Pipe } from '../../utils/pipe.js'
 import { OnNextFrame } from '../../services/on-next-frame.js'
 import { ToNumber } from '../../utils/to-number.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { CommasToArray } from '../../utils/commas-to-array.js'
 import { ToMap } from '../../utils/to-map.js'
-import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
-import { Get } from '../../utils/get.js'
-import { ObserveSlots } from '../../utils/observe-slots.js'
 import { ID } from '../../services/id.js'
 import { SetStyleRules } from '../../utils/set-style-rules.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
-import { AppendStyleElement } from '../../utils/append-style-element.js'
-import { ArrayFrom } from '../../utils/array-from.js'
+import { Components } from '../../services/components.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { Observer } from '../../utils/observer.js'
+import { CreateElement } from '../../utils/create-element.js'
+import { ObserveExists } from '../../utils/observe-exists.js'
+import { Filter } from '../../utils/filter.js'
+import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
+import { WhenAvailable } from '../../utils/when-available.js'
+import { ForEach } from '../../utils/for-each.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = require('./external.scss').toString()
@@ -79,7 +79,7 @@ function setDimensions(host) {
 const elements = {
     root: { selector: componentRoot },
     itemsContainer: { selector: '.'.concat(componentName, '-items') },
-    innerStyles: { selector: 'style.innerStyles' }
+    innerStyles: { selector: 'style.grid-innerStyles' }
 }
 
 function runDimensions(host) {
@@ -111,82 +111,45 @@ const properties = {
     watchhidden: {
         format: function (val) {
             return Pipe(ToBool, IfInvalid(true))(val).value
-        },
-        onChange: function (_val, host) { host.wrap() }
+        }
     },
 }
 
-function getComponentStyles(host) {
-    return function () {
-        return ''.concat(require('./style.scss').toString(), (host.theme || ''), host.styles)
+function removeChild(host, el) {
+    if (el.container) {
+        const slot = el.slot
+        const item = Filter(function (element) {
+            return element.slot === slot
+        }, host.items$.value)[0]
+
+        host.items$.remove(item)
+        ObserverUnsubscribe(el)
+
+        if (el.container.parentElement) {
+            el.container.parentElement.removeChild(el.container)
+        }
     }
 }
 
-function notSlottable(el) {
-    return Get(el, 'nongrid') || Get(el, 'tagName.toLowerCase()') === 'style'
-}
-
-function clear(host) {
-    return function () {
-        return ArrayFrom(host.children)
-            .forEach(function (el) {
-                return !notSlottable(el) ?
-                    Try(function (el) { return host.removeChild(el) })(el) :
-                    undefined
-            })
-    }
-}
-
-function wrap(host) {
-    return function () {
-        return ArrayFrom(host.children)
-            .forEach(function (el) {
-                if (notSlottable(el)) { return }
-
-                if (host.watchhidden) { watchItemVisibility(el) }
-
-                if (el.getAttribute('wrapped')) { return }
-
-                wrapItem(host.elements.itemsContainer, el)
-            })
-    }
-}
-
-function watchItemVisibility(el) {
-    if (!el.eventSubscriptions) { el.eventSubscriptions = {} }
-    if (el.eventSubscriptions.visibility) { return }
-
-    el.eventSubscriptions.visibility = ObserveVisibility(el)
-        .subscribe(function (hidden) {
-            const container = el.container
-            if (!container) { return }
-
-            const currentlyHidden = container.classList.contains('hidden')
-
-            if (hidden !== currentlyHidden) {
-                container.classList[hidden ? 'add' : 'remove']('hidden')
-            }
-        })
-}
-
-function wrapItem(itemsContainer, el) {
+function wrapChild(host, el) {
     const id = ID()
-    const slotWrapper = document.createElement('div')
-    slotWrapper.className = 'grid-layout-item'
-    slotWrapper.id = id
-    itemsContainer.appendChild(slotWrapper)
+    const wrapper = CreateElement({ tagName: 'div', class: componentName + '-slot-wrapper grid-layout-item', id: id })
 
-    const slot = document.createElement('slot')
-    slot.name = id
-    slotWrapper.appendChild(slot)
     el.slot = id
-    el.container = slotWrapper
-    el.setAttribute('wrapped', id)
+    el.container = wrapper
+    host.removeChild(el)
+
+    setTimeout(function () {
+        ObserveExists(el, true)
+            .subscribe(function elExistsCallback(exists) {
+                if (!exists) { removeChild(host, el) }
+            })
+    }, 0)
 
     return el
 }
 
-export const GridLayout = WCConstructor({
+const GridLayout = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -199,42 +162,55 @@ export const GridLayout = WCConstructor({
         items: function (host) {
             return {
                 get: function () {
-                    return ArrayFrom(host.children)
-                        .filter(function (el) {
-                            return el.tagName.toLowerCase() !== 'style'
-                        })
+                    return host.items$.value
                 }
             }
         }
     },
     methods: {
-        getComponentStyles: getComponentStyles,
-        clear: clear,
-        wrap: wrap
+        clear: function clear(host) {
+            return function clearInner() {
+                ForEach(function (child) {
+                    removeChild(host, child)
+                }, host.items$.value, true)
+            }
+        },
+        wrap: function wrap() {
+            return function wrapInner() { }
+        },
+        addItem: function addItem(host) {
+            return function addItemInner(item) {
+                if (!host.items$.has(item)) {
+                    const newElement = document.adoptNode(wrapChild(host, item))
+
+                    return WhenAvailable(host, 'elements.itemsContainer')
+                        .then(function (itemsContainer) {
+                            itemsContainer.appendChild(newElement.container)
+                            newElement.container.appendChild(newElement)
+                            host.items$.insert(newElement)
+                        })
+                }
+            }
+        }
     },
     onConnected: function (host) {
-        host.elements.innerStyles = AppendStyleElement(' ', host.shadowRoot, 'innerStyles', 'innerStyles')
-
-        function disconnectEl(el) {
-            const containerParent = Get(el, 'container.parentElement')
-            ObserverUnsubscribe(el)
-            if (containerParent) { containerParent.removeChild(el.container) }
-        }
-
-        host.eventSubscriptions = {
-            slot: ObserveSlots(host).subscribe(function (results) {
-                results.removed.forEach(disconnectEl)
-                host.wrap()
+        host.items$ = Observer([], true)
+        host.eventSubscriptions = host.eventSubscriptions ? host.eventSubscriptions : {}
+        host.eventSubscriptions['children' + ID()] = host.children$
+            .subscribe(function addedChildrenUpdate(children) {
+                children
+                    .forEach(function addedChildWrap(child) {
+                        host.addItem(child)
+                    })
             })
-        }
+
 
         window.addEventListener('resize', function () { return host.scaletofit ? runScale(host) : undefined })
 
-        host.wrap()
-
         OnNextFrame(function () { return host.setAttribute('viewable', true) })
-    },
-    onDisconnected: function (host) { ObserverUnsubscribe(host) }
+    }
 })
 
-WCDefine(componentName, GridLayout)
+Components.addComponent(componentName, GridLayout)
+
+export { GridLayout }

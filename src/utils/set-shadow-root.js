@@ -8,16 +8,12 @@ export function SetShadowRoot(options) {
     const style = options.style
 
     const Template = document.createElement('template')
-    Template.innerHTML = template
+    Template.innerHTML = template + '<span class="style-block-theme"></span><span class="style-block-styles"></span>'
 
     const clone = document.importNode(Template.content, true)
     element.attachShadow({ mode: 'open' }).appendChild(clone)
 
-    AppendStyleElement(style, element.shadowRoot, ''.concat(componentName, '-componentStyle'), 'componentStyle')
-    AppendStyleElement(' ', element.shadowRoot, ''.concat(componentName, '-themeStyles'), 'themeStyles')
-    AppendStyleElement(' ', element.shadowRoot, ''.concat(componentName, '-injectedStyles'), 'injectedStyles')
-
-    if (!('registerElement' in document) && !document.head.querySelector(''.concat('style[name="', componentName, '"]'))) {
-        AppendStyleElement(style, document.head, componentName)
+    if (style && style !== '') {
+        AppendStyleElement(style, element.shadowRoot, ''.concat(componentName, '-componentStyle'), 'componentStyle')
     }
 }

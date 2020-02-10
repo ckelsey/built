@@ -44,7 +44,7 @@ const exported = {
                                 {
                                     corejs: 3,
                                     modules: false,
-                                    useBuiltIns: 'entry',
+                                    useBuiltIns: 'usage',
                                     targets: {
                                         ie: 11,
                                         browsers: 'last 2 versions'

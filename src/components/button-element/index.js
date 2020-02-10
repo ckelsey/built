@@ -1,22 +1,20 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToString } from '../../utils/to-string.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { CreateElement } from '../../utils/create-element.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { Components } from '../../services/components.js'
 
-const template = require('./index.html')
 const componentName = 'button-element'
 const componentRoot = '.' + componentName + '-container'
-const style = require('./style.scss').toString()
 
 const properties = {
     name: {
-        format: function (val, host) { return Pipe(ToString, IfInvalid(host.textContent))(val).value },
+        format: function (val, host) { return Pipe(ToString, IfInvalid(host.textContent.trim()))(val).value },
         onChange: function (val, host) {
-            return WCWhenPropertyReady(host, 'elements.button').then(
+            return WhenAvailable(host, 'elements.button').then(
                 function btnReady(btn) {
                     btn.setAttribute('name', val)
                 }
@@ -26,7 +24,7 @@ const properties = {
     disabled: {
         format: function (val) { return Pipe(ToBool, IfInvalid(false))(val).value },
         onChange: function (val, host) {
-            return WCWhenPropertyReady(host, 'elements.root').then(
+            return WhenAvailable(host, 'elements.root').then(
                 function rootReady(root) {
                     root.classList[val ? 'add' : 'remove']('disabled')
                 }
@@ -36,7 +34,7 @@ const properties = {
     type: {
         format: function (val) { return Pipe(ToString, IfInvalid(null))(val).value },
         onChange: function (val, host) {
-            return WCWhenPropertyReady(host, 'elements.button')
+            return WhenAvailable(host, 'elements.button')
                 .then(function btnReady(btn) {
                     if (val) {
                         btn.setAttribute('type', 'submit')
@@ -59,16 +57,20 @@ const elements = {
     slot: { selector: 'slot' }
 }
 
-export const ButtonElement = WCConstructor({
+const ButtonElement = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
-    template: template,
-    style: style,
-    outerStyle: 'button-element{display:inline-block;}',
+    template: require('./index.html'),
+    style: require('./style.scss').toString(),
+    outerStyle: require('./outer.scss').toString(),
     observedAttributes: Object.keys(properties),
     properties: properties,
     elements: elements,
-    onConnected: function (host) { host.elements.button.classList.add('ready') },
+    onConnected: function (host) {
+        host.setAttribute('ready', true)
+    },
 })
 
-WCDefine(componentName, ButtonElement)
+Components.addComponent(componentName, ButtonElement)
+
+export { ButtonElement }

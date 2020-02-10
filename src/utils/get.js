@@ -1,46 +1,63 @@
+function emptyModifyFn(v) {
+    return v
+}
+
+function argsMapper(arg) {
+    return !isNaN(arg) ? parseFloat(arg) : arg.trim()
+}
+
+function isNull(v) {
+    return v === undefined || v === null
+}
+
 export function Get(obj, path, emptyVal, modifyFn) {
-    modifyFn = modifyFn && typeof modifyFn === 'function' ? modifyFn : function (v) { return v }
+    modifyFn = typeof modifyFn === 'function' ? modifyFn : emptyModifyFn
 
     /** If nothing to search, return */
-    if (!obj) { return emptyVal }
-
-    /** The search array, initial search item being the source */
-    let Path = [obj]
-
-    /** Populate the search array */
-    if (path && path.toString().split) {
-        Path = [obj].concat(path.toString().split('.'))
+    if (!obj) {
+        return modifyFn(emptyVal)
     }
 
-    const result = Path.reduce(function resultReducer(accumulator, currentValue) {
+    /** The search array, initial search item being the source */
+    const pathParts = path.split('.')
+    let result = obj
 
-        /** If through reduce, accumulator comes out empty, stop */
-        if (accumulator === undefined || accumulator === null) {
-            return emptyVal
+    const count = pathParts.length
+    let loopIndex = pathParts.length
+
+    // for (let partIndex = 0; partIndex < pathParts.length; partIndex = partIndex + 1) {
+    while (loopIndex) {
+        if (isNull(result)) {
+            result = emptyVal
+            break
         }
 
-        function argsMapper(arg) {
-            return !isNaN(arg) ? parseFloat(arg) : arg.trim()
-        }
+        const partIndex = count - loopIndex
+        const startParens = /\(/.exec(pathParts[partIndex])
 
-        /** If a function, call it */
-        if (currentValue.indexOf('.') === -1 && currentValue.indexOf('(') > -1) {
-            const reg = /\((.*?)\)/g.exec(currentValue)
-            const argsString = reg[1]
-            const args = argsString.split(',').map(argsMapper)
-            const functionName = currentValue.split('(')[0]
+        if (startParens) {
+            const fn = result[pathParts[partIndex].slice(0, startParens.index)]
 
-            if (typeof accumulator[functionName] === 'function') {
-                return accumulator[functionName].apply(accumulator, args)
+            if (typeof fn === 'function') {
+
+                result = fn.apply(
+                    result,
+                    /\((.*?)\)/g.exec(pathParts[partIndex])[1]
+                        .split(',')
+                        .map(argsMapper)
+                )
+
+                loopIndex = loopIndex - 1
+                continue
             }
         }
 
-        return accumulator[currentValue]
-
-    })
+        result = result[pathParts[partIndex]]
+        loopIndex = loopIndex - 1
+    }
 
     /** If nothing was found return emptyVal */
-    if (result === undefined || result === null) { return emptyVal }
+    if (isNull(result)) { result = emptyVal }
 
     return modifyFn(result)
 }

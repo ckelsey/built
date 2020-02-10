@@ -8,7 +8,7 @@ import { OnNextFrame } from '../../services/on-next-frame.js'
 import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
 import { ObserveSlots } from '../../utils/observe-slots.js'
 import { WasClickedOn } from '../../utils/was-clicked-on.js'
-import { ArrayFrom } from '../../utils/array-from.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = require('./outer.scss').toString()
@@ -29,7 +29,7 @@ function toggleOptions(show, host) {
             root.classList.add('opened')
         }
 
-        host.dispatchEvent(new CustomEvent(show ? 'selectopen' : 'selectclose', { detail: host }))
+        DispatchEvent(host, show ? 'selectopen' : 'selectclose', host)
     })
 }
 
@@ -59,7 +59,7 @@ const openClose = (open, host) => {
             }
         }
 
-        ArrayFrom(host.children).forEach(c => c.blur())
+        Array.from(host.children).forEach(c => c.blur())
     }
 
     if (open) {
@@ -93,7 +93,7 @@ export const DropDown = WCConstructor({
         host.tabIndex = '0'
 
         const addClasses = () => {
-            ArrayFrom(host.children)
+            Array.from(host.children)
                 .forEach(child => {
                     if (child.getAttribute('slot') === 'option') {
                         child.tabIndex = '0'
@@ -111,12 +111,12 @@ export const DropDown = WCConstructor({
                     return host.open ? openClose(false, host) : undefined
                 }
 
-                if (WasClickedOn(ArrayFrom(host.querySelectorAll('[slot="option"]')), e)) {
-                    host.dispatchEvent(new CustomEvent('optionclick', { detail: { host: host, event: e } }))
+                if (WasClickedOn(Array.from(host.querySelectorAll('[slot="option"]')), e)) {
+                    DispatchEvent(host, 'optionclick', { host: host, event: e })
                 }
 
                 if (WasClickedOn([host.elements.heading, host.querySelector('[slot="label"]')], e)) {
-                    host.dispatchEvent(new CustomEvent('labelclick', { detail: { host: host, event: e } }))
+                    DispatchEvent(host, 'labelclick', { host: host, event: e })
 
                     if (host.open) {
                         return OnNextFrame(() => openClose(false, host))

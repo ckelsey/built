@@ -1,8 +1,8 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { OnNextFrame } from '../../services/on-next-frame.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
-import { AssignObject } from '../../utils/assign.js'
+import { WhenAvailable } from '../../utils/when-available.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { Components } from '../../services/components.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = 'icon-element { display: inline-flex; align-items: center; justify-content: flex-start; }'
@@ -17,8 +17,8 @@ const attributes = {
             if (!value) { return }
             if (host.subscription) { host.subscription() }
             OnNextFrame(function () {
-                WCWhenPropertyReady(host, 'elements.svgContainer').then(function (el) { el.innerHTML = value })
-                host.dispatchEvent(new CustomEvent('iconloaded', { detail: host }))
+                WhenAvailable(host, 'elements.svgContainer').then(function (el) { el.innerHTML = value })
+                DispatchEvent(host, 'iconloaded', host)
             })
         }
     },
@@ -28,7 +28,7 @@ const attributes = {
         },
         onChange: function (value, host) {
             OnNextFrame(function () {
-                WCWhenPropertyReady(host, 'elements.svgContainer').then(function (el) { el.style.color = value })
+                WhenAvailable(host, 'elements.svgContainer').then(function (el) { el.style.color = value })
             })
         }
     },
@@ -38,13 +38,13 @@ const attributes = {
         },
         onChange: function (value, host) {
             OnNextFrame(function () {
-                WCWhenPropertyReady(host, 'elements.svgContainer').then(function (el) { el.style.height = el.style.width = value })
+                WhenAvailable(host, 'elements.svgContainer').then(function (el) { el.style.height = el.style.width = value })
             })
         }
     }
 }
 
-const properties = AssignObject({}, {
+const properties = Object.assign({}, {
     subscription: {
         format: function (val) {
             return val
@@ -55,7 +55,8 @@ const properties = AssignObject({}, {
 const template = require('./index.html')
 const componentName = 'icon-element'
 const componentRoot = ''.concat('.', componentName, '-container')
-export const IconElement = WCConstructor({
+
+const IconElement = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -66,4 +67,6 @@ export const IconElement = WCConstructor({
     elements: elements
 })
 
-WCDefine(componentName, IconElement)
+Components.addComponent(componentName, IconElement)
+
+export { IconElement }

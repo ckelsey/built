@@ -31,6 +31,6 @@ export function FunctionToPartial() {
 
     /** return function that takes new arguments which then returns a new FunctionToPartial */
     return function () {
-        return FunctionToPartial.apply(null, [fn].concat(argArray.concat(ArrayFrom(arguments))))
+        return FunctionToPartial.apply(null, [fn].concat(argArray, ArrayFrom(arguments)))
     }
 }

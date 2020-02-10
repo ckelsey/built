@@ -9,6 +9,7 @@ import { Timer } from '../../services/timer.js'
 import { GetCurve } from '../../utils/get-curve.js'
 import { IsElement } from '../../utils/is-element.js'
 import { ToArray } from '../../utils/to-array.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const template = require('./index.html')
 const componentName = 'effect-bounce-z'
@@ -43,7 +44,7 @@ function loadTargets(_val, host) {
 
             if (validTarget(target)) {
                 object.handler = function (e) {
-                    host.dispatchEvent(new Event('started', { detail: object }))
+                    DispatchEvent(host, 'started', object)
 
                     object.element.style.transformStyle = 'preserve-3d'
                     object.element.style.backfaceVisibility = 'hidden'
@@ -61,7 +62,7 @@ function loadTargets(_val, host) {
                         }
                     ).then(function () {
                         object.element.style.removeProperty('transform')
-                        host.dispatchEvent(new Event('ended', { detail: object }))
+                        DispatchEvent(host, 'ended', object)
                         return object
                     })
                 }

@@ -1,7 +1,7 @@
 import { EaseInOut, Timer, OnNextFrame, Get } from '../..'
-import { ArrayFrom } from '../../utils/array-from'
+import { DispatchEvent } from '../../utils/dispatch-event'
+import { Filter } from '../../utils/filter'
 
-const style = require('./style.scss').toString()
 function animator(from, to, speed, stepFn) {
     return new Promise(function (resolve) {
         try {
@@ -29,10 +29,11 @@ function animateOpacity(from, to, el, speed) {
         return el.style.opacity = opacityStep
     })
 }
+
 function removeElement(el) { try { el.parentNode.removeChild(el) } catch (error) { } }
 
 function dispatchTransition(host, from, to, isEnd) {
-    return host.dispatchEvent(new CustomEvent('transition'.concat((isEnd ? 'ed' : 'ing')), { detail: { host: host, from: from, to: to } }))
+    return DispatchEvent(host, 'transition'.concat((isEnd ? 'ed' : 'ing')), { host: host, from: from, to: to })
 }
 
 function elementOpacity(el, defaultOpacity) {
@@ -44,21 +45,13 @@ function elementOpacity(el, defaultOpacity) {
 
 export function getChildren(host) {
     return function () {
-        return ArrayFrom(host.children).filter(function (c) {
-            return c.hasAttribute('slot')
-        })
+        return host.slotted$.value
     }
 }
 
 export function getCurrent(host) {
     return function () {
-        return host.querySelector('[slot="current"]')
-    }
-}
-
-export function getComponentStyles(host) {
-    return function () {
-        return ''.concat(style, host.theme, host.styles)
+        return Filter(function (slotted) { return slotted.slot === 'current' }, host.slotted$)[0]
     }
 }
 
@@ -124,7 +117,6 @@ function endTransition(host, old, current, currentContainer, nextContainer) {
 
 function startTransition(host, current, child) {
     try {
-        if (!host.contains(child)) { host.appendChild(child) }
         child.setAttribute('slot', 'next')
         host.start = { from: current, to: child }
         dispatchTransition(host, current, child)

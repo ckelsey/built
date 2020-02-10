@@ -1,22 +1,24 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { ToString } from '../../utils/to-string.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { ToNumber } from '../../utils/to-number.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { CreateElement } from '../../utils/create-element.js'
 import { OnNextFrame } from '../../services/on-next-frame.js'
 import { CommasToArray } from '../../utils/commas-to-array.js'
 import { ToMap } from '../../utils/to-map.js'
-import { Try } from '../../utils/try.js'
 import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
 import { Get } from '../../utils/get.js'
-import { ObserveSlots } from '../../utils/observe-slots.js'
 import { ID } from '../../services/id.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { Components } from '../../services/components.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { ObserveExists } from '../../utils/observe-exists.js'
+import { Observer } from '../../utils/observer.js'
 import { ArrayFrom } from '../../utils/array-from.js'
+import { Filter } from '../../utils/filter.js'
 
 const defaultWidth = 240
 const defaultGap = [16, 16]
@@ -26,7 +28,7 @@ const componentRoot = '.' + componentName + '-container'
 const outerStyle = require('./outer.scss').toString()
 
 function setAttribute(host, val, name, elKey) {
-    return WCWhenPropertyReady(host, 'elements.' + elKey).then(
+    return WhenAvailable(host, 'elements.' + elKey).then(
         function ElReady(el) {
             return el[val ? 'setAttribute' : 'removeAttribute'](name, val)
         }
@@ -34,7 +36,7 @@ function setAttribute(host, val, name, elKey) {
 }
 
 function submitForm(host) {
-    return host.elements.form.dispatchEvent(new Event('submit'))
+    return DispatchEvent(host.elements.form, 'submit')
 }
 
 function getFormData(host) {
@@ -65,8 +67,56 @@ function getFormData(host) {
     const formData = new FormData(newForm)
 
     formData.forEach(function formDataForEach(value, key) { data[key] = value })
-    host.dispatchEvent(new CustomEvent('submitdata', { detail: data }))
+    DispatchEvent(host, 'submitdata', data)
     OnNextFrame(function getFormDataNext() { document.body.removeChild(newForm) })
+}
+
+function removeChild(host, el) {
+    if (el.container) {
+        const slot = el.slot
+        const item = Filter(function (element) {
+            return element.slot === slot
+        }, host.items$.value)[0]
+
+        host.items$.remove(item)
+        ObserverUnsubscribe(el)
+
+        if (el.container.parentElement) {
+            el.container.parentElement.removeChild(el.container)
+        }
+    }
+}
+
+function wrapChild(host, el) {
+    const tagName = Get(el, 'nodeName.toLowerCase()')
+    const isInput = /input-/.test(tagName)
+    const isBtn = tagName === 'button-element'
+    const isSubmit = isBtn && el.type === 'submit'
+    const id = ID()
+    const wrapper = CreateElement({ tagName: 'div', class: componentName + '-slot-wrapper', id: id })
+
+    if (!el.eventSubscriptions) {
+        el.eventSubscriptions = {}
+    }
+
+    if (isSubmit) {
+        el.eventSubscriptions = { click: ObserveEvent(el, 'click').subscribe(function () { return submitForm(host) }) }
+    } else if (isInput) {
+        el.eventSubscriptions = { done: ObserveEvent(el, 'done').subscribe(function () { return submitForm(host) }) }
+    }
+
+    el.slot = id
+    el.container = wrapper
+    host.removeChild(el)
+
+    setTimeout(function () {
+        ObserveExists(el, true)
+            .subscribe(function elExistsCallback(exists) {
+                if (!exists) { removeChild(host, el) }
+            })
+    }, 0)
+
+    return el
 }
 
 const elements = {
@@ -151,7 +201,7 @@ const properties = {
     }
 }
 
-export const AjaxForm = WCConstructor({
+const AjaxForm = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -159,65 +209,35 @@ export const AjaxForm = WCConstructor({
     properties: properties,
     observedAttributes: Object.keys(properties),
     elements: elements,
-    onConnected: function (host) {
-        function wrap(el) {
-            return WCWhenPropertyReady(host, 'elements.grid')
-                .then(function gridReady(appendTo) {
-                    const tagName = Get(el, 'tagName.toLowerCase()')
-                    const isInput = tagName === 'input-field'
-                    const isBtn = tagName === 'button-element'
-                    const isSubmit = isBtn && el.type === 'submit'
-                    const id = ID()
-                    const wrapper = CreateElement({ tagName: 'div', class: '.' + componentName + '-slot-wrapper', id: id })
-                    const slot = CreateElement({ tagName: 'slot', name: id })
+    methods: {
+        addItem: function (host) {
+            return function (item) {
+                if (!host.items$.has(item)) {
+                    const newElement = document.adoptNode(wrapChild(host, item))
 
-                    if (isSubmit) {
-                        el.eventSubscriptions = { click: ObserveEvent(el, 'click').subscribe(function () { return submitForm(host) }) }
-                    } else if (isInput) {
-                        el.eventSubscriptions = { done: ObserveEvent(el, 'done').subscribe(function () { return submitForm(host) }) }
-                    }
-
-                    el.slot = id
-                    el.container = wrapper
-
-                    wrapper.appendChild(slot)
-                    appendTo.appendChild(wrapper)
-                })
+                    return WhenAvailable(host, 'elements.grid')
+                        .then(function (grid) {
+                            grid.appendChild(newElement.container)
+                            newElement.container.appendChild(newElement)
+                            host.items$.insert(newElement)
+                        })
+                }
+            }
         }
-
-        function removeEl() {
-            Try(function (el) {
-                Get(el, 'container.parentElement').removeChild(el.container)
-            })
-        }
-
-        function unsubscribeEl() {
-            Try(function (el) {
-                ObserverUnsubscribe(el)
-            })
-        }
-
-        function unwrap(el) {
-            unsubscribeEl(el)
-            removeEl(el)
-        }
-
-        function addedEach(el) {
-            Get(el, 'tagName.toLowerCase()') === 'style' ? undefined : wrap(el)
-        }
-
-        host.eventSubscriptions = {
-            slots: ObserveSlots(host, false).subscribe(function SlotsSub(elements) {
-                elements.added.forEach(addedEach)
-                elements.removed.forEach(unwrap)
-            })
-        }
-
-        ArrayFrom(host.children).forEach(addedEach)
     },
-    onDisconnected: function (host) {
-        ObserverUnsubscribe(host)
+    onConnected: function (host) {
+        host.items$ = Observer([], true)
+        host.eventSubscriptions = host.eventSubscriptions ? host.eventSubscriptions : {}
+        host.eventSubscriptions['addedChildren' + ID()] = host.addedChildren$.subscribe(function addedChildrenUpdate(children) {
+            children
+                .reverse()
+                .forEach(function addedChildWrap(child) {
+                    host.addItem(child)
+                })
+        })
     }
 })
 
-WCDefine(componentName, AjaxForm)
+Components.addComponent(componentName, AjaxForm)
+
+export { AjaxForm }

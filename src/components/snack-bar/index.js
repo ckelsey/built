@@ -1,17 +1,17 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { ToString } from '../../utils/to-string.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { Pipe } from '../../utils/pipe.js'
 import { OnNextFrame } from '../../services/on-next-frame.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { EventName } from '../../utils/event-name.js'
 import { IndexOf } from '../../utils/index-of.js'
 import { iconInfo, iconCheck, iconError, iconWarning, iconClose } from '../../services/icons.js'
 import { IfEmpty } from '../../utils/if-empty.js'
-import { ArrayFrom } from '../../utils/array-from.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { Components } from '../../services/components.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = require('./outer.scss').toString()
@@ -27,7 +27,7 @@ function setShown(host) {
     const endEventName = EventName('transitionend')
 
     function dispatch() {
-        return host.dispatchEvent(new CustomEvent(host.shown ? 'opened' : 'closed', { detail: host }))
+        return DispatchEvent(host, host.shown ? 'opened' : 'closed', host)
     }
 
     if (endEventName) {
@@ -59,13 +59,12 @@ function setType(host) {
 }
 
 function setIcon(host, key) {
-    WCWhenPropertyReady(host, key)
-        .then(function () {
-            const icon = host.elements[key]
-
+    WhenAvailable(host, 'elements.' + key)
+        .then(function (icon) {
             if (!icon) { return }
 
-            icon[host[key][0] === '<' ? 'svg' : 'type'] = host[key]
+            // icon[host[key][0] === '<' ? 'svg' : 'type'] = host[key]
+            icon.svg = host[key]
         })
 }
 
@@ -171,7 +170,8 @@ const elements = {
     }
 }
 
-export const SnackBar = WCConstructor({
+
+const SnackBar = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -183,7 +183,7 @@ export const SnackBar = WCConstructor({
     methods: {
         clear: function (host) {
             return function () {
-                return ArrayFrom(host.children).forEach(function (c) {
+                return Array.from(host.children).forEach(function (c) {
                     return c.slot ? host.removeChild(c) : undefined
                 })
             }
@@ -191,4 +191,6 @@ export const SnackBar = WCConstructor({
     },
 })
 
-WCDefine(componentName, SnackBar)
+Components.addComponent(componentName, SnackBar)
+
+export { SnackBar }

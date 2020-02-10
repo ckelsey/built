@@ -1,7 +1,6 @@
 import { IsElement } from './is-element.js'
 import { Get } from './get.js'
 import { SetStyleRules } from './set-style-rules.js'
-import { ArrayFrom } from './array-from.js'
 
 function exists(thing) { return !!thing }
 function getRules(sheet) { return Get(sheet, 'sheet.rules', Get(sheet, 'sheet.cssRules', [])) }
@@ -17,13 +16,13 @@ function mapRuleObject(rule) {
 }
 
 function mapSheets(sheet) {
-    return ArrayFrom(getRules(sheet))
+    return Array.from(getRules(sheet))
         .map(mapRuleObject)
         .filter(validRule)
 }
 
 export function MergeStyleSheets() {
-    const styleElements = ArrayFrom(arguments).map(getStyleElement).filter(exists)
+    const styleElements = Array.from(arguments).map(getStyleElement).filter(exists)
     const sheets = styleElements.map(mapSheets).filter(exists)
     const styleObject = sheets.shift()
     const styleObjectIndice = styleObject.map(getSelector)

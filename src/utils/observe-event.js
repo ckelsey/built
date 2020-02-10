@@ -1,6 +1,5 @@
 import { Observer } from './observer.js'
 import { ObserveExists } from './observe-exists.js'
-import { AssignObject } from './assign.js'
 
 export function ObserveEvent(element, eventName, options) {
     if (!element || !eventName) { return }
@@ -8,8 +7,9 @@ export function ObserveEvent(element, eventName, options) {
     options = options ? options : {}
 
     let isRunning = false
+    let disposeTimer = setTimeout(function () { })
 
-    options = AssignObject({}, {
+    options = Object.assign({}, {
         preventDefault: false,
         stopPropagation: false,
         useCapture: true
@@ -26,7 +26,9 @@ export function ObserveEvent(element, eventName, options) {
     function startup() {
         if (isRunning) { return }
         isRunning = true
-        try { element.addEventListener(eventName, eventHandler, options.useCapture) } catch (error) { }
+        try {
+            element.addEventListener(eventName, eventHandler, options.useCapture)
+        } catch (error) { }
     }
 
     const observer = Observer(undefined, undefined, startup)
@@ -40,27 +42,30 @@ export function ObserveEvent(element, eventName, options) {
     }
 
     function shutDown() {
-
-        try {
-            element.removeEventListener(eventName, eventHandler, options.useCapture)
-        } catch (error) { }
-
+        try { element.removeEventListener(eventName, eventHandler, options.useCapture) } catch (error) { }
         isRunning = false
     }
 
     function dispose() {
         shutDown()
-        observer.complete()
-        try { exists() } catch (error) { }
+
+        disposeTimer = setTimeout(function () {
+            observer.complete()
+            try { exists() } catch (error) { }
+        }, 1000)
     }
 
     function subFn(exists) {
-        return exists ? undefined : dispose()
+        clearTimeout(disposeTimer)
+
+        if (!exists) {
+            dispose()
+        } else {
+            startup()
+        }
     }
 
     const exists = isWindow() ? function () { } : ObserveExists(element).subscribe(subFn)
-
-    startup()
 
     return observer
 }

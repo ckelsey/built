@@ -6,10 +6,6 @@ let isRunning = false
 let frameTimer
 let timeout
 
-// function getEntry() {
-//     return OnNextFrameData[OnNextFrameIds.shift()]
-// }
-
 function deleteEntry(id) {
     if (!OnNextFrameQueueObject[id]) { return }
     OnNextFrameQueueObject[id].hasRun = true
@@ -32,9 +28,7 @@ function runTasks(startTime) {
         if (OnNextFrameQueueObject[id] && !OnNextFrameQueueObject[id].canceled && !OnNextFrameQueueObject[id].hasRun) {
             OnNextFrameQueueObject[id].hasRun = true
             OnNextFrameQueueObject[id].resolve(OnNextFrameQueueObject[id].task())
-            requestAnimationFrame(function () {
-                deleteEntry(id)
-            })
+            deleteEntry(id)
         }
 
     } while (hasTime(startTime) && OnNextFrameQueue.length)
@@ -50,7 +44,7 @@ function runTasks(startTime) {
     }
 }
 
-runTasks.max = 5
+runTasks.max = 4.5
 
 function RunOnNextFrame() {
     if (isRunning || !OnNextFrameQueue.length) { return }

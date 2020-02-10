@@ -31,13 +31,14 @@ export function CreateElement(obj) {
                 el.eventSubscriptions = {}
             }
 
-            function eventsKeysEach(eventKey) {
-                if (typeof events[eventKey] === 'function') {
-                    el.eventSubscriptions[eventKey] = events[eventKey]()
+            const eventKeys = Object.keys(events)
+            let loopIndex = eventKeys.length
+
+            while (loopIndex--) {
+                if (typeof events[eventKeys[loopIndex]] === 'function') {
+                    el.eventSubscriptions[eventKeys[loopIndex]] = events[eventKeys[loopIndex]]()
                 }
             }
-
-            Object.keys(events).forEach(eventsKeysEach)
         }
 
         function childrenArrayEach(child) {
@@ -56,7 +57,9 @@ export function CreateElement(obj) {
 
         if (key === 'children') {
             if (Array.isArray(obj[key])) {
-                return obj[key].forEach(childrenArrayEach)
+                let loopIndex = obj[key].length
+                while (loopIndex--) { childrenArrayEach(obj[key][loopIndex]) }
+                return
             } else {
                 return IsElement(obj[key]).valid ?
                     el.appendChild(obj[key]) :
@@ -71,7 +74,10 @@ export function CreateElement(obj) {
         }
     }
 
-    Object.keys(obj).forEach(objKeysEach)
+    const objKeys = Object.keys(obj)
+    let index = objKeys.length
+
+    while (index--) { objKeysEach(objKeys[index]) }
 
     return el
 }

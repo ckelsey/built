@@ -1,12 +1,12 @@
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { Components } from '../../services/components.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
-import { WCConstructor } from '../../utils/wc-constructor.js'
 import { ID } from '../../services/id.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToString } from '../../utils/to-string.js'
 import { Get } from '../../utils/get.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { SetAttribute } from '../../utils/set-attribute.js'
 
 import { processedValue } from '../input-shared/processed-value.js'
@@ -21,7 +21,7 @@ import { valueValidation } from './value-validation.js'
 import { valueMaxMin } from './value-max-min.js'
 import { valueFormat } from './value-format.js'
 import { ToBool } from '../../utils/to-bool.js'
-import { AssignObject } from '../../utils/assign.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const outerStyle = require('../input-shared/outer.scss').toString()
 const style = require('./style.scss').toString()
@@ -64,10 +64,10 @@ function postProcessValue(host) {
     }
 }
 
-const properties = AssignObject({}, Properties, {
+const properties = Object.assign({}, Properties, {
     pattern: {
         format: function (val) { return Pipe(ToString, IfInvalid(null))(val).value },
-        onChange: function (val, host) { WCWhenPropertyReady(host, 'input').then(function (input) { return SetAttribute(input, 'pattern', val) }) }
+        onChange: function (val, host) { WhenAvailable(host, 'input').then(function (input) { return SetAttribute(input, 'pattern', val) }) }
     },
     cachedPreProcessValueNeedsUpdate: { format: function (val) { return Pipe(ToBool, IfInvalid(true))(val).value } },
     cachedPreProcessValue: {
@@ -90,7 +90,7 @@ const elements = {
         onChange: function (el, host) {
             el.eventSubscriptions = {
                 click: ObserveEvent(el, 'click').subscribe(function () {
-                    host.dispatchEvent(new CustomEvent('iconclick', { detail: host }))
+                    DispatchEvent(host, 'iconclick', host)
                 })
             }
         }
@@ -100,7 +100,7 @@ const elements = {
     root: { selector: '.input-field-container' }
 }
 
-export const InputField = WCConstructor({
+const InputField = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -127,8 +127,12 @@ export const InputField = WCConstructor({
             return host.preProcessValue(Get(host, 'state.value.value', '')).sanitized
         }
     },
-    onConnected: function (host) { host.inputID = ID() },
+    onConnected: function (host) {
+        host.inputID = ID()
+    },
     formElement: true
 })
 
-WCDefine(componentName, InputField, 'input')
+Components.addComponent(componentName, InputField)
+
+export { InputField }

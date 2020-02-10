@@ -7,6 +7,9 @@ import { ObserveEvent } from '../../utils/observe-event.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { SetStyleRules } from '../../utils/set-style-rules.js'
 import { ValidateHtml } from '../../utils/validate-html.js'
+import { OnNextFrame } from '../../services/on-next-frame.js'
+import { Get } from '../../utils/get.js'
+import { DispatchEvent } from '../../utils/dispatch-event.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = require('./outer.scss').toString()
@@ -49,12 +52,12 @@ function waitForEl(host, key) {
             let el = host.elements[key]
 
             function checkIfReady() {
-                cancelAnimationFrame(host[timerForString(key)])
+                Get(host, timerForString(key) + '.cancel()')
 
                 el = host.elements[key]
 
                 return !el ?
-                    host[timerForString(key)] = requestAnimationFrame(checkIfReady) :
+                    host[timerForString(key)] = OnNextFrame(checkIfReady) :
                     resolve(el)
             }
 
@@ -82,18 +85,11 @@ function toggleLoad(host) {
             root.classList[host.loading ? 'add' : 'remove']('loading')
             root.classList[host.error ? 'add' : 'remove']('errored')
 
-            host.dispatchEvent(new CustomEvent(
-                host.error ?
-                    'imageerror' :
-                    host.loading ?
-                        'imageloading' :
-                        'imageloaded',
-                { detail: host }
-            ))
+            DispatchEvent(host, host.error ? 'imageerror' : host.loading ? 'imageloading' : 'imageloaded', host)
 
             if (!host.loading) {
                 host.complete = true
-                host.dispatchEvent(new CustomEvent('imagecomplete', { detail: host }))
+                DispatchEvent(host, 'imagecomplete', host)
             }
 
             toggleText(host)
@@ -181,7 +177,7 @@ const elements = {
     root: {
         selector: componentRoot,
         onChange: function (el) {
-            requestAnimationFrame(function () {
+            OnNextFrame(function () {
                 el.classList.remove('notready')
                 el.style.removeProperty('opacity')
             })
@@ -190,8 +186,7 @@ const elements = {
     spinner: {
         selector: ''.concat(componentRoot, ' spinner-element'),
         onChange: function (el) {
-            function remove() { return el.style.removeProperty('opacity') }
-            setTimeout(function () { requestAnimationFrame(remove) }, 66)
+            OnNextFrame(function remove() { return el.style.removeProperty('opacity') })
         }
     },
     img: {

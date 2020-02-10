@@ -1,4 +1,5 @@
-import { ArrayFrom } from './array-from.js'
+import { Get } from './get.js'
+import { OnNextFrame } from '../services/on-next-frame.js'
 
 export function Throttle(fn, wait) {
     wait = wait === undefined ? 33 : wait
@@ -6,23 +7,23 @@ export function Throttle(fn, wait) {
     let start = null
 
     return function () {
-        cancelAnimationFrame(timer)
+        Get(timer, 'cancel()')
         start = new Date().getTime()
         const _this = this
-        const args = ArrayFrom(arguments)
+        const args = Array.from(arguments)
 
         function test() {
             const now = new Date().getTime()
 
             if (now - start >= wait) {
                 fn.apply(_this, args)
-                cancelAnimationFrame(timer)
+                Get(timer, 'cancel()')
                 start = null
                 timer = null
                 return
             }
 
-            timer = requestAnimationFrame(test)
+            timer = OnNextFrame(test)
         }
 
         test()

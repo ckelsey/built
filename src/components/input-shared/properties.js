@@ -1,5 +1,5 @@
 import { IsElement } from '../../utils/is-element.js'
-import { WCWhenPropertyReady } from '../../utils/wc-when-property-ready.js'
+import { WhenAvailable } from '../../utils/when-available.js'
 import { SetAttribute } from '../../utils/set-attribute.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToBool } from '../../utils/to-bool.js'
@@ -32,7 +32,7 @@ function addRemoveContainerClass(val, host, clss) {
 }
 
 function setInputAttribute(host, name, value) {
-    return WCWhenPropertyReady(host, 'input').then(function (input) {
+    return WhenAvailable(host, 'input').then(function (input) {
         return SetAttribute(input, name, value)
     })
 }
@@ -88,7 +88,7 @@ export const properties = {
     helptext: {
         format: stringOrEmpty,
         onChange: function (val, host) {
-            WCWhenPropertyReady(host, 'elements.help').then(function (el) {
+            WhenAvailable(host, 'elements.help').then(function (el) {
                 return el.innerHTML = ValidateHtml(val, [], ['script']).sanitized || ''
             })
         }
@@ -108,7 +108,7 @@ export const properties = {
         onChange: function (val, host) {
             SetAttribute(host.elements.container, 'valid', val)
             addRemoveContainerClass(val, host, 'invalid')
-            WCWhenPropertyReady(host, 'elements.error').then(function (el) {
+            WhenAvailable(host, 'elements.error').then(function (el) {
                 return el.innerHTML = ValidateHtml(host.validationMessage, [], ['script']).sanitized || ''
             })
             onInvalid(host)
@@ -120,10 +120,10 @@ export const properties = {
             return Pipe(IndexOf(labelPositions), IfInvalid(getDefaultLabelPosition(host)))(val).value
         },
         onChange: function (val, host) {
-            WCWhenPropertyReady(host, 'elements.container').then(function (container) {
+            WhenAvailable(host, 'elements.container').then(function (container) {
                 return SetAttribute(container, 'label-position', val)
             })
-            WCWhenPropertyReady(host, 'labelelement').then(function (label) {
+            WhenAvailable(host, 'labelelement').then(function (label) {
                 return label.slot = ''.concat('label-', val, '')
             })
         },
@@ -131,7 +131,9 @@ export const properties = {
 
     label: {
         format: stringOrEmpty,
-        onChange: function (_val, host) { setLabel(host) },
+        onChange: function (_val, host) {
+            setLabel(host)
+        },
     },
 
     matchinput: {
@@ -185,7 +187,9 @@ export const properties = {
 
     type: {
         format: function (val, host) { return Pipe(IndexOf(supportedInputTypes), IfInvalid(defaultType(host)))(val).value },
-        onChange: function (_val, host) { setInput(host) },
+        onChange: function (_val, host) {
+            setInput(host)
+        },
     },
 
     value: {

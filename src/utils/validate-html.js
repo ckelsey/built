@@ -3,10 +3,9 @@ import { ToString } from './to-string.js'
 import { Pipe } from './pipe.js'
 import { svgTags } from './svg-tags.js'
 import { htmlTags } from './html-tags.js'
-import { ArrayFrom } from './array-from.js'
 
 function getElements(Doc, selector) {
-    return ArrayFrom(Doc.body.querySelectorAll(selector))
+    return Array.from(Doc.body.querySelectorAll(selector))
 }
 
 export function ValidateHtml(str, allowedHtmlTags, disallowedHtmlTags) {

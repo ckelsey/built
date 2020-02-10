@@ -1,7 +1,6 @@
 import { Timer } from '../services/timer.js'
 import { EaseInOut } from './ease-in-out.js'
 import { Get } from './get.js'
-import { AssignObject } from './assign.js'
 
 function animator(from, to, speed, stepFn) {
     return new Promise(
@@ -23,7 +22,7 @@ export function ScrollTo(options) {
         options.y = box.top
     }
 
-    options = AssignObject(
+    options = Object.assign(
         {},
         {
             speed: 300,

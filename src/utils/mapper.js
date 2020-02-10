@@ -1,4 +1,4 @@
-import { ReduceMap } from './reduce-map.js'
+import { ForEach } from './for-each'
 
 /**
  * Performs a provided mapping operation to a provided collection. Intended to be used inconjunction with a transducer.
@@ -10,8 +10,13 @@ import { ReduceMap } from './reduce-map.js'
  * Map(v=>v.toLowerCase(), ['A', 'B']) // ['a', 'b']
  * TODO - be able to take an object, Set, Weak map, etc
  */
-function Map(mapFunction, collection) {
-    return collection.reduce(ReduceMap(mapFunction), [])
-}
+export function Mapper(mapFunction, collection) {
+    const result = []
 
-export { Map }
+    ForEach(
+        function MapInner(item) { result.push(mapFunction(item)) },
+        collection
+    )
+
+    return result
+}

@@ -1,5 +1,5 @@
+import { DispatchEvent } from '../../utils/dispatch-event.js'
+
 export function dispatch(host, type, data) {
-    return host.dispatchEvent(
-        new CustomEvent(type, { detail: data ? data : data === false ? false : host.state })
-    )
+    return DispatchEvent(host, type, data ? data : data === false ? false : host.state)
 }

@@ -2,6 +2,23 @@
 
 .input-field-container.input-bool {
     .input-field-container-inner {
+        &[showicon="true"] {
+            .input-field-checkbox-overlay {
+                &:after {
+                    content: '';
+                    border: 0.125em solid;
+                    border-top-color: transparent;
+                    border-right-color: transparent;
+                    position: absolute;
+                    width: 0.45em;
+                    height: 0.225em;
+                    left: 0.23em;
+                    top: 0.29em;
+                    transform: rotate(-45deg);
+                    border-radius: 0.15em;
+                }
+            }
+        }
 
         &[input-kind="checkbox"],
         &[input-kind="radio"] {
@@ -24,6 +41,7 @@
 
             .input-field-border {
                 box-shadow: none;
+                transition: none;
             }
 
             effect-underline {
@@ -37,7 +55,7 @@
             }
 
             .input-field-middle-section {
-                align-items: flex-start;
+                align-items: center;
             }
         }
 

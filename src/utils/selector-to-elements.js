@@ -1,6 +1,5 @@
 import { TMonad } from './t-monad.js'
 import { IsElement } from './is-element.js'
-import { ArrayFrom } from './array-from.js'
 
 export function SelectorToElements(parent, value) {
     const result = TMonad(value)
@@ -16,7 +15,7 @@ export function SelectorToElements(parent, value) {
     const isEl = IsElement(result)
 
     if (result.type === 'string') {
-        result.value = ArrayFrom(parent.querySelectorAll(result.value))
+        result.value = Array.from(parent.querySelectorAll(result.value))
     } else if (isEl.valid) {
         result.value = [result.value]
     }

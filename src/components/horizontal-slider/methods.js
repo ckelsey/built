@@ -1,4 +1,5 @@
 import { setActiveChicklet, setActiveItem } from './elements'
+import { OnNextFrame } from '../../services/on-next-frame.js'
 
 function whichTransitionEvent() {
     var t
@@ -109,7 +110,7 @@ export function autoplay(host) {
             time = new Date().getTime()
         }
 
-        requestAnimationFrame(run)
+        OnNextFrame(run)
     }
 
     if (canPlay()) { run() }

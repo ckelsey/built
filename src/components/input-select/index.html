@@ -2,20 +2,20 @@
     <div class="input-field-container-inner">
         <div class="input-field-top-section">
             <div class="input-field-label-top">
-                <slot name="label-top"></slot>
+                <span slotblock label-top></span>
             </div>
         </div>
         <div class="input-field-middle-section">
             <div class="input-field-label-left">
-                <slot name="label-left"></slot>
+                <span slotblock label-left></span>
             </div>
             <div class="input-field-input-section">
                 <div class="input-field-label-inside">
-                    <slot name="label-inside"></slot>
+                    <span slotblock label-inside></span>
                 </div>
                 <div class="input-field-input-container">
                     <div class="input-field-input-container-inner">
-                        <slot name="input"></slot>
+                        <span slotblock inputholder></span>
                     </div>
                     <div class="input-field-input-overlay">
                         <icon-element class="input-field-icon" size="1.25em"></icon-element>
@@ -25,12 +25,12 @@
                 </div>
             </div>
             <div class="input-field-label-right">
-                <slot name="label-right"></slot>
+                <span slotblock label-right></span>
             </div>
         </div>
         <div class="input-field-bottom-section">
             <div class="input-field-label-bottom">
-                <slot name="label-bottom"></slot>
+                <span slotblock label-bottom></span>
             </div>
             <div class="input-field-bottom-content">
                 <div class="input-field-messages">
