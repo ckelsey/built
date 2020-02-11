@@ -9,6 +9,7 @@ function isVisible(e) {
     return (instance.boundingClientRect.width === 0 && instance.boundingClientRect.height === 0) || isNotDisplayed
 }
 
+/** TODO npm i intersection-observer */
 function IObserver(callback) {
     if ('IntersectionObserver' in window) { return new IntersectionObserver(callback) }
 
@@ -71,7 +72,7 @@ export function ObserveVisibility(element) {
     function startup() {
         if (isRunning || intersectionObserver) { return }
         isRunning = true
-        intersectionObserver = IObserver(callback)
+        intersectionObserver = new window.IntersectionObserver(callback)
         intersectionObserver.observe(element)
     }
 
