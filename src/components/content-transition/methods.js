@@ -90,14 +90,22 @@ function getTransitionElements(host, indexOrChild) {
         currentContainer: host.elements.currentContainer,
         root: host.elements.root,
         child: child,
-        current: current
+        current: current,
+        hiddenSlot: host.elements.hidden,
+        currentSlot: host.elements.current
     }
 }
 
 function endTransition(host, old, current, currentContainer, nextContainer) {
     try {
-        if (old && old.slot !== 'hidden') { old.slot = 'hidden' }
-        if (current && current.slot !== 'current') { current.slot = 'current' }
+        console.log(current)
+        if (old && old.getAttribute('slot') !== 'hidden') {
+            old.setAttribute('slot', 'hidden')
+        }
+
+        if (current && current.getAttribute('slot') !== 'current') {
+            current.setAttribute('slot', 'current')
+        }
 
         currentContainer.style.removeProperty('transform')
         currentContainer.style.removeProperty('opacity')
@@ -108,7 +116,10 @@ function endTransition(host, old, current, currentContainer, nextContainer) {
         host.elements.root.style.removeProperty('height')
 
         host.end = { current: current, index: host.getChildren().indexOf(current) }
-    } catch (error) { }
+
+    } catch (error) {
+        console.log(error)
+    }
 
     return current
 }
