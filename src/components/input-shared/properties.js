@@ -8,7 +8,6 @@ import { ToString } from '../../utils/to-string.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { Get } from '../../utils/get.js'
 import { ToNumber } from '../../utils/to-number.js'
-import { ToObject } from '../../utils/to-object.js'
 import { setInput } from './set-input.js'
 import { setInputID } from './set-input-id.js'
 import { setLabel } from './set-label.js'
@@ -82,7 +81,7 @@ export const properties = {
 
     format: {
         format: function (val) {
-            return Pipe(ToObject, IfInvalid(Pipe(ToString, IfInvalid(null))(val).value))(val).value
+            return Pipe(ToString, IfInvalid(null))(val).value
         },
         onChange: function (_val, host) { host.processValue() },
     },

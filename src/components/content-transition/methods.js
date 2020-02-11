@@ -98,7 +98,6 @@ function getTransitionElements(host, indexOrChild) {
 
 function endTransition(host, old, current, currentContainer, nextContainer) {
     try {
-        console.log(current)
         if (old && old.getAttribute('slot') !== 'hidden') {
             old.setAttribute('slot', 'hidden')
         }
@@ -117,9 +116,7 @@ function endTransition(host, old, current, currentContainer, nextContainer) {
 
         host.end = { current: current, index: host.getChildren().indexOf(current) }
 
-    } catch (error) {
-        console.log(error)
-    }
+    } catch (error) { }
 
     return current
 }

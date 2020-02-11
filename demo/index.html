@@ -40,6 +40,8 @@
             <input-field label="Email address <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" autocomplete="email" type="email" name="Email" id="Email" required="true" labelposition="top" input-element></input-field>
 
             <input-field label="Phone number" class="support-dvd-input static-input" autocomplete="phone" type="intlphone" name="Telephone" id="Telephone" labelposition="top" input-element></input-field>
+
+            <input-field label="State" class="support-dvd-input static-input" autocomplete="state" name="state" id="state" labelposition="top" format="/[a-z]/g=>toUpperCase, /[^A-Z]/g=>" max="2" input-element></input-field>
         </grid-layout>
 
         <button-element>Hi</button-element>

@@ -22,6 +22,7 @@ import { valueMaxMin } from './value-max-min.js'
 import { valueFormat } from './value-format.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { ToNumber } from '../../utils/to-number.js'
 
 const outerStyle = require('../input-shared/outer.scss').toString()
 const style = require('./style.scss').toString()
@@ -86,6 +87,33 @@ const properties = Object.assign({}, Properties, {
             WhenAvailable(host, 'elements.inputContainer')
                 .then(function (inputContainer) {
                     inputContainer.setAttribute('resize', val)
+                })
+                .catch(function () { })
+        }
+    },
+    max: {
+        format: function (val) { return Pipe(ToNumber, IfInvalid(null))(val).value },
+        onChange: function (val, host) {
+            WhenAvailable(host, 'input')
+                .then(function (input) {
+                    if (host.type === 'number') {
+                        return SetAttribute(input, 'max', val)
+                    }
+
+                    return SetAttribute(input, 'maxlength', val)
+                })
+                .catch(function () { })
+        }
+    },
+    min: {
+        onChange: function (val, host) {
+            WhenAvailable(host, 'input')
+                .then(function (input) {
+                    if (host.type === 'number') {
+                        return SetAttribute(input, 'min', val)
+                    }
+
+                    return SetAttribute(input, 'minlength', val)
                 })
                 .catch(function () { })
         }
