@@ -13,13 +13,7 @@ export function onDone(host) {
             const form = Get(host, 'internals_.form', host.closest('form'))
 
             if (form) {
-                try {
-                    const domEvent = document.createEvent('Event')
-                    domEvent.initEvent('submit', false, true)
-                    DispatchEvent(form, domEvent)
-                } catch (error) {
-                    DispatchEvent(form, 'submit')
-                }
+                DispatchEvent(form, 'submit')
             }
         })
         .catch(function () { })

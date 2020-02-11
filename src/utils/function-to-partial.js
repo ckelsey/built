@@ -11,7 +11,7 @@ import { ArrayFrom } from './array-from.js'
  * @return {function()} - A curried proxy of the passed in function
  * 
  * @example
- * const curried = FunctionToPartial( (a, b, c) => { console.log(a, b, c) })
+ * const curried = FunctionToPartial( (a, b, c) => { log(a, b, c) })
  * curried('one') // proxy with argument 'a' populated with 'one'
  * curried('two') // proxy with argument 'b' populated with 'two'
  * curried('three') // 'one two three'

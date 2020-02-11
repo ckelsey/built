@@ -12,6 +12,7 @@ import { IfEmpty } from '../../utils/if-empty.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
 import { Components } from '../../services/components.js'
 import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { ForEach } from '../../utils/for-each.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = require('./outer.scss').toString()
@@ -62,10 +63,9 @@ function setIcon(host, key) {
     WhenAvailable(host, 'elements.' + key)
         .then(function (icon) {
             if (!icon) { return }
-
-            // icon[host[key][0] === '<' ? 'svg' : 'type'] = host[key]
-            icon.svg = host[key]
+            icon[host[key][0] === '<' ? 'svg' : 'type'] = host[key]
         })
+        .catch(function () { })
 }
 
 function showHideClose(el, show) {
@@ -183,12 +183,13 @@ const SnackBar = ComponentConstructor({
     methods: {
         clear: function (host) {
             return function () {
-                return Array.from(host.children).forEach(function (c) {
-                    return c.slot ? host.removeChild(c) : undefined
-                })
+                ForEach(function slottedRemove(slot) {
+                    host.slotted$.remove(slot)
+                    try { slot.parentElement.removeChild(slot) } catch (error) { }
+                }, host.slotted$.value, true)
             }
         }
-    },
+    }
 })
 
 Components.addComponent(componentName, SnackBar)

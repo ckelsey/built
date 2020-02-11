@@ -7,10 +7,12 @@ export function onBlur(host) {
 
     host.focused = false
 
-    WhenAvailable(host, 'input').then(function (input) {
-        host.value = GetInputValue(input)
-        input.blur()
-        dispatch(host, 'blur', host)
-    })
+    WhenAvailable(host, 'input')
+        .then(function (input) {
+            host.value = GetInputValue(input)
+            input.blur()
+            dispatch(host, 'blur', host)
+        })
+        .catch(function () { })
 
 }

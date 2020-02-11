@@ -67,12 +67,28 @@ function postProcessValue(host) {
 const properties = Object.assign({}, Properties, {
     pattern: {
         format: function (val) { return Pipe(ToString, IfInvalid(null))(val).value },
-        onChange: function (val, host) { WhenAvailable(host, 'input').then(function (input) { return SetAttribute(input, 'pattern', val) }) }
+        onChange: function (val, host) {
+            WhenAvailable(host, 'input')
+                .then(function (input) { return SetAttribute(input, 'pattern', val) })
+                .catch(function () { })
+        }
     },
     cachedPreProcessValueNeedsUpdate: { format: function (val) { return Pipe(ToBool, IfInvalid(true))(val).value } },
     cachedPreProcessValue: {
         format: function (val) { return val },
         onChange: function (_val, host) { host.cachedPreProcessValueNeedsUpdate = false }
+    },
+    resize: {
+        format: function (val) {
+            return Pipe(ToString, IfInvalid('none'))(val).value
+        },
+        onChange: function (val, host) {
+            WhenAvailable(host, 'elements.inputContainer')
+                .then(function (inputContainer) {
+                    inputContainer.setAttribute('resize', val)
+                })
+                .catch(function () { })
+        }
     }
 })
 

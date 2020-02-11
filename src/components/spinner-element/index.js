@@ -1,5 +1,5 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
+import { Components } from '../../services/components.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { Pipe } from '../../utils/pipe.js'
 import { OnNextFrame } from '../../services/on-next-frame.js'
@@ -135,7 +135,7 @@ const properties = {
     }
 }
 
-export const SpinnerElement = WCConstructor({
+const SpinnerElement = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -146,4 +146,6 @@ export const SpinnerElement = WCConstructor({
     elements: elements,
 })
 
-WCDefine(componentName, SpinnerElement)
+Components.addComponent(componentName, SpinnerElement)
+
+export { SpinnerElement }

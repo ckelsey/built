@@ -17,7 +17,9 @@ const attributes = {
             if (!value) { return }
             if (host.subscription) { host.subscription() }
             OnNextFrame(function () {
-                WhenAvailable(host, 'elements.svgContainer').then(function (el) { el.innerHTML = value })
+                WhenAvailable(host, 'elements.svgContainer')
+                    .then(function (el) { el.innerHTML = value })
+                    .catch(function () { })
                 DispatchEvent(host, 'iconloaded', host)
             })
         }
@@ -28,7 +30,9 @@ const attributes = {
         },
         onChange: function (value, host) {
             OnNextFrame(function () {
-                WhenAvailable(host, 'elements.svgContainer').then(function (el) { el.style.color = value })
+                WhenAvailable(host, 'elements.svgContainer')
+                    .then(function (el) { el.style.color = value })
+                    .catch(function () { })
             })
         }
     },
@@ -38,7 +42,9 @@ const attributes = {
         },
         onChange: function (value, host) {
             OnNextFrame(function () {
-                WhenAvailable(host, 'elements.svgContainer').then(function (el) { el.style.height = el.style.width = value })
+                WhenAvailable(host, 'elements.svgContainer')
+                    .then(function (el) { el.style.height = el.style.width = value })
+                    .catch(function () { })
             })
         }
     }

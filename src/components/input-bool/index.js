@@ -35,9 +35,11 @@ const inputProperties = Object.assign({}, properties, {
             return Pipe(ToBool, IfInvalid(true))(val).value
         },
         onChange: function (val, host) {
-            WhenAvailable(host, 'elements.container').then(function containerReady(container) {
-                container.setAttribute('showicon', val)
-            })
+            WhenAvailable(host, 'elements.container')
+                .then(function containerReady(container) {
+                    container.setAttribute('showicon', val)
+                })
+                .catch(function () { })
         }
     }
 })
@@ -66,8 +68,12 @@ const InputBool = ComponentConstructor({
         postProcessValue: function (host) {
             return function (results) {
                 return Promise.all([
-                    WhenAvailable(host, 'elements.container').then(function (container) { return container.classList[results.sanitized ? 'add' : 'remove']('checked') }),
-                    WhenAvailable(host, 'input').then(function (input) { return input.checked = results.sanitized })
+                    WhenAvailable(host, 'elements.container')
+                        .then(function (container) { return container.classList[results.sanitized ? 'add' : 'remove']('checked') })
+                        .catch(function () { }),
+                    WhenAvailable(host, 'input')
+                        .then(function (input) { return input.checked = results.sanitized })
+                        .catch(function () { })
                 ])
             }
         },

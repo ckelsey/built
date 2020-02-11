@@ -19,6 +19,7 @@ import { ObserveExists } from '../../utils/observe-exists.js'
 import { Observer } from '../../utils/observer.js'
 import { ArrayFrom } from '../../utils/array-from.js'
 import { Filter } from '../../utils/filter.js'
+import { ForEach } from '../../utils/for-each.js'
 
 const defaultWidth = 240
 const defaultGap = [16, 16]
@@ -28,11 +29,11 @@ const componentRoot = '.' + componentName + '-container'
 const outerStyle = require('./outer.scss').toString()
 
 function setAttribute(host, val, name, elKey) {
-    return WhenAvailable(host, 'elements.' + elKey).then(
-        function ElReady(el) {
+    return WhenAvailable(host, 'elements.' + elKey)
+        .then(function ElReady(el) {
             return el[val ? 'setAttribute' : 'removeAttribute'](name, val)
-        }
-    )
+        })
+        .catch(function () { })
 }
 
 function submitForm(host) {
@@ -214,13 +215,9 @@ const AjaxForm = ComponentConstructor({
             return function (item) {
                 if (!host.items$.has(item)) {
                     const newElement = document.adoptNode(wrapChild(host, item))
-
-                    return WhenAvailable(host, 'elements.grid')
-                        .then(function (grid) {
-                            grid.appendChild(newElement.container)
-                            newElement.container.appendChild(newElement)
-                            host.items$.insert(newElement)
-                        })
+                    host.elements.grid.appendChild(newElement.container)
+                    newElement.container.appendChild(newElement)
+                    host.items$.insert(newElement)
                 }
             }
         }
@@ -228,13 +225,7 @@ const AjaxForm = ComponentConstructor({
     onConnected: function (host) {
         host.items$ = Observer([], true)
         host.eventSubscriptions = host.eventSubscriptions ? host.eventSubscriptions : {}
-        host.eventSubscriptions['addedChildren' + ID()] = host.addedChildren$.subscribe(function addedChildrenUpdate(children) {
-            children
-                .reverse()
-                .forEach(function addedChildWrap(child) {
-                    host.addItem(child)
-                })
-        })
+        host.eventSubscriptions['children' + ID()] = host.children$.subscribe(function (children) { ForEach(host.addItem, children) })
     }
 })
 

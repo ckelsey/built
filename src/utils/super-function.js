@@ -54,11 +54,11 @@ import { Observer } from './observer.js'
  * 
  * curried3.curry('Krypto the Superdog', 'Arm Rip Off Boy') // 'Aquaman | Krypto the Superdog | Arm Rip Off Boy'
  * 
- * curried3.subscribe('args', console.log)
+ * curried3.subscribe('args', log)
  * curried3.pushArgument('Squirrel Girl') 
  * // subscription triggered -> ['Aquaman', 'Squirrel Girl']
  * 
- * curried3.subscribe('call', console.log)
+ * curried3.subscribe('call', log)
  * curried3('Razorback')
  * // subscription triggered -> {
  * //   arguments:[

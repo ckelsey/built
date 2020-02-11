@@ -14,7 +14,7 @@ export function processValue(host) {
                 const stringEmpty = (isNaN(sanitized) || typeof sanitized === 'string') && !sanitized.length
                 const empty = stringEmpty && !autofilled
                 const valid = !host.focused && empty ? true : processed.valid
-                const badFormat = Get(processed, 'validity.badFormat')
+                const badFormat = Get(host, 'validity.badFormat')
 
                 if (badFormat && processed.reason.length) {
                     host.setCustomValidity(processed.reason.join(', '))

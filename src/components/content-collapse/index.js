@@ -39,6 +39,7 @@ const properties = {
                     transition(val ? 1 : 0)
                     host.elements.icon.setAttribute('rotation', val ? 'down' : 'right')
                 })
+                .catch(function () { })
         }
     },
     arrow: {
@@ -46,7 +47,9 @@ const properties = {
             return Pipe(ToString, IfInvalid(iconChevron))(val).value
         },
         onChange: function (val, host) {
-            WhenAvailable(host, 'elements.icon').then(function (el) { el.svg = val })
+            WhenAvailable(host, 'elements.icon')
+                .then(function (el) { el.svg = val })
+                .catch(function () { })
         }
     },
     group: {
@@ -63,6 +66,7 @@ const properties = {
                 .then(function (transition) {
                     transition.speed = val
                 })
+                .catch(function () { })
         }
 
     }

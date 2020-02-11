@@ -50,6 +50,7 @@ export function setInput(host) {
         .then(function (container) {
             return SetAttribute(container, 'input-kind', host.type)
         })
+        .catch(function () { })
 
     const slotSelector = '[inputholder]'
     const tagName = tagType(host.type)

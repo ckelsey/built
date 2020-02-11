@@ -32,9 +32,11 @@ function addRemoveContainerClass(val, host, clss) {
 }
 
 function setInputAttribute(host, name, value) {
-    return WhenAvailable(host, 'input').then(function (input) {
-        return SetAttribute(input, name, value)
-    })
+    return WhenAvailable(host, 'input')
+        .then(function (input) {
+            return SetAttribute(input, name, value)
+        })
+        .catch(function () { })
 }
 
 function defaultType(host) {
@@ -88,9 +90,11 @@ export const properties = {
     helptext: {
         format: stringOrEmpty,
         onChange: function (val, host) {
-            WhenAvailable(host, 'elements.help').then(function (el) {
-                return el.innerHTML = ValidateHtml(val, [], ['script']).sanitized || ''
-            })
+            WhenAvailable(host, 'elements.help')
+                .then(function (el) {
+                    return el.innerHTML = ValidateHtml(val, [], ['script']).sanitized || ''
+                })
+                .catch(function () { })
         }
     },
 
@@ -108,9 +112,11 @@ export const properties = {
         onChange: function (val, host) {
             SetAttribute(host.elements.container, 'valid', val)
             addRemoveContainerClass(val, host, 'invalid')
-            WhenAvailable(host, 'elements.error').then(function (el) {
-                return el.innerHTML = ValidateHtml(host.validationMessage, [], ['script']).sanitized || ''
-            })
+            WhenAvailable(host, 'elements.error')
+                .then(function (el) {
+                    return el.innerHTML = ValidateHtml(host.validationMessage, [], ['script']).sanitized || ''
+                })
+                .catch(function () { })
             onInvalid(host)
         },
     },
@@ -120,12 +126,16 @@ export const properties = {
             return Pipe(IndexOf(labelPositions), IfInvalid(getDefaultLabelPosition(host)))(val).value
         },
         onChange: function (val, host) {
-            WhenAvailable(host, 'elements.container').then(function (container) {
-                return SetAttribute(container, 'label-position', val)
-            })
-            WhenAvailable(host, 'labelelement').then(function (label) {
-                return label.slot = ''.concat('label-', val, '')
-            })
+            WhenAvailable(host, 'elements.container')
+                .then(function (container) {
+                    return SetAttribute(container, 'label-position', val)
+                })
+                .catch(function () { })
+            WhenAvailable(host, 'labelelement')
+                .then(function (label) {
+                    return label.slot = ''.concat('label-', val, '')
+                })
+                .catch(function () { })
         },
     },
 

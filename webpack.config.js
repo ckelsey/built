@@ -12,7 +12,9 @@ const postPlugin = {
         'AfterEmitPlugin',
         () => new Promise(resolve => {
             exec('cp ./dist/bundle.js ./demo/node_modules/builtjs/dist/bundle.js', () => {
-                exec('osascript -e \'display notification "Complete" with title "WEBPACK"\'', resolve)
+                exec('cp ./dist/bundle.js ~/Sites/vision/CIS-Paramount/node_modules/builtjs/dist/bundle.js', () => {
+                    exec('osascript -e \'display notification "Complete" with title "WEBPACK"\'', resolve)
+                })
             })
         })
     )

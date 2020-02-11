@@ -23,8 +23,11 @@
     }
 
     &.shown {
-        pointer-events: all;
         opacity: 1;
+
+        .snack-bar-inner {
+            pointer-events: all;
+        }
     }
 
     .snack-bar-inner {

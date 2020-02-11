@@ -30,8 +30,6 @@ function animateOpacity(from, to, el, speed) {
     })
 }
 
-function removeElement(el) { try { el.parentNode.removeChild(el) } catch (error) { } }
-
 function dispatchTransition(host, from, to, isEnd) {
     return DispatchEvent(host, 'transition'.concat((isEnd ? 'ed' : 'ing')), { host: host, from: from, to: to })
 }
@@ -194,7 +192,11 @@ export function transition(host) {
                     .then(function () {
                         if (!host.keepchildren) {
                             while (host.getChildren().length > 1) {
-                                removeElement(host.getChildren()[0])
+                                const child = host.getChildren()[0]
+                                host.slotted$.remove(child)
+                                try {
+                                    child.parentNode.removeChild(child)
+                                } catch (error) { }
                             }
                         }
 

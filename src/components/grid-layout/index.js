@@ -14,8 +14,8 @@ import { CreateElement } from '../../utils/create-element.js'
 import { ObserveExists } from '../../utils/observe-exists.js'
 import { Filter } from '../../utils/filter.js'
 import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
-import { WhenAvailable } from '../../utils/when-available.js'
 import { ForEach } from '../../utils/for-each.js'
+import { ObserveVisibility } from '../../utils/observe-visibility.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = require('./external.scss').toString()
@@ -25,10 +25,21 @@ const componentRoot = ''.concat('.', componentName, '-container')
 const defaultWidth = 240
 const defaultGap = [16, 16]
 
+function cssSelectorId(host) {
+    return '#' + host.componentContent.id
+}
+
 function unsupportedCSS(host, gap, columnwidth) {
     return typeof host.style.grid === 'string'
         ? '' :
-        '.grid-layout-items{margin-left:-'.concat(gap, 'px;margin-right:-', gap, 'px;}.grid-layout-items .grid-layout-item{max-width:', columnwidth, 'px;margin:', gap, 'px;}')
+        cssSelectorId(host) + ' .grid-layout-items{' +
+        'margin-left:-' + gap, 'px;' +
+        'margin-right:-', gap, 'px;' +
+        '}' +
+        cssSelectorId(host) + ' .grid-layout-items .grid-layout-item{' +
+        'max-width:' + columnwidth + 'px;' +
+        'margin:' + gap + 'px;' +
+        '}'
 }
 
 function cancelTimer(host) {
@@ -59,7 +70,16 @@ function setScale(host) {
             gapMedian = (columnGapPercent - columnwidth) / 2
         }
 
-        const thisStyle = '.grid-layout-items{display:flex; width:'.concat(100 + (gapMedian * 2), '%;margin-left:-', gapMedian, '%;}.grid-layout-item{width:', columnGapPercent, '%;padding:', gapMedian / 2, '% ', gapMedian, '%;}')
+        const thisStyle = '' +
+            cssSelectorId(host) + ' .grid-layout-items{' +
+            'display:flex;' +
+            'width:' + (100 + (gapMedian * 2)) + '%;' +
+            'margin-left:-' + gapMedian + '%;' +
+            '}' +
+            cssSelectorId(host) + ' .grid-layout-item{' +
+            'width:' + columnGapPercent + '%;' +
+            'padding:' + (gapMedian / 2) + '% ' + gapMedian + '%;' +
+            '}'
 
         SetStyleRules(host.elements.innerStyles, thisStyle)
     })
@@ -71,7 +91,13 @@ function setDimensions(host) {
         const gapValues = Array.isArray(gap) ? [gap[0], gap[1]] : [gap, gap]
         const gapMedian = gapValues.reduce(function (t, c) { t = t + c; return t }, 0) / 2
         const columnwidth = host.columnwidth || defaultWidth
-        const thisStyle = '.grid-layout-items{grid-row-gap:'.concat(gapValues[0], 'px; grid-column-gap:', gapValues[1], 'px; grid-template-columns:repeat(auto-fit, minmax(', columnwidth, 'px, 0fr));}', unsupportedCSS(host, gapMedian, columnwidth))
+        const thisStyle = '' +
+            cssSelectorId(host) + ' .grid-layout-items{' +
+            'grid-row-gap:' + gapValues[0] + 'px;' +
+            'grid-column-gap:' + gapValues[1] + 'px;' +
+            'grid-template-columns:repeat(auto-fit, minmax(' + columnwidth + 'px, 0fr));' +
+            '}' +
+            unsupportedCSS(host, gapMedian, columnwidth)
 
         SetStyleRules(host.elements.innerStyles, thisStyle)
     })
@@ -137,13 +163,23 @@ function wrapChild(host, el) {
 
     el.slot = id
     el.container = wrapper
-    host.removeChild(el)
+    el.eventSubscriptions = el.eventSubscriptions ? el.eventSubscriptions : {}
+
+    try {
+        host.removeChild(el)
+    } catch (error) { }
 
     setTimeout(function () {
-        ObserveExists(el, true)
+        el.eventSubscriptions.gridLayoutExists = ObserveExists(el, true)
             .subscribe(function elExistsCallback(exists) {
                 if (!exists) { removeChild(host, el) }
             })
+        el.eventSubscriptions.visible = ObserveVisibility(el).subscribe(function visibilityCallback(hidden) {
+            const currentlyHidden = el.container.classList.contains('hidden')
+            if (hidden !== currentlyHidden) {
+                el.container.classList[hidden ? 'add' : 'remove']('hidden')
+            }
+        })
     }, 0)
 
     return el
@@ -175,20 +211,13 @@ const GridLayout = ComponentConstructor({
                 }, host.items$.value, true)
             }
         },
-        wrap: function wrap() {
-            return function wrapInner() { }
-        },
         addItem: function addItem(host) {
             return function addItemInner(item) {
                 if (!host.items$.has(item)) {
                     const newElement = document.adoptNode(wrapChild(host, item))
-
-                    return WhenAvailable(host, 'elements.itemsContainer')
-                        .then(function (itemsContainer) {
-                            itemsContainer.appendChild(newElement.container)
-                            newElement.container.appendChild(newElement)
-                            host.items$.insert(newElement)
-                        })
+                    host.elements.itemsContainer.appendChild(newElement.container)
+                    newElement.container.appendChild(newElement)
+                    host.items$.insert(newElement)
                 }
             }
         }
@@ -197,15 +226,19 @@ const GridLayout = ComponentConstructor({
         host.items$ = Observer([], true)
         host.eventSubscriptions = host.eventSubscriptions ? host.eventSubscriptions : {}
         host.eventSubscriptions['children' + ID()] = host.children$
-            .subscribe(function addedChildrenUpdate(children) {
-                children
-                    .forEach(function addedChildWrap(child) {
-                        host.addItem(child)
-                    })
+            .subscribe(function childrenUpdate(children) {
+                ForEach(function addedChildWrap(child) {
+                    host.addItem(child)
+                }, children)
             })
 
-
         window.addEventListener('resize', function () { return host.scaletofit ? runScale(host) : undefined })
+
+        if (host.scaletofit) {
+            runScale(host)
+        } else {
+            runDimensions(host)
+        }
 
         OnNextFrame(function () { return host.setAttribute('viewable', true) })
     }

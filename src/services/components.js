@@ -22,17 +22,13 @@ export const Components = {
         components[tag] = {
             tag: tag,
             create: function create(node) {
-                componentFunction(node)
-                node.onConnected(node)
+                if (componentFunction(node)) {
+                    node.onConnected(node)
+                }
             }
         }
 
-        const tagElements = document.body.querySelectorAll(tag)
-        let tagElementsIndex = tagElements.length
-
-        while (tagElementsIndex--) {
-            components[tag].create(tagElements[tagElementsIndex])
-        }
+        ForEach(components[tag].create, document.body.querySelectorAll(tag))
     },
 
     init: function () {
@@ -44,6 +40,10 @@ export const Components = {
                     components[tag].create(node)
                 })
             }
+
+            ForEach(function handleAddedNodeChildren(child) {
+                handleAddedNode(child)
+            }, node.children)
 
             if (node.exists$) {
                 node.exists$.next(true)
@@ -62,7 +62,11 @@ export const Components = {
             }
         }
 
-        const componentsObserverConfig = { childList: true, subtree: true }
+        const componentsObserverConfig = {
+            childList: true,
+            subtree: true
+        }
+
         const componentsObserver = new MutationObserver(function componentsObserverCallback(mutations) {
 
             ForEach(function mutationsEach(mutation) {

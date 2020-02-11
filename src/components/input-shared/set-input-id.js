@@ -13,12 +13,14 @@ export function setInputID(host) {
             WhenAvailable(host, 'labelelement')
                 .then(function (label) {
                     return SetAttribute(label, ['id', 'for'], [inputID, id])
-                }),
+                })
+                .catch(function () { }),
 
             WhenAvailable(host, 'input')
                 .then(function (input) {
                     return SetAttribute(input, ['id', 'aria-labelledby'], [id, inputID])
                 })
+                .catch(function () { })
         ])
     })
 }

@@ -6,8 +6,6 @@ export function Memoize(fn) {
         const obj = { fn: fn, args: Array.from(arguments).value }
         const cached = cache.get(obj)
 
-        console.log(cached, obj)
-
         if (cached) {
             return cached
         }

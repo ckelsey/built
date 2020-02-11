@@ -30,7 +30,18 @@
     </head>
 
     <body>
-        <div id="app"></div>
+        <grid-layout columnwidth="400px" scaletofit="true">
+            <input-bool type="checkbox" label="Checkbox"></input-bool>
+
+            <input-field label="First name <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" name="InquirerFirstName" id="InquirerFirstName" required="true" labelposition="top" input-element></input-field>
+
+            <input-field label="Last name <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" name="InquirerLastName" id="InquirerLastName" required="true" labelposition="top" input-element></input-field>
+
+            <input-field label="Email address <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" autocomplete="email" type="email" name="Email" id="Email" required="true" labelposition="top" input-element></input-field>
+
+            <input-field label="Phone number" class="support-dvd-input static-input" autocomplete="phone" type="intlphone" name="Telephone" id="Telephone" labelposition="top" input-element></input-field>
+        </grid-layout>
+
         <button-element>Hi</button-element>
         <input-field label="ho" type="tel"></input-field>
         <input-bool type="checkbox" label="Checkbox"></input-bool>
@@ -60,6 +71,8 @@
         <snack-bar shown="true" type="info">
             <div slot="body">A snackie poo</div>
         </snack-bar>
+
+        <spinner-element></spinner-element>
 
         <script type="text/javascript" src="/dist/app.js"></script>
 

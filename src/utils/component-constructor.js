@@ -68,7 +68,7 @@ function getMatchingSlot(host, name) {
 
 function assignSlot(host, child) {
     if (!host || !host.slots || !host.slots.length || !child) {
-        return child
+        return false
     }
 
     const slotName = getSlotName(child, 'slot')
@@ -91,37 +91,18 @@ function assignSlot(host, child) {
         }
     }, host.slots)
 
-    return assigned ? false : child
+    return assigned
 }
 
 function childMutation(mutation) {
     if (!mutation.target || !mutation.target.parentNode) { return }
 
-    const added = Filter(function tryAssignSlot(child) {
-        if (isUselessText(child)) {
-            child.parentNode.removeChild(child)
-            return false
-        }
-
-        if (assignSlot(mutation.target, child)) {
-            return true
-        }
-
-        return false
-    }, mutation.addedNodes, true)
-
-    const removed = ArrayFrom(mutation.removedNodes)
-
-    if (mutation.target.removedChildren$ && removed.length) {
-        requestAnimationFrame(() => mutation.target.removedChildren$.next(removed))
-    }
-
-    if (mutation.target.addedChildren$ && added.length) {
-        requestAnimationFrame(() => mutation.target.addedChildren$.next(added))
-    }
+    ForEach(function tryAssignSlot(child) { assignSlot(mutation.target, child) }, mutation.addedNodes, true)
 
     if (mutation.target.children$) {
-        requestAnimationFrame(() => mutation.target.children$.next(getChildrenArray(mutation.target)))
+        mutation.target.children$.next(Filter(function filterChildren(child) {
+            return !child.contentFor
+        }, mutation.target.childNodes))
     }
 }
 
@@ -154,6 +135,7 @@ function setProperty(host, key, formatter, getter, setter) {
 
                 if (!Equals(host.state[key].value, formattedValue)) {
                     host.state[key].next(formattedValue)
+                    host.trigger(key, formattedValue)
                 }
             }
         })
@@ -189,7 +171,10 @@ function handleInnerStyleChange(host, key, styleString) {
     const parsedRules = Transduce(getString)(ParseCss(styleString), '', combineRules)
 
     if (styleElement && styleString === '') {
-        styleElement.parentNode.removeChild(styleElement)
+        if (styleElement.parentNode) {
+            styleElement.parentNode.removeChild(styleElement)
+        }
+
         return host.elements[key] = undefined
     }
 
@@ -274,12 +259,6 @@ function createElements(host, elements) {
             return
         }
     }
-}
-
-function getChildrenArray(host) {
-    return Filter(function (element) {
-        return element && !element.contentFor
-    }, host.childNodes)
 }
 
 export function ComponentConstructor(options) {
@@ -396,7 +375,6 @@ export function ComponentConstructor(options) {
     const _nodeObserverConfig = nodeObserverConfig(observedAttributes)
 
     function CreateComponent(host) {
-        console.log(host, host.constructed)
         if (host.constructed) {
             return
         }
@@ -441,11 +419,9 @@ export function ComponentConstructor(options) {
             host.appendChild(host.componentContent)
         }
 
-        childMutation({ target: host, addedNodes: existingChildren })
-
         host.children$ = Observer(existingChildren)
-        host.addedChildren$ = Observer(existingChildren)
-        host.removedChildren$ = Observer([])
+
+        childMutation({ target: host, addedNodes: existingChildren })
 
         const nodeObserver = new MutationObserver(function MutationObserverCallback(mutations) {
             ForEach(function nodeObserverCallbackInner(mutation) {
@@ -455,6 +431,24 @@ export function ComponentConstructor(options) {
         })
         nodeObserver.observe(host, _nodeObserverConfig)
         host.nodeObserver = nodeObserver
+
+        host.callbacks = {}
+
+        host.on = function (name, callback) {
+            if (!host.callbacks[name]) {
+                host.callbacks[name] = []
+            }
+
+            host.callbacks[name].push(callback)
+        }
+
+        host.trigger = function (name, data) {
+            if (!host.callbacks[name]) { return }
+
+            ForEach(function (callback) {
+                return callback(data)
+            }, host.callbacks[name])
+        }
 
         if (formElement) {
             try { host.internals_ = host.attachInternals() } catch (error) { }
@@ -469,24 +463,3 @@ export function ComponentConstructor(options) {
 
     return CreateComponent
 }
-
-
-
-
-
-
-// function getComponentContentElement(host) {
-//     return FindFirst(function (el) {
-//         return !!el && typeof el.getAttribute === 'function' && el.getAttribute(componentContents)
-//     }, host.childNodes)
-// }
-
-// const node = document.createElement('template')
-// node.innerHTML = '<div ' + componentContents + '="' + componentName + '">' + template + styleElementsString + '</div>'
-
-
-// host.appendChild(node.cloneNode(true))
-// host.attachShadow({ mode: 'open' })
-// host.shadowRoot.appendChild(document.importNode(node.content, true))
-// host.componentContent = getComponentContentElement(host)
-// host.slots = Mapper(function (el) { return el }, host.componentContent.querySelectorAll('slot'))

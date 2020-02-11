@@ -9,25 +9,6 @@ input-select {
     position: relative;
     color: inherit;
 
-    &[resize="auto"],
-    &[resize="none"] {
-        .input-field-input {
-            resize: none;
-        }
-    }
-
-    &[resize="horizontal"] {
-        .input-field-input {
-            resize: horizontal;
-        }
-    }
-
-    &[resize="vertical"] {
-        .input-field-input {
-            resize: vertical;
-        }
-    }
-
     .input-field-input {
         background: rgba(255, 255, 255, .4);
         position: relative;

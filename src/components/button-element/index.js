@@ -14,21 +14,21 @@ const properties = {
     name: {
         format: function (val, host) { return Pipe(ToString, IfInvalid(host.textContent.trim()))(val).value },
         onChange: function (val, host) {
-            return WhenAvailable(host, 'elements.button').then(
-                function btnReady(btn) {
+            return WhenAvailable(host, 'elements.button')
+                .then(function btnReady(btn) {
                     btn.setAttribute('name', val)
-                }
-            )
+                })
+                .catch(function () { })
         }
     },
     disabled: {
         format: function (val) { return Pipe(ToBool, IfInvalid(false))(val).value },
         onChange: function (val, host) {
-            return WhenAvailable(host, 'elements.root').then(
-                function rootReady(root) {
+            return WhenAvailable(host, 'elements.root')
+                .then(function rootReady(root) {
                     root.classList[val ? 'add' : 'remove']('disabled')
-                }
-            )
+                })
+                .catch(function () { })
         }
     },
     type: {
@@ -47,6 +47,7 @@ const properties = {
                         try { btn.removeChild(btn.querySelector('input[type="submit"]')) } catch (error) { }
                     }
                 })
+                .catch(function () { })
         }
     }
 }
