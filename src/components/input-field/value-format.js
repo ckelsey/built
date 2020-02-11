@@ -1,6 +1,5 @@
 import { ToRegex } from '../../utils/to-regex.js'
 import { MatchAll } from '../../utils/match-all.js'
-import { Transduce } from '../../utils/transduce.js'
 import { Mapper } from '../../utils/mapper.js'
 
 export function valueFormat(pattern, value) {

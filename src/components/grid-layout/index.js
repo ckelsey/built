@@ -52,12 +52,14 @@ function setScale(host) {
 
         const gap = host.gap || defaultGap
         let gapMedian = gap.reduce(function (t, c) { t = t + c; return t }, 0) / 2
-        let columnwidth = host.columnwidth || defaultWidth
+        let columnwidth = Math.max(host.columnwidth || defaultWidth, host.minwidth)
         const contentWidth = host.elements.root.offsetWidth + gapMedian
+
+
         let columnGapPercent = 100 / Math.round(contentWidth / (gapMedian + columnwidth))
         const ratio = 1 - (gapMedian / columnwidth)
 
-        if (columnwidth === '100%') {
+        if (columnwidth === '100%' || columnwidth >= contentWidth) {
             columnwidth = 100
             gapMedian = 0
         } else {
@@ -121,6 +123,10 @@ function runScale(host) {
 const properties = {
     columnwidth: {
         format: function (val) { return val === '100%' ? val : Pipe(ToNumber, IfInvalid(defaultWidth))(val).value },
+        onChange: function (_val, host) { host.scaletofit ? runScale(host) : runDimensions(host) }
+    },
+    minwidth: {
+        format: function (val) { return Pipe(ToNumber, IfInvalid(0))(val).value },
         onChange: function (_val, host) { host.scaletofit ? runScale(host) : runDimensions(host) }
     },
     gap: {

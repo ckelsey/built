@@ -1,4 +1,6 @@
-- ie content-collapse
+- ie
+    - format change does nothing
+    - footer is up higher than it should
 
 - phone input show error on invalid chars
 
