@@ -1,4 +1,5 @@
 import { ObserveWorker } from '../utils/observe-worker.js'
+import { ObjectAssign } from '../utils/object-assign.js'
 
 export function Request(apiBase) {
     return function (reqData) {
@@ -7,7 +8,7 @@ export function Request(apiBase) {
         const base = apiBase
         const path = ''.concat(base, ''.concat('/', reqData.path || '').split('//').join('/'))
 
-        const REQ = Object.assign(
+        const REQ = ObjectAssign(
             {},
             {
                 data: undefined,

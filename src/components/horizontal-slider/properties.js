@@ -6,6 +6,7 @@ import { Get } from '../../utils/get.js'
 import { unsetItemEvents, setItemEvents, setChicklets, setPrevious, setNext } from './elements.js'
 import { autoplay, setLoop } from './methods.js'
 import { ToArray } from '../../utils/to-array.js'
+import { ObjectAssign } from '../../utils/object-assign.js'
 
 export const attributes = {
     chicklets: {
@@ -66,7 +67,7 @@ export const attributes = {
     }
 }
 
-export const properties = Object.assign({}, attributes, {
+export const properties = ObjectAssign({}, attributes, {
     items: {
         format: function (val, host) {
             return Pipe(ToArray, IfInvalid(Get(host, 'state.items.value', [])))(val).value

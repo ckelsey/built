@@ -1,11 +1,14 @@
 import { Get } from '../utils/get.js'
 import { OnNextFrame } from './on-next-frame.js'
 import { ForEach } from '../utils/for-each.js'
+import { ComponentSupport } from '../utils/component-support.js'
 
+const nativeSupport = ComponentSupport()
 const components = {}
 let initialized = false
 
 export const Components = {
+    nativeSupport: nativeSupport,
     get: function (name) {
         if (name) {
             return components[name]
@@ -22,13 +25,15 @@ export const Components = {
         components[tag] = {
             tag: tag,
             create: function create(node) {
-                if (componentFunction(node)) {
-                    node.onConnected(node)
-                }
+                setTimeout(function () {
+                    return componentFunction(node) ? node.onConnected(node) : undefined
+                }, 0)
             }
         }
 
-        ForEach(components[tag].create, document.body.querySelectorAll(tag))
+        function asyncCreate(node) { setTimeout(function () { components[tag].create(node) }, 0) }
+        function createEach() { ForEach(asyncCreate, document.body.querySelectorAll(tag)) }
+        setTimeout(createEach, 0)
     },
 
     init: function () {

@@ -3,6 +3,7 @@ import { WhenAvailable } from '../../utils/when-available.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
 import { Components } from '../../services/components.js'
 import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { ObjectAssign } from '../../utils/object-assign.js'
 
 const style = require('./style.scss').toString()
 const outerStyle = 'icon-element { display: inline-flex; align-items: center; justify-content: flex-start; }'
@@ -50,7 +51,7 @@ const attributes = {
     }
 }
 
-const properties = Object.assign({}, {
+const properties = ObjectAssign({}, {
     subscription: {
         format: function (val) {
             return val

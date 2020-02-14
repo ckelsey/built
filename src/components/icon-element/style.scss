@@ -1,3 +1,11 @@
+icon-element {
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
+    }
+}
+
 .icon-element-container {
     display: inline-flex;
     align-items: center;

@@ -2,60 +2,114 @@ import { Pipe } from '../../utils/pipe.js'
 import { OnNextFrame } from '../../services/on-next-frame.js'
 import { ToNumber } from '../../utils/to-number.js'
 import { ToBool } from '../../utils/to-bool.js'
-import { CommasToArray } from '../../utils/commas-to-array.js'
-import { ToMap } from '../../utils/to-map.js'
-import { ID } from '../../services/id.js'
+import { Mapper } from '../../utils/mapper.js'
+import { Transduce } from '../../utils/transduce.js'
 import { SetStyleRules } from '../../utils/set-style-rules.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
-import { Components } from '../../services/components.js'
-import { ComponentConstructor } from '../../utils/component-constructor.js'
-import { Observer } from '../../utils/observer.js'
-import { CreateElement } from '../../utils/create-element.js'
-import { ObserveExists } from '../../utils/observe-exists.js'
-import { Filter } from '../../utils/filter.js'
-import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
 import { ForEach } from '../../utils/for-each.js'
-import { ObserveVisibility } from '../../utils/observe-visibility.js'
+import { LoadOnReady } from '../../component-build/load-on-ready.js'
+import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
+import { WhenAvailable } from '../../utils/when-available.js'
+import { nativeSupport } from '../../component-build/native-support.js'
+import { Filter } from '../../utils/filter.js'
+import { AppendStyleElement } from '../../utils/append-style-element.js'
 
-const style = require('./style.scss').toString()
-const outerStyle = require('./external.scss').toString()
+const style = '[name="grid-layout-item"] { display: flex; justify-items: center; grid-auto-flow: dense; width: 100%; flex-wrap: wrap; }'
+const outerStyle = 'grid-layout { display: block; opacity: 0; transition: opacity 0.15s linear 0.15s; } grid-layout[viewable="true"] { opacity: 1; } [slot="grid-layout-item"]{box-sizing:border-box;}'
 const template = require('./index.html')
 const componentName = 'grid-layout'
-const componentRoot = ''.concat('.', componentName, '-container')
 const defaultWidth = 240
 const defaultGap = [16, 16]
 
-function cssSelectorId(host) {
-    return '#' + host.componentContent.id
+function cancelTimer(host) { return host.timer ? host.timer.cancel() : undefined }
+
+function getGap(host) {
+    let gap = defaultGap
+
+    function fromArray(val, isArray) {
+        if (!isArray && !Array.isArray(val)) { val = [val, val] }
+
+        gap = Mapper(function (val) { return parseFloat(val) }, val)
+
+        if (gap.length === 1) { gap.push(gap[0]) }
+    }
+
+    if (typeof host.gap === 'string') {
+        try {
+            fromArray(JSON.parse(host.gap))
+        } catch (error) {
+            gap = Transduce(
+                function (val) { return parseFloat(val.trim()) },
+                function (val) { return val && !isNaN(val) ? val : undefined }
+            )(host.gap.split(','))
+        }
+
+    } else if (Array.isArray(host.gap) && host.gap.length) {
+        fromArray(host.gap, true)
+    } else if (!isNaN(host.gap)) {
+        gap = [host.gap, host.gap]
+    }
+
+    return gap
 }
 
-function unsupportedCSS(host, gap, columnwidth) {
-    return typeof host.style.grid === 'string'
-        ? '' :
-        cssSelectorId(host) + ' .grid-layout-items{' +
-        'margin-left:-' + gap, 'px;' +
-        'margin-right:-', gap, 'px;' +
-        '}' +
-        cssSelectorId(host) + ' .grid-layout-items .grid-layout-item{' +
-        'max-width:' + columnwidth + 'px;' +
-        'margin:' + gap + 'px;' +
-        '}'
+function setStyles(host, styleStrings) {
+    // NON IE11
+    if (nativeSupport) {
+        WhenAvailable(host, 'elements.theme').then(function (el) { SetStyleRules(el, styleStrings.both) })
+        SetStyleRules(host.querySelector('style[name="grid-layout-outerStyle"]'), styleStrings.updatedOuterStyle)
+        return
+    }
+
+    // IE11
+    let styleEl = Filter(function (child) {
+        return child.nodeName.toLowerCase() === 'style' && child.getAttribute('class') === host.componentId + '-style'
+    }, host.children)[0]
+
+    if (!styleEl) {
+        AppendStyleElement(styleStrings.both, host, 'grid-layout-style-' + host.componentId, host.componentId + '-style')
+    } else {
+        SetStyleRules(styleEl, styleStrings.both)
+    }
 }
 
-function cancelTimer(host) {
-    return host.timer ? host.timer.cancel() : undefined
+function getStyleStrings(host, gapMedian, columnGapPercent) {
+    const updatedInnerStyle = style +
+        ' [grid-id="' + host.componentId + '"] [name="grid-layout-item"]{' +
+        'display:flex;' +
+        'width:' + (100 + (gapMedian * 2)) + '%;' +
+        'margin-left:-' + gapMedian + '%;' +
+        '} ' + (host.theme || '')
+
+    const slotStyles = 'min-width:' + columnGapPercent + '%;' +
+        'padding:' + (gapMedian / 2) + '% ' + gapMedian + '%;' +
+        'box-sizing:border-box;'
+
+    const updatedOuterStyle = outerStyle +
+        ' [grid-id="' + host.componentId + '"] [slot="grid-layout-item"],' +
+        (nativeSupport ?
+            ' [grid-id="' + host.componentId + '"] slot[slot="grid-layout-item"]::slotted(*)' :
+            ' [grid-id="' + host.componentId + '"] [slotname="grid-layout-item"] > [slot="grid-layout-item"], [grid-id="' + host.componentId + '"] [slotname="grid-layout-item"] > [slot="grid-layout-item"] > [slot]'
+        ) +
+        '{' + slotStyles + '} ' +
+        ' [grid-id="' + host.componentId + '"] slot[slot="grid-layout-item"],' +
+        ' [grid-id="' + host.componentId + '"] [slotname="grid-layout-item"] > [slot="grid-layout-item"][slotname]{' +
+        'width:100%;' +
+        'padding:0;' +
+        '} ' + (host.outertheme || '')
+
+    return {
+        updatedOuterStyle: updatedOuterStyle,
+        both: updatedInnerStyle + updatedOuterStyle
+    }
 }
 
 function setScale(host) {
     return OnNextFrame(function () {
-        if (!host.scaletofit) { return }
-
-        const gap = host.gap || defaultGap
-        let gapMedian = gap.reduce(function (t, c) { t = t + c; return t }, 0) / 2
+        const gap = getGap(host)
+        let gapMedian = (gap[0] + gap[1]) / 2
         let columnwidth = Math.max(host.columnwidth || defaultWidth, host.minwidth)
         const contentWidth = host.elements.root.offsetWidth + gapMedian
-
-
         let columnGapPercent = 100 / Math.round(contentWidth / (gapMedian + columnwidth))
         const ratio = 1 - (gapMedian / columnwidth)
 
@@ -63,56 +117,21 @@ function setScale(host) {
             columnwidth = 100
             gapMedian = 0
         } else {
-            if (columnGapPercent > 50) {
-                columnGapPercent = 50
-            }
-
+            if (columnGapPercent > 50) { columnGapPercent = 50 }
             columnwidth = columnGapPercent * ratio
-
             gapMedian = (columnGapPercent - columnwidth) / 2
         }
 
-        const thisStyle = '' +
-            cssSelectorId(host) + ' .grid-layout-items{' +
-            'display:flex;' +
-            'width:' + (100 + (gapMedian * 2)) + '%;' +
-            'margin-left:-' + gapMedian + '%;' +
-            '}' +
-            cssSelectorId(host) + ' .grid-layout-item{' +
-            'width:' + columnGapPercent + '%;' +
-            'padding:' + (gapMedian / 2) + '% ' + gapMedian + '%;' +
-            '}'
-
-        SetStyleRules(host.elements.innerStyles, thisStyle)
+        setStyles(host, getStyleStrings(host, gapMedian, columnGapPercent))
     })
 }
 
-function setDimensions(host) {
-    return OnNextFrame(function () {
-        const gap = host.gap || defaultGap
-        const gapValues = Array.isArray(gap) ? [gap[0], gap[1]] : [gap, gap]
-        const gapMedian = gapValues.reduce(function (t, c) { t = t + c; return t }, 0) / 2
-        const columnwidth = host.columnwidth || defaultWidth
-        const thisStyle = '' +
-            cssSelectorId(host) + ' .grid-layout-items{' +
-            'grid-row-gap:' + gapValues[0] + 'px;' +
-            'grid-column-gap:' + gapValues[1] + 'px;' +
-            'grid-template-columns:repeat(auto-fit, minmax(' + columnwidth + 'px, 0fr));' +
-            '}' +
-            unsupportedCSS(host, gapMedian, columnwidth)
-
-        SetStyleRules(host.elements.innerStyles, thisStyle)
-    })
-}
 const elements = {
-    root: { selector: componentRoot },
-    itemsContainer: { selector: '.'.concat(componentName, '-items') },
-    innerStyles: { selector: 'style.grid-innerStyles' }
-}
-
-function runDimensions(host) {
-    cancelTimer(host)
-    host.timer = setDimensions(host)
+    root: {
+        selector: '.' + componentName + '-container',
+        onChange: function (el, host) { el.setAttribute('grid-id', host.componentId) }
+    },
+    itemsContainer: { selector: '[name="'.concat(componentName, '-items"]') },
 }
 
 function runScale(host) {
@@ -123,83 +142,74 @@ function runScale(host) {
 const properties = {
     columnwidth: {
         format: function (val) { return val === '100%' ? val : Pipe(ToNumber, IfInvalid(defaultWidth))(val).value },
-        onChange: function (_val, host) { host.scaletofit ? runScale(host) : runDimensions(host) }
+        onChange: function (_val, host) { runScale(host) }
     },
     minwidth: {
         format: function (val) { return Pipe(ToNumber, IfInvalid(0))(val).value },
-        onChange: function (_val, host) { host.scaletofit ? runScale(host) : runDimensions(host) }
+        onChange: function (_val, host) { runScale(host) }
     },
     gap: {
-        format: function (val) {
-            return Pipe(CommasToArray, IfInvalid([val, val]), ToMap(function (v) {
-                const tv = ToNumber(v).value
-                if (isNaN(tv)) { return defaultGap[0] }
-                return tv
-            }))(val).value
-        },
-        onChange: function (_val, host) { host.scaletofit ? runScale(host) : runDimensions(host) }
+        format: function (val) { return val },
+        onChange: function (_val, host) { runScale(host) }
     },
-    scaletofit: { format: function (val) { return Pipe(ToBool, IfInvalid(false))(val).value } },
-    watchhidden: {
-        format: function (val) {
-            return Pipe(ToBool, IfInvalid(true))(val).value
-        }
-    },
+    watchhidden: { format: function (val) { return Pipe(ToBool, IfInvalid(true))(val).value } },
 }
 
-function removeChild(host, el) {
-    if (el.container) {
-        const slot = el.slot
-        const item = Filter(function (element) {
-            return element.slot === slot
-        }, host.items$.value)[0]
+// function removeChild(host, el) {
+//     if (el.container) {
+//         const slot = el.slot
+//         const item = Filter(function (element) {
+//             return element.slot === slot
+//         }, host.items$.value)[0]
 
-        host.items$.remove(item)
-        ObserverUnsubscribe(el)
+//         host.items$.remove(item)
+//         ObserverUnsubscribe(el)
 
-        if (el.container.parentElement) {
-            el.container.parentElement.removeChild(el.container)
-        }
-    }
-}
+//         if (el.container.parentElement) {
+//             el.container.parentElement.removeChild(el.container)
+//         }
+//     }
+// }
 
-function wrapChild(host, el) {
-    const id = ID()
-    const wrapper = CreateElement({ tagName: 'div', class: componentName + '-slot-wrapper grid-layout-item', id: id })
+// function wrapChild(host, el) {
+//     const id = ID()
+//     const wrapper = CreateElement({ tagName: 'div', class: componentName + '-slot-wrapper grid-layout-item', id: id })
 
-    el.slot = id
-    el.container = wrapper
-    el.eventSubscriptions = el.eventSubscriptions ? el.eventSubscriptions : {}
+//     el.slot = id
+//     el.container = wrapper
+//     el.eventSubscriptions = el.eventSubscriptions ? el.eventSubscriptions : {}
 
-    try {
-        host.removeChild(el)
-    } catch (error) { }
+//     if (el.fillrow === true || el.getAttribute('fillrow') === 'true') {
+//         wrapper.style.width = '100%'
+//     }
 
-    setTimeout(function () {
-        el.eventSubscriptions.gridLayoutExists = ObserveExists(el, true)
-            .subscribe(function elExistsCallback(exists) {
-                if (!exists) { removeChild(host, el) }
-            })
-        el.eventSubscriptions.visible = ObserveVisibility(el).subscribe(function visibilityCallback(hidden) {
-            const currentlyHidden = el.container.classList.contains('hidden')
-            if (hidden !== currentlyHidden) {
-                el.container.classList[hidden ? 'add' : 'remove']('hidden')
-            }
-        })
-    }, 0)
+//     try { host.removeChild(el) } catch (error) { }
 
-    return el
-}
+//     setTimeout(function () {
+//         el.eventSubscriptions.gridLayoutExists = ObserveExists(el, true)
+//             .subscribe(function elExistsCallback(exists) {
+//                 if (!exists) { removeChild(host, el) }
+//             })
+//         el.eventSubscriptions.visible = ObserveVisibility(el).subscribe(function visibilityCallback(hidden) {
+//             const currentlyHidden = el.container.classList.contains('hidden')
+//             if (hidden !== currentlyHidden) {
+//                 el.container.classList[hidden ? 'add' : 'remove']('hidden')
+//             }
+//         })
+//     }, 0)
 
-const GridLayout = ComponentConstructor({
+//     return el
+// }
+
+const GridLayout = {
     componentName: componentName,
-    componentRoot: componentRoot,
     template: template,
-    style: style,
+    shadowStyle: style,
     outerStyle: outerStyle,
     observedAttributes: Object.keys(properties),
     properties: properties,
     elements: elements,
+    observeChildren: true,
     computed: {
         items: function (host) {
             return {
@@ -212,44 +222,34 @@ const GridLayout = ComponentConstructor({
     methods: {
         clear: function clear(host) {
             return function clearInner() {
-                ForEach(function (child) {
-                    removeChild(host, child)
-                }, host.items$.value, true)
-            }
-        },
-        addItem: function addItem(host) {
-            return function addItemInner(item) {
-                if (!host.items$.has(item)) {
-                    const newElement = document.adoptNode(wrapChild(host, item))
-                    host.elements.itemsContainer.appendChild(newElement.container)
-                    newElement.container.appendChild(newElement)
-                    host.items$.insert(newElement)
-                }
+                console.log(host.children$)
+                // ForEach(function (child) {
+                //     removeChild(host, child)
+                // }, host.items$.value, true)
             }
         }
     },
     onConnected: function (host) {
-        host.items$ = Observer([], true)
-        host.eventSubscriptions = host.eventSubscriptions ? host.eventSubscriptions : {}
-        host.eventSubscriptions['children' + ID()] = host.children$
-            .subscribe(function childrenUpdate(children) {
-                ForEach(function addedChildWrap(child) {
-                    host.addItem(child)
-                }, children)
-            })
+        host.setAttribute('grid-id', host.componentId)
 
-        window.addEventListener('resize', function () { return host.scaletofit ? runScale(host) : undefined })
+        window.addEventListener('resize', function () { return runScale(host) })
 
-        if (host.scaletofit) {
-            runScale(host)
-        } else {
-            runDimensions(host)
-        }
+        runScale(host)
+
+        host.eventSubscriptions.addedChildren = host.children$.on('addedNodes', function (addedNodes) {
+            if (!addedNodes.length) { return }
+            ForEach(host.addItem, addedNodes)
+        })
+
+        host.eventSubscriptions.removedNodes = host.children$.on('removedNodes', function (removedNodes) {
+            if (!removedNodes.length) { return }
+            ForEach(ObserverUnsubscribe, removedNodes)
+        })
 
         OnNextFrame(function () { return host.setAttribute('viewable', true) })
     }
-})
+}
 
-Components.addComponent(componentName, GridLayout)
+LoadOnReady(GridLayout)
 
 export { GridLayout }

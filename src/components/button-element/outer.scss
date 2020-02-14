@@ -1,6 +1,9 @@
 button-element {
     opacity: 0;
+    font: inherit;
+    line-height: inherit;
     display: inline-block;
+    position: relative;
 
     &[ready="true"] {
         opacity: 1

@@ -21,46 +21,97 @@
             }
 
         </style>
-        <style type="text/css" style="display:none;" name="button-element-init">
-            button-element {
-                opacity: 0;
+        <style type="text/css">
+            ajax-form {
+                background: #d9d9d9;
+                padding: 1em 2em;
+                margin: 1em 0;
+                box-shadow: 0 0 0 1px hsla(0, 0%, 0%, 0.07);
+                border-radius: 3px;
+                box-sizing: border-box;
             }
 
         </style>
+
+        <script type="text/javascript" src="/node_modules/builtjs/dist/loader.js"></script>
+        <script type="text/javascript">window.ComponentsLoader('/node_modules/builtjs/dist/')</script>
     </head>
 
     <body>
-        <grid-layout columnwidth="400px" scaletofit="true">
-            <input-bool type="checkbox" label="Checkbox"></input-bool>
-
-            <input-field label="First name <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" name="InquirerFirstName" id="InquirerFirstName" required="true" labelposition="top" input-element></input-field>
-
-            <input-field label="Last name <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" name="InquirerLastName" id="InquirerLastName" required="true" labelposition="top" input-element></input-field>
-
-            <input-field label="Email address <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" autocomplete="email" type="email" name="Email" id="Email" required="true" labelposition="top" input-element></input-field>
-
-            <input-field label="Phone number" class="support-dvd-input static-input" autocomplete="phone" type="intlphone" name="Telephone" id="Telephone" labelposition="top" input-element></input-field>
-
-            <input-field label="State" class="support-dvd-input static-input" autocomplete="state" name="state" id="state" labelposition="top" format="/[a-z]/g=>toUpperCase, /[^A-Z]/g=>" max="2" input-element></input-field>
-        </grid-layout>
-
+        <h2>Button Element</h2>
         <button-element>Hi</button-element>
+        <br /><br />
+
+        <h2>Grid Layout</h2>
+        <grid-layout columnwidth="400px">
+            <div slot="grid-layout-item">Hi</div>
+            <div slot="grid-layout-item">Ho</div>
+            <div slot="grid-layout-item">Howdy</div>
+            <input-bool slot="grid-layout-item" type="checkbox" label="Checkbox"></input-bool>
+
+            <input-field slot="grid-layout-item" label="First name <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" name="InquirerFirstName" id="InquirerFirstName" required="true" labelposition="top" input-element></input-field>
+
+            <input-field slot="grid-layout-item" label="Last name <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" name="InquirerLastName" id="InquirerLastName" required="true" labelposition="top" input-element></input-field>
+
+            <input-field slot="grid-layout-item" label="Email address <span style='color:#c10005;'>&amp;nbsp;*</span>" class="support-dvd-input static-input" autocomplete="email" type="email" name="Email" id="Email" required="true" labelposition="top" input-element></input-field>
+
+            <input-field slot="grid-layout-item" label="Phone number" class="support-dvd-input static-input" autocomplete="phone" type="intlphone" name="Telephone" id="Telephone" labelposition="top" input-element></input-field>
+
+            <input-field slot="grid-layout-item" label="State" class="support-dvd-input static-input" autocomplete="state" name="state" id="state" labelposition="top" format="/[a-z]/g=>toUpperCase, /[^A-Z]/g=>" max="2" input-element></input-field>
+        </grid-layout>
+        <br /><br />
+
+
+
+        <h2>Input Field</h2>
         <input-field label="ho" type="tel"></input-field>
+        <br /><br />
+
+        <h2>Input Bool</h2>
         <input-bool type="checkbox" label="Checkbox"></input-bool>
+        <br /><br />
+
+        <h2>Input Select</h2>
         <input-select options="one, two, three" label="Select..."></input-select>
+        <br /><br />
 
+        <h2>Ajax Form</h2>
         <ajax-form>
-            <input-select options="one, two, three" label="Options"></input-select>
-            <input-field label="Email please" type="email"></input-field>
-            <input-bool type="checkbox" label="Check this"></input-bool>
+            <input-select options="one, two, three" label="Options" slot="ajax-form-item"></input-select>
+            <input-field label="Email please" type="email" slot="ajax-form-item"></input-field>
+            <input-bool type="checkbox" label="Check this" slot="ajax-form-item"></input-bool>
+            <button-element type="submit" slot="ajax-form-button">Submit</button-element>
+            <button-element slot="ajax-form-button">Cancel</button-element>
         </ajax-form>
+        <br /><br />
 
+        <h2>Drop Down</h2>
+        <drop-down>
+            <div slot="drop-down-label">A drop down</div>
+            <div slot="drop-down-option">Option one</div>
+            <div slot="drop-down-option">Second option</div>
+            <div slot="drop-down-option">One more</div>
+        </drop-down>
+        <br /><br />
+
+        <h2>Collapse Menu</h2>
+        <collapse-menu minpagewidth="600" background="#fff">
+            <div slot="collapse-menu-item">Item one</div>
+            <div slot="collapse-menu-item">Another item</div>
+            <div slot="collapse-menu-item">Third</div>
+            <div slot="collapse-menu-item">Quad</div>
+        </collapse-menu>
+        <br /><br />
+
+        <h2>Content Collpase</h2>
         <content-collapse group="content-collapse">
             <div slot="content-collapse-toggler">Toggle 1</div>
             <div slot="content-collapse-content">Toggle 1 body</div>
         </content-collapse>
+        <br /><br />
 
-        <content-collapse group="content-collapse">
+        <h2>Content Collpase with group</h2>
+        <content-collapse group="content-collapse" class="group">
             <div slot="content-collapse-toggler">Toggle 2</div>
             <div slot="content-collapse-content">Toggle 2 body</div>
         </content-collapse>
@@ -69,16 +120,30 @@
             <div slot="content-collapse-toggler">Toggle 3</div>
             <div slot="content-collapse-content">Toggle 3 body</div>
         </content-collapse>
+        <br /><br />
 
         <snack-bar shown="true" type="info">
-            <div slot="body">A snackie poo</div>
+            <div slot="body">A snacky poo</div>
         </snack-bar>
 
         <spinner-element></spinner-element>
 
+        <cookie-message></cookie-message>
+
+        <!-- <effect-bounce-z id="bounce"></effect-bounce-z> -->
+
         <script type="text/javascript" src="/dist/app.js"></script>
 
         <script>
+            // var bounce = document.getElementById('bounce')
+            // var group = document.querySelector('.group')
+
+            // bounce.targets = [group]
+            // group.addEventListener('click', function () {
+            //     console.log('click')
+            //     bounce.trigger(0)
+            // })
+
             // var len = 0
             // while (len--) {
             //     var btn = document.createElement('button-element')

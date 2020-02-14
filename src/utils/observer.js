@@ -1,4 +1,7 @@
 import { ID } from '../services/id.js'
+import { ForIn } from './for-in.js'
+import { ObjectAssign } from './object-assign.js'
+import { ForEach } from './for-each.js'
 
 const emptyFn = function () { }
 
@@ -6,21 +9,22 @@ function Observer(initialValue, noInit, onSubscribe) {
     noInit = noInit ? true : false
     onSubscribe = onSubscribe && typeof onSubscribe === 'function' ? onSubscribe : emptyFn
 
-    let values = Object.assign({}, {
+    let values = ObjectAssign({}, {
         value: initialValue,
         errors: [],
         previousValue: undefined,
         updated: new Date().getTime(),
         subscriptions: {},
-        isComplete: false
+        isComplete: false,
+        eventCallbacks: {}
     })
 
-    function valuesSubsEach(subscriptionId) {
-        return values.subscriptions[subscriptionId].unsubscribe()
+    function valuesSubsEach(subscription) {
+        return subscription.unsubscribe()
     }
 
     function destroy() {
-        Object.keys(values.subscriptions).forEach(valuesSubsEach)
+        ForIn(valuesSubsEach, values.subscriptions)
 
         Object.defineProperties(result, {
             value: { get: function () { return undefined } },
@@ -31,27 +35,33 @@ function Observer(initialValue, noInit, onSubscribe) {
             complete: { value: emptyFn },
             subscribe: { value: emptyFn },
             unsubscribe: { value: emptyFn },
+            insert: { value: emptyFn },
+            insertAll: { value: emptyFn },
+            remove: { value: emptyFn },
+            removeElements: { value: emptyFn },
+            has: { value: emptyFn },
+            indexOf: { value: emptyFn },
+            reverse: { value: emptyFn },
+            on: { value: emptyFn },
+            trigger: { value: emptyFn },
         })
+
+        values.eventCallbacks = null
+        delete values.eventCallbacks
 
         values.isComplete = true
     }
 
-    function loopSubsEach(key, val, valuesObj) {
-        return function loopSubsEachInner(subscriptionId) {
-            const subscriptionFn = values.subscriptions[subscriptionId][key]
-            if (typeof subscriptionFn !== 'function') { return }
-            subscriptionFn(val, valuesObj, subscriptionId)
-        }
-    }
+    function loop(functionKey, val, valuesObj) {
+        valuesObj ? valuesObj : {}
 
-    function loop(key, val, valuesObj) {
-        valuesObj = valuesObj ? valuesObj : {}
+        ForIn(function loopSubsEach(subscription, subscriptionId) {
+            return typeof subscription[functionKey] === 'function' ?
+                subscription[functionKey](val, valuesObj, subscriptionId) :
+                undefined
+        }, values.subscriptions)
 
-        const _loopSubsEach = loopSubsEach(key, val, valuesObj)
-
-        Object.keys(values.subscriptions).forEach(_loopSubsEach)
-
-        if (key === 'complete') {
+        if (functionKey === 'complete') {
             destroy()
         }
     }
@@ -65,22 +75,23 @@ function Observer(initialValue, noInit, onSubscribe) {
 
     function getArrayIndexOf(element, isArray) {
         if (!isArray) { return }
-
         const index = values.value.indexOf(element)
-
-        return index === -1 ? undefined : index
+        return index > -1 ? index : undefined
     }
 
     function getObjectKey(value) {
-        try {
-            for (const prop in values.value) {
-                if (values.value[prop]) {
-                    if (values.value[prop] === value) {
-                        return prop
-                    }
-                }
+        let result
+
+        function getObjectKeyLoop(val, prop) {
+            if (val === value) {
+                result = prop
+                getObjectKeyLoop.breakloop = true
             }
-        } catch (error) { }
+        }
+
+        try { ForIn(getObjectKeyLoop, values.value) } catch (error) { }
+
+        return result
     }
 
     const result = {
@@ -90,7 +101,7 @@ function Observer(initialValue, noInit, onSubscribe) {
         get subscriptions() { return values.subscriptions },
 
         next: function (v) {
-            values = Object.assign({}, values, {
+            values = ObjectAssign({}, values, {
                 value: v,
                 previousValue: values.value,
                 updated: new Date().getTime(),
@@ -101,7 +112,7 @@ function Observer(initialValue, noInit, onSubscribe) {
         },
 
         error: function (err) {
-            values = Object.assign({}, values, {
+            values = ObjectAssign({}, values, {
                 errors: values.errors.concat([err]),
                 updated: new Date().getTime(),
             })
@@ -115,7 +126,7 @@ function Observer(initialValue, noInit, onSubscribe) {
             error = error ? error : emptyFn
             complete = complete ? complete : emptyFn
 
-            const subscription = Object.assign({}, {
+            const subscription = ObjectAssign({}, {
                 next: next,
                 error: error,
                 complete: complete,
@@ -163,6 +174,24 @@ function Observer(initialValue, noInit, onSubscribe) {
             return result.next(values.value)
         },
 
+        insertAll: function (elements, index) {
+            try {
+                if (index === undefined) {
+                    index = values.value.length
+                }
+
+                if (Array.isArray(values.value)) {
+                    values.value.splice.apply(values.value, [index, 0].concat(elements))
+                    return result.next(values.value)
+                }
+
+                ForIn(function (val, prop) { values.value[prop] = val }, elements)
+
+            } catch (error) { }
+
+            return result.next(values.value)
+        },
+
         remove: function (element, index, all) {
             try {
                 const isArray = Array.isArray(values.value)
@@ -196,10 +225,31 @@ function Observer(initialValue, noInit, onSubscribe) {
                 const objectKey = getObjectKey(element)
 
                 if (objectKey !== undefined) {
-                    values.value[objectKey] = undefined
+                    values.value[objectKey] = null
                     delete values.value[objectKey]
                     return result.next(values.value)
                 }
+
+            } catch (error) { }
+
+            return result.next(values.value)
+        },
+
+        removeElements: function (elements) {
+            try {
+                if (Array.isArray(values.value)) {
+                    ForEach(function (element) {
+                        const index = values.value.indexOf(element)
+                        if (index > -1) { values.value.splice(index, 1) }
+                    }, elements)
+
+                    return result.next(values.value)
+                }
+
+                ForIn(function (val, prop) {
+                    values.value[prop] = null
+                    delete values.value[prop]
+                }, elements)
 
             } catch (error) { }
 
@@ -260,6 +310,26 @@ function Observer(initialValue, noInit, onSubscribe) {
             } catch (error) { }
 
             return getObjectKey(value) || -1
+        },
+
+        on: function (name, callback) {
+            if (!values.eventCallbacks[name]) {
+                values.eventCallbacks[name] = {}
+            }
+
+            const id = ID()
+            values.eventCallbacks[name][id] = callback
+
+            return function () {
+                values.eventCallbacks[name][id] = null
+                delete values.eventCallbacks[name][id]
+            }
+        },
+
+        trigger: function (name, data) {
+            if (!values.eventCallbacks[name]) { return }
+
+            ForIn(function (callback) { callback(data) }, values.eventCallbacks[name])
         }
     }
 

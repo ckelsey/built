@@ -1,5 +1,10 @@
 <div class="ajax-form-container">
     <form class="ajax-form-form">
-        <grid-layout class="ajax-form-grid"></grid-layout>
+        <grid-layout class="ajax-form-grid">
+            <slot name="ajax-form-item" slot="grid-layout-item"></slot>
+        </grid-layout>
+        <grid-layout class="ajax-form-grid-buttons">
+            <slot name="ajax-form-button" slot="grid-layout-item"></slot>
+        </grid-layout>
     </form>
 </div>

@@ -1,3 +1,11 @@
+overlay-message {
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
+    }
+}
+
 .overlay-message-container {
     position: fixed;
     width: 100%;

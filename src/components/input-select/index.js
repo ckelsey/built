@@ -16,8 +16,8 @@ import { IfInvalid } from '../../utils/if-invalid.js'
 import { setInput } from '../input-shared/set-input.js'
 import { Get } from '../../utils/get.js'
 import { iconTriangle } from '../../services/icons.js'
+import { ObjectAssign } from '../../utils/object-assign.js'
 
-const outerStyle = require('../input-shared/outer.scss').toString()
 const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = 'input-select'
@@ -28,7 +28,7 @@ function postProcessValue() {
     }
 }
 
-const properties = Object.assign({}, Properties, {
+const properties = ObjectAssign({}, Properties, {
     options: {
         format: function (val) {
             return Pipe(
@@ -76,7 +76,6 @@ const InputSelect = ComponentConstructor({
     componentRoot: componentRoot,
     template: template,
     style: style,
-    outerStyle: outerStyle,
     observedAttributes: observedAttributes,
     properties: properties,
     elements: elements,

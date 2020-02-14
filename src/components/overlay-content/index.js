@@ -1,5 +1,5 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { Components } from '../../services/components.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { Pipe } from '../../utils/pipe.js'
 import { OnNextFrame } from '../../services/on-next-frame.js'
@@ -10,9 +10,9 @@ import { IndexOf } from '../../utils/index-of.js'
 import { Timer } from '../../services/timer.js'
 import { EaseInOut } from '../../utils/ease-in-out.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { ObjectAssign } from '../../utils/object-assign.js'
 
 const style = require('./style.scss').toString()
-const outerStyle = require('./outer.scss').toString()
 const positionPadding = 40
 const widths = ['content', 'target']
 const alignments = ['center', 'left', 'right', 'top', 'bottom', 'center center', 'center top', 'center bottom', 'left center', 'left top', 'left bottom', 'right center', 'right top', 'right bottom',]
@@ -106,22 +106,20 @@ function setPositions(host) {
 }
 
 function animator(points, speed, stepFn) {
-    return new Promise(function (resolve) {
-        return Timer(
-            stepFn,
-            EaseInOut(points, speed)
-        ).then(resolve)
-    })
+    return Timer(
+        stepFn,
+        EaseInOut(points, speed)
+    )
 }
-export const OverlayContent = WCConstructor({
+
+const OverlayContent = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
     style: style,
-    outerStyle: outerStyle,
     elements: elements,
     observedAttributes: Object.keys(attributes),
-    properties: Object.assign({}, {
+    properties: ObjectAssign({}, {
         showing: {
             format: function (val) {
                 return ToBool(val).value
@@ -162,13 +160,13 @@ export const OverlayContent = WCConstructor({
                     const innerBox = Get(inner, 'getBoundingClientRect()', emptyBox)
                     const isOnTop = spaceAbove > spaceBelow
 
-                    return Object.assign(
+                    return ObjectAssign(
                         {},
                         Get(container, 'getBoundingClientRect()', emptyBox),
                         {
                             hostHeight: (isOnTop ? spaceAbove : spaceBelow) - positionPadding,
-                            scrollTop: Get(container, 'scrollTop', 0),
-                            scrollLeft: Get(container, 'scrollLeft', 0),
+                            // scrollTop: Get(container, 'scrollTop', 0),
+                            // scrollLeft: Get(container, 'scrollLeft', 0),
                             targetWidth: !host.widthbasis || host.widthbasis === 'content' ? 'auto' : targetMinWidth,
                             targetMinWidth: targetMinWidth,
                             targetBox: targetBox,
@@ -185,7 +183,7 @@ export const OverlayContent = WCConstructor({
                             containerLeft: (targetBox.left + containerWidth >= (windowWidth - 10) ? targetBox.right - containerWidth : targetBox.left) - innerBox.left,
                             container: container,
                             inner: inner,
-                            innerBox: innerBox,
+                            // innerBox: innerBox,
                             outOfView: targetBox.top - 10 > clientHeight || targetBox.bottom + 10 < 0
                         }
                     )
@@ -206,32 +204,30 @@ export const OverlayContent = WCConstructor({
             return function () {
                 if (host.showing) { return Promise.resolve() }
 
-                return new Promise(function (resolve) {
-                    host.showing = true
+                host.showing = true
 
-                    const container = host.elements.contentContainer
-                    const inner = host.elements.inner
+                const container = host.elements.contentContainer
+                const inner = host.elements.inner
 
-                    if (!container || !inner) { return }
+                if (!container || !inner) { return }
 
-                    container.style.pointerEvents = 'all'
-                    inner.style.display = 'block'
+                container.style.pointerEvents = 'all'
+                inner.style.display = 'block'
 
-                    animator(
-                        [0, 1.02, 0.99, 1],
-                        host.speed / 2,
-                        function (scalePoint) {
-                            container.style.transform = ''.concat('scale(1, ', scalePoint, ')')
-                            container.style.opacity = scalePoint
-                        })
-                        .then(function () {
-                            container.style.transform = 'scale(1, 1)'
-                            container.style.opacity = 1
-                            resolve(DispatchEvent(host, 'shown', host))
-                        })
+                setPositions(host)
 
-                    setPositions(host)
-                })
+                return animator(
+                    [0, 1.02, 0.99, 1],
+                    host.speed / 2,
+                    function (scalePoint) {
+                        container.style.transform = ''.concat('scale(1, ', scalePoint, ')')
+                        container.style.opacity = scalePoint
+                    })
+                    .then(function () {
+                        container.style.transform = 'scale(1, 1)'
+                        container.style.opacity = 1
+                        DispatchEvent(host, 'shown', host)
+                    })
             }
         },
 
@@ -257,4 +253,6 @@ export const OverlayContent = WCConstructor({
     }
 })
 
-WCDefine(componentName, OverlayContent)
+Components.addComponent(componentName, OverlayContent)
+
+export { OverlayContent }

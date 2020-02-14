@@ -1,5 +1,3 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { Throttle } from '../../utils/throttle.js'
 import { ToString } from '../../utils/to-string.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
@@ -10,9 +8,11 @@ import { ToNumber } from '../../utils/to-number.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
 import { WasClickedOn } from '../../utils/was-clicked-on.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { Components } from '../../services/components.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { ForEach } from '../../utils/for-each.js'
 
 const style = require('./style.scss').toString()
-const outerStyle = require('./outer.scss').toString()
 const template = require('./index.html')
 const componentName = 'collapse-menu'
 const componentRoot = ''.concat('.', componentName, '-container')
@@ -109,16 +109,11 @@ const elements = {
             el.classList[host.collapseonwrap ? 'add' : 'remove']('collapseonwrap')
 
             function subFn(e) {
-                const items = Array.from(host.querySelectorAll('[slot="item"]'))
-                let len = items.length
-
-                while (len) {
-                    len = len - 1
-
-                    if (WasClickedOn(items[len], e)) {
-                        DispatchEvent(host, 'itemclick', { event: e, item: items[len] })
+                ForEach(function (item) {
+                    if (WasClickedOn(item, e)) {
+                        DispatchEvent(host, 'itemclick', { event: e, item: item })
                     }
-                }
+                }, host.slotted$.value)
             }
 
             el.eventSubscriptions = {
@@ -141,15 +136,16 @@ const elements = {
     }
 }
 
-export const CollapseMenu = WCConstructor({
+const CollapseMenu = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
     style: style,
-    outerStyle: outerStyle,
     observedAttributes: observedAttributes,
     properties: properties,
     elements: elements
 })
 
-WCDefine(componentName, CollapseMenu)
+Components.addComponent(componentName, CollapseMenu)
+
+export { CollapseMenu }

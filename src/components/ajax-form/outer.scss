@@ -3,8 +3,15 @@ ajax-form {
     line-height: inherit;
     display: block;
     position: relative;
+    transition: opacity 0.2s;
 
-    input-field {
+    &[ready="true"] {
+    opacity: 1;
+}
+
+    input-field,
+    input-bool,
+    input-select {
         width: 100%;
     }
 }

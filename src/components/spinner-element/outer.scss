@@ -1,13 +1,23 @@
 spinner-element {
-    position: fixed;
+    position: absolute;
     height: 100%;
     width: 100%;
-    display: block;
+    display: none;
     pointer-events: none;
     z-index: 999999999999999999;
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
+    }
 }
 
 spinner-element[page="true"] {
     top: 0;
     left: 0;
+    position: fixed;
+}
+
+spinner-element[visible="true"] {
+    display: block;
 }

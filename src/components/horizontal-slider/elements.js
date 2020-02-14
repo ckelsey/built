@@ -2,6 +2,7 @@ import { goToNextPage, goToPreviousPage, autoplay } from './methods.js'
 import { Get } from '../../utils/get.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
 
 const sliderItemSelectedClass = 'active-horizontal-slider-item'
 const sliderItemClass = 'horizontal-slider-item'
@@ -111,7 +112,7 @@ export function setChicklets(host) {
 
     if (!host.chicklets) {
         const currentChicklets = Array.from(chicklets.querySelectorAll('.'.concat(chickletSelector)))
-        currentChicklets.forEach(function (chicklet) { host.unsubscribeEvents(chicklet) })
+        currentChicklets.forEach(function (chicklet) { ObserverUnsubscribe(chicklet) })
         chicklets.innerHTML = ''
     }
 
@@ -139,7 +140,7 @@ export function setPrevious(el, host) {
 
     el.classList[host.arrows ? 'add' : 'remove'](arrowClass)
 
-    host.unsubscribeEvents(el)
+    ObserverUnsubscribe(el)
 
     el.eventSubscriptions = {
         click: ObserveEvent(el, 'click').subscribe(function () { goToPreviousPage(host, host.currentindex) })
@@ -151,7 +152,7 @@ export function setNext(el, host) {
 
     el.classList[host.arrows ? 'add' : 'remove'](arrowClass)
 
-    host.unsubscribeEvents(el)
+    ObserverUnsubscribe(el)
 
     el.eventSubscriptions = {
         click: ObserveEvent(el, 'click').subscribe(function () { goToNextPage(host, host.currentindex) })

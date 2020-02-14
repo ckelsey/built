@@ -1,6 +1,7 @@
 import { ToObject } from '../utils/to-object.js'
 import { ObserveWorker } from '../utils/observe-worker.js'
 import { UseIf } from '../utils/use-if.js'
+import { ObjectAssign } from '../utils/object-assign.js'
 
 // TODO pako is not so great, minimal size savings. Is there anything else?
 // const pako = require('../lib/pako/dist/pako.min.js')
@@ -31,7 +32,7 @@ export function UploadService(options, file) {
         }
     }
 
-    const Options = Object.assign({}, {
+    const Options = ObjectAssign({}, {
         progressCB: emptyFn,
         completeCB: emptyFn,
         errorCB: emptyFn,
@@ -56,7 +57,7 @@ export function UploadService(options, file) {
     const fileObject = getFile()
     const size = fileObject.size
     const total = getTotal(fileObject, Options.bytesPerChunk)
-    const uploadData = Object.assign({},
+    const uploadData = ObjectAssign({},
         Options,
         { size: size, total: total, fileObject: fileObject }
     )
@@ -106,7 +107,7 @@ export function UploadService(options, file) {
     }
 
     function getHeaders(index, chunkSize, fileSize) {
-        return Object.assign({}, {
+        return ObjectAssign({}, {
             'Content-Type': 'application/octet-stream',
             'X-Chunk-Id': index,
             'X-Chunk-Length': chunkSize,

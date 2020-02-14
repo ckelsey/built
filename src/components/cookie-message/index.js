@@ -1,10 +1,10 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { ToString } from '../../utils/to-string.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { ObserveEvent } from '../../utils/observe-event.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
+import { Components } from '../../services/components.js'
 
 const style = require('./style.scss').toString()
 const template = require('./index.html')
@@ -130,7 +130,7 @@ const elements = {
     }
 }
 
-export const CookieMessage = WCConstructor({
+const CookieMessage = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -143,4 +143,6 @@ export const CookieMessage = WCConstructor({
     }
 })
 
-WCDefine(componentName, CookieMessage)
+Components.addComponent(componentName, CookieMessage)
+
+export { CookieMessage }

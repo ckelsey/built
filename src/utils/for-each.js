@@ -2,11 +2,19 @@ export function ForEach(fn, collection, reverseOrder) {
     if (!collection) { return }
 
     let index = collection.length
-    const count = index
 
-    while (count && index) {
-        fn(collection[reverseOrder ? index - 1 : count - index])
+    function getIValue() {
+        return reverseOrder ?
+            function () { return index - 1 } :
+            function () { return collection.length - index }
+    }
 
+    const iValue = getIValue()
+
+    function apply(i) { fn(collection[i], i, collection) }
+
+    while (index) {
+        apply(iValue())
         index = index - 1
     }
 

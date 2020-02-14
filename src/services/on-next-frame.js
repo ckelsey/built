@@ -28,7 +28,9 @@ function runTasks(startTime) {
         if (OnNextFrameQueueObject[id] && !OnNextFrameQueueObject[id].canceled && !OnNextFrameQueueObject[id].hasRun) {
             OnNextFrameQueueObject[id].hasRun = true
             OnNextFrameQueueObject[id].resolve(OnNextFrameQueueObject[id].task())
-            deleteEntry(id)
+            requestAnimationFrame(function () {
+                deleteEntry(id)
+            })
         }
 
     } while (hasTime(startTime) && OnNextFrameQueue.length)
@@ -77,6 +79,7 @@ export function OnNextFrame(task) {
 
     OnNextFrameQueue.push(id)
     RunOnNextFrame()
+
     return OnNextFrameQueueObject[id]
 }
 

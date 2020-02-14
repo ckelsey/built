@@ -112,7 +112,6 @@ export const OverlayMessage = WCConstructor({
             }
         }
     },
-    onDisconnected: function (host) { ObserverUnsubscribe(host) },
     onConnected: function (host) {
         host.subscriptions = {
             slots: ObserveSlots(host, true).subscribe(function () {

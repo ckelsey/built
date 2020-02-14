@@ -17,6 +17,7 @@ function doAllTheThings(host) {
     if (!root) { return }
 
     root.setAttribute('type', host.type)
+
     setRootClass(host, host.page, 'fullpage')
     setRootClass(host, host.scrim, 'showscrim')
     setType(host)
@@ -79,18 +80,18 @@ function toggleVisibility(host) {
     })
 }
 
-function onChangeDoThings(_el, host) {
-    return doAllTheThings(host)
-}
-
 const elements = {
     root: {
         selector: componentRoot,
-        onChange: onChangeDoThings
+        onChange: function (_el, host) {
+            doAllTheThings(host)
+        }
     },
     scrim: {
         selector: '.spinner-element-scrim',
-        onChange: onChangeDoThings
+        onChange: function (_el, host) {
+            doAllTheThings(host)
+        }
     },
     inner: { selector: '.spinner-element-inner' },
     slot: { selector: 'slot' }
@@ -101,37 +102,54 @@ const properties = {
         format: function (val) {
             return Pipe(ToBool, IfInvalid(false))(val).value
         },
-        onChange: function (_val, host) { toggleVisibility(host) }
+        onChange: function (val, host) {
+            host.setAttribute('visible', val)
+            toggleVisibility(host)
+        }
     },
     page: {
         format: function (val) {
             return Pipe(ToBool, IfInvalid(false))(val).value
         },
-        onChange: onChangeDoThings
+        onChange: function (val, host) {
+            host.setAttribute('page', val)
+            doAllTheThings(host)
+        }
     },
     scrim: {
         format: function (val) {
             return Pipe(ToBool, IfInvalid(false))(val).value
         },
-        onChange: onChangeDoThings
+        onChange: function (val, host) {
+            host.setAttribute('scrim', val)
+            doAllTheThings(host)
+        }
     },
     blur: {
         format: function (val) {
             return Pipe(ToNumber, IfInvalid(0))(val).value
         },
-        onChange: onChangeDoThings
+        onChange: function (val, host) {
+            host.setAttribute('blur', val)
+            doAllTheThings(host)
+        }
     },
     scrimopacity: {
         format: function (val) {
             return Pipe(ToNumber, IfInvalid(1))(val).value
         },
-        onChange: onChangeDoThings
+        onChange: function (_val, host) {
+            doAllTheThings(host)
+        }
     },
     type: {
         format: function (val) {
             return typeof val === 'string' ? val : 'column'
         },
-        onChange: onChangeDoThings
+        onChange: function (val, host) {
+            host.setAttribute('type', val)
+            doAllTheThings(host)
+        }
     }
 }
 

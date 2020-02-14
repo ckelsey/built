@@ -1,7 +1,7 @@
 <div class="drop-down-container">
     <div class="drop-down-heading">
         <div class="drop-down-label">
-            <slot name="label"></slot>
+            <span slotname="drop-down-label"></span>
         </div>
         <div class="drop-down-arrow">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -9,7 +9,6 @@
         </div>
     </div>
     <overlay-content align="center bottom" class="drop-down-overlay">
-        <slot name="option"></slot>
+        <span slot="overlay-content-slot" slotname="drop-down-option"></span>
     </overlay-content>
-    <slot name="nonitem"></slot>
 </div>

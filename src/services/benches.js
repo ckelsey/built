@@ -39,7 +39,7 @@ const Benches = {
         })
     },
     average: function () {
-        const keys = Object.keys(programs).filter(k => programs[k].time !== 0)
+        const keys = Object.keys(programs).filter(function (k) { return programs[k].time !== 0 })
 
         console.log('Average time:', keys.reduce(function (target, programKey) {
             return target + programs[programKey].time

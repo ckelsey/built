@@ -13,7 +13,9 @@ import { CreateElement } from './create-element.js'
 
 
 export function AppendStyleElement(rulesString, parent, name, classes) {
-    if (!parent || !rulesString) { return }
+    if (!parent) { return }
+
+    rulesString = rulesString ? rulesString : ''
 
     /** First create and add the style element */
     const style = CreateElement({

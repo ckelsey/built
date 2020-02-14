@@ -7,25 +7,15 @@ import { ObserveEvent } from '../../utils/observe-event.js'
 import { WhenAvailable } from '../../utils/when-available.js'
 import { CreateElement } from '../../utils/create-element.js'
 import { OnNextFrame } from '../../services/on-next-frame.js'
-import { CommasToArray } from '../../utils/commas-to-array.js'
-import { ToMap } from '../../utils/to-map.js'
 import { ObserverUnsubscribe } from '../../utils/observer-unsubscribe.js'
-import { Get } from '../../utils/get.js'
-import { ID } from '../../services/id.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
-import { Components } from '../../services/components.js'
-import { ComponentConstructor } from '../../utils/component-constructor.js'
-import { ObserveExists } from '../../utils/observe-exists.js'
-import { Observer } from '../../utils/observer.js'
 import { ArrayFrom } from '../../utils/array-from.js'
-import { Filter } from '../../utils/filter.js'
+import { LoadOnReady } from '../../component-build/load-on-ready.js'
 import { ForEach } from '../../utils/for-each.js'
 
-const defaultWidth = 240
-const defaultGap = [16, 16]
+const defaultWidth = 400
 const template = require('./index.html')
 const componentName = 'ajax-form'
-const componentRoot = '.' + componentName + '-container'
 const outerStyle = require('./outer.scss').toString()
 
 function setAttribute(host, val, name, elKey) {
@@ -72,57 +62,10 @@ function getFormData(host) {
     OnNextFrame(function getFormDataNext() { document.body.removeChild(newForm) })
 }
 
-function removeChild(host, el) {
-    if (el.container) {
-        const slot = el.slot
-        const item = Filter(function (element) {
-            return element.slot === slot
-        }, host.items$.value)[0]
-
-        host.items$.remove(item)
-        ObserverUnsubscribe(el)
-
-        if (el.container.parentElement) {
-            el.container.parentElement.removeChild(el.container)
-        }
-    }
-}
-
-function wrapChild(host, el) {
-    const tagName = Get(el, 'nodeName.toLowerCase()')
-    const isInput = /input-/.test(tagName)
-    const isBtn = tagName === 'button-element'
-    const isSubmit = isBtn && el.type === 'submit'
-    const id = ID()
-    const wrapper = CreateElement({ tagName: 'div', class: componentName + '-slot-wrapper', id: id })
-
-    if (!el.eventSubscriptions) {
-        el.eventSubscriptions = {}
-    }
-
-    if (isSubmit) {
-        el.eventSubscriptions = { click: ObserveEvent(el, 'click').subscribe(function () { return submitForm(host) }) }
-    } else if (isInput) {
-        el.eventSubscriptions = { done: ObserveEvent(el, 'done').subscribe(function () { return submitForm(host) }) }
-    }
-
-    el.slot = id
-    el.container = wrapper
-    host.removeChild(el)
-
-    setTimeout(function () {
-        ObserveExists(el, true)
-            .subscribe(function elExistsCallback(exists) {
-                if (!exists) { removeChild(host, el) }
-            })
-    }, 0)
-
-    return el
-}
-
 const elements = {
-    root: { selector: componentRoot },
+    root: { selector: '.' + componentName + '-container' },
     grid: { selector: '.' + componentName + '-grid' },
+    buttonGrid: { selector: '.' + componentName + '-grid-buttons' },
     form: {
         selector: '.' + componentName + '-form',
         onChange: function (el, host) {
@@ -172,63 +115,83 @@ const properties = {
             return Pipe(ToString, IfInvalid('application/json'))(val).value
         }
     },
-    scaletofit: {
-        format: function (val) {
-            return Pipe(ToBool, IfInvalid(true))(val).value
-        },
-        onChange: function (val, host) {
-            return setAttribute(host, val, 'scaletofit', 'grid')
-        }
-    },
     columnwidth: {
         format: function (val) { return val === '100%' ? val : Pipe(ToNumber, IfInvalid(defaultWidth))(val).value },
         onChange: function (val, host) {
             return setAttribute(host, val, 'columnwidth', 'grid')
         }
     },
+    mincolumnwidth: {
+        format: function (val) { return Pipe(ToNumber, IfInvalid(300))(val).value },
+        onChange: function (val, host) {
+            return setAttribute(host, val, 'minwidth', 'grid')
+        }
+    },
+    buttonscolumnwidth: {
+        format: function (val) { return val === '100%' ? val : Pipe(ToNumber, IfInvalid(50))(val).value },
+        onChange: function (val, host) {
+            return setAttribute(host, val, 'columnwidth', 'buttonGrid')
+        }
+    },
+    buttonsmincolumnwidth: {
+        format: function (val) { return Pipe(ToNumber, IfInvalid(50))(val).value },
+        onChange: function (val, host) {
+            return setAttribute(host, val, 'minwidth', 'buttonGrid')
+        }
+    },
     gap: {
-        format: function (val) {
-            return Pipe(CommasToArray, IfInvalid([val, val]), ToMap(
-                function gapMap(v) {
-                    const tv = ToNumber(v).value
-                    if (isNaN(tv)) { return defaultGap[0] }
-                    return tv
-                }
-            ))(val).value
-        },
+        format: function (val) { return val },
         onChange: function (val, host) {
             return setAttribute(host, val, 'gap', 'grid')
+        }
+    },
+    buttonsgap: {
+        format: function (val) { return val },
+        onChange: function (val, host) {
+            return setAttribute(host, val, 'gap', 'buttonGrid')
         }
     }
 }
 
-const AjaxForm = ComponentConstructor({
+function addItem(host) {
+    return function addItemInner(node) {
+        const isSubmit = node.type === 'submit'
+
+        if (!node.eventSubscriptions) { node.eventSubscriptions = {} }
+
+        if (isSubmit) {
+            node.eventSubscriptions = {
+                click: ObserveEvent(node, 'click').subscribe(function () {
+                    return submitForm(host)
+                })
+            }
+        } else {
+            node.eventSubscriptions = { done: ObserveEvent(node, 'done').subscribe(function () { return submitForm(host) }) }
+        }
+    }
+}
+
+const AjaxForm = {
     componentName: componentName,
-    componentRoot: componentRoot,
     template: template,
     outerStyle: outerStyle,
     properties: properties,
-    observedAttributes: Object.keys(properties),
     elements: elements,
-    methods: {
-        addItem: function (host) {
-            return function (item) {
-                if (!host.items$.has(item)) {
-                    const newElement = document.adoptNode(wrapChild(host, item))
-                    host.elements.grid.appendChild(newElement.container)
-                    newElement.container.appendChild(newElement)
-                    host.items$.insert(newElement)
-                }
-            }
-        }
-    },
+    observeChildren: true,
+    methods: { addItem: addItem },
     onConnected: function (host) {
-        host.items$ = Observer([], true)
-        host.eventSubscriptions = host.eventSubscriptions ? host.eventSubscriptions : {}
-        host.eventSubscriptions['children' + ID()] = host.children$.subscribe(function (children) { ForEach(host.addItem, children) })
-    }
-})
+        host.eventSubscriptions.addedChildren = host.children$.on('addedNodes', function (addedNodes) {
+            if (!addedNodes.length) { return }
+            ForEach(host.addItem, addedNodes)
+        })
 
-Components.addComponent(componentName, AjaxForm)
+        host.eventSubscriptions.removedNodes = host.children$.on('removedNodes', function (removedNodes) {
+            if (!removedNodes.length) { return }
+            ForEach(ObserverUnsubscribe, removedNodes)
+        })
+    }
+}
+
+LoadOnReady(AjaxForm)
 
 export { AjaxForm }

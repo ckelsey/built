@@ -1,6 +1,11 @@
 image-loader {
     display: inline-block;
     outline: none !important;
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
+    }
 
     &[fit] {
         width: 100%;

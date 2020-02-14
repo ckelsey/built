@@ -1,5 +1,6 @@
 import { Observer } from './observer.js'
 import { ObserveExists } from './observe-exists.js'
+import { ObjectAssign } from './object-assign.js'
 
 export function ObserveEvent(element, eventName, options) {
     if (!element || !eventName) { return }
@@ -9,7 +10,7 @@ export function ObserveEvent(element, eventName, options) {
     let isRunning = false
     let disposeTimer = setTimeout(function () { })
 
-    options = Object.assign({}, {
+    options = ObjectAssign({}, {
         preventDefault: false,
         stopPropagation: false,
         useCapture: true

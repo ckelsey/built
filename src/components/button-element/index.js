@@ -4,11 +4,9 @@ import { ToString } from '../../utils/to-string.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { WhenAvailable } from '../../utils/when-available.js'
 import { CreateElement } from '../../utils/create-element.js'
-import { ComponentConstructor } from '../../utils/component-constructor.js'
-import { Components } from '../../services/components.js'
+import { LoadOnReady } from '../../component-build/load-on-ready.js'
 
-const componentName = 'button-element'
-const componentRoot = '.' + componentName + '-container'
+const name = 'button-element'
 
 const properties = {
     name: {
@@ -53,16 +51,14 @@ const properties = {
 }
 
 const elements = {
-    root: { selector: componentRoot, },
-    button: { selector: componentRoot + ' > button' },
-    slot: { selector: 'slot' }
+    root: { selector: '.' + name + '-container', },
+    button: { selector: '.' + name + '-container > button', }
 }
 
-const ButtonElement = ComponentConstructor({
-    componentName: componentName,
-    componentRoot: componentRoot,
+const ButtonElement = {
+    componentName: name,
     template: require('./index.html'),
-    style: require('./style.scss').toString(),
+    shadowStyle: require('./style.scss').toString(),
     outerStyle: require('./outer.scss').toString(),
     observedAttributes: Object.keys(properties),
     properties: properties,
@@ -70,8 +66,8 @@ const ButtonElement = ComponentConstructor({
     onConnected: function (host) {
         host.setAttribute('ready', true)
     },
-})
+}
 
-Components.addComponent(componentName, ButtonElement)
+LoadOnReady(ButtonElement)
 
 export { ButtonElement }

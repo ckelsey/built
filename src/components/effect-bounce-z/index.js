@@ -1,5 +1,3 @@
-import { WCConstructor } from '../../utils/wc-constructor.js'
-import { WCDefine } from '../../utils/wc-define.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToNumber } from '../../utils/to-number.js'
@@ -10,6 +8,8 @@ import { GetCurve } from '../../utils/get-curve.js'
 import { IsElement } from '../../utils/is-element.js'
 import { ToArray } from '../../utils/to-array.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
+import { Components } from '../../services/components.js'
+import { ComponentConstructor } from '../../utils/component-constructor.js'
 
 const template = require('./index.html')
 const componentName = 'effect-bounce-z'
@@ -36,20 +36,20 @@ function loadTargets(_val, host) {
     host._targets = Get(host, 'targets', [])
         .map(function (target) {
             const object = {
-                element: Pipe(IsElement, IfInvalid(null))(target.element).value,
+                element: Pipe(IsElement, IfInvalid(null))(target).value,
                 on: typeof target.on === 'string' ? target.on : defaultOn,
                 amount: Pipe(ToNumber, IfInvalid(defaultAmount))(target.amount).value,
                 speed: Pipe(ToNumber, IfInvalid(defaultSpeed))(target.speed).value
             }
 
-            if (validTarget(target)) {
+            if (validTarget(object)) {
                 object.handler = function (e) {
                     DispatchEvent(host, 'started', object)
 
                     object.element.style.transformStyle = 'preserve-3d'
                     object.element.style.backfaceVisibility = 'hidden'
 
-                    if (typeof target.handler === 'function') { target.handler(e) }
+                    // if (typeof object.handler === 'function') { object.handler(e) }
 
                     return animator(
                         [1, -object.amount, (-object.amount * 1.125), 1],
@@ -70,6 +70,8 @@ function loadTargets(_val, host) {
                 object.observer = ObserveEvent(object.element, object.on).subscribe(object.handler)
                 return object
             }
+
+            return object
         })
         .filter(function (t) { return !!t })
 }
@@ -84,10 +86,10 @@ const properties = {
 }
 
 function runTargetAtIndex(index, host) {
-    return Get(host, ''.concat('_targets.', index, '.handler()'))
+    return Get(host, '_targets.' + index + '.handler()')
 }
 
-export const EffectBounceZ = WCConstructor({
+const EffectBounceZ = ComponentConstructor({
     componentName: componentName,
     componentRoot: componentRoot,
     template: template,
@@ -99,8 +101,9 @@ export const EffectBounceZ = WCConstructor({
                 runTargetAtIndex(index, host)
             }
         }
-    },
-    onDisconnected: function (host) { return unloadTargets(host) }
+    }
 })
 
-WCDefine(componentName, EffectBounceZ)
+Components.addComponent(componentName, EffectBounceZ)
+
+export { EffectBounceZ }

@@ -8,12 +8,18 @@ snack-bar {
         word-break: break-word;
     }
 
-    ::slotted(*) {
+    [slot] {
         padding: 1em;
         box-sizing: border-box;
         align-items: center;
         display: block;
         width: 100%;
         word-break: break-word;
+    }
+
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
     }
 }

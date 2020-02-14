@@ -1,4 +1,5 @@
 import { Type } from './type.js'
+import { ObjectAssign } from './object-assign.js'
 
 function arrEach(result) {
     return function arrEachInner(value, index) {
@@ -17,11 +18,11 @@ function mergeArray(arr1, arr2) {
 
 function merge(obj1, obj2) {
     if (!obj1) {
-        return Object.assign({}, obj2)
+        return ObjectAssign({}, obj2)
     }
 
     if (!obj2) {
-        return Object.assign({}, obj1)
+        return ObjectAssign({}, obj1)
     }
 
     const type1 = Type(obj1)
@@ -35,7 +36,7 @@ function merge(obj1, obj2) {
         return mergeArray(obj1, obj2)
     }
 
-    const result = Object.assign({}, obj1)
+    const result = ObjectAssign({}, obj1)
 
     Object.keys(obj2).forEach(function (key) {
         if (!obj2[key]) { return }

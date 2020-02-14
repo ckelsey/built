@@ -1,3 +1,14 @@
+drop-down {
+    outline: none !important;
+    display: inline-block;
+    position: relative;
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
+    }
+}
+
 .drop-down-container {
     display: flex;
     flex-wrap: nowrap;
@@ -45,11 +56,11 @@
         display: inline-block;
         content: "\00a0";
     }
-}
 
-.drop-down-option {
-    padding: 0.5em 1em;
-    color: inherit;
-    background-color: #fafafa;
-    outline: none !important;
+    [slot="drop-down-option"] {
+        padding: 0.5em 1em;
+        color: inherit;
+        background-color: #fafafa;
+        outline: none !important;
+    }
 }

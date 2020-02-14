@@ -11,6 +11,11 @@ cookie-message {
     display: flex;
     align-items: flex-end;
     outline: none !important;
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
+    }
 }
 
 .cookie-message-container {

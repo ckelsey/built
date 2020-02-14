@@ -176,7 +176,10 @@ export const properties = {
 
     ready: {
         format: trueOrNull,
-        onChange: function (val, host) { addRemoveContainerClass(val, host, 'ready') },
+        onChange: function (val, host) {
+            host.setAttribute('ready', val)
+            addRemoveContainerClass(val, host, 'ready')
+        },
     },
 
     required: {
@@ -204,8 +207,6 @@ export const properties = {
     value: {
         format: function (val, host) { return host.type === 'checkbox' || host.type === 'radio' ? ToBool(val).value : val },
         onChange: function (_val, host) {
-            if (!host.eventSubscriptions) { host.eventSubscriptions = {} }
-
             if (!host.eventSubscriptions.valuecaching) {
                 host.eventSubscriptions.valuecaching = host.state.value.subscribe(function () {
                     host.cacheNeedsUpdate = true

@@ -1,3 +1,21 @@
+overlay-content {
+    display: block;
+    position: fixed;
+    height: 0px;
+    width: 0px;
+    top: 0px;
+    left: 0px;
+    z-index: 99999;
+    overflow: visible;
+    pointer-events: none;
+    outline: none !important;
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
+    }
+}
+
 .overlay-content-container {
     display: block;
     position: absolute;

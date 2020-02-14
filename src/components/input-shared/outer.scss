@@ -8,6 +8,11 @@ input-select {
     vertical-align: top;
     position: relative;
     color: inherit;
+    transition: opacity 0.2s;
+
+    &[ready="true"] {
+        opacity: 1;
+    }
 
     .input-field-input {
         background: rgba(255, 255, 255, .4);

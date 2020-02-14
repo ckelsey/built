@@ -7,25 +7,26 @@ import popStateListener from './pop-state-listener.js'
 import getRoute from './get-route.js'
 import handleRoute from './handle-route.js'
 import UpdateState from './update-state.js'
+import { ObjectAssign } from '../../utils/object-assign.js'
 
 function getBaseUrl() {
     return ''.concat(location.protocol, '//', location.host, location.port ? ':' + location.port : '')
 }
 
 export function Router(routes) {
-    const _routes = Object.assign({}, routes)
+    const _routes = ObjectAssign({}, routes)
     const getRouteByPath = GetRouteByPath(_routes)
 
     // internal state
     let lastState = {}
-    let current = Object.assign({}, {
+    let current = ObjectAssign({}, {
         path: location.pathname,
         query: getQuery(location.search),
         base: getBaseUrl()
     }, getRouteByPath(location.pathname))
 
     const initialPath = ''.concat(location.pathname, location.search)
-    const initialRoute = Object.assign({}, getRoute(_routes, initialPath), current)
+    const initialRoute = ObjectAssign({}, getRoute(_routes, initialPath), current)
 
     const methods = {
         getRouteByPath: getRouteByPath,
@@ -40,19 +41,19 @@ export function Router(routes) {
 
         updateQuery: function (query) {
             if (!methods.current) { return }
-            methods.current = Object.assign({}, methods.current, { query: query })
+            methods.current = ObjectAssign({}, methods.current, { query: query })
             UpdateState(methods)
         },
 
         addQuery: function (query) {
             if (!methods.current) { return }
-            methods.current = Object.assign({}, methods.current, { query: Object.assign({}, methods.current.query, query) })
+            methods.current = ObjectAssign({}, methods.current, { query: ObjectAssign({}, methods.current.query, query) })
             UpdateState(methods)
         },
 
         replaceQuery: function (query) {
             if (!methods.current) { return }
-            methods.current = Object.assign({}, methods.current)
+            methods.current = ObjectAssign({}, methods.current)
             methods.current.query = query
             UpdateState(methods, true)
         },
@@ -81,7 +82,7 @@ export function Router(routes) {
     Object.defineProperties(methods, {
         current: {
             get: function () {
-                return Object.assign(
+                return ObjectAssign(
                     {},
                     current || {},
                     {

@@ -2,6 +2,7 @@ import { IndexOf, CommasToArray, IfNot, Pipe, IfInvalid, ToNumber, ToBool, ToObj
 import { setInput, setInputID, setInputAttribute, setLabel, setDefaultLabelPosition } from './methods-elements'
 import { setDroppable } from './methods-events'
 import { labelPositions, resizeOptions } from '../input-shared/definitions.js'
+import { ObjectAssign } from '../../utils/object-assign'
 
 const setColors = (host, invalid) => {
     const color = invalid ? host.warningcolor : host.accentcolor
@@ -245,7 +246,7 @@ export const observedAttributes = Object.keys(inputAttributes)
         Object.keys(inputStates)
     )
 
-export const properties = Object.assign(
+export const properties = ObjectAssign(
     {},
     inputAttributes,
     inputFieldProperties,

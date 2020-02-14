@@ -1,3 +1,37 @@
+- disconnectElements in onDisconnected
+- remake components to be class/object
+
+- collapse-menu
+- cookie-message
+- effect-bounce-z
+- effect-fade
+- effect-ripple
+- effect-scale
+- effect-underline
+- horizontal-slider
+- image-loader
+- overlay-content
+- overlay-message
+- progress-bar
+- tool-tip
+- input-file
+- input-array
+- input-slider
+- input-bool
+    - radio
+    - toggle
+
+- inputs performance
+    - reduce markup
+    - benchmark slowest functions on init
+
+- overlay-content performance, clean up
+
+- move initial opacity styles to loader.js
+
+- combine components and componentStore
+
+
 - phone input show error on invalid chars
 
 - ajax form on load input widths

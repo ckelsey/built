@@ -1,10 +1,10 @@
-import { Pipe } from './pipe.js'
-import { CommasToArray } from './commas-to-array.js'
-import { IfInvalid } from './if-invalid.js'
-import { ToString } from './to-string.js'
-import { ToSplit } from './to-split.js'
-import { ToMap } from './to-map.js'
-import { ToFilter } from './to-filter.js'
+import { Pipe } from '../utils/pipe.js'
+import { CommasToArray } from '../utils/commas-to-array.js'
+import { IfInvalid } from '../utils/if-invalid.js'
+import { ToString } from '../utils/to-string.js'
+import { ToSplit } from '../utils/to-split.js'
+import { ToMap } from '../utils/to-map.js'
+import { ToFilter } from '../utils/to-filter.js'
 
 function trim(el) {
     return el.trim()
@@ -59,7 +59,7 @@ function wcClass(el, newClasses, previousClasses) {
 }
 
 
-export const ComponentClassObject = {
+export const ComponentClassProperty = {
     format: function (val) {
         return Pipe(ToString, IfInvalid(''), ToSplit(' '), ToMap(trim), ToFilter(is))(val).value
     },

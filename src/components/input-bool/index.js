@@ -14,8 +14,8 @@ import { WhenAvailable } from '../../utils/when-available.js'
 import { Pipe } from '../../utils/pipe.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { IfInvalid } from '../../utils/if-invalid.js'
+import { ObjectAssign } from '../../utils/object-assign.js'
 
-const outerStyle = require('../input-shared/outer.scss').toString()
 const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = 'input-bool'
@@ -29,7 +29,7 @@ const elements = {
     root: { selector: '.input-field-container' },
 }
 
-const inputProperties = Object.assign({}, properties, {
+const inputProperties = ObjectAssign({}, properties, {
     showicon: {
         format: function (val) {
             return Pipe(ToBool, IfInvalid(true))(val).value
@@ -49,7 +49,6 @@ const InputBool = ComponentConstructor({
     componentRoot: componentRoot,
     template: template,
     style: style,
-    outerStyle: outerStyle,
     observedAttributes: Object.keys(inputProperties),
     properties: inputProperties,
     elements: elements,

@@ -23,8 +23,8 @@ import { valueFormat } from './value-format.js'
 import { ToBool } from '../../utils/to-bool.js'
 import { DispatchEvent } from '../../utils/dispatch-event.js'
 import { ToNumber } from '../../utils/to-number.js'
+import { ObjectAssign } from '../../utils/object-assign.js'
 
-const outerStyle = require('../input-shared/outer.scss').toString()
 const style = require('./style.scss').toString()
 const template = require('./index.html')
 const componentName = 'input-field'
@@ -65,7 +65,7 @@ function postProcessValue(host) {
     }
 }
 
-const properties = Object.assign({}, Properties, {
+const properties = ObjectAssign({}, Properties, {
     pattern: {
         format: function (val) { return Pipe(ToString, IfInvalid(null))(val).value },
         onChange: function (val, host) {
@@ -149,7 +149,6 @@ const InputField = ComponentConstructor({
     componentRoot: componentRoot,
     template: template,
     style: style,
-    outerStyle: outerStyle,
     properties: properties,
     observedAttributes: Object.keys(properties),
     elements: elements,
