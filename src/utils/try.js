@@ -1,7 +1,12 @@
-export function Try(fn) {
-    return function TryInner() {
+export default function Try(fn, elseFn = () => { }) {
+    try {
+        return fn()
+    } catch (error) {
         try {
-            return fn.apply(null, arguments)
-        } catch (error) { }
+            return fn.apply(null)
+        } catch (error) {
+            if (typeof elseFn !== 'function') { return elseFn }
+            return elseFn()
+        }
     }
 }

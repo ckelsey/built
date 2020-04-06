@@ -73,9 +73,8 @@ export const properties = {
         format: trueOrNull,
         onChange: function (val, host) {
             addRemoveContainerClass(val, host, 'focused')
-            host.setAttribute('focused', val ? val : 'false')
+            host.classList[val ? 'add' : 'remove']('isfocused')
             host.processValue()
-            dispatch(host, 'focus', host)
         },
     },
 

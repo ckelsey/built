@@ -1,6 +1,7 @@
 import { WhenAvailable } from '../../utils/when-available.js'
 import { IsAutoFilled } from '../../utils/is-autofilled.js'
 import { Get } from '../../utils/get.js'
+import { properties } from './properties.js'
 
 const supportsInternals = 'ElementInternals' in window && 'setFormData' in window.ElementInternals
 
@@ -15,6 +16,15 @@ export function processValue(host) {
                 const empty = stringEmpty && !autofilled
                 const valid = !host.focused && empty ? true : processed.valid
                 const badFormat = Get(host, 'validity.badFormat')
+
+                if (autofilled) {
+                    const autoFormatted = properties.value.format(host.input.value, host)
+
+                    if (autoFormatted !== sanitized) {
+                        host.value = autoFormatted
+                        return
+                    }
+                }
 
                 if (badFormat && processed.reason.length) {
                     host.setCustomValidity(processed.reason.join(', '))

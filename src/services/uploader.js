@@ -1,38 +1,27 @@
-import { ToObject } from '../utils/to-object.js'
-import { ObserveWorker } from '../utils/observe-worker.js'
-import { UseIf } from '../utils/use-if.js'
-import { ObjectAssign } from '../utils/object-assign.js'
-
-// TODO pako is not so great, minimal size savings. Is there anything else?
-// const pako = require('../lib/pako/dist/pako.min.js')
-// var reader = new FileReader();
-// reader.onload = function () {
-//     var compressed_file = pako.deflate(this.result, { level: 5 });
-//     var myBlob = new Blob([compressed_file], { type: 'application/x-gzip' })
-//     // Pass it back to the main thread
-// }
-// reader.readAsArrayBuffer(fileObject)
+import { ObserveWorker } from '../utils/observe-worker'
 
 // TODO API get urls
-// TODO API save to disc
 // TODO API stitch
-// TODO check is there has been progress already, resume
-
-// TODO pre upload chunk function?
-// TODO pre upload function?
+// TODO resume
 
 function emptyFn() { }
 
-export function UploadService(options, file) {
+function parse(data) {
+    let result = data
+    try { result = JSON.parse(data) } catch (error) { }
+    return result
+}
 
-    if (!file) {
-        return {
-            upload: function () { },
-            cancel: function () { }
-        }
+export default function Uploader(options, file) {
+    const methods = {}
+
+    const rejectedUpload = (status, error) => {
+        methods.cancel = () => { }
+        methods.upload = () => Promise.reject({ error, status })
+        return methods
     }
 
-    const Options = ObjectAssign({}, {
+    const Options = Object.assign({}, {
         progressCB: emptyFn,
         completeCB: emptyFn,
         errorCB: emptyFn,
@@ -45,7 +34,13 @@ export function UploadService(options, file) {
     }, options)
 
     function getFile() {
-        return file[0] ? file[0] : file
+        if (file instanceof Blob || file instanceof File) {
+            return file
+        }
+
+        if (file instanceof FileList) {
+            return file[0]
+        }
     }
 
     function getTotal(file, bytesPerChunk) {
@@ -55,19 +50,53 @@ export function UploadService(options, file) {
     const uploadMessages = []
     const completedChunks = []
     const fileObject = getFile()
-    const size = fileObject.size
-    const total = getTotal(fileObject, Options.bytesPerChunk)
-    const uploadData = ObjectAssign({},
+    const size = fileObject ? fileObject.size : 0
+    const total = fileObject ? getTotal(fileObject, Options.bytesPerChunk) : 0
+    const uploadData = Object.assign({},
         Options,
         { size: size, total: total, fileObject: fileObject }
     )
 
+    /** TEMP */
+    // uploadData.total = 5
+    // uploadData.size = uploadData.total * uploadData.bytesPerChunk
+    // uploadData.fileObject = 'hey'
+    // uploadData.url = 'hey'
+    /** END TEMP */
+
     let stop = false
     let chunkIndex = 0
 
+    Object.defineProperty(methods, 'currentChunk', {
+        get: function () {
+            return chunkIndex
+        }
+    })
+
+    Object.defineProperty(methods, 'data', {
+        get: function () {
+            return uploadData
+        }
+    })
+
+    if (!uploadData.fileObject || !uploadData.size || !uploadData.total) {
+        uploadData.errorCB('invalid file')
+        return rejectedUpload(-1, 'Invalid file')
+    }
+
+    if (!uploadData.url) {
+        uploadData.errorCB('Invalid upload url')
+        return rejectedUpload(-1, 'Invalid upload url')
+    }
+
     const worker$ = ObserveWorker(function workerFunction() {
         self.onmessage = function (e) {
-            const data = JSON.parse(e.data)
+            let data = e.data
+
+            try {
+                data = JSON.parse(e.data)
+            } catch (error) { }
+
             const x = new XMLHttpRequest()
 
             x.open(data.method, data.url, true)
@@ -80,11 +109,17 @@ export function UploadService(options, file) {
             Object.keys(data.headers).forEach(headersEach)
 
             x.onloadend = function () {
-                self.postMessage(JSON.stringify({
-                    response: x.response,
-                    statusText: x.statusText,
-                    status: x.status
-                }))
+                let response = ''
+
+                try {
+                    response = JSON.stringify({
+                        response: x.response,
+                        statusText: x.statusText,
+                        status: x.status
+                    })
+                } catch (error) { }
+
+                self.postMessage(response)
             }
 
             x.send(data.data)
@@ -92,22 +127,17 @@ export function UploadService(options, file) {
     })
 
     function setProgress() {
+        const currentProgress = uploadData.total == 1 ?
+            1 :
+            !completedChunks.length ?
+                0 :
+                Math.ceil((completedChunks.length / uploadData.total) * 100) / 100
 
-        return Options.progressCB(
-            UseIf(
-                function progValid(p) { return p <= 1 },
-                function elseNot() { return 1 },
-                uploadData.total === 1
-                    ? 1
-                    : !completedChunks.length
-                        ? 0
-                        : Math.ceil((completedChunks.length / uploadData.total) * 100) / 100
-            ).value
-        )
+        return uploadData.progressCB(currentProgress <= 1 ? currentProgress : 1)
     }
 
     function getHeaders(index, chunkSize, fileSize) {
-        return ObjectAssign({}, {
+        return Object.assign({}, {
             'Content-Type': 'application/octet-stream',
             'X-Chunk-Id': index,
             'X-Chunk-Length': chunkSize,
@@ -120,7 +150,7 @@ export function UploadService(options, file) {
     }
 
     function getChunk(index) {
-        return uploadData.total === 1 ?
+        return uploadData.total == 1 ?
             uploadData.fileObject :
             uploadData.fileObject.slice(index * uploadData.bytesPerChunk, (index + 1) * uploadData.bytesPerChunk)
     }
@@ -137,12 +167,11 @@ export function UploadService(options, file) {
     }
 
     function onChunkUploaded(e) {
-        // If no event, reject
-        if (!e) { return Promise.reject() }
+        if (!e) { return Promise.reject({ status: 500, error: 'An error occured during upload, please try again' }) }
 
-        const data = ToObject(e).value
+        const data = parse(e)
 
-        if (data.status !== 200) { return Promise.reject(data.statusText) }
+        if (data.status !== 200) { return Promise.reject({ status: data.status, error: 'An error occured during upload, please try again' }) }
 
         completedChunks.push(chunkIndex)
         uploadMessages.push({ chunk: chunkIndex, data: data })
@@ -163,16 +192,15 @@ export function UploadService(options, file) {
     }
 
     function onChunkUploadedAsync(index, e) {
-        if (!e) { return Promise.reject() }
+        if (!e) { return Promise.reject({ status: 500, error: 'An error occured during upload, please try again' }) }
 
-        const data = ToObject(e).value
+        const data = parse(e)
 
-        if (data.status !== 200) { return Promise.reject(data.statusText) }
+        if (data.status !== 200) { return Promise.reject({ status: data.status, error: 'An error occured during upload, please try again' }) }
 
         completedChunks.push(index)
         uploadMessages.push({ chunk: index, data: data })
 
-        // update progress
         setProgress()
 
         return Promise.resolve()
@@ -181,9 +209,11 @@ export function UploadService(options, file) {
     function uploadChunk(index) {
         return new Promise(
             function uploadChunkPromise(resolve, reject) {
-                if (stop) { return reject('upload was canceled') }
+                if (stop) { return reject({ status: 1000, error: 'Upload was canceled' }) }
 
-                return worker$.post(populateData(index))
+                const toSend = populateData(index)
+
+                return worker$.post(toSend)
                     .then(onChunkUploaded)
                     .then(resolve)
                     .catch(reject)
@@ -194,9 +224,11 @@ export function UploadService(options, file) {
     function uploadChunkAsync(index) {
         return new Promise(
             function uploadChunkAsyncPromise(resolve, reject) {
-                if (stop) { return reject('upload was canceled') }
+                if (stop) { return reject({ status: 1000, error: 'Upload was canceled' }) }
 
-                return worker$.post(populateData(index))
+                const toSend = populateData(index)
+
+                return worker$.post(toSend)
                     .then(function populateDataResult(res) {
                         return onChunkUploadedAsync(index, res)
                     })
@@ -206,61 +238,73 @@ export function UploadService(options, file) {
         )
     }
 
-    const methods = {
-        cancel: function () { stop = true },
-
-        upload: function () {
-            if (!uploadData.size || !uploadData.total) {
-                worker$.dispose()
-                return Options.errorCB('invalid file')
-            }
-
-            if (!uploadData.url) {
-                worker$.dispose()
-                return Options.errorCB('invalid upload url')
-            }
-
-            if (stop) {
-                worker$.dispose()
-                return Options.errorCB('upload stopped')
-            }
-
-            if (!uploadData.parallel) {
-                return uploadChunk(chunkIndex)
-                    .then(Options.completeCB)
-                    .catch(Options.errorCB)
-            }
-
-            const chunkArray = []
-            let index = 0
-
-            while (index < uploadData.total) {
-                chunkArray.push(index)
-                index = index + 1
-            }
-
-            function chunkMapper(c) {
-                return uploadChunkAsync(c)
-            }
-
-            function chunkMapAfter() {
-                return Options.completeCB(uploadMessages)
-            }
-
-            return Promise.all(chunkArray.map(chunkMapper))
-                .then(chunkMapAfter)
-                .catch(Options.errorCB)
-
+    function upload() {
+        if (stop) {
+            worker$.dispose()
+            uploadData.errorCB('Upload was canceled')
+            return Promise.reject({ status: 1000, error: 'Upload was canceled' })
         }
+
+        uploadData.progressCB(0)
+
+        if (!uploadData.parallel) {
+            return uploadChunk(chunkIndex)
+                .then(res => uploadData.completeCB(res))
+                .catch(res => uploadData.errorCB(res))
+        }
+
+        const chunkArray = []
+        let index = 0
+
+        while (index < uploadData.total) {
+            chunkArray.push(index)
+            index = index + 1
+        }
+
+        return Promise.all(chunkArray.map(c => uploadChunkAsync(c)))
+            .then(uploadMessages => uploadData.completeCB(uploadMessages))
+            .catch(res => uploadData.errorCB(res))
     }
 
-    Object.defineProperty(methods, 'currentChunk', {
-        get: function () {
-            return chunkIndex
-        }
-    })
+    methods.cancel = () => stop = true
+    methods.upload = upload
+
+    // function fakeUpload(totalModifier) {
+    //     return new Promise((resolve, reject) => {
+    //         uploadData.progressCB(0)
+
+    //         let i = 0
+    //         const run = () => {
+    //             if (stop) {
+    //                 uploadData.errorCB('Upload was canceled')
+    //                 return reject({ status: 1000, error: 'Upload was canceled' })
+    //             }
+
+    //             if (i == (uploadData.total + (totalModifier || 0))) {
+    //                 uploadData.completeCB('fakeUpload done')
+    //                 return resolve('fakeUpload done')
+    //             }
+
+    //             i = i + 1
+
+    //             uploadData.progressCB(Math.round((i / uploadData.total) * 100))
+
+    //             setTimeout(run, 1234)
+    //         }
+
+    //         run()
+    //     })
+    // }
+    // methods.upload = fakeUpload
+
+    // function fakeUploadThenError() {
+    //     return new Promise((_resolve, reject) => {
+    //         return fakeUpload(-2)
+    //             .then(() => { throw new Error() })
+    //             .catch(() => reject({ status: 500, error: 'Oops, aww shucks' }))
+    //     })
+    // }
+    // methods.upload = fakeUploadThenError
 
     return methods
 }
-
-window.UploadService = UploadService

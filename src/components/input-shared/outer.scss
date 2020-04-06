@@ -141,13 +141,13 @@ input-select {
 
 
     &[has-value="true"] label.input-field-inside-label,
-    &[focused="true"] label.input-field-inside-label,
+    &.isfocused label.input-field-inside-label,
     &[icon][has-value="true"][iconalign="left"] label.input-field-inside-label,
     &[icon][has-value="true"][iconalign="right"] label.input-field-inside-label,
-    &[icon][focused="true"][iconalign="left"] label.input-field-inside-label,
-    &[icon][focused="true"][iconalign="right"] label.input-field-inside-label,
+    &[icon].isfocused[iconalign="left"] label.input-field-inside-label,
+    &[icon].isfocused[iconalign="right"] label.input-field-inside-label,
     &[icon][has-value="true"][clearbutton] label.input-field-inside-label,
-    &[icon][focused="true"][clearbutton] label.input-field-inside-label {
+    &[icon].isfocused[clearbutton] label.input-field-inside-label {
         pointer-events: all;
         padding: 0;
         font-weight: bold;
@@ -157,7 +157,7 @@ input-select {
         max-width: 100%;
     }
 
-    &:not([focused="true"]) {
+    &:not(.isfocused) {
         transform-style: preserve-3d;
 
         .input-field-label-inside {
